@@ -1,6 +1,8 @@
 dnl We don't like the # comments
 m4_changecom()
 
+m4_define([_VERSION], [0.1])
+
 m4_define([m4_list_declare], [m4_do(
 	[m4_define([$1_GET], [m4_expand([m4_list_nth([$1], $][1)])])],
 	[m4_define([$1_FOREACH], [m4_foreach([item], [m4_expand([m4_list_contents([$1])])], $][1)])],
@@ -9,8 +11,8 @@ m4_define([m4_list_declare], [m4_do(
 m4_define([m4_list_add], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_ifndef(_LIST_NAME, 
-		[m4_define(_LIST_NAME, m4_dquote([[$2]]))],
-		[m4_define(_LIST_NAME, m4_dquote(m4_expand(_LIST_NAME),[[$2]]))],
+		[m4_define(_LIST_NAME, m4_dquote(m4_escape([$2])))],
+		[m4_define(_LIST_NAME, m4_dquote(m4_expand(_LIST_NAME), m4_escape([$2])))],
 	)],
 	[m4_popdef([_LIST_NAME])],
 )])
@@ -56,33 +58,41 @@ dnl To be able to use _POSITIONALS_FOREACH
 m4_list_declare([_POSITIONALS])
 
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
+	[[$0($@)]],
 	[m4_list_add([_POSITIONALS], [$1])],
 	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
 	[m4_define([_POSITIONALS], m4_eval(_POSITIONALS + 1))],
 )])
 
 m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
+	[[$0($@)]],
 	[_some_opt([$1], [$2], [$3], [$4], [arg])],
 )])
 
 dnl
 dnl $1 The function to call to get the version
 m4_define([ARG_VERSION], [m4_do(
-	[ARG_OPTIONAL_ACTION(
+	[dnl Just record how have we called ourselves
+],
+	[[$0($@)]],
+	[dnl The function with underscore doesn't record what we have just recorded
+],
+	_ARG_OPTIONAL_ACTION(
 		[version],
 		[v],
 		[Prints version],
 		[$1],
-	)],
+	),
 )])
 
 m4_define([ARG_HELP], [m4_do(
-	[ARG_OPTIONAL_ACTION(
+	[[$0]],
+	_ARG_OPTIONAL_ACTION(
 		[help],
 		[h],
 		[Prints help],
 		[print_help],
-	)],
+	),
 )])
 
 dnl $1 = long name, var suffix (translit of [-] -> _)
@@ -90,13 +100,21 @@ dnl $2 = short name (opt)
 dnl $3 = help
 dnl $4 = default (=off)
 m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
+	[[$0($@)]],
 	[_some_opt([$1], [$2], [$3], 
 		m4_ifnblank([$4], [$4], [off]), [bool])],
 )])
 
+m4_define([_ARG_OPTIONAL_ACTION_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), m4_quote($]][[4), [action])]])
+
 m4_define([ARG_OPTIONAL_ACTION], [m4_do(
-	[_some_opt([$1], [$2], [$3], [$4], [action])],
+	[[$0($@)]],
+	[dnl Just call _ARG_OPTIONAL_ACTION with same args
+],
+	]m4_dquote(_ARG_OPTIONAL_ACTION_BODY)[,
 )])
+
+m4_define([_ARG_OPTIONAL_ACTION], _ARG_OPTIONAL_ACTION_BODY)
 
 
 m4_define([_MAKE_HELP], [m4_do(
@@ -171,7 +189,7 @@ do],
 			shift],
 			[bool], _ARGVAR[="on"
 			test "$[]{1:0,5}" = "--no-" && ]_ARGVAR[="off"],
-			[action], m4_list_nth([_ARGS_DEFAULT], idx)[
+			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
 			exit 0],
 		)],
 		[
@@ -192,8 +210,8 @@ done]],
 	[dnl Now we look what positional args we got and we say if they were too little or too many. We also do the assignment to variables using eval.
 ],
 	[[POSITIONAL_NAMES=(]_POSITIONALS_FOREACH([['_varname(item)' ]])[)
-test ${#POSITIONALS[@]} -lt ]_POSITIONALS[ && { echo "Not enough positional arguments." &1>2; print_help; exit 1; }
-test ${#POSITIONALS[@]} -gt ]_POSITIONALS[ && { echo "There were spurious positional arguments." &1>2; print_help; exit 1; }
+test ${#POSITIONALS[@]} -lt ]_POSITIONALS[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) 2>&1; exit 1; }
+test ${#POSITIONALS[@]} -gt ]_POSITIONALS[ && { ( echo "FATAL ERROR: There were spurious positional arguments."; print_help ) 2>&1; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=${POSITIONALS[$ii]}"
@@ -211,3 +229,5 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 		[m4_popdef([_ARGVAR])],
 	)])],
 )])
+
+m4_define([ARGBASH_VERSION], [])

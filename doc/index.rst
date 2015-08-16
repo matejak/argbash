@@ -107,8 +107,60 @@ The argument name is transliterated like this:
 #. Dashes are transliterated to underscores (``-`` --> ``_``)
 #. ``_ARG_`` is prepended to the string.
 
-So given that you have an argument ``--input-file`` that expects a value, you can access it via BASH variable ``_ARG_INPUT_FILE``.
-Boolean arguments have values either ``on`` or ``off``.
+   So given that you have an argument ``--input-file`` that expects a value, you can access it via BASH variable ``_ARG_INPUT_FILE``.
+#. Boolean arguments have values either ``on`` or ``off``.
+
+   If (a boolean argument) ``--verbose`` is passed, value of ``_ARG_VERBOSE`` is set to ``on``.
+
+Usage
+-----
+
+Separate file for parsing
+-------------------------
+
+This is really easy.
+Just place the directives in the file behind comments and then run the ``genparse.sh`` with the ``--standalone`` argument.
+
+Parsing code and script body together
+-------------------------------------
+
+This requires some trivial adjustments to your script.
+
+#. Add Argbash definitions to the script so they come before the script body.
+   Let's say that the file is called ``my-template.m4s`` (``m4s`` stands for ``m4sugar``).
+   
+   .. note::
+
+      This one is just a recommendation, but don't do othewise if you don't have deep understanding of what's going on.
+
+#. Add this comment before the script body (it is a commented opening square bracket, the note is optional):
+
+   ::
+
+      # [ note: <--- this has to be here because of Argbash
+
+   and another one (closing square bracket):
+
+   ::
+
+      # ] note: <--- this has to be here because of Argbash
+
+#. Run the ``genparse.sh`` over the script:
+
+   ::
+    
+      bin/genparse.sh my-template.m4sh -o my-script.sh
+
+Then, if you do some script development and you decide to add an option or remove one:
+
+4. Forget about the template, edit the script --- declarations are preserved in there.
+   Obtain the updated version by re-running ``genparse.sh`` over ``my-script.sh``:
+
+   ::
+    
+      bin/genparse.sh my-script.sh -o my-script-new.sh
+
+   If you compare the two, you should find out that it works quite well and that the ``my-script-new.sh`` does what it is supposed to do and that it is by no means cluttered.
 
 Limitations
 -----------
@@ -118,7 +170,10 @@ Limitations
   Please read this carefuly.
 
 #. The delimiter between optional argument name and value is whitespace, ``=`` is not supported.
-#. If there is an argument that expects a value to be passed, if there is no value, no error is raised.
+#. If there is an argument that expects a value to be passed, and there is no value, no error is raised.
+#. Clustering of short arguments (e.g. using ``-xzf`` instead of ``-x -z -f``) is not supported.
+#. The square brackets in your script have to match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``)
+   This limitation does not apply if you have the argument sampling code in a separate file.
 
 Requirements
 ------------

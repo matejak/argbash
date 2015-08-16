@@ -4,6 +4,7 @@ VERSION=0.1
 
 # ARG_POSITIONAL_SINGLE([input])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
+# ARG_OPTIONAL_BOOLEAN([standalone],, [Whether the parsing code is in a standalone file.])
 # ARG_VERSION([echo "$0 v$VERSION"])
 # ARG_HELP
 
@@ -15,15 +16,18 @@ VERSION=0.1
 BINDIR="$(cd "$(dirname ${BASH_SOURCE[0]})" && pwd)"
 M4DIR="$BINDIR/../src"
 
+OUTPUT_M4="$M4DIR/output.m4"
+test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
+
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 $M4DIR/output.m4 "$_ARG_INPUT" | autom4te -l m4sugar
+	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$_ARG_INPUT" | autom4te -l m4sugar | grep -v '^#mark#\s*$'
 }
 
 test -f "$_ARG_INPUT" || { echo "'$_ARG_INPUT' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
-autom4te --version > /dev/null 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." }
+autom4te --version > /dev/null 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
 
 if test "$OUTFILE" = '-'
 then
