@@ -7,5 +7,5 @@ m4_define([ARGBASH],
 _MAKE_DEFAULTS
 _MAKE_HELP
 _MAKE_EVAL
-[@:>@)]])
+#mark# [@:>@)dnl]])
 m4_divert_push([STDOUT])dnl

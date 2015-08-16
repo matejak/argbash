@@ -23,6 +23,8 @@ Following arguments are supported:
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
+*Read [the docs](doc/index.rst) for more info*
+
 ## Requirements
 
  - `BASH` that can work with arrays (most likely `bash >= 3.0`)

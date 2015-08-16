@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([filename])
@@ -60,4 +59,4 @@ for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=${POSITIONALS[$ii]}"
 done
-])
+#mark# ])dnl
