@@ -5,21 +5,21 @@ m4_define([_VERSION], [0.1])
 
 m4_define([m4_list_declare], [m4_do(
 	[m4_define([$1_GET], [m4_expand([m4_list_nth([$1], $][1)])])],
-	[m4_define([$1_FOREACH], [m4_foreach([item], [m4_expand([m4_list_contents([$1])])], $][1)])],
+	[m4_define([$1_FOREACH], [m4_foreach([item], [m4_dquote_elt(m4_list_contents([$1]))], m4_quote($][1))])],
 )])
 
 m4_define([m4_list_add], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_ifndef(_LIST_NAME, 
+	[m4_ifndef(_LIST_NAME,
 		[m4_define(_LIST_NAME, m4_dquote(m4_escape([$2])))],
-		[m4_define(_LIST_NAME, m4_dquote(m4_expand(_LIST_NAME), m4_escape([$2])))],
+		[m4_define(_LIST_NAME, m4_dquote(m4_list_contents([$1]), m4_escape([$2])))],
 	)],
 	[m4_popdef([_LIST_NAME])],
 )])
 
 m4_define([m4_list_contents], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_ifndef(_LIST_NAME, [], m4_expand(_LIST_NAME))],
+	[m4_ifndef(_LIST_NAME, [], m4_quote(_LIST_NAME))],
 	[m4_popdef([_LIST_NAME])],
 )])
 
@@ -36,14 +36,14 @@ dnl $4: Default (opt)
 dnl $5: Type
 m4_define([_some_opt], [m4_do(
 	[m4_list_add([_ARGS_LONG], [$1])],
-	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones 
+	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
 ],
-	[m4_set_contains(_translit([_ARGS_LONG]),  [$1], 
-		[m4_ifnblank([$1], [m4_fatal([The long option '$1' is already used.])])],  
+	[m4_set_contains(_translit([_ARGS_LONG]),  [$1],
+		[m4_ifnblank([$1], [m4_fatal([The long option '$1' is already used.])])],
 		[m4_set_add(_translit([_ARGS_LONG]), [$1])])],
 	[m4_list_add([_ARGS_SHORT], [$2])],
-	[m4_set_contains([_ARGS_SHORT], [$2], 
-		[m4_ifnblank([$2], [m4_fatal([The short option '$2' is already used.])])], 
+	[m4_set_contains([_ARGS_SHORT], [$2],
+		[m4_ifnblank([$2], [m4_fatal([The short option '$2' is already used.])])],
 		[m4_set_add([_ARGS_SHORT], [$2])])],
 	[m4_list_add([_ARGS_HELP], [$3])],
 	[m4_list_add([_ARGS_DEFAULT], [$4])],
@@ -101,7 +101,7 @@ dnl $3 = help
 dnl $4 = default (=off)
 m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
 	[[$0($@)]],
-	[_some_opt([$1], [$2], [$3], 
+	[_some_opt([$1], [$2], [$3],
 		m4_ifnblank([$4], [$4], [off]), [bool])],
 )])
 
@@ -130,7 +130,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[ @<:@--],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), 
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[bool], [(no-)]m4_list_nth([_ARGS_LONG], idx),
 			[arg], m4_list_nth([_ARGS_LONG], idx)[ <arg>],
 			[m4_list_nth([_ARGS_LONG], idx)])],
@@ -178,14 +178,15 @@ do],
 		[m4_ifblank(m4_list_nth([_ARGS_SHORT], idx), [], [-m4_list_nth([_ARGS_SHORT], idx)|])],
 		[--m4_list_nth([_ARGS_LONG], idx)],
 		[@:}@
-			], 
+			],
 		[dnl: TODO: Below is a problem with quoting
 ],
 		[dnl Output the body of the case
 ],
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), 
-			[arg], _ARGVAR[="$[]2"
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[arg], [test $[]# -lt 2 && echo "Missing value for the positional argument."]
+			_ARGVAR[="$[]2"
 			shift],
 			[bool], _ARGVAR[="on"
 			test "$[]{1:0,5}" = "--no-" && ]_ARGVAR[="off"],
@@ -223,9 +224,10 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 ],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [action], [], m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)]))],
-		[
-],
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[action], [],
+			m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)
+]))],
 		[m4_popdef([_ARGVAR])],
 	)])],
 )])

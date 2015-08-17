@@ -11,7 +11,7 @@ It lets you to describe arguments your script should take and then, you can gene
 `argbash` is very simple to use and the generated code is also rather nice to read (at if you don't have allergy to tabs).
 Moreover, argument definitions stay embedded in the script, so when you need to update the parsing logic, you just re-run `argbash` on the already generated script.
 
-So by writing few comments to your script and running the Argbash's `bin/genparse.sh` over it, you will get a BASH script with argument parsing.
+So by writing few comments to your script and running the Argbash's `bin/argbash.sh` over it, you will get a BASH script with argument parsing.
 See the `resources/examples/simple.m4s` for source and `resources/examples/simple.sh` for the result.
 
 Following arguments are supported:
@@ -23,7 +23,7 @@ Following arguments are supported:
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
-*Read [the docs](doc/index.rst) for more info*
+**Read [the docs](doc/index.rst) for more info**
 
 ## Requirements
 

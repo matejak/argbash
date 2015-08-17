@@ -1,6 +1,18 @@
 Quickstart
 ==========
 
+Installation etc.
+-----------------
+
+Go to the ``resources`` folder.
+There is a ``Makefile``.
+
+* ``make examples`` compiles examples from ``.m4s`` files to ``.sh`` files in the ``examples`` folder.
+* ``make check`` runs the tests.
+* ``make install [PREFIX=foo]`` runs the installation into the prefix you can specify (default is ``$(HOME)/.local``).
+  This will install the ``argbash`` script (notice the missing ``.sh`` extension) into ``$PREFIX/bin`` (and some support files into ``$PREFIX/lib/argbash``).
+* ``make uninstall [PREFIX=foo]`` inverse of the above.
+
 Declaring arguments
 -------------------
 
@@ -39,7 +51,7 @@ Then, run the following command to your file:
 
 ::
   
-  bin/genparse.sh myfile.m4s -o myfile.sh
+  bin/argbash.sh myfile.m4s -o myfile.sh
 
 to either get a script that should work, or a file that you include in your script.
 
@@ -119,7 +131,7 @@ Separate file for parsing
 -------------------------
 
 This is really easy.
-Just place the directives in the file behind comments and then run the ``genparse.sh`` with the ``--standalone`` argument.
+Just place the directives in the file behind comments and then run the ``argbash.sh`` with the ``--standalone`` argument.
 
 Parsing code and script body together
 -------------------------------------
@@ -145,20 +157,20 @@ This requires some trivial adjustments to your script.
 
       # ] note: <--- this has to be here because of Argbash
 
-#. Run the ``genparse.sh`` over the script:
+#. Run the ``argbash.sh`` over the script:
 
    ::
     
-      bin/genparse.sh my-template.m4sh -o my-script.sh
+      bin/argbash.sh my-template.m4sh -o my-script.sh
 
 Then, if you do some script development and you decide to add an option or remove one:
 
 4. Forget about the template, edit the script --- declarations are preserved in there.
-   Obtain the updated version by re-running ``genparse.sh`` over ``my-script.sh``:
+   Obtain the updated version by re-running ``argbash.sh`` over ``my-script.sh``:
 
    ::
     
-      bin/genparse.sh my-script.sh -o my-script-new.sh
+      bin/argbash.sh my-script.sh -o my-script-new.sh
 
    If you compare the two, you should find out that it works quite well and that the ``my-script-new.sh`` does what it is supposed to do and that it is by no means cluttered.
 

@@ -5,7 +5,9 @@ M4_SRC = \
 	../src/stuff.m4 \
 	$(NUL)
 
-GENPARSE = ../bin/genparse.sh
+PREFIX = $(HOME)/.local
+
+GENPARSE = ../bin/argbash.sh
 EXAMPLES = \
 	examples/simple.sh \
 	examples/simple-standalone.sh \
@@ -26,7 +28,25 @@ EXAMPLES = \
 %3.sh: %2.sh $(GENPARSE)
 	$(GENPARSE) $< -o $@
 
-$(GENPARSE): bin/genparse.m4s $(M4_SRC)
-	$(GENPARSE) $< -o $@
+$(GENPARSE): bin/argbash.m4s $(M4_SRC)
+	bash $(GENPARSE) $< -o $@
 
 examples: $(EXAMPLES)
+
+check:
+	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
+
+install: $(GENPARSE)
+	@echo Installing to prefix "'$(PREFIX)'"
+	mkdir -p "$(PREFIX)/bin"
+	touch "$(PREFIX)/bin/argbash"
+	mkdir -p "$(PREFIX)/lib/argbash"
+	touch "$(PREFIX)/lib/argbash/stuff.m4"
+	cp $(M4_SRC) "$(PREFIX)/lib/argbash/"
+	sed -e 's|M4DIR=.*|M4DIR=$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(PREFIX)/bin/argbash"
+	chmod a+x "$(PREFIX)/bin/argbash"
+
+uninstall:
+	rm "$(PREFIX)/bin/argbash"
+	rm "$(PREFIX)/lib/argbash/"*.m4
+	rmdir "$(PREFIX)/lib/argbash"

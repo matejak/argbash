@@ -9,9 +9,7 @@
 #mark# m4_ignore([
 # THE DEFAULTS INITIALIZATION
 _ARG_UNIT=b
-
 _ARG_VERBOSE=off
-
 
 # THE PRINT HELP FUNCION
 function print_help
@@ -29,6 +27,7 @@ do
 	_key="$1"
 	case "$_key" in
 		-u|--unit)
+			test $# -lt 2 && echo "Missing value for the positional argument."
 			_ARG_UNIT="$2"
 			shift
 			;;
