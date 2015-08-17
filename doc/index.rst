@@ -21,8 +21,8 @@ Definitions
 
 There are two types of arguments:
 
- * Positional
- * Optional
+* Positional
+* Optional
 
 Take an example:
 
@@ -39,10 +39,10 @@ Your script
 You have to decide what arguments should your script support.
 Argbash lets you choose from:
 
- * Single-value positional arguments,
- * single-value optional arguments,
- * boolean optional arguments,
- * action optional arguments (i.e. the --version and --help type of comments).
+* Single-value positional arguments,
+* single-value optional arguments,
+* boolean optional arguments,
+* action optional arguments (i.e. the --version and --help type of comments).
 
 Take a look at the API and place the declarations either to your script or in a separate file.
 Let yourself be inspired by the ``resources/examples/simple.m4s`` example (you can view it using BASH syntax coloring despite the extension).
@@ -64,36 +64,36 @@ In order to declare your arguments, you write macros described below.
 
 So let's get back to argument types:
 
- * Single-value positional arguments:
-   ::
+* Single-value positional arguments:
+  ::
 
      ARG_POSITIONAL_SINGLE([argument-name])
 
- * Single-value optional arguments:
-   ::
+* Single-value optional arguments:
+  ::
 
      ARG_OPTIONAL_SINGLE([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
 
- * Boolean optional arguments:
-   ::
+* Boolean optional arguments:
+  ::
 
      ARG_OPTIONAL_BOOLEAN([argument-name-long], [argument-name-short (optional)], [help message], [default (default default is 'off')])
 
- * Action optional arguments (i.e. the --version and --help type of comments):
-   ::
+* Action optional arguments (i.e. the --version and --help type of comments):
+  ::
 
      ARG_OPTIONAL_ACTION([argument-name-long], [argument-name-short (optional)], [help message], [code to execute when specified])
 
-   The scripts exits after the argument is encountered.
-   You can specify a name of a function, ``echo "$0: v0.5"`` and whatever else.
- * Help argument (a special case of an action argument):
-   ::
+  The scripts exits after the argument is encountered.
+  You can specify a name of a function, ``echo "$0: v0.5"`` and whatever else.
+* Help argument (a special case of an action argument):
+  ::
 
      ARG_HELP
 
-   There are no parameters to this macro.
- * Version argument (a special case of an action argument):
-   ::
+  There are no parameters to this macro.
+* Version argument (a special case of an action argument):
+  ::
 
      ARG_VERSION([code to execute when specified])
 
