@@ -29,12 +29,28 @@ EXAMPLES = \
 	$(GENPARSE) $< -o $@
 
 $(GENPARSE): bin/argbash.m4s $(M4_SRC)
-	bash $(GENPARSE) $< -o $@
+	bash $(GENPARSE) $< -o argbash.temp
+	mv argbash.temp $@
+
+bootstrap:
+	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4s | autom4te -l m4sugar > $(GENPARSE)
+	chmod a+x $(GENPARSE)
 
 examples: $(EXAMPLES)
 
-check:
+check: unittests regressiontests
+
+unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
+
+regressiontests: ../tests/regressiontests/test.sh ../tests/regressiontests/test2.sh
+	cd ../tests/regressiontests && make check
+
+develop:
+	@echo Installing to prefix "'$(PREFIX)'"
+	mkdir -p "$(PREFIX)/bin"
+	touch "$(PREFIX)/bin/argbash" && rm "$(PREFIX)/bin/argbash"
+	ln -s $(PWD)/$(GENPARSE) "$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE)
 	@echo Installing to prefix "'$(PREFIX)'"

@@ -7,10 +7,13 @@ Installation etc.
 Go to the ``resources`` folder.
 There is a ``Makefile``.
 
+* ``make ../bin/argbash.sh``, ``make bootstrap`` makes (or updates) the ``argbash.sh`` script (the script basically overwrites itself).
+  Use the latter if previous update broke the current ``../bin/argbash.sh`` script.
 * ``make examples`` compiles examples from ``.m4s`` files to ``.sh`` files in the ``examples`` folder.
 * ``make check`` runs the tests.
 * ``make install [PREFIX=foo]`` runs the installation into the prefix you can specify (default is ``$(HOME)/.local``).
   This will install the ``argbash`` script (notice the missing ``.sh`` extension) into ``$PREFIX/bin`` (and some support files into ``$PREFIX/lib/argbash``).
+* ``make develop [PREFIX=foo]`` is similar to ``make install``, but it installs symlink to ``bin/argbash.sh``, so any change to the file will be immediatelly reflected for everybody who uses the system-wide one.
 * ``make uninstall [PREFIX=foo]`` inverse of the above.
 
 Declaring arguments
@@ -62,7 +65,9 @@ Generally, positional arguments have a name, whereas optional arguments have lon
 Moreover, they can have defaults and help messages. 
 In order to declare your arguments, you write macros described below.
 
-So let's get back to argument types:
+So let's get back to argument types.
+Below, is a list of argument types and macros that you have to write to support those.
+Place those macros in your files as Bash comments.
 
 * Single-value positional arguments:
   ::
@@ -89,13 +94,19 @@ So let's get back to argument types:
 * Help argument (a special case of an action argument):
   ::
 
-     ARG_HELP
+     ARG_HELP([program description (optional)])
 
-  There are no parameters to this macro.
 * Version argument (a special case of an action argument):
   ::
 
      ARG_VERSION([code to execute when specified])
+
+Plus, there are convenience macros:
+
+* Add a line where the directory where the script is running is stored to a variable:
+  ::
+    
+     DEFINE_SCRIPT_DIR([variable name (optional, default is SCRIPT_DIR)])
 
 .. note::
 
@@ -107,7 +118,7 @@ So let's get back to argument types:
      ARG_OPTIONAL_BOOLEAN([verbose], , [Turn on verbose mode], )
 
 Finally, you have to express your desire to generate the parsing code, help message etc.
-You do that by specifying a macro ``ARGBASH``.
+You do that by specifying a macro ``ARGBASH_GO``.
 
 Using parsing results
 +++++++++++++++++++++
@@ -145,6 +156,17 @@ This requires some trivial adjustments to your script.
 
       This one is just a recommendation, but don't do othewise if you don't have deep understanding of what's going on.
 
+   Definitions are described in the Argbash API section, include them in a form as shell comments like this:
+
+   ::
+
+      # ARG_POSITIONAL_SINGLE([filename])
+      # ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kilobytes, M for megabytes)], b)
+      # ARG_VERSION([echo $0 v0.1])
+      # ARG_OPTIONAL_BOOLEAN(verbose)
+      # ARG_HELP
+      # ARGBASH_GO
+
 #. Add this comment before the script body (it is a commented opening square bracket, the note is optional):
 
    ::
@@ -173,6 +195,17 @@ Then, if you do some script development and you decide to add an option or remov
       bin/argbash.sh my-script.sh -o my-script-new.sh
 
    If you compare the two, you should find out that it works quite well and that the ``my-script-new.sh`` does what it is supposed to do and that it is by no means cluttered.
+
+Examples
+--------
+
+Simple
+++++++
+
+The ``simple.sh`` script prints size of a file, accepting some options.
+
+* See the `template <../resources/examples/simple.m4s>`_ and the `actual script <../resources/examples/simple.sh>`_ (one file).
+* The `template <../resources/examples/simple-standalone.m4s>`_ and the `actual script <../resources/examples/simple-standalone.sh>`_ (separate file for parsing).
 
 Limitations
 -----------
