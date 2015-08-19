@@ -73,5 +73,8 @@ uninstall:
 	$(RM) "$(PREFIX)/lib/argbash/"*.m4
 	rmdir "$(PREFIX)/lib/argbash"
 
-tag:
+version:
+	@test -n '$(VERSION)' || echo "You have to specify a version string, for example 'make VERSION=1.0.0'"
 	echo '$(VERSION)' > ../src/version
+
+release: version $(GENPARSE) examples check

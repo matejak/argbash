@@ -133,8 +133,10 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[function print_help
 {
-	]m4_ifdef([_HELP_MSG], m4_expand([[echo] "_HELP_MSG"]))[
-	echo "Usage: $[]0],
+],
+	m4_ifnblank(m4_quote(_HELP_MSG), m4_expand([[	echo] "_HELP_MSG"
+])),
+	[	echo "Usage: $[]0],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
 	[m4_set_empty([_POSITIONALS], [], [ <])m4_set_contents([_POSITIONALS], [>, <])m4_set_empty([_POSITIONALS], [], [>])],
@@ -256,5 +258,3 @@ m4_define([_MAKE_OTHER], [m4_do(
 	[_OTHER_FOREACH([item
 ])],
 )])
-
-m4_define([ARGBASH_VERSION], [])
