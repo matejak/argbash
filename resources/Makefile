@@ -74,7 +74,10 @@ uninstall:
 	rmdir "$(PREFIX)/lib/argbash"
 
 version:
-	@test -n '$(VERSION)' || echo "You have to specify a version string, for example 'make VERSION=1.0.0'"
+	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make release VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
 
 release: version $(GENPARSE) examples check
+
+tag:
+	git tag $(shell cat ../src/version) master
