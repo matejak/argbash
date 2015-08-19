@@ -3,6 +3,7 @@ M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
 	../src/stuff.m4 \
+	../src/version \
 	$(NUL)
 
 PREFIX = $(HOME)/.local
@@ -12,6 +13,8 @@ EXAMPLES = \
 	examples/simple.sh \
 	examples/simple-standalone.sh \
 	$(NUL)
+
+ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 %-standalone.sh: %-standalone.m4s $(GENPARSE)
 	$(GENPARSE) $< -o $@ --standalone
@@ -35,6 +38,7 @@ $(GENPARSE): bin/argbash.m4s $(M4_SRC)
 bootstrap:
 	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4s | autom4te -l m4sugar > $(GENPARSE)
 	chmod a+x $(GENPARSE)
+	touch bin/argbash.m4s
 
 examples: $(EXAMPLES)
 
@@ -50,7 +54,9 @@ develop:
 	@echo Installing to prefix "'$(PREFIX)'"
 	mkdir -p "$(PREFIX)/bin"
 	touch "$(PREFIX)/bin/argbash" && rm "$(PREFIX)/bin/argbash"
-	ln -s $(PWD)/$(GENPARSE) "$(PREFIX)/bin/argbash"
+	echo '#!/bin/bash' > "$(PREFIX)/bin/argbash"
+	echo '$(ROOT_DIR)/$(GENPARSE) "$$@"' >> "$(PREFIX)/bin/argbash"
+	chmod a+x "$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE)
 	@echo Installing to prefix "'$(PREFIX)'"
@@ -63,6 +69,9 @@ install: $(GENPARSE)
 	chmod a+x "$(PREFIX)/bin/argbash"
 
 uninstall:
-	rm "$(PREFIX)/bin/argbash"
-	rm "$(PREFIX)/lib/argbash/"*.m4
+	$(RM) "$(PREFIX)/bin/argbash"
+	$(RM) "$(PREFIX)/lib/argbash/"*.m4
 	rmdir "$(PREFIX)/lib/argbash"
+
+tag:
+	echo '$(VERSION)' > ../src/version

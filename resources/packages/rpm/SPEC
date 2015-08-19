@@ -1,0 +1,27 @@
+Name:		argbash
+Version:	@VERSION@
+Release:	1%{?dist}
+Summary:	@DESC@
+Group:		
+License:	BSD
+URL:		@URL@
+Source0:	
+
+BuildRequires:	make
+Requires:	autoconf bash
+
+%description
+
+%prep
+%autosetup
+
+%build
+%configure
+
+%install
+%make_install
+
+%files
+%doc
+
+%changelog

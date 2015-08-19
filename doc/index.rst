@@ -13,7 +13,8 @@ There is a ``Makefile``.
 * ``make check`` runs the tests.
 * ``make install [PREFIX=foo]`` runs the installation into the prefix you can specify (default is ``$(HOME)/.local``).
   This will install the ``argbash`` script (notice the missing ``.sh`` extension) into ``$PREFIX/bin`` (and some support files into ``$PREFIX/lib/argbash``).
-* ``make develop [PREFIX=foo]`` is similar to ``make install``, but it installs symlink to ``bin/argbash.sh``, so any change to the file will be immediatelly reflected for everybody who uses the system-wide one.
+* ``make develop [PREFIX=foo]`` is similar to ``make install``, but it installs a wrapper around the local ``bin/argbash.sh``, so any change to the file will be immediatelly reflected for everybody who uses the system-wide one.
+  This is inspired by Python's ``python setup.py develop`` pattern.
 * ``make uninstall [PREFIX=foo]`` inverse of the above.
 
 Declaring arguments

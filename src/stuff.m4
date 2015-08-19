@@ -1,7 +1,8 @@
 dnl We don't like the # comments
 m4_changecom()
 
-m4_define([_VERSION], [0.1])
+dnl We include the version-defining macro
+m4_define([_ARGBASH_VERSION], m4_default_quoted(m4_normalize(m4_sinclude([version])), [unknown]))
 
 m4_define([m4_list_declare], [m4_do(
 	[m4_define([$1_GET], [m4_expand([m4_list_nth([$1], $][1)])])],
@@ -101,7 +102,7 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], [[SCRIPT_DIR]]))],
 	[m4_list_add([_OTHER],
-		m4_quote(_sciptdir[="$( cd "$( dirname "${BASH_SOURCES[0]}" )" && pwd )"]))],
+		m4_quote(_sciptdir[="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"]))],
 	[m4_popdef([_sciptdir])]
 )])
 
@@ -201,7 +202,7 @@ do],
 ],
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[arg], [test $[]# -lt 2 && echo "Missing value for the positional argument."]
+			[arg], [test $[]# -lt 2 && { echo "Missing value for the positional argument." >&2; exit 1; }]
 			_ARGVAR[="$[]2"
 			shift],
 			[bool], _ARGVAR[="on"
@@ -227,11 +228,11 @@ done]],
 	[dnl Now we look what positional args we got and we say if they were too little or too many. We also do the assignment to variables using eval.
 ],
 	[[POSITIONAL_NAMES=(]_POSITIONALS_FOREACH([['_varname(item)' ]])[)
-test ${#POSITIONALS[@]} -lt ]_POSITIONALS[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) 2>&1; exit 1; }
-test ${#POSITIONALS[@]} -gt ]_POSITIONALS[ && { ( echo "FATAL ERROR: There were spurious positional arguments."; print_help ) 2>&1; exit 1; }
+test ${#POSITIONALS[@]} -lt ]_POSITIONALS[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -gt ]_POSITIONALS[ && { ( echo "FATAL ERROR: There were spurious positional arguments."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
-	eval "${POSITIONAL_NAMES[$ii]}=${POSITIONALS[$ii]}"
+	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""
 done]],
 )])
 
