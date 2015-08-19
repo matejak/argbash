@@ -7,6 +7,7 @@ M4_SRC = \
 	$(NUL)
 
 PREFIX = $(HOME)/.local
+ROOT = /
 
 GENPARSE = ../bin/argbash.sh
 EXAMPLES = \
@@ -51,27 +52,27 @@ regressiontests: ../tests/regressiontests/test.sh ../tests/regressiontests/test2
 	cd ../tests/regressiontests && make check
 
 develop:
-	@echo Installing to prefix "'$(PREFIX)'"
-	mkdir -p "$(PREFIX)/bin"
-	touch "$(PREFIX)/bin/argbash" && rm "$(PREFIX)/bin/argbash"
-	echo '#!/bin/bash' > "$(PREFIX)/bin/argbash"
-	echo '$(ROOT_DIR)/$(GENPARSE) "$$@"' >> "$(PREFIX)/bin/argbash"
-	chmod a+x "$(PREFIX)/bin/argbash"
+	@echo Installing to prefix "'$(ROOT)/$(PREFIX)'"
+	mkdir -p "$(ROOT)/$(PREFIX)/bin"
+	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
+	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
+	echo '$(ROOT_DIR)/$(GENPARSE) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE)
-	@echo Installing to prefix "'$(PREFIX)'"
-	mkdir -p "$(PREFIX)/bin"
-	touch "$(PREFIX)/bin/argbash"
-	mkdir -p "$(PREFIX)/lib/argbash"
-	touch "$(PREFIX)/lib/argbash/stuff.m4"
-	cp $(M4_SRC) "$(PREFIX)/lib/argbash/"
-	sed -e 's|M4DIR=.*|M4DIR=$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(PREFIX)/bin/argbash"
-	chmod a+x "$(PREFIX)/bin/argbash"
+	@echo Installing to prefix "'$(ROOT)/$(PREFIX)'"
+	mkdir -p "$(ROOT)/$(PREFIX)/bin"
+	touch "$(ROOT)/$(PREFIX)/bin/argbash"
+	mkdir -p "$(ROOT)/$(PREFIX)/lib/argbash"
+	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
+	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
+	sed -e 's|M4DIR=.*|M4DIR=$(ROOT)/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
-	$(RM) "$(PREFIX)/bin/argbash"
-	$(RM) "$(PREFIX)/lib/argbash/"*.m4
-	rmdir "$(PREFIX)/lib/argbash"
+	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
+	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/"*.m4
+	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make release VERSION=1.0.0'"; exit 1; }

@@ -40,5 +40,5 @@ check() {
 
 package() {
 	cd "$pkgname-$pkgver/resources"
-	make PREFIX="$pkgdir/" install
+	make ROOT="$pkgdir" PREFIX="/usr" install
 }

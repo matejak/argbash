@@ -5,7 +5,7 @@ SOURCE = argbash-$(VERSION).tar.gz
 source: $(SOURCE)
 
 $(SOURCE):
-	wget https://github.com/matejak/argbash/archive/$(VERSION).tar.gz
+	wget -O $@ https://github.com/matejak/argbash/archive/$(VERSION).tar.gz
 
 md5-$(VERSION): $(SOURCE)
 	md5sum $< | cut -f 1 -d ' ' > $@
@@ -18,6 +18,9 @@ PKGBUILD: arch/PKGBUILD $(SOURCE) md5-$(VERSION)
 		| sed -e 's|@URL@|https://github.com/matejak/argbash|' \
 		| sed -e 's/@MD5SUM@/$(shell cat md5-$(VERSION))/' \
 		> $@
+
+archlinux: PKGBUILD
+	makepkg -f
 
 SPEC: rpm/SPEC $(SOURCE)
 	sed -e 's/@VERSION@/$(VERSION)/' $< > $@
