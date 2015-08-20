@@ -14,7 +14,7 @@ regressiontests: $(TESTS)
 stability: $(TESTDIR)/test.sh $(TESTDIR)/test2.sh
 	diff -q $< $(word 2,$^)
 
-define generic-regression =
+define generic_regression
 	$< LOO | grep -q POS_S=LOO,
 	$< "LOO BAR" | grep -q 'POS_S=LOO BAR,'
 	$< LOO | grep -q BOOL=off,
@@ -27,11 +27,10 @@ define generic-regression =
 endef
 
 args: $(TESTDIR)/test.sh
-	echo foo
-	$(generic-regression)
+	$(generic_regression)
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
 
 args-salone: $(TESTDIR)/call-standalone.sh $(TESTDIR)/test-standalone.sh
-	$(generic-regression)
+	$(generic_regression)

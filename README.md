@@ -14,7 +14,7 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Generate script from definitions once and use it afterwards on all platforms that have `Bash`!
 * Definitions will stay embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
 * Easy installation. Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
-* Refer to [docs](doc/index.rst) and [examples](resources/examples).
+* [Documentation](doc/index.rst) and [examples](resources/examples).
 
 ## What it is
 
