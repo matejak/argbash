@@ -7,4 +7,4 @@ install:
 
 # command to run tests
 script: 
-  - cd resources && make check
+  - make check
