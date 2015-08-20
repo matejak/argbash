@@ -26,6 +26,21 @@ m4_define([m4_list_contents], [m4_do(
 
 m4_define([m4_list_nth], [m4_argn([$2], m4_list_contents([$1]))])
 
+m4_define([m4_list_pop_front], [m4_do(
+	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
+	[m4_car(m4_unquote(_LIST_NAME))],
+	[m4_define(_LIST_NAME, m4_cdr(m4_unquote(_LIST_NAME)))],
+	[m4_popdef([_LIST_NAME])],
+)])
+
+m4_define([m4_list_pop_back], [m4_do(
+	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
+	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
+	[m4_list_pop_front([$1])],
+	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
+	[m4_popdef([_LIST_NAME])],
+)])
+
 m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 m4_define([_varname], [_ARG_[]_translit([$1])])
 

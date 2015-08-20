@@ -12,7 +12,10 @@ VERSION=_ARGBASH_VERSION
 
 # [
 
-# vvv A pretty reliable way of telling where we are
+# MS Windows compatibility fix
+DISCARD=/dev/null
+test -e $DISCARD || DISCARD=NUL
+
 M4DIR="$SCRIPT_DIR/../src"
 
 OUTPUT_M4="$M4DIR/output.m4"
@@ -29,13 +32,22 @@ function do_stuff
 test -f "$_ARG_INPUT" || { echo "'$_ARG_INPUT' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
-autom4te --version > /dev/null 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
+autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
 
 if test "$OUTFILE" = '-'
 then
 	do_stuff
 else
-	do_stuff > "$OUTFILE"
+	# vvv This should catch most of the cases when we want to overwrite the source file vvv
+	if test "$OUTFILE" = "$INFILE"
+	then
+		TEMP_OUTFILE=temp_$$
+		trap "rm $TEMP_OUTFILE" EXIT
+		do_stuff > "$TEMP_OUTFILE"
+		mv "$TEMP_OUTFILE" "$OUTFILE"
+	else
+		do_stuff > "$OUTFILE"
+	fi
 	chmod a+x "$OUTFILE"
 fi
 

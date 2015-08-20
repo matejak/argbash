@@ -1,4 +1,8 @@
 NUL =
+
+TESTDIR = ../tests/regressiontests
+include ../tests/regressiontests/Makefile
+
 M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
@@ -47,9 +51,6 @@ check: unittests regressiontests
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
-
-regressiontests: ../tests/regressiontests/test.sh ../tests/regressiontests/test2.sh
-	cd ../tests/regressiontests && make check
 
 develop:
 	@echo Installing to prefix "'$(ROOT)/$(PREFIX)'"

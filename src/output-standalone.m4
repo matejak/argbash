@@ -8,5 +8,5 @@ _MAKE_DEFAULTS
 _MAKE_HELP
 _MAKE_EVAL
 _MAKE_OTHER
-# [@<:@ <-- needed because of Argbash)dnl]])
+# [@:>@ <-- needed because of Argbash])])dnl
 m4_divert_push([STDOUT])dnl

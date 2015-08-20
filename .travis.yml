@@ -1,0 +1,10 @@
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install make autoconf
+
+install:
+  - cd resources && make install PREFIX=/usr/lib
+
+# command to run tests
+script: 
+  - cd resources && make check
