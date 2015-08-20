@@ -1,8 +1,8 @@
 # argbash
 
-![argbash logo](resources/logo/argbash.png)
-
 [![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
+
+![argbash logo](resources/logo/argbash.png)
 
 Do you write `Bash` scripts that are supposed to accept arguments?
 
