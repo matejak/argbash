@@ -27,6 +27,7 @@ define generic-regression =
 endef
 
 args: $(TESTDIR)/test.sh
+	echo foo
 	$(generic-regression)
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
