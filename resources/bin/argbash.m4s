@@ -16,6 +16,8 @@ VERSION=_ARGBASH_VERSION
 DISCARD=/dev/null
 test -e $DISCARD || DISCARD=NUL
 
+INFILE="$_ARG_INPUT"
+
 M4DIR="$SCRIPT_DIR/../src"
 
 OUTPUT_M4="$M4DIR/output.m4"
@@ -23,13 +25,13 @@ test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
 
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$_ARG_INPUT" \
+	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
 		| autom4te -l m4sugar -I "$M4DIR" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 }
 
-test -f "$_ARG_INPUT" || { echo "'$_ARG_INPUT' is supposed to be a file!"; exit 1; }
+test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
 autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
@@ -42,7 +44,7 @@ else
 	if test "$OUTFILE" = "$INFILE"
 	then
 		TEMP_OUTFILE=temp_$$
-		trap "rm $TEMP_OUTFILE" EXIT
+		trap "rm -f $TEMP_OUTFILE" EXIT
 		do_stuff > "$TEMP_OUTFILE"
 		mv "$TEMP_OUTFILE" "$OUTFILE"
 	else

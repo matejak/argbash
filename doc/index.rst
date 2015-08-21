@@ -216,10 +216,10 @@ Limitations
   Please read this carefuly.
 
 #. The delimiter between optional argument name and value is whitespace, ``=`` is not supported.
-#. If there is an argument that expects a value to be passed, and there is no value, no error is raised.
+   Create an issue if this disturbs you, it should be quite easy to implement.
 #. Clustering of short arguments (e.g. using ``-xzf`` instead of ``-x -z -f``) is not supported.
 #. The square brackets in your script have to match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``)
-   This limitation does not apply if you have the argument sampling code in a separate file.
+   This limitation does not apply if you have the argument parsing code in a separate file.
 
 Requirements
 ------------
@@ -232,7 +232,7 @@ You need:
 How it works
 ------------
 
-The source code of ``Argbash`` is mostly written in ``m4sugar``, which is build upon the venerable ``m4`` macro language.
+The source code of ``Argbash`` is mostly written in ``m4sugar``, which is built upon the venerable ``m4`` macro language.
 
 Others
 ------
@@ -246,7 +246,15 @@ Here follows a list of influences and/or alternatives:
   * Argbash: We handle the boolean options better.
 
 * Bash --- ``shflags``: The Bash framework for argument parsing: https://github.com/kward/shflags
-
   * Pros: It works great on Linux.
   * Cons: Doesn't work with Windows Bash, doesn't support long options on OSX.
   * Argbash: We work the same on all platforms that have ``bash``.
+
+* ``getopt``: Eternal utility for parsing command-line.
+  This is what powers ``shflags``.
+  * Pros: The GNU version can work with long and short optional arguments.
+  * Cons: Its use is `discouraged <http://bash.cumulonim.biz/BashFAQ(2f)035.html#getopts>`_ --- it seems to have some issues, you still need to deal with positional arguments by other means.
+
+* ``getopts``: Bash builtin for parsing command-line.
+  * Pros: Being included with Bash, it behaves the same on all platforms.
+  * Cons: Supports only short optional arguments.

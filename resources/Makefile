@@ -1,8 +1,5 @@
 NUL =
 
-TESTDIR = ../tests/regressiontests
-include ../tests/regressiontests/Makefile
-
 M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
@@ -21,6 +18,12 @@ EXAMPLES = \
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
+$(GENPARSE): bin/argbash.m4s $(M4_SRC)
+	bash $(GENPARSE) $< -o argbash.temp; mv argbash.temp $@
+
+TESTDIR = ../tests/regressiontests
+include ../tests/regressiontests/Makefile
+
 %-standalone.sh: %-standalone.m4s $(GENPARSE)
 	$(GENPARSE) $< -o $@ --standalone
 
@@ -35,10 +38,6 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 %3.sh: %2.sh $(GENPARSE)
 	$(GENPARSE) $< -o $@
-
-$(GENPARSE): bin/argbash.m4s $(M4_SRC)
-	bash $(GENPARSE) $< -o argbash.temp
-	mv argbash.temp $@
 
 bootstrap:
 	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4s | autom4te -l m4sugar > $(GENPARSE)
