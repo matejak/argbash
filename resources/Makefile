@@ -81,4 +81,5 @@ version:
 release: version $(GENPARSE) examples check
 
 tag:
-	git tag $(shell cat ../src/version) master
+	git tag $(shell cat ../src/version) -s -m 'Version release' master
+	git push --tags
