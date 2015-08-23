@@ -18,14 +18,20 @@ m4_define([m4_list_add], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
 m4_define([m4_list_contents], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_ifndef(_LIST_NAME, [], m4_quote(_LIST_NAME))],
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl Returns its n-th element
 m4_define([m4_list_nth], [m4_argn([$2], m4_list_contents([$1]))])
 
+dnl
+dnl The list loses its 1st element, which is also expanded by this macro.
 m4_define([m4_list_pop_front], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_car(m4_unquote(_LIST_NAME))],
@@ -33,6 +39,8 @@ m4_define([m4_list_pop_front], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl The list loses its last element, which is also expanded by this macro.
 m4_define([m4_list_pop_back], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
@@ -41,10 +49,16 @@ m4_define([m4_list_pop_back], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl The operation on command names that makes stem of variable names
 m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
+
+dnl
+dnl The operation on command names that converts them to variable names (where command values are stored)
 m4_define([_varname], [_ARG_[]_translit([$1])])
 
 dnl
+dnl Registers a command, recording its name, type etc.
 dnl $1: Long option
 dnl $2: Short option (opt)
 dnl $3: Help string
@@ -67,7 +81,9 @@ m4_define([_some_opt], [m4_do(
 	[m4_define([_NARGS], m4_eval(_NARGS + 1))],
 )])
 
+dnl Number of arguments we that are used in the script
 m4_define([_NARGS], 0)
+dnl Number of positional arguments expected in the script
 m4_define([_POSITIONALS], 0)
 
 dnl To be able to use _POSITIONALS_FOREACH
@@ -143,6 +159,8 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 m4_define([_ARG_OPTIONAL_ACTION], _ARG_OPTIONAL_ACTION_BODY)
 
 
+dnl
+dnl $1: The command short description
 m4_define([_MAKE_HELP], [m4_do(
 	[# THE PRINT HELP FUNCION
 ],
