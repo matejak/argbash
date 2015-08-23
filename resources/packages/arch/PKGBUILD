@@ -13,7 +13,7 @@ arch=(any)
 url="@URL@"
 license=('BSD')
 groups=()
-depends=('bash' 'autoconf')
+depends=('autoconf')
 makedepends=('make')
 checkdepends=()
 optdepends=()
@@ -24,9 +24,9 @@ backup=()
 options=()
 install=
 changelog=
-source=("$pkgname-$pkgver.tar.gz")
+source=("$pkgname-$pkgver.tar.gz" LICENSE)
 noextract=()
-md5sums=('@MD5SUM@')
+md5sums=('@MD5SUM@' '@LIC_MD5UM@')
 validpgpkeys=()
 
 build() {
@@ -39,6 +39,10 @@ check() {
 }
 
 package() {
+	LICENSES="$pkgdir/usr/share/licenses/$pkgname"
+	mkdir -p "$LICENSES"
+	cp LICENSE "$LICENSES"
+
 	cd "$pkgname-$pkgver/resources"
 	make ROOT="$pkgdir" PREFIX="/usr" install
 }
