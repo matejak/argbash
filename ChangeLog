@@ -1,0 +1,5 @@
+1.0.1: 2015-08-24
+
+Bugfixes:
+ * Fixed installation bug when ROOT variable was not treated properly
+
