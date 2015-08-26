@@ -1,0 +1,37 @@
+DOCDIR ?= .
+RESOURCES ?= ../resources
+
+MINIMAL = $(RESOURCES)/examples/minimal.sh
+
+NUL =
+
+PIECES = \
+	minimal-output-help.txt \
+	minimal-output-foobar.txt \
+	minimal-output-noverbose.txt \
+	$(NUL)
+
+pieces: $(PIECES)
+
+define CMD_OUT
+	echo "::" > $@
+	echo >> $@
+	echo "    $< $(FLAGS)" >> $@
+	echo >> $@
+	$< $(FLAGS) | sed -e 's/^/    /' >> $@
+endef
+
+minimal-output-help.txt: $(MINIMAL)
+	$(eval FLAGS := -h)
+	$(CMD_OUT)
+
+minimal-output-foobar.txt: $(MINIMAL)
+	$(eval FLAGS := foo -o bar --verbose)
+	$(CMD_OUT)
+
+minimal-output-noverbose.txt: $(MINIMAL)
+	$(eval FLAGS := foo -o bar)
+	$(CMD_OUT)
+
+clean:
+	$(RM) $(PIECES)
