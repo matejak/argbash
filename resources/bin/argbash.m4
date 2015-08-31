@@ -2,7 +2,7 @@
 
 VERSION=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
-# ARG_POSITIONAL_SINGLE([input])
+# ARG_POSITIONAL_SINGLE([input], [The input template file])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([standalone],, [Whether the parsing code is in a standalone file.])
 # ARG_VERSION([echo "argbash v$VERSION"])
@@ -35,6 +35,27 @@ test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
 autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
+
+function get_parsing_code
+{
+	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' $(cat "$INFILE") \
+			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
+			| tail -n 1)"
+	test -n "$_srcfile" || return 1
+	_thatfile="$(dirname "$INFILE")/$_srcfile"
+	# We supposet that $_thatfile is .sh
+	test -f "$_thatfile" && echo $_thatfile && return
+	_thatfile="${_thatfile:0:-2}m4"
+	test -f "$_thatfile" && echo $_thatfile
+	# if we are here, we are out of luck
+	test -n "$_srcfile" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1
+}
+
+# So let's settle the parsing code first. Hopefully we won't create a loop.
+parsing_code="$(get_parsing_code)"
+# Just if the original was m4, we replace .m4 with .sh
+test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
+test "$_ARG_STANDALONE" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
 
 if test "$OUTFILE" = '-'
 then

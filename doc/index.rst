@@ -1,5 +1,12 @@
+Argbash documentation
+=====================
+
 Quickstart
-==========
+----------
+
+Basically, you write a simple template of your script.
+Then, you run ``Argbash`` on top of it to get the fully functional script, which retains the template section.
+If you need to make adjustments to the template, you just edit the template section of the script and run ``Argbash`` on top of it to get the updated script.
 
 Installation etc.
 -----------------
@@ -8,8 +15,8 @@ Go to the ``resources`` folder.
 There is a ``Makefile``.
 
 * ``make ../bin/argbash.sh``, ``make bootstrap`` makes (or updates) the ``argbash.sh`` script (the script basically overwrites itself).
-  Use the latter if previous update broke the current ``../bin/argbash.sh`` script.
-* ``make examples`` compiles examples from ``.m4s`` files to ``.sh`` files in the ``examples`` folder.
+  Use the latter if previous update broke the current ``../bin/argbash.sh`` so it is not able to regenerate itself.
+* ``make examples`` compiles examples from ``.m4`` files to ``.sh`` files in the ``examples`` folder.
 * ``make check`` runs the tests.
 * ``make install [PREFIX=foo]`` runs the installation into the prefix you can specify (default is ``$(HOME)/.local``).
   This will install the ``argbash`` script (notice the missing ``.sh`` extension) into ``$PREFIX/bin`` (and some support files into ``$PREFIX/lib/argbash``).
@@ -49,18 +56,18 @@ Argbash lets you choose from:
 * action optional arguments (i.e. the --version and --help type of comments).
 
 Take a look at the API and place the declarations either to your script or in a separate file.
-Let yourself be inspired by the ``resources/examples/simple.m4s`` example (you can view it using BASH syntax coloring despite the extension).
+Let yourself be inspired by the ``resources/examples/simple.m4`` example (you can view it using BASH syntax coloring despite the extension).
 
 Then, run the following command to your file:
 
 ::
   
-  bin/argbash.sh myfile.m4s -o myfile.sh
+  bin/argbash.sh myfile.m4 -o myfile.sh
 
 to either get a script that should work, or a file that you include in your script.
 
 Argbash API
-+++++++++++
+-----------
 
 Generally, positional arguments have a name, whereas optional arguments have long name (and optionally a short name).
 Moreover, they can have defaults and help messages. 
@@ -70,10 +77,16 @@ So let's get back to argument types.
 Below, is a list of argument types and macros that you have to write to support those.
 Place those macros in your files as Bash comments.
 
+Positional arguments
+++++++++++++++++++++
+
 * Single-value positional arguments:
   ::
 
      ARG_POSITIONAL_SINGLE([argument-name])
+
+Optional arguments
+++++++++++++++++++
 
 * Single-value optional arguments:
   ::
@@ -91,16 +104,28 @@ Place those macros in your files as Bash comments.
      ARG_OPTIONAL_ACTION([argument-name-long], [argument-name-short (optional)], [help message], [code to execute when specified])
 
   The scripts exits after the argument is encountered.
-  You can specify a name of a function, ``echo "$0: v0.5"`` and whatever else.
-* Help argument (a special case of an action argument):
+  You can specify a name of a function, ``echo "my-script: v0.5"`` and whatever else.
+  This is simply a shell code that will be executed as-is (including ``"`` and ``'`` quotes) when the argument is passed.
+  It can be multi-line, but if you need something sophisticated, it is recommended to define a shell function in your script template and call that one instead.
+
+Special arguments
++++++++++++++++++
+
+* Help argument (a special case of an optional action argument):
   ::
 
      ARG_HELP([program description (optional)])
+
+  This will generate the ``--help`` and ``-h`` action arguments that will print the usage information.
+  Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed. 
 
 * Version argument (a special case of an action argument):
   ::
 
      ARG_VERSION([code to execute when specified])
+ 
+Convenience macros
+++++++++++++++++++
 
 Plus, there are convenience macros:
 
@@ -151,7 +176,7 @@ Parsing code and script body together
 This requires some trivial adjustments to your script.
 
 #. Add Argbash definitions to the script so they come before the script body.
-   Let's say that the file is called ``my-template.m4s`` (``m4s`` stands for ``m4sugar``).
+   Let's say that the file is called ``my-template.m4`` (the extension :footnote:```m4`` is the extension used for the ``M4`` language, but we use the ``m4sugar`` extension built on top of it).` doesn't matter). 
    
    .. note::
 
@@ -184,7 +209,7 @@ This requires some trivial adjustments to your script.
 
    ::
     
-      bin/argbash.sh my-template.m4sh -o my-script.sh
+      bin/argbash.sh my-template.m4 -o my-script.sh
 
 Then, if you do some script development and you decide to add an option or remove one:
 
@@ -205,8 +230,8 @@ Simple
 
 The ``simple.sh`` script prints size of a file, accepting some options.
 
-* See the `template <../resources/examples/simple.m4s>`_ and the `actual script <../resources/examples/simple.sh>`_ (one file).
-* The `template <../resources/examples/simple-standalone.m4s>`_ and the `actual script <../resources/examples/simple-standalone.sh>`_ (separate file for parsing).
+* See the `template <../resources/examples/simple.m4>`_ and the `actual script <../resources/examples/simple.sh>`_ (one file).
+* The `template <../resources/examples/simple-standalone.m4>`_ and the `actual script <../resources/examples/simple-standalone.sh>`_ (separate file for parsing).
 
 Limitations
 -----------

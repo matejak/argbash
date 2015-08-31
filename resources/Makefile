@@ -19,7 +19,7 @@ EXAMPLES = \
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 $(GENPARSE): bin/argbash.m4 $(M4_SRC)
-	bash $(GENPARSE) $< -o argbash.temp; mv argbash.temp $@
+	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
 TESTDIR = ../tests/regressiontests
 include ../tests/regressiontests/Makefile
@@ -79,7 +79,7 @@ uninstall:
 	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:
-	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make release VERSION=1.0.0'"; exit 1; }
+	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
 
 release: version $(GENPARSE) examples check
