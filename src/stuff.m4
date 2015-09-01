@@ -56,10 +56,22 @@ m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 m4_define([_varname], [_ARG_[]_translit([$1])])
 
 dnl
+dnl Encloses string into "" if its first char is not ' or "
+dnl The string si also []-quoted
+dnl Property: Quoting a blank input results in non-blank result
+dnl to AVOID it, pass string like ""ls -l or "ls" -l
+m4_define([_sh_quote], [m4_do(
+	[m4_if(
+		m4_index(['], [$1]), 0, [[$1]],
+		m4_index(["], [$1]), 0, [[$1]],
+		[["$1"]])],
+)])
+
+dnl
 dnl $1: Long option
 dnl $2: Short option (opt)
 dnl $3: Help string
-dnl $4: Default (opt)
+dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
 m4_define([_some_opt], [m4_do(
 	[m4_list_add([_ARGS_LONG], [$1])],
@@ -113,7 +125,7 @@ dnl Do something depending on whether there have been optional positional args d
 m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
-dnl 
+dnl
 dnl Declare one positional argument
 dnl $1: Name of the arg
 dnl $2: Help for the arg
@@ -129,26 +141,29 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[m4_define([_POSITIONALS_MIN], m4_incr(_POSITIONALS_MIN))],
 )])
 
-dnl 
+dnl
 dnl Declare one positional argument with default
 dnl $1: Name of the arg
-dnl $2: Help for the arg
-dnl $3: Default
+dnl $2: Default
+dnl $3: Help for the arg
 m4_define([ARG_POSITIONAL_SINGLE_OPT], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[_A_POSITIONAL_VARNUM],
+	[m4_define([_POSITIONALS_MORE], m4_incr(_POSITIONALS_MORE))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
-	[m4_list_add([_POSITIONALS_MSGS], [$2])],
+	[m4_list_add([_POSITIONALS_MSGS], [$3])],
 	[m4_list_add([_POSITIONALS_MINS], 0)],
-	[m4_list_add([_POSITIONALS_DEFAULTS], [$3])],
+	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
+],
+	[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$2]))],
 	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
 )])
 
 m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
-	[_some_opt([$1], [$2], [$3], [$4], [arg])],
+	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
 
 dnl
@@ -259,7 +274,7 @@ m4_define([_MAKE_HELP], [m4_do(
 		[[	echo -e "\t<]m4_list_nth([_POSITIONALS_NAMES], idx)[>: ]],
 		[m4_list_nth([_POSITIONALS_MSGS], idx)],
 		[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-			[[ (default: ]m4_list_nth([_POSITIONALS_DEFAULTS], idx))])],
+			[[ (default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"')])],
 		[["
 ]],
 )])],
@@ -277,7 +292,9 @@ m4_define([_MAKE_HELP], [m4_do(
 		[: m4_list_nth([_ARGS_HELP], idx)],
 		[dnl Actions don't have defaults
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [action], [], [ (default: 'm4_list_nth([_ARGS_DEFAULT], idx)')])],
+		[dnl We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
+],
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [action], [], [ (default: '"m4_list_nth([_ARGS_DEFAULT], idx)"')])],
 		["
 ],
 	)])],
@@ -296,7 +313,7 @@ do],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[
 		],
-		[dnl Output short option (if we have it), then | 
+		[dnl Output short option (if we have it), then |
 ],
 		[m4_ifblank(m4_list_nth([_ARGS_SHORT], idx), [], [-m4_list_nth([_ARGS_SHORT], idx)|])],
 		[dnl If we are dealing with bool, also look for --no-...
@@ -358,7 +375,16 @@ done]],
 )])
 
 m4_define([_MAKE_DEFAULTS], [m4_do(
-	[# THE DEFAULTS INITIALIZATION
+	[# THE DEFAULTS INITIALIZATION --- POSITIONALS
+],
+	[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+		[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
+		[m4_ifnblank(m4_quote(_DEFAULT),
+			[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=_DEFAULT
+])],
+		[m4_popdef([_DEFAULT])],
+	)])],
+	[# THE DEFAULTS INITIALIZATION --- OPTIONALS
 ],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],

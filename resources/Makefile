@@ -28,6 +28,8 @@ RESOURCES = $(ROOT_DIR)
 DOCDIR = $(ROOT_DIR)/../doc
 include ../doc/Makefile
 
+CHANGELOG = ../ChangeLog
+
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@ --standalone
 
@@ -81,8 +83,10 @@ uninstall:
 version:
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
+	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
 
 release: version $(GENPARSE) examples check
+	sed -i "1s/([-0-9]+)/($$(date -I))/ $(CHANGELOG)
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

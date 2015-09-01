@@ -46,7 +46,7 @@ function get_parsing_code
 	# We supposet that $_thatfile is .sh
 	test -f "$_thatfile" && echo $_thatfile && return
 	_thatfile="${_thatfile:0:-2}m4"
-	test -f "$_thatfile" && echo $_thatfile
+	test -f "$_thatfile" && echo $_thatfile && return
 	# if we are here, we are out of luck
 	test -n "$_srcfile" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1
 }
