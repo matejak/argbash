@@ -10,10 +10,10 @@ There are two types of arguments --- thake an example:
   
   ls -l --sort time /home
 
-* Optional arguments (``-l``, ``--sort``) and
-* positional arguments (``/home``).
+* Optional arguments are ``-l`` and ``--sort``, while we have only one
+* positional argument --- ``/home``.
 
-Here, the argument ``-l`` is optional of a boolean type (it is either on or off), ``--sort`` is also optional, taking exactly one value (in this case ``auto``, the equal sign acts as a delimiter).
+Here, the argument ``-l`` is optional of a boolean type (it is either on or off), ``--sort`` is also optional, taking exactly one value (in this case ``time``).
 ``-l`` and ``--sort`` are called options, hence the name *optional* arguments.
 The common pattern is that optional arguments are not required, being there just for the case you need them.
 
