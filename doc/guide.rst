@@ -1,19 +1,17 @@
 Declaring arguments
--------------------
+===================
 
 Definitions
-+++++++++++
+-----------
 
-There are two types of arguments:
-
-* Positional
-* Optional
-
-Take an example:
+There are two types of arguments --- thake an example:
 
 ::
   
   ls -l --sort time /home
+
+* Optional arguments (``-l``, ``--sort``) and
+* positional arguments (``/home``).
 
 Here, the argument ``-l`` is optional of a boolean type (it is either on or off), ``--sort`` is also optional, taking exactly one value (in this case ``auto``, the equal sign acts as a delimiter).
 ``-l`` and ``--sort`` are called options, hence the name *optional* arguments.
@@ -23,12 +21,12 @@ The ``/home`` argument is a positional one.
 In case of ``ls``, the positional argument has a default --- running ``ls`` without parameters is the same as running ``ls .``.
 ``ls`` itself accepts an arbitrary number of positional arguments and it treats them in the same way.
 
-On the other hand, the ``grep`` command accepts at least one positional argument.
+On the other hand, the ``grep`` command requires at least one positional argument.
 The first one is supposed to be the regular expression you want to match against, and the rest are paths, so they are not treated the same.
-The first positional argument doesn't have a default, whereas the second one normally defaults to ``-``, which means ``stdin``.
+The first positional argument doesn't have a default, whereas the second one normally defaults to ``-``, which means ``grep`` will try to read input from ``stdin``.
 
 Your script
-+++++++++++
+-----------
 
 You have to decide what arguments should your script support.
 As of this version, ``Argbash`` lets you choose from:
@@ -69,8 +67,8 @@ We have positional and optional arguments sorted out, so let's define some other
   Although this is confusing, it is a common way of putting it.
   Let's take ``ls -l --sort time`` again as an example :
 
-  * ``-l``: This option doesn't accept any arguments
-  * ``--sort time``: This option accepts exactly one argument (in this case, its value was ``time``).
+  * ``-l`` --- this option doesn't accept any arguments
+  * ``--sort`` --- this option accepts exactly one argument (in this case, its value was ``time``).
     If you don't provide one, you will get an error.
 
   ``Argbash`` exposes values of passed arguments as variables.
