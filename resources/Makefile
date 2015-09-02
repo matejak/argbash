@@ -24,10 +24,6 @@ $(GENPARSE): bin/argbash.m4 $(M4_SRC)
 TESTDIR = ../tests/regressiontests
 include ../tests/regressiontests/Makefile
 
-RESOURCES = $(ROOT_DIR)
-DOCDIR = $(ROOT_DIR)/../doc
-include ../doc/Makefile
-
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
