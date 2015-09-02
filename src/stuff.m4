@@ -204,6 +204,7 @@ dnl $1 = the filename (assuming that it is in the same directory as the script)
 dnl $2 = what has been passed to DEFINE_SCRIPT_DIR as the first param
 m4_define([INCLUDE_PARSING_CODE], [m4_do(
 	[[$0($@)]],
+	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
 	[m4_list_add([_OTHER],
 		m4_expand([[source "$]m4_default([$2], _DEFAULT_SCRIPTDIR)[/$1]"
 ]))],
@@ -211,6 +212,7 @@ m4_define([INCLUDE_PARSING_CODE], [m4_do(
 
 m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
+	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_add([_OTHER],
 		m4_quote(_sciptdir[="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"]))],
@@ -345,7 +347,6 @@ do],
 	[[
 		*@:}@
 		    	POSITIONALS+=("$][1")
-		    	# unknown option
 			;;
 	esac
 	shift

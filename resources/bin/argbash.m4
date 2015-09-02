@@ -43,9 +43,9 @@ function get_parsing_code
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$INFILE")/$_srcfile"
-	# We supposet that $_thatfile is .sh
 	test -f "$_thatfile" && echo $_thatfile && return
-	_thatfile="${_thatfile:0:-2}m4"
+	# Take out everything after last dot (http://stackoverflow.com/questions/125281/how-do-i-remove-the-file-suffix-and-path-portion-from-a-path-string-in-bash)
+	_thatfile="${_thatfile%.*}.m4"
 	test -f "$_thatfile" && echo $_thatfile && return
 	# if we are here, we are out of luck
 	test -n "$_srcfile" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1

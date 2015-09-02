@@ -84,6 +84,7 @@ version:
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
 	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
+	touch $(M4_SRC)
 
 release: version $(GENPARSE) examples check
 	sed -i "1s/([-0-9]+)/($$(date -I))/ $(CHANGELOG)
