@@ -53,8 +53,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Argbash'
-copyright = '2015, Matěj Týč'
-author = 'Matěj Týč'
+copyright = u'2015, Matěj Týč'
+author = u'Matěj Týč'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -233,7 +233,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
   (master_doc, 'Argbash.tex', 'Argbash Documentation',
-   'Matěj Týč', 'manual'),
+   u'Matěj Týč', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
