@@ -49,6 +49,7 @@ bootstrap:
 examples: $(EXAMPLES)
 
 check: unittests regressiontests
+	$(MAKE) tests-clean
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4

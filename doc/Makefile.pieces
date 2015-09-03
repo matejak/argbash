@@ -2,13 +2,14 @@ DOCDIR ?= .
 RESOURCES ?= ../resources
 
 MINIMAL = $(RESOURCES)/examples/minimal.sh
+STATICDIR = _static
 
 NUL =
 
 PIECES = \
-	minimal-output-help.txt \
-	minimal-output-foobar.txt \
-	minimal-output-noverbose.txt \
+	$(STATICDIR)/minimal-output-help.txt \
+	$(STATICDIR)/minimal-output-foobar.txt \
+	$(STATICDIR)/minimal-output-noverbose.txt \
 	$(NUL)
 
 pieces: $(PIECES)
@@ -21,15 +22,15 @@ define CMD_OUT
 	$< $(FLAGS) | sed -e 's/^/    /' >> $@
 endef
 
-minimal-output-help.txt: $(MINIMAL)
+$(STATICDIR)/minimal-output-help.txt: $(MINIMAL)
 	$(eval FLAGS := -h)
 	$(CMD_OUT)
 
-minimal-output-foobar.txt: $(MINIMAL)
+$(STATICDIR)/minimal-output-foobar.txt: $(MINIMAL)
 	$(eval FLAGS := foo -o bar --verbose)
 	$(CMD_OUT)
 
-minimal-output-noverbose.txt: $(MINIMAL)
+$(STATICDIR)/minimal-output-noverbose.txt: $(MINIMAL)
 	$(eval FLAGS := foo -o bar)
 	$(CMD_OUT)
 

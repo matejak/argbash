@@ -1,0 +1,6 @@
+::
+
+    ../resources/examples/minimal.sh foo -o bar --verbose
+
+    Positional arg value: foo
+    Optional arg --option value: bar

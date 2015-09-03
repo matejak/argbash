@@ -9,6 +9,16 @@ TESTS = \
 	args-salone \
 	$(NUL)
 
+# test-salone is side-effect of call-salone
+SCRIPTS = \
+	$(TESTDIR)/test.sh \
+	$(TESTDIR)/test2.sh \
+	$(TESTDIR)/test-standalone.sh \
+	$(TESTDIR)/test-standalone2.sh \
+	$(TESTDIR)/call-salone.sh \
+	$(TESTDIR)/test-salone.sh \
+	$(NUL)
+
 regressiontests: $(TESTS)
 
 stability: $(TESTDIR)/test.sh $(TESTDIR)/test2.sh
@@ -39,3 +49,6 @@ args-salone: $(TESTDIR)/call-salone.sh
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
+
+tests-clean:
+	$(RM) $(SCRIPTS)

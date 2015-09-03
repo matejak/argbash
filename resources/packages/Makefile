@@ -1,19 +1,19 @@
 VERSION = $(shell cat ../../src/version)
 
-SOURCE = argbash-$(VERSION).tar.gz
+SOURCE = build/argbash-$(VERSION).tar.gz
 
-LICENSE: ../../LICENSE
+build/LICENSE: ../../LICENSE | build
 	cp $< $@
 
-md5-LICENSE: LICENSE
+build/md5-LICENSE: build/LICENSE | build
 	md5sum $< | cut -f 1 -d ' ' > $@
 
 source: $(SOURCE)
 
-$(SOURCE):
+$(SOURCE): | build
 	wget -O $@ https://github.com/matejak/argbash/archive/$(VERSION).tar.gz
 
-md5-$(VERSION): $(SOURCE)
+build/md5-$(VERSION): $(SOURCE)
 	md5sum $< | cut -f 1 -d ' ' > $@
 
 define substitute =
@@ -23,16 +23,22 @@ cat $< \
 	| sed -e 's/@PKGREL@/$(PKGREL)/' \
 	| sed -e 's/@DESC@/Bash argument parsing code generator/' \
 	| sed -e 's|@URL@|https://github.com/matejak/argbash|' \
-	| sed -e 's/@MD5SUM@/$(shell cat md5-$(VERSION))/' \
-	| sed -e 's/@LIC_MD5UM@/$(shell cat md5-LICENSE)/' \
+	| sed -e 's/@MD5SUM@/$(shell cat $(word 3,$+))/' \
+	| sed -e 's/@LIC_MD5UM@/$(shell cat $(word 4,$+))/' \
 	> $@
 endef
 
-PKGBUILD: arch/PKGBUILD $(SOURCE) md5-$(VERSION) md5-LICENSE
+build:
+	mkdir $@
+
+build/PKGBUILD: arch/PKGBUILD $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE
 	$(substitute)
 
-archlinux: PKGBUILD
-	makepkg -f
+archlinux: build/PKGBUILD
+	cd build && makepkg -f
 
-SPEC: rpm/SPEC $(SOURCE)
+build/SPEC: rpm/SPEC $(SOURCE)
 	$(substitute)
+
+clean:
+	$(RM) build/*

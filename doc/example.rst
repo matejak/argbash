@@ -18,15 +18,15 @@ Here, we can notice multiple notable things:
 
 So let's try the script in action! Let's see what happens when we pass the -h option:
 
-.. include:: minimal-output-help.txt
+.. include:: _static/minimal-output-help.txt
 
 OK, so it seems that passing it one (mandatory) positional arg will do the trick:
 
-.. include:: minimal-output-noverbose.txt
+.. include:: _static/minimal-output-noverbose.txt
 
 Oops, we have forgot to turn verbose output on! Let's fix that...
 
-.. include:: minimal-output-foobar.txt
+.. include:: _static/minimal-output-foobar.txt
 
 Closer look
 -----------
