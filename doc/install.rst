@@ -36,6 +36,8 @@ The main Makefile
 
 The ``Makefile`` in the ``resources`` folder can do many things:
 
+.. _install:
+
 Installation
 ++++++++++++
 

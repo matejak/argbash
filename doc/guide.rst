@@ -1,5 +1,7 @@
-Declaring arguments
-===================
+Template writing guide
+======================
+
+This section tells you how to write templates, the next one is about ``argbash.sh`` invocation.
 
 Definitions
 -----------
@@ -184,6 +186,8 @@ The macro doesn't take any parameters.
   
    ARGBASH_GO
 
+.. _parsing_results:
+
 Using parsing results
 +++++++++++++++++++++
 
@@ -198,3 +202,4 @@ The argument name is transliterated like this:
 #. Boolean arguments have values either ``on`` or ``off``.
 
    If (a boolean argument) ``--verbose`` is passed, value of ``_ARG_VERBOSE`` is set to ``on``.
+

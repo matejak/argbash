@@ -1,67 +1,93 @@
-Usage
-=====
+Argbash invocation
+==================
 
-Layout
-------
+So, you have a template and now it is time to (re)generate a shell script from it!
 
-Separate file for parsing
-+++++++++++++++++++++++++
+File layout
+-----------
 
-This is really easy.
-Just place the directives in the file behind comments and then run the ``argbash.sh`` with the ``--standalone`` argument.
+You have three options here, they are sorted by the estimated preference: 
+
+#. One file with both parsing code and script body.
+
+   This is a both simple and functional approach.
+
+#. Two files --- one for the parsing code and one for the script body, both taken care of by ``Argbash``.
+
+   This is more suitable for people that prefer to keep things tidy, you can have the parsing code separate and included in the script at run-time.
+   However, ``Argbash`` can assist you with that.
+
+#. Same as the above, just without ``Argbash`` assistance.
+
+   You want to take this path if your script has a non-matching square brackets problem (see :ref:`limitations`).
+   This is very unlikely.
+
+.. note::
+
+   We assume that you have installed (see :ref:`install`) the ``argbash.sh``, so it is available as a command ``argbash``.
+   If it is not the case, you just have to substitute ``argbash`` by direct invocation of ``bin/argbash.sh``.
 
 Parsing code and script body together
 +++++++++++++++++++++++++++++++++++++
 
-This requires some trivial adjustments to your script.
+Assuming that you have created a template file ``my-template.m4``, you simply run ``argbash`` over the script [*]_:
 
-#. Add Argbash definitions to the script so they come before the script body.
-   Let's say that the file is called ``my-template.m4`` (the extension [*]_ is not important in itself). 
-   
-   .. note::
-
-      This one is just a recommendation, but don't do othewise if you don't have deep understanding of what's going on.
-
-   Definitions are described in the Argbash API section, include them in a form as shell comments like this:
-
-   ::
-
-      # ARG_POSITIONAL_SINGLE([filename])
-      # ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kilobytes, M for megabytes)], b)
-      # ARG_VERSION([echo $0 v0.1])
-      # ARG_OPTIONAL_BOOLEAN(verbose)
-      # ARG_HELP
-      # ARGBASH_GO
-
-#. Add this comment before the script body (it is a commented opening square bracket, the note is optional):
-
-   ::
-
-      # [ note: <--- this has to be here because of Argbash
-
-   and another one (closing square bracket):
-
-   ::
-
-      # ] note: <--- this has to be here because of Argbash
-
-#. Run the ``argbash.sh`` over the script:
-
-   ::
+::
     
-      bin/argbash.sh my-template.m4 -o my-script.sh
+   argbash my-template.m4 -o my-script.sh
 
-Then, if you do some script development and you decide to add an option or remove one:
+If you want to regenerate a new version of ``my-script.sh`` after you have modified its template section, you can run
 
-4. Forget about the template, edit the script --- declarations are preserved in there.
-   Obtain the updated version by re-running ``argbash.sh`` over ``my-script.sh``:
-
-   ::
+::
     
-      bin/argbash.sh my-script.sh -o my-script-new.sh
+   argbash my-script.sh -o my-script.sh
 
-   If you compare the two, you should find out that it works quite well and that the ``my-script-new.sh`` does what it is supposed to do and that it is by no means cluttered.
+as the script can deal with input and output being the same file.
 
 .. [*] ``m4`` is the extension used for the ``M4`` language, but we use the ``m4sugar`` extension built on top of it).
 
+Separate file for parsing with assistance
++++++++++++++++++++++++++++++++++++++++++
 
+You have two files, let's say it is a ``my-parsing.m4`` and ``my-script.sh``.
+The ``my-parsing.m4`` file contains just the template section of ``my-script.sh``.
+Then, you add a very small template code to ``my-script.sh`` at the beginning:
+
+.. code-block:: bash
+
+    # DEFINE_SCRIPT_DIR
+    # INCLUDE_PARSING_CODE([my-parsing.sh])
+    # ARGBASH_GO
+    
+    # [ <-- needed because of Argbash
+    
+    # HERE GOES THE SCRIPT BODY
+    
+    # ] <-- needed because of Argbash
+
+i.e. you add thos three lines with definitions and you enclose the script in square brackets.
+
+Finally, you just make sure that ``my-script.sh`` and ``my-parsing.m4`` are next to each other and run
+
+::
+
+   argbash my-script.sh -o my-script.sh
+
+which finds ``my-parsing.m4`` (it would find ``my-parsing.sh`` too) and generates new ``my-parsing.sh`` and ``my-script.sh`` that you can use right away.
+
+Separate file for parsing
++++++++++++++++++++++++++
+
+If you want/have to take care of including the parsing code yourself, just make sure you do it in the script:
+
+.. code-block:: bash
+
+    source $(dirname $0)/my-parsing.sh
+    
+    # HERE GOES THE SCRIPT BODY
+
+Then, you just generate ``my-parsing.sh`` using ``--standalone`` option:
+
+::
+
+   argbash my-parsing.m4 -o my-parsing.sh

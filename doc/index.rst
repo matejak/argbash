@@ -38,7 +38,7 @@ So, let's say that we would like a script that produces the following help messa
 .. literalinclude:: _static/minimal-output-help.txt
    :start-after: minimal.sh
 
-Then, it means that we need following arguments
+Then, it means that we need following arguments:
 
 * One mandatory positional argument.
   (In other words, an argument that must be passed and that is not preceeded by options such as ``--foo``, ``-f``.)
@@ -55,7 +55,7 @@ Therefore, we write this to the template:
    :language: bash
    :end-before: needed because of Argbash
 
-The body of the script is trivial, but note that it is enclosed in square brackets.
+The body of the script (that follows the template) is trivial, but note that it is enclosed in a pair of square brackets.
 They are "hidden" in comments, but still, they have to be there.
 
 .. literalinclude:: ../resources/examples/minimal.m4
@@ -78,6 +78,11 @@ Now we launch it and the output is good!
    Positional arg value: posi-tional
    Optional arg --option value: opt-ional
 
+.. note::
+
+   If something still isn't totally clear, take look at the :ref:`sec_example` section.
+
+.. _limitations:
 
 Limitations
 +++++++++++

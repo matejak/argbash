@@ -12,6 +12,7 @@ ROOT = /
 
 GENPARSE = ../bin/argbash.sh
 EXAMPLES = \
+	examples/minimal.sh \
 	examples/simple.sh \
 	examples/simple-standalone.sh \
 	$(NUL)
@@ -84,7 +85,7 @@ version:
 	touch $(M4_SRC)
 
 release: version $(GENPARSE) examples check
-	sed -i "1s/([-0-9]+)/($$(date -I))/ $(CHANGELOG)
+	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

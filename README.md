@@ -36,7 +36,7 @@ Following arguments are supported:
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
-**Read [the docs](doc/index.rst) for more info**
+**[Read the docs](http://argbash.readthedocs.org/en/latest/) for more info**
 
 ## Requirements
 

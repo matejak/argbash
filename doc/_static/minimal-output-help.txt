@@ -4,7 +4,7 @@
 
     This is a minimal demo of Argbash potential
     Usage: ../resources/examples/minimal.sh <positional-arg> [--option <arg>] [--(no-)verbose] [--version] [--help]
-    	<positional-arg>: Positional arg
+    	<positional-arg>: Positional arg description
     	-o,--option: A option with short and long flags and default (default: 'b')
     	--verbose,--no-verbose: A boolean option with long flag (and implicit default: off) (default: 'off')
     	-v,--version: Prints version
