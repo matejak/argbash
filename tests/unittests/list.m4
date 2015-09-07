@@ -17,6 +17,8 @@ m4_list_add([FOO], [ANTIFUSE(list)])
 m4_list_add([FOO], [BOMB]) 
 m4_list_add([FOO], [BAZ])
 m4_list_add([FOO], [BAZ2])
+assert_equals(m4_list_len([FOO]), 5)
+
 m4_ifnblank(m4_expand([m4_list_add([FOO], [])m4_list_add([FOO], [--LALA])]),
 	[m4_fatal([Leaking text in m4_list_add])])
 assert_equals(m4_list_nth([FOO], 1), [BOMB])
@@ -33,6 +35,12 @@ assert_equals(m4_quote(m4_list_pop_front([FOO])), [BOMB])
 assert_equals(m4_quote(m4_list_pop_back([FOO])), [--LALA])
 dnl After pop
 assert_equals(m4_list_nth([FOO], 2), [BOMB])
+
+m4_list_add([EMPTY], [])
+m4_list_add([EMPTY], [second])
+dnl The first element is the empty string
+assert_equals(m4_list_nth([EMPTY], 2), [second])
+assert_equals(m4_list_len([EMPTY]), 2)
 m4_ignore([
 m4_divert_push(0)dnl
 ])

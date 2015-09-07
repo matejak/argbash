@@ -12,25 +12,28 @@ ROOT = /
 
 GENPARSE = ../bin/argbash.sh
 EXAMPLES = \
+	examples/minimal.sh \
 	examples/simple.sh \
 	examples/simple-standalone.sh \
 	$(NUL)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-$(GENPARSE): bin/argbash.m4s $(M4_SRC)
-	bash $(GENPARSE) $< -o argbash.temp; mv argbash.temp $@
+$(GENPARSE): bin/argbash.m4 $(M4_SRC)
+	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
 TESTDIR = ../tests/regressiontests
 include ../tests/regressiontests/Makefile
 
-%-standalone.sh: %-standalone.m4s $(GENPARSE)
+CHANGELOG = ../ChangeLog
+
+%-standalone.sh: %-standalone.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@ --standalone
 
 %-standalone2.sh: %-standalone.sh $(GENPARSE)
 	$(GENPARSE) $< -o $@ --standalone
 
-%.sh: %.m4s $(GENPARSE)
+%.sh: %.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@
 
 %2.sh: %.sh $(GENPARSE)
@@ -40,13 +43,14 @@ include ../tests/regressiontests/Makefile
 	$(GENPARSE) $< -o $@
 
 bootstrap:
-	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4s | autom4te -l m4sugar > $(GENPARSE)
+	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4 | autom4te -l m4sugar > $(GENPARSE)
 	chmod a+x $(GENPARSE)
-	touch bin/argbash.m4s
+	touch bin/argbash.m4
 
 examples: $(EXAMPLES)
 
 check: unittests regressiontests
+	$(MAKE) tests-clean
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
@@ -75,10 +79,13 @@ uninstall:
 	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:
-	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make release VERSION=1.0.0'"; exit 1; }
+	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
+	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
+	touch $(M4_SRC)
 
 release: version $(GENPARSE) examples check
+	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

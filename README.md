@@ -1,6 +1,7 @@
 # argbash
 
 [![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
+[![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://readthedocs.org/projects/argbash/?badge=latest)
 
 ![argbash logo](resources/logo/argbash.png)
 
@@ -35,7 +36,7 @@ Following arguments are supported:
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
-**Read [the docs](doc/index.rst) for more info**
+**[Read the docs](http://argbash.readthedocs.org/en/latest/) for more info**
 
 ## Requirements
 

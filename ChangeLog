@@ -1,5 +1,15 @@
-1.0.1: 2015-08-24
+1.1.1 (2015-08-24)
+------------------
 
 Bugfixes:
- * Fixed installation bug when ROOT variable was not treated properly
 
+* Fixed installation bug when ROOT variable was not treated properly
+
+1.1.0 (2015-09-06)
+------------------
+
+New features:
+
+* Support for positional args with default values.
+* "Intelligent" shell auto-quoting of macro arguments.
+* Improvement of standalone parsing code mode.
