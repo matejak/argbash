@@ -51,6 +51,7 @@ examples: $(EXAMPLES)
 
 check: unittests regressiontests
 	$(MAKE) tests-clean
+	@echo "*** All is OK ***"
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
@@ -60,7 +61,7 @@ develop:
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
-	echo '$(ROOT_DIR)/$(GENPARSE) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
+	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE)
@@ -76,6 +77,7 @@ install: $(GENPARSE)
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
 	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/"*.m4
+	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/version"
 	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:

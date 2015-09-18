@@ -262,8 +262,8 @@ latex_logo = LOGO_STEM + 'argbash.png'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'argbash', 'Argbash Documentation',
-     [author], 1)
+    ('guide.rst', 'argbash.m4', 'Argbash Documentation', [author], 1),
+    ('usage.rst', 'argbash', 'Argbash Documentation', [author], 1),
 ]
 
 # If true, show URL addresses after external links.
