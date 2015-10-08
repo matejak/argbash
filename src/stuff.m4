@@ -29,14 +29,20 @@ m4_define([m4_list_len], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
 m4_define([m4_list_contents], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_ifndef(_LIST_NAME, [], m4_quote(_LIST_NAME))],
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl Returns its n-th element
 m4_define([m4_list_nth], [m4_argn([$2], m4_list_contents([$1]))])
 
+dnl
+dnl The list loses its 1st element, which is also expanded by this macro.
 m4_define([m4_list_pop_front], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_car(m4_unquote(_LIST_NAME))],
@@ -44,6 +50,8 @@ m4_define([m4_list_pop_front], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl The list loses its last element, which is also expanded by this macro.
 m4_define([m4_list_pop_back], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
@@ -52,7 +60,12 @@ m4_define([m4_list_pop_back], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl The operation on command names that makes stem of variable names
 m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
+
+dnl
+dnl The operation on command names that converts them to variable names (where command values are stored)
 m4_define([_varname], [_ARG_[]_translit([$1])])
 
 dnl
@@ -68,6 +81,7 @@ m4_define([_sh_quote], [m4_do(
 )])
 
 dnl
+dnl Registers a command, recording its name, type etc.
 dnl $1: Long option
 dnl $2: Short option (opt)
 dnl $3: Help string
@@ -126,37 +140,21 @@ m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
 dnl
-dnl Declare one positional argument
-dnl $1: Name of the arg
-dnl $2: Help for the arg
-m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
-	[[$0($@)]],
-	[IF_POSITIONALS_VARNUM([m4_fatal([There are some potional args before this one ('$1', that is not optional). We don't support that yet, sorry.]])],
-	[_A_POSITIONAL],
-	[m4_list_add([_POSITIONALS_NAMES], [$1])],
-	[m4_list_add([_POSITIONALS_MSGS], [$2])],
-	[m4_list_add([_POSITIONALS_MINS], 1)],
-	[m4_list_add([_POSITIONALS_DEFAULTS], [])],
-	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
-	[m4_define([_POSITIONALS_MIN], m4_incr(_POSITIONALS_MIN))],
-)])
-
-dnl
 dnl Declare one positional argument with default
 dnl $1: Name of the arg
-dnl $2: Default
-dnl $3: Help for the arg
-m4_define([ARG_POSITIONAL_SINGLE_OPT], [m4_do(
+dnl $2: Help for the arg
+dnl $3: Default (opt.)
+m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[_A_POSITIONAL_VARNUM],
 	[m4_define([_POSITIONALS_MORE], m4_incr(_POSITIONALS_MORE))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
-	[m4_list_add([_POSITIONALS_MSGS], [$3])],
-	[m4_list_add([_POSITIONALS_MINS], 0)],
+	[m4_list_add([_POSITIONALS_MSGS], [$2])],
+	[m4_list_add([_POSITIONALS_MINS], m4_ifblank([$3], 1, 0))],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
-	[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$2]))],
+	[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
 )])
 
@@ -262,6 +260,8 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 m4_define([_ARG_OPTIONAL_ACTION], _A_OPTIONAL[]_ARG_OPTIONAL_ACTION_BODY)
 
 
+dnl
+dnl $1: The command short description
 m4_define([_MAKE_HELP], [m4_do(
 	[# THE PRINT HELP FUNCION
 ],
