@@ -51,31 +51,33 @@ examples: $(EXAMPLES)
 
 check: unittests regressiontests
 	$(MAKE) tests-clean
+	@echo "*** All is OK ***"
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
 
 develop:
-	@echo Installing to prefix "'$(ROOT)/$(PREFIX)'"
+	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
-	echo '$(ROOT_DIR)/$(GENPARSE) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
+	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE)
-	@echo Installing to prefix "'$(ROOT)/$(PREFIX)'"
+	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash"
 	mkdir -p "$(ROOT)/$(PREFIX)/lib/argbash"
 	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
-	sed -e 's|M4DIR=.*|M4DIR=$(ROOT)/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
+	sed -e 's|M4DIR=.*|M4DIR=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
 	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/"*.m4
+	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/version"
 	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:

@@ -10,7 +10,7 @@ You have three options here, they are sorted by the estimated preference:
 
 #. One file with both parsing code and script body.
 
-   This is a both simple and functional approach.
+   This is a both simple and functional approach, but your script will be polluted with the auto-generated argument parsing code.
 
 #. Two files --- one for the parsing code and one for the script body, both taken care of by ``Argbash``.
 
