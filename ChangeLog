@@ -1,3 +1,13 @@
+1.1.0 (TBA       )
+------------------
+
+New features:
+
+* Support for repeated arguments, added specialized verbose macro
+* TBD: Support for double dash (separating positional and optional arguments)
+* TBD: Support for leftover args (kindof)
+
+
 1.1.0 (2015-09-06)
 ------------------
 

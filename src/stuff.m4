@@ -184,7 +184,6 @@ m4_define([ARG_VERSION], [m4_do(
 
 m4_define([ARG_HELP], [m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
 	[m4_define([_HELP_MSG], m4_escape([$1]))],
 	_ARG_OPTIONAL_ACTION(
 		[help],
@@ -217,6 +216,26 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_list_add([_OTHER],
 		m4_quote(_sciptdir[="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"]))],
 	[m4_popdef([_sciptdir])],
+)])
+
+m4_define([_ARG_OPTIONAL_INCR_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), 0, [incr])]])
+
+m4_define([_ARG_OPTIONAL_INCR], _A_OPTIONAL[]_ARG_OPTIONAL_INCR_BODY)
+
+dnl $1 = long name
+dnl $2 = short name (opt)
+dnl $3 = help
+m4_define([ARG_OPTIONAL_INCR], [m4_do(
+	[[$0($@)]],
+	[_A_OPTIONAL],
+	]m4_dquote(_ARG_OPTIONAL_INCR_BODY)[,
+)])
+
+dnl $1 = short name (opt)
+m4_define([ARG_VERBOSE], [m4_do(
+	[[$0($@)]],
+	[_A_OPTIONAL],
+	[_ARG_OPTIONAL_INCR([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
 )])
 
 dnl $1 = long name, var suffix (translit of [-] -> _)
