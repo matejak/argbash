@@ -129,6 +129,15 @@ Optional arguments
 
   The default default is ``off`` and you can specify only ``on`` and ``off``.
 
+* Repeated optional arguments:
+  ::
+
+     ARG_OPTIONAL_REPEATED([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+
+  The default default is 0.
+  The argument accepts no values on command-line, but it tracks a numerical value internally.
+  That one increases with every argument occurence.
+
 * Action optional arguments (i.e. the ``--version`` and ``--help`` type of comments):
   ::
 

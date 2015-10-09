@@ -3,7 +3,7 @@
 
 New features:
 
-* Support for repeated arguments, added specialized verbose macro
+* Support for repeated arguments, added specialized macro for --verbose 
 * TBD: Support for double dash (separating positional and optional arguments)
 * TBD: Support for leftover args (kindof)
 

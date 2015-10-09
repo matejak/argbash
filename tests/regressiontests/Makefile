@@ -35,6 +35,9 @@ define generic_regression
 	$< LOO --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
 	$< LOO | grep -q 'POS_OPT=pos-default,'
+	$< LOO | grep -q 'OPT_INCR=2,'
+	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
+	$< LOO --opt-incr -i | grep -q 'OPT_INCR=4,'
 	$< -h | grep -- pos-arg | grep -q @pos-arg@
 	$< -h | grep -- pos-opt | grep -q @pos-opt-arg@
 	$(TESTDIR)/reverse $< LOO --opt-arg 2> /dev/null

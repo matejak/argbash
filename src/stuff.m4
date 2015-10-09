@@ -106,7 +106,9 @@ m4_define([_some_opt], [m4_do(
 
 dnl Number of distinct args the script can accept
 m4_define([_NARGS], 0)
+dnl Minimal number of positional args the script accepts
 m4_define([_POSITIONALS_MIN], 0)
+dnl Highest number of positional args the script can accept (-1 for infinity)
 m4_define([_POSITIONALS_MORE], 0)
 
 dnl To be able to use _POSITIONALS_NAMES_FOREACH
@@ -145,6 +147,34 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
+	[[$0($@)]],
+	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
+	[dnl Number of possibly supplied positional arguments just went up
+],
+	[m4_define([_POSITIONALS_MORE], m4_incr(_POSITIONALS_MORE))],
+	[dnl If we don't have default, also a number of positional args that are needed went up
+],
+	[m4_ifblank([$3], [m4_do(
+			[m4_list_add([_POSITIONALS_MINS], 1)],
+			[m4_list_add([_POSITIONALS_DEFAULTS], [])],
+		)], [m4_do(
+			[_A_POSITIONAL_VARNUM],
+			[m4_list_add([_POSITIONALS_MINS], 0)],
+			[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
+		)])],
+	[m4_list_add([_POSITIONALS_NAMES], [$1])],
+	[m4_list_add([_POSITIONALS_MSGS], [$2])],
+	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
+],
+	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
+)])
+
+dnl
+dnl Declare sequence of multiple positional arguments
+dnl $1: Name of the arg
+dnl $2: Help for the arg
+dnl $3: How many args (opt., default is -1 == infinitely many)
+m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[_A_POSITIONAL_VARNUM],
@@ -216,24 +246,25 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_popdef([_sciptdir])],
 )])
 
-m4_define([_ARG_OPTIONAL_INCR_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), 0, [incr])]])
+m4_define([_ARG_OPTIONAL_REPEATED_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), m4_quote($]][[4), [incr])]])
 
-m4_define([_ARG_OPTIONAL_INCR], _A_OPTIONAL[]_ARG_OPTIONAL_INCR_BODY)
+m4_define([_ARG_OPTIONAL_REPEATED], _A_OPTIONAL[]_ARG_OPTIONAL_INCR_BODY)
 
 dnl $1 = long name
 dnl $2 = short name (opt)
 dnl $3 = help
-m4_define([ARG_OPTIONAL_INCR], [m4_do(
+dnl $4 = default (=0)
+m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
-	]m4_dquote(_ARG_OPTIONAL_INCR_BODY)[,
+	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
 )])
 
 dnl $1 = short name (opt)
 m4_define([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
-	[_ARG_OPTIONAL_INCR([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
+	[_ARG_OPTIONAL_REPEATED([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
 )])
 
 dnl $1 = long name, var suffix (translit of [-] -> _)
@@ -356,6 +387,7 @@ do],
 			shift],
 			[bool], _ARGVAR[="on"
 			test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
+			[incr], m4_quote((( _ARGVAR++ ))),
 			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
 			exit 0],
 		)],

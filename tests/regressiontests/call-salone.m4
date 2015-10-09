@@ -6,6 +6,6 @@
 
 # [ <-- needed because of Argbash
 
-echo "BOOL=$_ARG_BOO_L,OPT_S=$_ARG_OPT_ARG,POS_S=$_ARG_POS_ARG,POS_OPT=$_ARG_POS_OPT,"
+echo "BOOL=$_ARG_BOO_L,OPT_S=$_ARG_OPT_ARG,POS_S=$_ARG_POS_ARG,POS_OPT=$_ARG_POS_OPT,OPT_INCR=$_ARG_OPT_INCR,"
 
 # ] <-- needed because of Argbash
