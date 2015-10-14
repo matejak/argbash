@@ -2,11 +2,16 @@ TESTDIR ?= ../regressiontests
 
 NUL =
 
+%.sh: %.m4 ../../bin/argbash.sh
+	$(word 2,$^) $< -o $@
+
 TESTS = \
 	stability \
 	args \
 	stability-salone \
 	args-salone \
+	test-onlyopt \
+	test-onlypos \
 	$(NUL)
 
 # test-salone is side-effect of call-salone
@@ -17,6 +22,8 @@ SCRIPTS = \
 	$(TESTDIR)/test-standalone2.sh \
 	$(TESTDIR)/call-salone.sh \
 	$(TESTDIR)/test-salone.sh \
+	$(TESTDIR)/test-onlyopt.sh \
+	$(TESTDIR)/test-onlypos.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -49,6 +56,17 @@ args: $(TESTDIR)/test.sh
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 args-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
+
+test-onlypos: $(TESTDIR)/test-onlypos.sh
+	$(TESTDIR)/reverse grep -q case $<
+	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,
+	$< LOO ar,guma | grep -q POS_S=LOO,POS_OPT=ar,guma,
+
+test-onlyopt: $(TESTDIR)/test-onlyopt.sh
+	$(TESTDIR)/reverse grep -q POSITION $<
+	$< --opt-arg PoS | grep -q OPT_S=PoS,
+	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$(TESTDIR)/reverse $< LOO 2> /dev/null
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)

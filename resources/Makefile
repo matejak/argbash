@@ -22,9 +22,6 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 $(GENPARSE): bin/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
-TESTDIR = ../tests/regressiontests
-include ../tests/regressiontests/Makefile
-
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
@@ -41,6 +38,11 @@ CHANGELOG = ../ChangeLog
 
 %3.sh: %2.sh $(GENPARSE)
 	$(GENPARSE) $< -o $@
+
+# Must be included AFTER we have rules for .sh stuff
+TESTDIR = ../tests/regressiontests
+include ../tests/regressiontests/Makefile
+
 
 bootstrap:
 	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4 | autom4te -l m4sugar > $(GENPARSE)

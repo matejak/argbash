@@ -155,6 +155,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[dnl If we don't have default, also a number of positional args that are needed went up
 ],
 	[m4_ifblank([$3], [m4_do(
+			[_A_POSITIONAL],
 			[m4_list_add([_POSITIONALS_MINS], 1)],
 			[m4_list_add([_POSITIONALS_DEFAULTS], [])],
 		)], [m4_do(
@@ -248,7 +249,7 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 
 m4_define([_ARG_OPTIONAL_REPEATED_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), m4_quote($]][[4), [incr])]])
 
-m4_define([_ARG_OPTIONAL_REPEATED], _A_OPTIONAL[]_ARG_OPTIONAL_INCR_BODY)
+m4_define([_ARG_OPTIONAL_REPEATED], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCR_BODY)
 
 dnl $1 = long name
 dnl $2 = short name (opt)
@@ -288,7 +289,7 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 	]m4_dquote(_ARG_OPTIONAL_ACTION_BODY)[,
 )])
 
-m4_define([_ARG_OPTIONAL_ACTION], _A_OPTIONAL[]_ARG_OPTIONAL_ACTION_BODY)
+m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
 
 dnl
@@ -304,33 +305,41 @@ m4_define([_MAKE_HELP], [m4_do(
 	[	echo "Usage: $[]0],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
-	[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-		[m4_pushdef([argname], <m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx))>)],
-		[ m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-			[m4_expand([@<:@argname@:>@])], [m4_expand([argname])])],
-		[m4_popdef([argname])],
-)])],
+	[m4_if(HAVE_POSITIONAL, 1,
+		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+			[m4_pushdef([argname], <m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx))>)],
+			[ m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
+				[m4_expand([@<:@argname@:>@])], [m4_expand([argname])])],
+			[m4_popdef([argname])],
+		)])],
+	)],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
-	[m4_for([idx], 1, _NARGS, 1, [m4_do(
-		[ @<:@--],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[bool], [(no-)]m4_list_nth([_ARGS_LONG], idx),
-			[arg], m4_list_nth([_ARGS_LONG], idx)[ <arg>],
-			[m4_list_nth([_ARGS_LONG], idx)])],
-		[@:>@],
-	)])],
+	[m4_if(HAVE_OPTIONAL, 1,
+		[m4_for([idx], 1, _NARGS, 1, [m4_do(
+			[ @<:@--],
+			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+				[bool], [(no-)]m4_list_nth([_ARGS_LONG], idx),
+				[arg], m4_list_nth([_ARGS_LONG], idx)[ <arg>],
+				[m4_list_nth([_ARGS_LONG], idx)])],
+			[@:>@],
+		)])],
+	)],
 	["
 ],
-	[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-		[[	echo -e "\t<]m4_list_nth([_POSITIONALS_NAMES], idx)[>: ]],
-		[m4_list_nth([_POSITIONALS_MSGS], idx)],
-		[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-			[[ (default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"')])],
-		[["
+	[m4_if(HAVE_POSITIONAL, 1,
+		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+			[[	echo -e "\t<]m4_list_nth([_POSITIONALS_NAMES], idx)[>: ]],
+			[m4_list_nth([_POSITIONALS_MSGS], idx)],
+			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
+				[[ (default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"')])],
+			[["
 ]],
-)])],
-	[m4_for([idx], 1, _NARGS, 1, [m4_do(
+		)])],
+	)],
+	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
+],
+	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[	echo -e "\t],
 		[dnl Display a short one if it is not blank
 ],
@@ -349,19 +358,16 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [action], [], [ (default: '"m4_list_nth([_ARGS_DEFAULT], idx)"')])],
 		["
 ],
-	)])],
+	)])])],
 	[}],
 )])
 
-m4_define([_MAKE_EVAL], [m4_do(
-	[# THE PARSING ITSELF
-],
-	[while test $[]# -gt 0
-do],
-	[
-	_key="$[]1"
+m4_define([_EVAL_OPTIONALS], [m4_do(
+	[	_key="$[]1"
 ],
 	[	case "$_key" in],
+	[dnl We don't do this if _NARGS == 0
+],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[
 		],
@@ -395,56 +401,93 @@ do],
 			;;],
 		[m4_popdef([_ARGVAR])],
 	)])],
+	[m4_if(HAVE_POSITIONAL, 1,
+		[m4_expand([_EVAL_POSITIONALS_CASE])],
+		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
 	[[
+	esac]],
+)])
+
+dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
+m4_define([_EVAL_POSITIONALS_CASE], [[
 		*@:}@
 		    	POSITIONALS+=("$][1")
-			;;
-	esac
-	shift
+			;;]])
+
+dnl If we expect only optional arguments and we get an intruder, fail noisily.
+m4_define([_EXCEPT_OPTIONALS_CASE], [[
+		*@:}@
+			{ (echo "FATAL ERROR: Got an unexpected argument '$][1'"; print_help) >&2; exit 1; }
+			;;]])
+
+dnl Store positional args inside a 'for' statement
+m4_define([_EVAL_POSITIONALS_FOR],
+	[[	POSITIONALS+=("$][1")]])
+
+m4_define([_MAKE_EVAL], [m4_do(
+	[# THE PARSING ITSELF
+],
+	[while test $[]# -gt 0
+do
+],
+	[dnl We assume that we have either optional args (with possibility of positionals), or that we have only positional args.
+],
+	[m4_if(HAVE_OPTIONAL, 1,
+		[m4_expand([_EVAL_OPTIONALS])],
+		[m4_expand([_EVAL_POSITIONALS_FOR])])
+],
+	[[	shift
 done]],
 	[
-
 ],
-	[dnl Now we look what positional args we got and we say if they were too little or too many. We also do the assignment to variables using eval.
+	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
+		[dnl Now we look what positional args we got and we say if they were too little or too many. We also do the assignment to variables using eval.
 ],
-	[[POSITIONAL_NAMES=(]],
-	[_POSITIONALS_NAMES_FOREACH([['_varname(item)' ]])],
-	[[)
+		[
+],
+		[[POSITIONAL_NAMES=(]],
+		[_POSITIONALS_NAMES_FOREACH([['_varname(item)' ]])],
+		[[)
 test ${#POSITIONALS[@]} -lt ]],
-	[_POSITIONALS_MIN],
-	[[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
+		[_POSITIONALS_MIN],
+		[[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
 test ${#POSITIONALS[@]} -gt ]],
-	[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MIN + _POSITIONALS_MORE))],
-	[_POSITIONALS_TOTAL],
-	[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most ]],
-	[_POSITIONALS_TOTAL],
-	[m4_popdef([_POSITIONALS_TOTAL])],
-	[[."; print_help ) >&2; exit 1; }
+		[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MIN + _POSITIONALS_MORE))],
+		[_POSITIONALS_TOTAL],
+		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most ]],
+		[_POSITIONALS_TOTAL],
+		[m4_popdef([_POSITIONALS_TOTAL])],
+		[[."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""
 done]],
+	)])],
 )])
 
 m4_define([_MAKE_DEFAULTS], [m4_do(
-	[# THE DEFAULTS INITIALIZATION --- POSITIONALS
+	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
+		[# THE DEFAULTS INITIALIZATION --- POSITIONALS
 ],
-	[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-		[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
-		[m4_ifnblank(m4_quote(_DEFAULT),
-			[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=_DEFAULT
+		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+			[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
+			[m4_ifnblank(m4_quote(_DEFAULT),
+				[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=_DEFAULT
 ])],
-		[m4_popdef([_DEFAULT])],
+			[m4_popdef([_DEFAULT])],
+		)])],
 	)])],
-	[# THE DEFAULTS INITIALIZATION --- OPTIONALS
+	[m4_if(HAVE_OPTIONAL, 1, [m4_do(
+		[# THE DEFAULTS INITIALIZATION --- OPTIONALS
 ],
-	[m4_for([idx], 1, _NARGS, 1, [m4_do(
-		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[action], [],
-			m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)
+		[m4_for([idx], 1, _NARGS, 1, [m4_do(
+			[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
+			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+				[action], [],
+				m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)
 ]))],
-		[m4_popdef([_ARGVAR])],
+			[m4_popdef([_ARGVAR])],
+		)])],
 	)])],
 )])
 
@@ -455,3 +498,11 @@ m4_define([_MAKE_OTHER], [m4_do(
 	[_OTHER_FOREACH([item
 ])],
 )])
+
+dnl And stop those annoying diversion warnings
+m4_define([_m4_divert(STDOUT)], 1)
+
+dnl Expand to 1 if we don't have positional nor optional args
+m4_define([_NO_ARGS_WHATSOEVER],
+	[m4_if(HAVE_POSITIONAL, 1, 0,
+		m4_if(HAVE_OPTIONAL, 1, 0, 1))])
