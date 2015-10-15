@@ -14,25 +14,30 @@ You declare arguments that your script should use in few lines and then, you run
 :Copyright:
   - 2014-2015, Matěj Týč
 
-Quickstart
-----------
-
-Basically, you write a simple template of your script.
-Then, you run the ``argbash.sh`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
-The script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash.sh`` on top of it to get the updated script.
-
 Requirements
 ++++++++++++
 
 You need:
 
 * ``bash>=3.0``
-* ``autoconf>=2.64`` (Argbash makes use of the ``autom4te`` utility)
+* ``autoconf>=2.64`` (``Argbash`` makes use of the ``autom4te`` utility)
+
+Quickstart
+----------
+
+In a nutshell, using ``Argbash`` consists of these simple steps:
+
+#. You write a simple template of your script based on arguments your script is supposed to accept.
+#. You run the ``argbash.sh`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
+
+Eventually, you may want to add/remove/rename arguments your script accepts.
+In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
+Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash.sh`` on top of the script to get it updated.
 
 Writing a template
 ++++++++++++++++++
 
-Let's stick with a testing script that accepts some arguments and then it just prints them out.
+Let's stick with a testing script that accepts some arguments and then it just prints their values.
 So, let's say that we would like a script that produces the following help message:
 
 .. literalinclude:: _static/minimal-output-help.txt
@@ -41,11 +46,11 @@ So, let's say that we would like a script that produces the following help messa
 Then, it means that we need following arguments:
 
 * One mandatory positional argument.
-  (In other words, an argument that must be passed and that is not preceeded by options such as ``--foo``, ``-f``.)
+  (In other words, an argument that must be passed and that is not preceeded by *options* such as ``--foo``, ``-f``.)
 * Four optional arguments:
 
   * ``--option`` that accepts one value,
-  * ``--verbose`` that doesn't accept any value --- it either is or isn't specified,
+  * ``--print`` that doesn't accept any value --- it either is or isn't specified,
   * ``--version`` that also doesn't accept any value and the program is supposed just to print its version and quit afterwards, and finally
   * ``--help`` that prints a help message and also quits.
 
@@ -55,8 +60,8 @@ Therefore, we write this to the template:
    :language: bash
    :end-before: needed because of Argbash
 
-The body of the script (that follows the template) is trivial, but note that it is enclosed in a pair of square brackets.
-They are "hidden" in comments, but still, they have to be there.
+The body of the script (i.e. lines past the template) is trivial, but note that it is enclosed in a pair of square brackets.
+They are "hidden" in comments and not seen by the shell, but still, they have to be there for the "use the script as a template" feature to function.
 
 .. literalinclude:: ../resources/examples/minimal.m4
    :language: bash
@@ -73,7 +78,7 @@ Now we launch it and the output is good!
 
 ::
 
-   ./script.sh posi-tional -o opt-ional --verbose
+   ./script.sh posi-tional -o opt-ional --print
 
    Positional arg value: posi-tional
    Optional arg --option value: opt-ional
@@ -119,4 +124,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

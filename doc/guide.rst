@@ -6,7 +6,7 @@ This section tells you how to write templates, the next one is about ``argbash.s
 Definitions
 -----------
 
-There are two types of arguments --- thake an example:
+There are two major types of arguments --- thake an example:
 
 ::
   
@@ -21,11 +21,11 @@ The common pattern is that optional arguments are not required, being there just
 
 The ``/home`` argument is a positional one.
 In case of ``ls``, the positional argument has a default --- running ``ls`` without parameters is the same as running ``ls .``.
-``ls`` itself accepts an arbitrary number of positional arguments and it treats them in the same way.
+``ls`` itself accepts an arbitrary number of positional arguments and it treats them all in the same way.
 
 On the other hand, the ``grep`` command requires at least one positional argument.
-The first one is supposed to be the regular expression you want to match against, and the rest are paths, so they are not treated the same.
-The first positional argument doesn't have a default, whereas the second one normally defaults to ``-``, which means ``grep`` will try to read input from ``stdin``.
+The first one is supposed to be the regular expression you want to match against, and the other ones correspond to filenames, so they are not treated the same.
+The first positional argument ``grep`` accepts (i.e. the regular expression), doesn't have a default, whereas the second one normally defaults to ``-``, which means ``grep`` will try to read input from ``stdin``.
 
 Your script
 -----------
@@ -36,12 +36,13 @@ As of this version, ``Argbash`` lets you choose from:
 * Single-value positional arguments (with optional defaults),
 * single-value optional arguments,
 * boolean optional arguments,
-* action optional arguments (i.e. the ``--version`` and ``--help`` type of args).
+* action optional arguments (i.e. the ``--version`` and ``--help`` type of args) and
+* repeatable arguments that "remember" being repeated multiple times (e.g. ``--verbose``).
 
 Plus, there are convenience macros that don't relate to argument parsing, but they might help you to write better scripts.
 
 Take a look at the API and place the declarations either to your script or in a separate file.
-Let yourself be inspired by the ``resources/examples/simple.m4`` example (you can view it using BASH syntax coloring despite the extension).
+Let yourself be inspired by the ``resources/examples/simple.m4`` example (Bash syntax highlighting is recommended, despite the extension).
 
 Then, run the following command to your file:
 
@@ -49,7 +50,7 @@ Then, run the following command to your file:
   
   bin/argbash.sh myfile.m4 -o myfile.sh
 
-to either get a script that should work, or a file that you include in your script.
+to either get a script that should just work, or a file that you include in your script.
 
 Argbash API
 -----------
@@ -62,10 +63,11 @@ We have positional and optional arguments sorted out, so let's define some other
 * Name:
   Both positional and optional arguments have a name.
   In case of optional argument, the name is what appears before the double dash, e.g. name of ``--project-path`` is ``project-path``.
-  The name is used in help and later in your script.
+  The long or short string (e.g. ``--project-path``, ``-p``) itself is called option.
+  The argument's name is used in help and later in your script when you access argument's value.
   
 * Argument:
-  Options accept arguments.
+  On command-line, options are followed by arguments.
   Although this is confusing, it is a common way of putting it.
   Let's take ``ls -l --sort time`` again as an example :
 
@@ -81,7 +83,7 @@ We have positional and optional arguments sorted out, so let's define some other
   General notice:
   There is no way of how to find out whether an argument was used or not just by the value of the corresponding variable in the script.
   ``Bash`` doesn't distinguish between empty variables and variables containing an empty string.
-  At the same time, it is possible to pass an empty string as an argument value.
+  Also note that it is perfectly possible to pass an empty string as an argument value.
 
 So let's get back to argument types.
 Below, is a list of argument types and macros that you have to write to support those.
@@ -163,6 +165,13 @@ Special arguments
   ::
 
      ARG_VERSION([code to execute when specified])
+
+* Verbose argument (a special case of a repeated argument):
+  ::
+
+     ARG_VERBOSE([short arg name])
+
+  Default default is 0, you can use a ``test $_ARG_VERBOSE -ge 1`` pattern.
  
 Convenience macros
 ++++++++++++++++++

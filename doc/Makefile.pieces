@@ -27,7 +27,7 @@ $(STATICDIR)/minimal-output-help.txt: $(MINIMAL)
 	$(CMD_OUT)
 
 $(STATICDIR)/minimal-output-foobar.txt: $(MINIMAL)
-	$(eval FLAGS := foo -o bar --verbose)
+	$(eval FLAGS := foo -o bar --print)
 	$(CMD_OUT)
 
 $(STATICDIR)/minimal-output-noverbose.txt: $(MINIMAL)
