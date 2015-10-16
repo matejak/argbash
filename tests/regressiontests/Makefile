@@ -2,7 +2,9 @@ TESTDIR ?= ../regressiontests
 
 NUL =
 
-%.sh: %.m4 ../../bin/argbash.sh
+ARGBASH_BIN = $(TESTDIR)/../../bin/argbash.sh
+
+%.sh: %.m5 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 
 TESTS = \
@@ -12,6 +14,7 @@ TESTS = \
 	args-salone \
 	test-onlyopt \
 	test-onlypos \
+	test-gen \
 	$(NUL)
 
 # test-salone is side-effect of call-salone
@@ -52,6 +55,16 @@ endef
 
 args: $(TESTDIR)/test.sh
 	$(generic_regression)
+
+GENTESTS = $(foreach tname,pos opt pos2 opt2 pos-opt pos-opt2,$(TESTDIR)/gen-test-$(tname).m4)
+
+test-gen: $(ARGBASH_BIN) $(GENTESTS)
+	ERROR=pos-arg $(TESTDIR)/reverse $< $(word 2,$+) > /dev/null
+	ERROR=opt-arg $(TESTDIR)/reverse $< $(word 3,$+) > /dev/null
+	ERROR=pos_arg $(TESTDIR)/reverse $< $(word 4,$+) > /dev/null
+	ERROR=opt_arg $(TESTDIR)/reverse $< $(word 5,$+) > /dev/null
+	ERROR=same-arg $(TESTDIR)/reverse $< $(word 6,$+) > /dev/null
+	ERROR=same_arg $(TESTDIR)/reverse $< $(word 7,$+) > /dev/null
 
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 args-salone: $(TESTDIR)/call-salone.sh

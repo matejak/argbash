@@ -12,7 +12,11 @@ m4_define([assert_equals],
 		[m4_fatal([Item '$1' doesn't match '$2'.])])])
 
 dnl If BOMB gets expanded, we will be noticed.
+m4_list_declare([FOO])
+assert_equals(m4_list_len([FOO]), 0)
+assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [])
 m4_list_add([FOO], [BOMB]) 
+assert_equals(m4_list_len([FOO]), 1)
 m4_list_add([FOO], [ANTIFUSE(list)])
 m4_list_add([FOO], [BOMB]) 
 m4_list_add([FOO], [BAZ])
@@ -29,10 +33,12 @@ assert_equals(m4_list_nth([FOO], 7), [--LALA])
 dnl The list items should be single-quoted only, so passing them to m4_expand should expand them.
 m4_expand(m4_list_nth([FOO], 2))
 ANTIBOMB([list])
-m4_list_declare([FOO])
 assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [-BOMB-])
+assert_equals(m4_list_len([FOO]), 7)
 assert_equals(m4_quote(m4_list_pop_front([FOO])), [BOMB])
+assert_equals(m4_list_len([FOO]), 6)
 assert_equals(m4_quote(m4_list_pop_back([FOO])), [--LALA])
+assert_equals(m4_list_len([FOO]), 5)
 dnl After pop
 assert_equals(m4_list_nth([FOO], 2), [BOMB])
 

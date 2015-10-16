@@ -16,6 +16,8 @@ VERSION=_ARGBASH_VERSION
 DISCARD=/dev/null
 test -e $DISCARD || DISCARD=NUL
 
+set -o pipefail
+
 INFILE="$_ARG_INPUT"
 
 M4DIR="$SCRIPT_DIR/../src"

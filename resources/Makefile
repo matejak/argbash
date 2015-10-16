@@ -44,8 +44,9 @@ TESTDIR = ../tests/regressiontests
 include ../tests/regressiontests/Makefile
 
 
+# We include the source dir because there is m4_include in stuff.m4
 bootstrap:
-	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4 | autom4te -l m4sugar > $(GENPARSE)
+	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4 | autom4te -I ../src -l m4sugar > $(GENPARSE)
 	chmod a+x $(GENPARSE)
 	touch bin/argbash.m4
 

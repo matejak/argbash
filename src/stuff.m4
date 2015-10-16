@@ -9,56 +9,8 @@ m4_define([DEFINE_VERSION], [m4_do(
 	[m4_expand([USER_VERSION])],
 )])
 
-m4_define([m4_list_declare], [m4_do(
-	[m4_define([$1_GET], [m4_expand([m4_list_nth([$1], $][1)])])],
-	[m4_define([$1_FOREACH], [m4_foreach([item], [m4_dquote_elt(m4_list_contents([$1]))], m4_quote($][1))])],
-)])
-
-m4_define([m4_list_add], [m4_do(
-	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_ifndef(_LIST_NAME,
-		[m4_define(_LIST_NAME, m4_dquote(m4_escape([$2])))],
-		[m4_define(_LIST_NAME, m4_dquote(m4_list_contents([$1]), m4_escape([$2])))],
-	)],
-	[m4_popdef([_LIST_NAME])],
-)])
-
-m4_define([m4_list_len], [m4_do(
-	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_count(m4_unquote(_LIST_NAME))],
-	[m4_popdef([_LIST_NAME])],
-)])
-
-dnl
-dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
-m4_define([m4_list_contents], [m4_do(
-	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_ifndef(_LIST_NAME, [], m4_quote(_LIST_NAME))],
-	[m4_popdef([_LIST_NAME])],
-)])
-
-dnl
-dnl Returns its n-th element
-m4_define([m4_list_nth], [m4_argn([$2], m4_list_contents([$1]))])
-
-dnl
-dnl The list loses its 1st element, which is also expanded by this macro.
-m4_define([m4_list_pop_front], [m4_do(
-	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_car(m4_unquote(_LIST_NAME))],
-	[m4_define(_LIST_NAME, m4_cdr(m4_unquote(_LIST_NAME)))],
-	[m4_popdef([_LIST_NAME])],
-)])
-
-dnl
-dnl The list loses its last element, which is also expanded by this macro.
-m4_define([m4_list_pop_back], [m4_do(
-	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
-	[m4_list_pop_front([$1])],
-	[m4_define(_LIST_NAME, m4_dquote(m4_reverse(m4_unquote(_LIST_NAME))))],
-	[m4_popdef([_LIST_NAME])],
-)])
+dnl Contains implementation of m4_list_...
+m4_include([list.m4])
 
 dnl
 dnl The operation on command names that makes stem of variable names
@@ -81,6 +33,25 @@ m4_define([_sh_quote], [m4_do(
 )])
 
 dnl
+dnl $1: Argument name
+dnl $2: Argument type (OPT or POS)
+dnl
+dnl Also writes the argname to the right set
+m4_define([_CHECK_ARGNAME_FREE], [m4_do(
+	[m4_pushdef([_TLIT], m4_dquote(_translit([$1])))],
+	[m4_set_contains([_ARGS_LONG], _TLIT,
+		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a long option used earlier.])])])],
+	[m4_set_contains([_POSITIONALS], _TLIT,
+		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a positional argument name used earlier.])])])],
+	[m4_set_add(m4_case([$2],
+			[OPT], [[_ARGS_LONG]],
+			[POS], [_POSITIONALS],
+			[m4_fatal([Unknown argument type '$2'])]),
+		_TLIT)],
+	[m4_popdef([_TLIT])],
+)])
+
+dnl
 dnl Registers a command, recording its name, type etc.
 dnl $1: Long option
 dnl $2: Short option (opt)
@@ -91,9 +62,7 @@ m4_define([_some_opt], [m4_do(
 	[m4_list_add([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
 ],
-	[m4_set_contains(_translit([_ARGS_LONG]),  [$1],
-		[m4_ifnblank([$1], [m4_fatal([The long option '$1' is already used.])])],
-		[m4_set_add(_translit([_ARGS_LONG]), [$1])])],
+	[_CHECK_ARGNAME_FREE([$1], [OPT])],
 	[m4_list_add([_ARGS_SHORT], [$2])],
 	[m4_set_contains([_ARGS_SHORT], [$2],
 		[m4_ifnblank([$2], [m4_fatal([The short option '$2' is already used.])])],
@@ -104,14 +73,14 @@ m4_define([_some_opt], [m4_do(
 	[m4_define([_NARGS], m4_eval(_NARGS + 1))],
 )])
 
-dnl Number of distinct args the script can accept
+dnl Number of distinct optional args the script can accept
 m4_define([_NARGS], 0)
 dnl Minimal number of positional args the script accepts
 m4_define([_POSITIONALS_MIN], 0)
-dnl Highest number of positional args the script can accept (-1 for infinity)
+dnl Greatest number of positional args the script can accept (-1 for infinity)
 m4_define([_POSITIONALS_MORE], 0)
 
-dnl To be able to use _POSITIONALS_NAMES_FOREACH
+dnl To be able to use _POSITIONALS_NAMES_FOREACH etc.
 m4_list_declare([_POSITIONALS_NAMES])
 m4_list_declare([_POSITIONALS_MINS])
 
@@ -167,7 +136,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
-	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
+	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
 dnl
@@ -186,7 +155,7 @@ m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
 	[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
-	[m4_set_contains([_POSITIONALS], [$1], [m4_fatal([The positional option name '$1' is already used.])], [m4_set_add([_POSITIONALS], [$1])])],
+	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
 m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
@@ -247,9 +216,11 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_popdef([_sciptdir])],
 )])
 
-m4_define([_ARG_OPTIONAL_REPEATED_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), m4_quote($]][[4), [incr])]])
+dnl Precedence is important, _CALL_SOME_OPT has to be defined early on
+m4_define([_CALL_SOME_OPT], [[_some_opt([$1], [$2], [$3], [$4], [$5])]])
 
-m4_define([_ARG_OPTIONAL_REPEATED], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCR_BODY)
+m4_define([_ARG_OPTIONAL_REPEATED_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [incr])])
+m4_define([_ARG_OPTIONAL_REPEATED], [_A_OPTIONAL[]]_ARG_OPTIONAL_REPEATED_BODY)
 
 dnl $1 = long name
 dnl $2 = short name (opt)
@@ -279,7 +250,7 @@ m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
 		m4_ifnblank([$4], [$4], [off]), [bool])],
 )])
 
-m4_define([_ARG_OPTIONAL_ACTION_BODY], [[_some_opt(m4_quote(]]$[[]]1[[), m4_quote($]][[2), m4_quote($]][[3), m4_quote($]][[4), [action])]])
+m4_define([_ARG_OPTIONAL_ACTION_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [action])])
 
 m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 	[[$0($@)]],
@@ -388,7 +359,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 ],
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[arg], [test $[]# -lt 2 && { echo "Missing value for the positional argument." >&2; exit 1; }]
+			[arg], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
 			_ARGVAR[="$[]2"
 			shift],
 			[bool], _ARGVAR[="on"

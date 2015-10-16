@@ -34,7 +34,7 @@ do
 	_key="$1"
 	case "$_key" in
 		-o|--output)
-			test $# -lt 2 && { echo "Missing value for the positional argument." >&2; exit 1; }
+			test $# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }
 			_ARG_OUTPUT="$2"
 			shift
 			;;
@@ -75,6 +75,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # MS Windows compatibility fix
 DISCARD=/dev/null
 test -e $DISCARD || DISCARD=NUL
+
+set -o pipefail
 
 INFILE="$_ARG_INPUT"
 
