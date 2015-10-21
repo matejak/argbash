@@ -21,7 +21,7 @@ _ARG_STANDALONE=off
 function print_help
 {
 	echo "Argbash is an argument parser generator for Bash."
-	echo "Usage: $0 <input> [--output <arg>] [--(no-)standalone] [--version] [--help]"
+	echo "Usage: $0 [--output <arg>] [--(no-)standalone] [--version] [--help] <input>"
 	echo -e "\t<input>: The input template file"
 	echo -e "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '""-""')"
 	echo -e "\t--standalone,--no-standalone: Whether the parsing code is in a standalone file. (default: '"off"')"
@@ -59,7 +59,7 @@ done
 
 POSITIONAL_NAMES=('_ARG_INPUT' )
 test ${#POSITIONALS[@]} -lt 0 && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
-test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most 1."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most 1, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""

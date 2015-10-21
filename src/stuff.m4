@@ -164,6 +164,11 @@ m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
 
+m4_define([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
+	[[$0($@)]],
+	[m4_define([HAVE_DOUBLEDASH], 1)],
+)])
+
 dnl
 dnl $1 The function to call to get the version
 m4_define([ARG_VERSION], [m4_do(
@@ -274,16 +279,6 @@ m4_define([_MAKE_HELP], [m4_do(
 	m4_ifnblank(m4_quote(_HELP_MSG), m4_expand([[	echo] "_HELP_MSG"
 ])),
 	[	echo "Usage: $[]0],
-	[dnl If we have positionals, display them like <pos1> <pos2> ...
-],
-	[m4_if(HAVE_POSITIONAL, 1,
-		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-			[m4_pushdef([argname], <m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx))>)],
-			[ m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-				[m4_expand([@<:@argname@:>@])], [m4_expand([argname])])],
-			[m4_popdef([argname])],
-		)])],
-	)],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
 	[m4_if(HAVE_OPTIONAL, 1,
@@ -294,6 +289,17 @@ m4_define([_MAKE_HELP], [m4_do(
 				[arg], m4_list_nth([_ARGS_LONG], idx)[ <arg>],
 				[m4_list_nth([_ARGS_LONG], idx)])],
 			[@:>@],
+		)])],
+	)],
+	[m4_if(HAVE_DOUBLEDASH, 1, [[ @<:@--@:>@]])],
+	[dnl If we have positionals, display them like <pos1> <pos2> ...
+],
+	[m4_if(HAVE_POSITIONAL, 1,
+		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+			[m4_pushdef([argname], <m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx))>)],
+			[ m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
+				[m4_expand([@<:@argname@:>@])], [m4_expand([argname])])],
+			[m4_popdef([argname])],
 		)])],
 	)],
 	["
@@ -336,6 +342,13 @@ m4_define([_MAKE_HELP], [m4_do(
 m4_define([_EVAL_OPTIONALS], [m4_do(
 	[	_key="$[]1"
 ],
+	[m4_if(HAVE_DOUBLEDASH, 1, [[	if test "$_key" = '--'
+	then
+		shift
+		POSITIONALS+=("$][@")
+		break
+	fi
+]])],
 	[	case "$_key" in],
 	[dnl We don't do this if _NARGS == 0
 ],
@@ -428,7 +441,7 @@ test ${#POSITIONALS[@]} -gt ]],
 		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most ]],
 		[_POSITIONALS_TOTAL],
 		[m4_popdef([_POSITIONALS_TOTAL])],
-		[[."; print_help ) >&2; exit 1; }
+		[[, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""

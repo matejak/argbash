@@ -114,6 +114,17 @@ Positional arguments
   If you leave the default blank, it is understood that you don't want one.
   If you really want to have an explicit default of empty string, pass a quoted empty string (i.e. ``""`` or ``''``).
 
+* End of optional arguments and beginning of positional ones (the double-dash ``--``):
+  ::
+
+     ARG_POSITIONAL_DOUBLEDASH()
+
+  You are encouraged to add this to your script if you use both positional and optional arguments.
+
+  This pattern is known for example from the ``grep`` command.
+  The idea is that you specify optional arguments first and then, whatever argument follows it on the com-line, it is considered to be a positional one.
+  If your script accepts a ``--help`` optional argument and you want it to be recognized as positional, using the double-dash is the only way.
+
 Optional arguments
 ++++++++++++++++++
 

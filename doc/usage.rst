@@ -90,4 +90,4 @@ Then, you just generate ``my-parsing.sh`` using ``--standalone`` option:
 
 ::
 
-   argbash my-parsing.m4 -o my-parsing.sh
+   argbash my-parsing.m4 -o my-parsing.sh --standalone
