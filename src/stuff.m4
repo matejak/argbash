@@ -1,24 +1,30 @@
 dnl We don't like the # comments
 m4_changecom()
 
+
 dnl We include the version-defining macro
 m4_define([_ARGBASH_VERSION], m4_default_quoted(m4_normalize(m4_sinclude([version])), [unknown]))
+
 
 m4_define([DEFINE_VERSION], [m4_do(
 	[m4_define([USER_VERSION], m4_expand([m4_esyscmd_s([$1])]))],
 	[m4_expand([USER_VERSION])],
 )])
 
+
 dnl Contains implementation of m4_list_...
 m4_include([list.m4])
+
 
 dnl
 dnl The operation on command names that makes stem of variable names
 m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 
+
 dnl
 dnl The operation on command names that converts them to variable names (where command values are stored)
 m4_define([_varname], [_ARG_[]_translit([$1])])
+
 
 dnl
 dnl Encloses string into "" if its first char is not ' or "
@@ -31,6 +37,7 @@ m4_define([_sh_quote], [m4_do(
 		m4_index(["], [$1]), 0, [[$1]],
 		[["$1"]])],
 )])
+
 
 dnl
 dnl $1: Argument name
@@ -50,6 +57,7 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 		_TLIT)],
 	[m4_popdef([_TLIT])],
 )])
+
 
 dnl
 dnl Registers a command, recording its name, type etc.
@@ -84,9 +92,11 @@ dnl To be able to use _POSITIONALS_NAMES_FOREACH etc.
 m4_list_declare([_POSITIONALS_NAMES])
 m4_list_declare([_POSITIONALS_MINS])
 
+
 m4_define([_A_POSITIONAL], [m4_do(
 	[m4_define([HAVE_POSITIONAL], 1)],
 )])
+
 
 dnl
 dnl Call in cases when it is not clear how many positional args to expect.
@@ -98,17 +108,21 @@ m4_define([_A_POSITIONAL_VARNUM], [m4_do(
 	[m4_define([HAVE_POSITIONAL_VARNUM], 1)],
 )])
 
+
 m4_define([_A_OPTIONAL], [m4_do(
 	[m4_define([HAVE_OPTIONAL], 1)],
 )])
+
 
 dnl Do something depending on whether there is already infinitely many args possible or not
 m4_define([IF_POSITIONALS_INF],
 	[m4_if([_POSITIONALS_MORE], -1, [$1], [$2])])
 
+
 dnl Do something depending on whether there have been optional positional args declared beforehand or not
 m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
+
 
 dnl
 dnl Declare one positional argument with default
@@ -139,6 +153,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
+
 dnl
 dnl Declare sequence of multiple positional arguments
 dnl $1: Name of the arg
@@ -158,16 +173,19 @@ m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
+
 m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
 
+
 m4_define([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 	[[$0($@)]],
 	[m4_define([HAVE_DOUBLEDASH], 1)],
 )])
+
 
 dnl
 dnl $1 The function to call to get the version
@@ -185,6 +203,7 @@ m4_define([ARG_VERSION], [m4_do(
 	),
 )])
 
+
 m4_define([ARG_HELP], [m4_do(
 	[[$0($@)]],
 	[m4_define([_HELP_MSG], m4_escape([$1]))],
@@ -198,6 +217,8 @@ m4_define([ARG_HELP], [m4_do(
 
 
 m4_define([_DEFAULT_SCRIPTDIR], [[SCRIPT_DIR]])
+
+
 dnl
 dnl In your script, include just this directive (and DEFINE_SCRIPT_DIR before) to include the parsing stuff from a standalone file.
 dnl The argbash script generator will pick it up and (re)generate that one as well
@@ -212,6 +233,7 @@ m4_define([INCLUDE_PARSING_CODE], [m4_do(
 ]))],
 )])
 
+
 m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
@@ -221,11 +243,13 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_popdef([_sciptdir])],
 )])
 
+
 dnl Precedence is important, _CALL_SOME_OPT has to be defined early on
 m4_define([_CALL_SOME_OPT], [[_some_opt([$1], [$2], [$3], [$4], [$5])]])
 
 m4_define([_ARG_OPTIONAL_REPEATED_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [incr])])
 m4_define([_ARG_OPTIONAL_REPEATED], [_A_OPTIONAL[]]_ARG_OPTIONAL_REPEATED_BODY)
+
 
 dnl $1 = long name
 dnl $2 = short name (opt)
@@ -237,12 +261,14 @@ m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
 	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
 )])
 
+
 dnl $1 = short name (opt)
 m4_define([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_ARG_OPTIONAL_REPEATED([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
 )])
+
 
 dnl $1 = long name, var suffix (translit of [-] -> _)
 dnl $2 = short name (opt)
@@ -255,7 +281,9 @@ m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
 		m4_ifnblank([$4], [$4], [off]), [bool])],
 )])
 
+
 m4_define([_ARG_OPTIONAL_ACTION_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [action])])
+
 
 m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 	[[$0($@)]],
@@ -264,6 +292,7 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 ],
 	]m4_dquote(_ARG_OPTIONAL_ACTION_BODY)[,
 )])
+
 
 m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
@@ -339,6 +368,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[}],
 )])
 
+
 m4_define([_EVAL_OPTIONALS], [m4_do(
 	[	_key="$[]1"
 ],
@@ -392,11 +422,13 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	esac]],
 )])
 
+
 dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
 m4_define([_EVAL_POSITIONALS_CASE], [[
 		*@:}@
 		    	POSITIONALS+=("$][1")
 			;;]])
+
 
 dnl If we expect only optional arguments and we get an intruder, fail noisily.
 m4_define([_EXCEPT_OPTIONALS_CASE], [[
@@ -404,9 +436,11 @@ m4_define([_EXCEPT_OPTIONALS_CASE], [[
 			{ (echo "FATAL ERROR: Got an unexpected argument '$][1'"; print_help) >&2; exit 1; }
 			;;]])
 
+
 dnl Store positional args inside a 'for' statement
 m4_define([_EVAL_POSITIONALS_FOR],
 	[[	POSITIONALS+=("$][1")]])
+
 
 m4_define([_MAKE_EVAL], [m4_do(
 	[# THE PARSING ITSELF
@@ -449,6 +483,9 @@ done]],
 	)])],
 )])
 
+
+dnl
+dnl Create the part of the script where default values for arguments are assigned.
 m4_define([_MAKE_DEFAULTS], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION --- POSITIONALS
@@ -475,6 +512,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 	)])],
 )])
 
+
 m4_define([_MAKE_OTHER], [m4_do(
 	[[# OTHER STUFF GENERATED BY Argbash
 ]],
@@ -483,15 +521,18 @@ m4_define([_MAKE_OTHER], [m4_do(
 ])],
 )])
 
+
 dnl And stop those annoying diversion warnings
 m4_define([_m4_divert(STDOUT)], 1)
+
 
 dnl Expand to 1 if we don't have positional nor optional args
 m4_define([_NO_ARGS_WHATSOEVER],
 	[m4_if(HAVE_POSITIONAL, 1, 0,
 		m4_if(HAVE_OPTIONAL, 1, 0, 1))])
 
-dnl $1: The macro call
+
+dnl $1: The macro call (the caller is supposed to pass [$0($@)]
 m4_define([ARGBASH_GO_BASE], [m4_do(
 	[[$1
 ]],
