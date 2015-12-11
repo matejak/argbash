@@ -6,10 +6,11 @@ NUL =
 ARGBASH_BIN = $(TESTDIR)/../../bin/argbash.sh
 REVERSE = $(TESTDIR)/reverse
 
-%.sh: %.m5 $(ARGBASH_BIN)
+%.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 
 TESTS = \
+	test-more \
 	stability \
 	args \
 	stability-salone \
@@ -33,6 +34,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-onlyopt.sh \
 	$(TESTDIR)/test-onlypos.sh \
 	$(TESTDIR)/test-ddash.sh \
+	$(TESTDIR)/test-more.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -63,7 +65,7 @@ endef
 args: $(TESTDIR)/test.sh
 	$(generic_regression)
 
-GENTESTS = $(foreach tname,pos opt pos2 opt2 pos-opt pos-opt2,$(TESTDIR)/gen-test-$(tname).m4)
+GENTESTS = $(foreach tname,pos opt pos2 opt2 pos-opt pos-opt2 more,$(TESTDIR)/gen-test-$(tname).m4)
 
 test-gen: $(ARGBASH_BIN) $(GENTESTS)
 	ERROR=pos-arg $(REVERSE) $< $(word 2,$+) > /dev/null
@@ -72,10 +74,16 @@ test-gen: $(ARGBASH_BIN) $(GENTESTS)
 	ERROR=opt_arg $(REVERSE) $< $(word 5,$+) > /dev/null
 	ERROR=same-arg $(REVERSE) $< $(word 6,$+) > /dev/null
 	ERROR=same_arg $(REVERSE) $< $(word 7,$+) > /dev/null
+	ERROR="unknown number" $(REVERSE) $< $(word 8,$+) > /dev/null
 
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 args-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
+
+test-more: $(TESTDIR)/test-more.sh
+	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x foo bar,"
+	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa foo,"
+	$< LOO laa bus kus | grep -q POS_S=LOO,POS_MORE=laa bus kus,
 
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(REVERSE) grep -q case $<

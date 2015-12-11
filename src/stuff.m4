@@ -16,6 +16,8 @@ dnl Contains implementation of m4_list_...
 m4_include([list.m4])
 
 
+m4_define([_HELP_MSG])
+
 dnl
 dnl The operation on command names that makes stem of variable names
 m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
@@ -146,6 +148,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 			[m4_list_add([_POSITIONALS_MINS], 0)],
 			[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 		)])],
+	[m4_list_add([_POSITIONALS_MAXES], 1)],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
@@ -158,17 +161,33 @@ dnl
 dnl Declare sequence of multiple positional arguments
 dnl $1: Name of the arg
 dnl $2: Help for the arg
-dnl $3: How many args (opt., default is -1 == infinitely many)
+dnl $3: How many args (-1 == infinitely many)
+dnl $4, $5, ...: Defaults (opt.)
+dnl TODO:
+dnl  - handle defaults - now only one global default is allowed per script
+dnl   - store them
+dnl   - display them in the help
+dnl   - use them to extend POSITIONALS
+dnl  - use constructs s.a. POSITIONALS+=("${defaults[@]:0:$needed}")
+dnl  More:
+dnl   - infinitely many args = probably drop the -1 notation, inf. args can be handled in a parallel manner.
 m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
+	[IF_POSITIONALS_VARNUM([m4_fatal([We already expect unknown number of arguments before '$1'. This is not supported])], [])],
 	[_A_POSITIONAL_VARNUM],
-	[m4_define([_POSITIONALS_MORE], m4_incr(_POSITIONALS_MORE))],
+	[m4_define([_POSITIONALS_MORE], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MORE + [$3])))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
-	[m4_list_add([_POSITIONALS_MINS], m4_ifblank([$3], 1, 0))],
+	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))
+],
+	[m4_list_add([_POSITIONALS_MINS], m4_if([$3], -1, -1, m4_eval([$3] - ($# - 3) )))],
+	[m4_list_add([_POSITIONALS_MAXES], [$3])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
+	[m4_foreach([_default], [m4_shiftn(3, $@)], [m4_do(
+		[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([_default]))],
+	)])],
 	[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
@@ -305,7 +324,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[function print_help
 {
 ],
-	m4_ifnblank(m4_quote(_HELP_MSG), m4_expand([[	echo] "_HELP_MSG"
+	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([[	echo] "_HELP_MSG"
 ])),
 	[	echo "Usage: $[]0],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
@@ -326,7 +345,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
 			[m4_pushdef([argname], <m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx))>)],
-			[ m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
+			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
 				[m4_expand([@<:@argname@:>@])], [m4_expand([argname])])],
 			[m4_popdef([argname])],
 		)])],
@@ -338,7 +357,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[[	echo -e "\t<]m4_list_nth([_POSITIONALS_NAMES], idx)[>: ]],
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-				[[ (default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"')])],
+				[[ @{:@default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"'@:}@])],
 			[["
 ]],
 		)])],
@@ -463,12 +482,20 @@ done]],
 ],
 		[
 ],
-		[[POSITIONAL_NAMES=(]],
-		[_POSITIONALS_NAMES_FOREACH([['_varname(item)' ]])],
-		[[)
+		[[POSITIONAL_NAMES=@{:@]],
+		[m4_for([ii], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+			[dnl Go through all positionals names ...
+],
+			[m4_for([jj], 1, m4_list_nth([_POSITIONALS_MAXES], ii), 1, [m4_do(
+				[dnl And repeat each of them POSITIONALS_MAXES-times
+],
+				['_varname(m4_list_nth([_POSITIONALS_NAMES], ii))' ],
+			)])],
+		)])],
+		[[@:}@
 test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
-		[[ && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
+		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require at least ]_POSITIONALS_MIN[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
 test ${#POSITIONALS[@]} -gt ]],
 		[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MIN + _POSITIONALS_MORE))],
 		[_POSITIONALS_TOTAL],
@@ -532,10 +559,11 @@ m4_define([_NO_ARGS_WHATSOEVER],
 		m4_if(HAVE_OPTIONAL, 1, 0, 1))])
 
 
-dnl $1: The macro call (the caller is supposed to pass [$0($@)]
+dnl $1: The macro call (the caller is supposed to pass [$0($@)])
 m4_define([ARGBASH_GO_BASE], [m4_do(
 	[[$1
 ]],
+	[m4_define([_POSITIONALS_MIN], m4_list_sum(_POSITIONALS_MINS))],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@
 ### START OF CODE GENERATED BY ARGBASH v]_ARGBASH_VERSION[ one line above ###
 # Argbash is FREE SOFTWARE, know your rights: https://github.com/matejak/argbash

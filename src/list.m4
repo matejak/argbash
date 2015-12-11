@@ -31,9 +31,19 @@ m4_define([m4_list_contents], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+m4_define([m4_list_sum], [m4_do(
+	[m4_eval(m4_quote(m4_join(+, m4_list_contents([$1]))))],
+)])
+
 dnl
 dnl Returns its n-th element
-m4_define([m4_list_nth], [m4_argn([$2], m4_list_contents([$1]))])
+m4_define([m4_list_nth], [m4_do(
+	[m4_if(m4_cmp([$2], 0), 1, ,[m4_fatal([Requesting element $2 from list '$1': Only positive indices are available])])],
+	[m4_pushdef([_listlen], m4_list_len([$1]))],
+	[m4_if(m4_cmp([$2], _listlen), 1, [m4_fatal([The list '$1' has length of ]_listlen[, so element No. $2 is not available])])],
+	[m4_argn([$2], m4_list_contents([$1]))],
+	[m4_popdef([_listlen])],
+)])
 
 dnl
 dnl The list loses its 1st element, which is also expanded by this macro.

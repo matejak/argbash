@@ -140,7 +140,7 @@ Optional arguments
 
      ARG_OPTIONAL_BOOLEAN([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
 
-  The default default is ``off`` and you can specify only ``on`` and ``off``.
+  The default default is ``off`` (the only alternative is ``on``).
 
 * Repeated optional arguments:
   ::
@@ -230,5 +230,5 @@ The argument name is transliterated like this:
    So given that you have an argument ``--input-file`` that expects a value, you can access it via BASH variable ``_ARG_INPUT_FILE``.
 #. Boolean arguments have values either ``on`` or ``off``.
 
-   If (a boolean argument) ``--verbose`` is passed, value of ``_ARG_VERBOSE`` is set to ``on``.
+   If (a boolean argument) ``--quiet`` is passed, value of ``_ARG_QUIET`` is set to ``on``.
 

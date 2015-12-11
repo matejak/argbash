@@ -21,7 +21,7 @@ _ARG_STANDALONE=off
 function print_help
 {
 	echo "Argbash is an argument parser generator for Bash."
-	echo "Usage: $0 [--output <arg>] [--(no-)standalone] [--version] [--help] <input>"
+	echo "Usage: $0 [--output <arg>] [--(no-)standalone] [--version] [--help]<input>"
 	echo -e "\t<input>: The input template file"
 	echo -e "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '""-""')"
 	echo -e "\t--standalone,--no-standalone: Whether the parsing code is in a standalone file. (default: '"off"')"
@@ -58,8 +58,8 @@ do
 done
 
 POSITIONAL_NAMES=('_ARG_INPUT' )
-test ${#POSITIONALS[@]} -lt 0 && { ( echo "FATAL ERROR: Not enough positional arguments."; print_help ) >&2; exit 1; }
-test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most 1, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -lt 1 && { ( echo "FATAL ERROR: Not enough positional arguments --- we require at least 1, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -gt 2 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most 2, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""
@@ -87,10 +87,14 @@ test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
 
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
-		| autom4te -l m4sugar -I "$M4DIR" \
+	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" > temp
+	# cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
+	#	| autom4te -l m4sugar -I "$M4DIR" \
+		autom4te -l m4sugar -I "$M4DIR" temp \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
+	_ret=$?
+	test $_ret = 0 || {  echo "Error during autom4te run, aborting!" >&2; exit $_ret; }
 }
 
 test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }

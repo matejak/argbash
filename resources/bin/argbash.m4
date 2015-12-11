@@ -27,10 +27,14 @@ test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
 
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
-		| autom4te -l m4sugar -I "$M4DIR" \
+	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" > temp
+	# cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
+	#	| autom4te -l m4sugar -I "$M4DIR" \
+		autom4te -l m4sugar -I "$M4DIR" temp \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
+	_ret=$?
+	test $_ret = 0 || {  echo "Error during autom4te run, aborting!" >&2; exit $_ret; }
 }
 
 test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }

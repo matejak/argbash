@@ -23,6 +23,15 @@ m4_list_add([FOO], [BAZ])
 m4_list_add([FOO], [BAZ2])
 assert_equals(m4_list_len([FOO]), 5)
 
+dnl Try a simple sum
+m4_list_add([nums], [1])
+m4_list_add([nums], [8])
+m4_list_add([nums],[-5])
+m4_list_add([nums],[12])
+m4_list_add([nums], [0])
+dnl Sum is ........ 16
+assert_equals(m4_list_sum([nums]), 16)
+
 m4_ifnblank(m4_expand([m4_list_add([FOO], [])m4_list_add([FOO], [--LALA])]),
 	[m4_fatal([Leaking text in m4_list_add])])
 assert_equals(m4_list_nth([FOO], 1), [BOMB])
