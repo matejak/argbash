@@ -10,6 +10,7 @@ REVERSE = $(TESTDIR)/reverse
 	$(word 2,$^) $< -o $@
 
 TESTS = \
+	test-most \
 	test-more \
 	stability \
 	args \
@@ -35,6 +36,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-onlypos.sh \
 	$(TESTDIR)/test-ddash.sh \
 	$(TESTDIR)/test-more.sh \
+	$(TESTDIR)/test-most.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -79,6 +81,10 @@ test-gen: $(ARGBASH_BIN) $(GENTESTS)
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 args-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
+
+test-most: $(TESTDIR)/test-most.sh
+	$< xx yy | grep -q "POS_MORE1=xx yy,POS_MORE2=hu lu,"
+	$< xx yy zz aa | grep -q "POS_MORE1=xx yy,POS_MORE2=zz aa,"
 
 test-more: $(TESTDIR)/test-more.sh
 	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x f\[o\]o ba,r,"

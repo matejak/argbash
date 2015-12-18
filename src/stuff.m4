@@ -150,6 +150,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 		)])],
 	[m4_list_add([_POSITIONALS_MAXES], 1)],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
+	[m4_list_add([_POSITIONALS_TYPES], [single])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
@@ -175,36 +176,22 @@ m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([We already expect unknown number of arguments before '$1'. This is not supported])], [])],
-	[_A_POSITIONAL_VARNUM],
 	[m4_define([_POSITIONALS_MORE], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MORE + [$3])))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
+	[m4_list_add([_POSITIONALS_TYPES], [more])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
 	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))
 ],
 	[m4_pushdef([_min_argn], m4_eval([$3] - ($# - 3) ))],
+	[dnl If we have defaults, we actually accept unknown number of arguments
+],
+	[m4_if(_min_argn, [$3], , [_A_POSITIONAL_VARNUM])],
 	[m4_list_add([_POSITIONALS_MINS], m4_if([$3], -1, -1, _min_argn))],
 	[m4_list_add([_POSITIONALS_MAXES], [$3])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
-	[m4_ignore([_default], [m4_shiftn(3, $@)], [m4_do(
-		[m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote(_default))],
-	)])],
-	[dnl m4_list_add([_POSITIONALS_DEFAULTS], _sh_quote([$3]))
-],
-	[m4_list_add([_POSITIONALS_DEFAULTS], m4_do(
-		[@{:@],
-		[dnl m4_for([foo], 1, 0) doesn't work
-],
-		[m4_if(_min_argn, 0, , 
-			[m4_for([foo], 1, _min_argn, 1, ['' ])])],
-		[m4_join([ ], 
-			m4_map_args_sep(
-				[_sh_quote(], 
-				[),], 
-				[], 
-				m4_shiftn(3, $@)))],
-		[@:}@],
-	))],
+	[m4_list_add([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
+	[m4_list_add([_$1_DEFAULTS], m4_shiftn(3, $@))],
 	[m4_popdef([_min_argn])],
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
@@ -373,8 +360,13 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
 			[[	echo -e "\t<]m4_list_nth([_POSITIONALS_NAMES], idx)[>: ]],
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
-			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0,
-				[[ @{:@default: '"]m4_list_nth([_POSITIONALS_DEFAULTS], idx)"'@:}@])],
+			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0, [m4_do(
+					[ @{:@],
+					[ default: '"],
+					[m4_list_nth([_POSITIONALS_DEFAULTS], idx)],
+					["']
+					[@:}@],
+				)])],
 			[["
 ]],
 		)])],
@@ -542,10 +534,29 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 		[# THE DEFAULTS INITIALIZATION --- POSITIONALS
 ],
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-			[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
-			[m4_ifnblank(m4_quote(_DEFAULT),
-				[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=_DEFAULT
-])],
+			[m4_pushdef([_DEFAULT], m4_dquote(m4_list_nth([_POSITIONALS_DEFAULTS], idx)))],
+			[m4_ifnblank(m4_quote(_DEFAULT), [m4_do(
+				[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=],
+				[m4_case(m4_list_nth([_POSITIONALS_TYPES], idx),
+					[single], [_DEFAULT],
+					[more], [m4_do(
+						[m4_pushdef([_min_argn], m4_list_nth([_POSITIONALS_MINS], idx))],
+						[@{:@],
+						[dnl m4_for([foo], 1, 0) doesn't work
+],
+						[m4_if(_min_argn, 0, , 
+							[m4_for([foo], 1, _min_argn, 1, ['' ])])],
+						[m4_join([ ], 
+							m4_map_sep(
+								[_sh_quote], 
+								[,], 
+								m4_dquote(m4_dquote_elt(m4_list_contents(_DEFAULT)))))],
+						[@:}@],
+						[m4_popdef([_min_argn])],
+				)])],
+				[
+],
+			)])],
 			[m4_popdef([_DEFAULT])],
 		)])],
 	)])],
