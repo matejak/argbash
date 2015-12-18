@@ -81,9 +81,9 @@ args-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
 
 test-more: $(TESTDIR)/test-more.sh
-	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x foo bar,"
-	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa foo,"
-	$< LOO laa bus kus | grep -q POS_S=LOO,POS_MORE=laa bus kus,
+	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x f\[o\]o ba,r,"
+	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa ba,r,"
+	$< LOO laa bus kus | grep -q "POS_S=LOO,POS_MORE=laa bus kus",
 
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(REVERSE) grep -q case $<

@@ -14,6 +14,7 @@ m4_define([assert_equals],
 dnl If BOMB gets expanded, we will be noticed.
 m4_list_declare([FOO])
 assert_equals(m4_list_len([FOO]), 0)
+assert_equals(m4_list_len([NOLIST]), 0)
 assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [])
 m4_list_add([FOO], [BOMB]) 
 assert_equals(m4_list_len([FOO]), 1)

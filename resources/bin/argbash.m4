@@ -5,6 +5,7 @@ VERSION=_ARGBASH_VERSION
 # ARG_POSITIONAL_SINGLE([input], [The input template file])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([standalone],, [Whether the parsing code is in a standalone file.])
+# ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
 # ARG_VERSION([echo "argbash v$VERSION"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 
@@ -21,16 +22,15 @@ set -o pipefail
 INFILE="$_ARG_INPUT"
 
 M4DIR="$SCRIPT_DIR/../src"
+test -n "$_ARG_DEBUG" && DEBUG="-t $_ARG_DEBUG"
 
 OUTPUT_M4="$M4DIR/output.m4"
 test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
 
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" > temp
-	# cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
-	#	| autom4te -l m4sugar -I "$M4DIR" \
-		autom4te -l m4sugar -I "$M4DIR" temp \
+	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
+		| autom4te $DEBUG -l m4sugar -I "$M4DIR" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	_ret=$?
@@ -45,7 +45,7 @@ autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (i
 function get_parsing_code
 {
 	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' $(cat "$INFILE") \
-			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
+			| autom4te $DEBUG -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$INFILE")/$_srcfile"
