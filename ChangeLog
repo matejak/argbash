@@ -5,11 +5,17 @@ New features:
 
 * Support for repeated arguments, added specialized macro for --verbose 
 * Support for double dash (separating positional and optional arguments)
+* Support for multi-valued arguments (with defaults)
+* Improved generated code so users get more descriptive messages when
+  something goes wrong
+* The bash code tries to be minimal - only features that are used are
+  supported
 * TBD: Support for leftover args (kindof)
 
 Bugfixes:
 
 * Fixed installation bug when ROOT variable was not treated properly
+* Improved m4s list implementation
 
 1.1.0 (2015-09-06)
 ------------------
