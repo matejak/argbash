@@ -513,7 +513,7 @@ test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
 		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require at least ]_POSITIONALS_MIN[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
 test ${#POSITIONALS[@]} -gt ]],
-		[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MIN + _POSITIONALS_MORE))],
+		[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MORE))],
 		[_POSITIONALS_TOTAL],
 		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most ]],
 		[_POSITIONALS_TOTAL],
@@ -521,7 +521,7 @@ test ${#POSITIONALS[@]} -gt ]],
 		[[, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
-	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\""
+	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an argbash bug." >&2; exit 1; }
 done]],
 	)])],
 )])

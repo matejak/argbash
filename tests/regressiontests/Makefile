@@ -95,6 +95,8 @@ test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(REVERSE) grep -q case $<
 	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,
 	$< LOO ar,guma | grep -q POS_S=LOO,POS_OPT=ar,guma,
+	ERROR=spurious $(REVERSE) $< one two three
+	ERROR='Not enough' $(REVERSE) $<
 
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$(REVERSE) grep -q POSITION $<
