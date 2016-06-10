@@ -88,7 +88,7 @@ m4_define([_NARGS], 0)
 dnl Minimal number of positional args the script accepts
 m4_define([_POSITIONALS_MIN], 0)
 dnl Greatest number of positional args the script can accept (-1 for infinity)
-m4_define([_POSITIONALS_MORE], 0)
+m4_define([_POSITIONALS_MAX], 0)
 
 dnl To be able to use _POSITIONALS_NAMES_FOREACH etc.
 m4_list_declare([_POSITIONALS_NAMES])
@@ -118,7 +118,7 @@ m4_define([_A_OPTIONAL], [m4_do(
 
 dnl Do something depending on whether there is already infinitely many args possible or not
 m4_define([IF_POSITIONALS_INF],
-	[m4_if([_POSITIONALS_MORE], -1, [$1], [$2])])
+	[m4_if([_POSITIONALS_MAX], -1, [$1], [$2])])
 
 
 dnl Do something depending on whether there have been optional positional args declared beforehand or not
@@ -136,7 +136,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
-	[m4_define([_POSITIONALS_MORE], m4_incr(_POSITIONALS_MORE))],
+	[m4_define([_POSITIONALS_MAX], m4_incr(_POSITIONALS_MAX))],
 	[dnl If we don't have default, also a number of positional args that are needed went up
 ],
 	[m4_ifblank([$3], [m4_do(
@@ -176,7 +176,7 @@ m4_define([ARG_POSITIONAL_MORE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([We already expect unknown number of arguments before '$1'. This is not supported])], [])],
-	[m4_define([_POSITIONALS_MORE], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MORE + [$3])))],
+	[m4_define([_POSITIONALS_MAX], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MAX + [$3])))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_TYPES], [more])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
@@ -362,9 +362,9 @@ m4_define([_MAKE_HELP], [m4_do(
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[m4_if(m4_list_nth([_POSITIONALS_MINS], idx), 0, [m4_do(
 					[ @{:@],
-					[ default: '"],
+					[default: '"],
 					[m4_list_nth([_POSITIONALS_DEFAULTS], idx)],
-					["']
+					["'],
 					[@:}@],
 				)])],
 			[["
@@ -508,21 +508,23 @@ done]],
 			)])],
 			[m4_popdef([_POS_MAX])],
 		)])],
+		[m4_pushdef([_NARGS_SPEC], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [exactly _POSITIONALS_MIN], [between _POSITIONALS_MIN and _POSITIONALS_MAX]))],
 		[[@:}@
 test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
-		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require at least ]_POSITIONALS_MIN[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
+		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
 test ${#POSITIONALS[@]} -gt ]],
-		[m4_pushdef([_POSITIONALS_TOTAL], m4_eval(_POSITIONALS_MORE))],
-		[_POSITIONALS_TOTAL],
-		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most ]],
-		[_POSITIONALS_TOTAL],
-		[m4_popdef([_POSITIONALS_TOTAL])],
-		[[, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
+		[_POSITIONALS_MAX],
+		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+		[_NARGS_SPEC],
+		[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+],
+		[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an argbash bug." >&2; exit 1; }
 done]],
+		[m4_popdef([_NARGS_SPEC])],
 	)])],
 )])
 
@@ -544,12 +546,12 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 						[@{:@],
 						[dnl m4_for([foo], 1, 0) doesn't work
 ],
-						[m4_if(_min_argn, 0, , 
+						[m4_if(_min_argn, 0, ,
 							[m4_for([foo], 1, _min_argn, 1, ['' ])])],
-						[m4_join([ ], 
+						[m4_join([ ],
 							m4_map_sep(
-								[_sh_quote], 
-								[,], 
+								[_sh_quote],
+								[,],
 								m4_dquote(m4_dquote_elt(m4_list_contents(_DEFAULT)))))],
 						[@:}@],
 						[m4_popdef([_min_argn])],

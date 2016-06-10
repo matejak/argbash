@@ -1,5 +1,5 @@
 TESTDIR ?= ../regressiontests
-PHONIES ?= 
+PHONIES ?=
 
 NUL =
 
@@ -20,6 +20,7 @@ TESTS = \
 	test-onlypos \
 	test-ddash \
 	test-gen \
+	test-simple \
 	$(NUL)
 
 PHONIES += $(TESTS)
@@ -37,10 +38,10 @@ SCRIPTS = \
 	$(TESTDIR)/test-ddash.sh \
 	$(TESTDIR)/test-more.sh \
 	$(TESTDIR)/test-most.sh \
+	$(TESTDIR)/test-simple.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
-phony: $(PHONIES)
 
 stability: $(TESTDIR)/test.sh $(TESTDIR)/test2.sh
 	diff -q $< $(word 2,$^)
@@ -96,6 +97,7 @@ test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,
 	$< LOO ar,guma | grep -q POS_S=LOO,POS_OPT=ar,guma,
 	ERROR=spurious $(REVERSE) $< one two three
+	ERROR='between 1 and 2' $(REVERSE) $< one two three
 	ERROR='Not enough' $(REVERSE) $<
 
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
@@ -117,5 +119,16 @@ test-ddash: $(TESTDIR)/test-ddash.sh
 	ERROR=spurious 	$(REVERSE) $< -- foo bar
 	ERROR=bar 	$(REVERSE) $< -- foo bar
 
+test-simple: $(TESTDIR)/test-simple.sh
+	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
+	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	ERROR=spurious 	$(REVERSE) $< -- one two
+	ERROR="last one was: 'two'" 	$(REVERSE) $< one two
+	ERROR="expect exactly 1" 	$(REVERSE) $< one two
+	ERROR="[Nn]ot enough" 	$(REVERSE) $<
+	ERROR="require exactly 1" 	$(REVERSE) $<
+
 tests-clean:
 	$(RM) $(SCRIPTS)
+
+.PHONY: $(PHONIES)

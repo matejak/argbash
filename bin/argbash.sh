@@ -66,8 +66,8 @@ do
 done
 
 POSITIONAL_NAMES=('_ARG_INPUT' )
-test ${#POSITIONALS[@]} -lt 1 && { ( echo "FATAL ERROR: Not enough positional arguments --- we require at least 1, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
-test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect at most 1, but got ${#POSITIONALS[@]} (the last one we got was '${POSITIONALS[-1]}')."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -lt 1 && { ( echo "FATAL ERROR: Not enough positional arguments --- we require exactly 1, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
+test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect exactly 1, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an argbash bug." >&2; exit 1; }

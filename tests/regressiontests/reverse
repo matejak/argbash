@@ -7,7 +7,7 @@ else
 	"$@"
 fi
 
-if test $? = 0 
+if test $? = 0
 then
 	echo "Error expected, but it did not occur" >&2
 	exit 1
