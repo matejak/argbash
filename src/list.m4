@@ -39,6 +39,21 @@ m4_define([m4_list_contents], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
+dnl
+dnl Given a list name and an element, it returns list of indices of the element in the list 
+dnl or nothing if it has not been found
+m4_define([m4_list_contains], [m4_do(
+	[m4_define([_FOUND_IDX], 0)],
+	[m4_define([_FOUND_RESULT], [])],
+	[m4_foreach([elem], [m4_dquote_elt(m4_list_contents([$1]))], [m4_do(
+		[m4_if(elem, [$2], [m4_define([_FOUND_RESULT], m4_expand([_FOUND_RESULT,_FOUND_IDX]))])],
+		[m4_define([_FOUND_IDX], m4_incr(_FOUND_IDX))],
+	)])],
+	[m4_expand(m4_cdr(_FOUND_RESULT))],
+	[m4_undefine([_FOUND_RESULT])],
+	[m4_undefine([_FOUND_IDX])],
+)])
+
 m4_define([m4_list_sum], [m4_do(
 	[m4_eval(m4_quote(m4_join(+, m4_list_contents([$1]))))],
 )])

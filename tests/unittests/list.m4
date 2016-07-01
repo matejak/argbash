@@ -45,7 +45,11 @@ m4_expand(m4_list_nth([FOO], 2))
 ANTIBOMB([list])
 assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [-BOMB-])
 assert_equals(m4_list_len([FOO]), 7)
+assert_equals(m4_quote(m4_list_contains([FOO], [BOMB])), [0,2])
+assert_equals(m4_quote(m4_list_contains([FOO], [BAZ])), 3)
+assert_equals(m4_quote(m4_list_contains([FOO], [BAM])), [])
 assert_equals(m4_quote(m4_list_pop_front([FOO])), [BOMB])
+assert_equals(m4_quote(m4_list_contains([FOO], [BOMB])), [1])
 assert_equals(m4_list_len([FOO]), 6)
 assert_equals(m4_quote(m4_list_pop_back([FOO])), [--LALA])
 assert_equals(m4_list_len([FOO]), 5)
@@ -60,3 +64,4 @@ assert_equals(m4_list_len([EMPTY]), 2)
 m4_ignore([
 m4_divert_push(0)dnl
 ])
+]) dnl m4_ignore
