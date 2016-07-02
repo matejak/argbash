@@ -21,6 +21,7 @@ TESTS = \
 	test-ddash \
 	test-gen \
 	test-simple \
+	test-wrapping \
 	$(NUL)
 
 PHONIES += $(TESTS)
@@ -39,6 +40,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-more.sh \
 	$(TESTDIR)/test-most.sh \
 	$(TESTDIR)/test-simple.sh \
+	$(TESTDIR)/test-wrapping.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -127,6 +129,13 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
+
+test-wrapping: $(TESTDIR)/test-wrapping.sh
+	$< -h | grep opt-arg
+	$< -h | grep pos-arg
+	$< LOOL | grep 'POS_S=LOOL,POS_OPT=pos-default'
+	$< LOOL | grep 'POS_S=LOOL,POS_OPT=pos-default'
+	$< LOOL --boo_l --opt-arg lalala | BOOL=on,OPT_S=lalala,
 
 tests-clean:
 	$(RM) $(SCRIPTS)
