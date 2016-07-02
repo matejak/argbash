@@ -80,10 +80,12 @@ We have positional and optional arguments sorted out, so let's define some other
 * Default:
   In case of positional and boolean arguments, you may specify their default values.
 
-  General notice:
-  There is no way of how to find out whether an argument was used or not just by the value of the corresponding variable in the script.
-  ``Bash`` doesn't distinguish between empty variables and variables containing an empty string.
-  Also note that it is perfectly possible to pass an empty string as an argument value.
+  .. note::
+
+    General notice:
+    There is no way of how to find out whether an argument was passed or not just by lookint at the value of the corresponding variable in the script.
+    ``Bash`` doesn't distinguish between empty variables and variables containing an empty string.
+    Also note that it is perfectly possible to pass an empty string as an argument value.
 
 So let's get back to argument types.
 Below, is a list of argument types and macros that you have to write to support those.

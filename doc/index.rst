@@ -41,6 +41,7 @@ Let's stick with a testing script that accepts some arguments and then it just p
 So, let's say that we would like a script that produces the following help message:
 
 .. literalinclude:: _static/minimal-output-help.txt
+   :language: plain
    :start-after: minimal.sh
 
 Then, it means that we need following arguments:

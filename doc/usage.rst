@@ -44,7 +44,7 @@ If you want to regenerate a new version of ``my-script.sh`` after you have modif
 
 as the script can deal with input and output being the same file.
 
-.. [*] ``m4`` is the extension used for the ``M4`` language, but we use the ``m4sugar`` extension built on top of it).
+.. [*] ``m4`` is the file extension used for the ``M4`` language, but we use the ``m4sugar`` language extension built on top of it.
 
 Separate file for parsing with assistance
 +++++++++++++++++++++++++++++++++++++++++
