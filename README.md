@@ -14,6 +14,7 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Fast, minimalistic declaration of arguments your script expects (positional, optional, long, short, boolean).
 * Generate script from definitions once and use it afterwards on all platforms that have `Bash`!
 * Definitions will stay embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
+* You can re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
 * Easy installation. Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
@@ -29,9 +30,11 @@ See the `resources/examples/simple.m4s` for source and `resources/examples/simpl
 
 Following arguments are supported:
 
-- Positional arguments,
+- Positional arguments (defaults supported, possibiliy of fixed, variable or infinite number of arguments),
 - optional arguments that take one value,
-- boolean optional arguments and
+- boolean optional arguments,
+- repeated (i.e. non-overwriting) optional arguments,
+- incrementing (such as --verbose) optional arguments and
 - action optional arguments (such as --version, --help).
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
