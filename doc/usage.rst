@@ -6,7 +6,7 @@ So, you have a template and now it is time to (re)generate a shell script from i
 File layout
 -----------
 
-You have three options here, they are sorted by the estimated preference: 
+You have three options here, they are sorted by the estimated preference:
 
 #. One file with both parsing code and script body.
 
@@ -33,13 +33,13 @@ Parsing code and script body together
 Assuming that you have created a template file ``my-template.m4``, you simply run ``argbash`` over the script [*]_:
 
 ::
-    
+
    argbash my-template.m4 -o my-script.sh
 
 If you want to regenerate a new version of ``my-script.sh`` after you have modified its template section, you can run
 
 ::
-    
+
    argbash my-script.sh -o my-script.sh
 
 as the script can deal with input and output being the same file.
@@ -58,11 +58,11 @@ Then, you add a very small template code to ``my-script.sh`` at the beginning:
     # DEFINE_SCRIPT_DIR
     # INCLUDE_PARSING_CODE([my-parsing.sh])
     # ARGBASH_GO
-    
+
     # [ <-- needed because of Argbash
-    
+
     # HERE GOES THE SCRIPT BODY
-    
+
     # ] <-- needed because of Argbash
 
 i.e. you add thos three lines with definitions and you enclose the script in square brackets.
@@ -83,7 +83,7 @@ If you want/have to take care of including the parsing code yourself, just make 
 .. code-block:: bash
 
     source $(dirname $0)/my-parsing.sh
-    
+
     # HERE GOES THE SCRIPT BODY
 
 Then, you just generate ``my-parsing.sh`` using ``--standalone`` option:

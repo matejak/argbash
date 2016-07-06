@@ -9,7 +9,7 @@ Definitions
 There are two major types of arguments --- thake an example:
 
 ::
-  
+
   ls -l --sort time /home
 
 * Optional arguments are ``-l`` and ``--sort``, while we have only one
@@ -47,7 +47,7 @@ Let yourself be inspired by the ``resources/examples/simple.m4`` example (Bash s
 Then, run the following command to your file:
 
 ::
-  
+
   bin/argbash.sh myfile.m4 -o myfile.sh
 
 to either get a script that should just work, or a file that you include in your script.
@@ -65,7 +65,7 @@ We have positional and optional arguments sorted out, so let's define some other
   In case of optional argument, the name is what appears before the double dash, e.g. name of ``--project-path`` is ``project-path``.
   The long or short string (e.g. ``--project-path``, ``-p``) itself is called option.
   The argument's name is used in help and later in your script when you access argument's value.
-  
+
 * Argument:
   On command-line, options are followed by arguments.
   Although this is confusing, it is a common way of putting it.
@@ -172,7 +172,7 @@ Special arguments
      ARG_HELP([program description (optional)])
 
   This will generate the ``--help`` and ``-h`` action arguments that will print the usage information.
-  Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed. 
+  Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
 
 * Version argument (a special case of an action argument):
   ::
@@ -185,7 +185,7 @@ Special arguments
      ARG_VERBOSE([short arg name])
 
   Default default is 0, you can use a ``test $_ARG_VERBOSE -ge 1`` pattern.
- 
+
 Convenience macros
 ++++++++++++++++++
 
@@ -193,7 +193,7 @@ Plus, there are convenience macros:
 
 * Add a line where the directory where the script is running is stored to a variable:
   ::
-    
+
      DEFINE_SCRIPT_DIR([variable name (optional, default is SCRIPT_DIR)])
 
 * Include a file (let's say a ``parse.sh`` file) that is in the same directory during runtime.
@@ -201,10 +201,57 @@ Plus, there are convenience macros:
   Thanks to this, managing a script with body and parsing logic in separate files is really easy.
 
   ::
-    
+
      INCLUDE_PARSING_CODE([filename], [SCRIPT_DIR variable name (optional, default is SCRIPT_DIR)])
 
   You have to use ``DEFINE_SCRIPT_DIR`` before, but you will be told so if you don't.
+
+* Point to a script that uses ``Argbash`` (or to its template), and your script will inherit its arguments (unless you exclude some of them).
+
+  ::
+
+     ARGBASH_WRAP(filename stem, [list of long options to exclude], [flags to exclude certain arg types, default is HV for (h)elp and (v)ersion])
+
+  Given that you have a script ``process_single.sh`` and you write its wrapper ``process_file.sh``
+  Imagine that one reads a file and passes data from every line to ``process_single.sh`` along with some options that ``process_file.sh`` accepts.
+
+  In this case, you write ``ARGBASH_WRAP([process_single], [operation])`` to your ``process_file.m4`` template.
+
+  * Filename stem is a filename without a directory component or an extension.
+    Stems are searched for in search paths (current directory, directory of the template) and extensions ``.m4`` and ``.sh`` are tried out.
+
+  * The list of long options is a list of first arguments to functions such as ``ARG_POSITIONAL_SINGLE``, ``ARG_OPTIONAL_SINGLE``, ``ARG_OPTIONAL_BOOLEAN``, etc.
+    Therefore, don't include leading double dash to any of the list items that represent blacklisted optional arguments.
+
+  * Flags is a string that may contain some characters.
+    If a flag is set, a class of arguments is excluded from the file.
+    The default ``HV`` should be enough in most scenarios --- you want your own help and version info, not one from the wrapped script, right?
+
+    Following flags are supported:
+
+    ========= ===================
+    Character Meaning
+    ========= ===================
+    H         Don't include help.
+    V         Don't include version info.
+    ========= ===================
+
+  * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_ARGS_PROCESS_SINGLE``.
+    Therefore, when you finally decide to call ``process-single.sh`` in your script with all wrapped arguments (e.g. ``--some-opt foo --bar``), all you have to do is to write
+
+    ::
+
+      ./process-single.sh "${_ARGS_PROCESS_SINGLE[@]}"
+
+    which is exactly the same as
+
+    ::
+
+      MAYBE_BAR=
+      test $_ARG_BAR = on && MAYBE_BAR='--bar'
+      ./process-single.sh --some-opt "$_ARG_SOME_OPT" $MAYBE_BAR
+
+    The stem to array name conversion is the same as with :ref:`argument names:parsing_results` except the prefix ``_ARGS_`` is prepended.
 
 Action macro
 ++++++++++++
@@ -214,7 +261,7 @@ You do that by specifying a macro ``ARGBASH_GO``.
 The macro doesn't take any parameters.
 
 ::
-  
+
    ARGBASH_GO
 
 .. _parsing_results:

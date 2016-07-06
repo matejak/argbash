@@ -12,6 +12,8 @@ m4_define([assert_equals],
 		[m4_fatal([Item '$1' doesn't match '$2'.])])])
 
 dnl If BOMB gets expanded, we will be noticed.
+assert_equals(m4_quote(m4_list_contents([lol])), [])
+assert_equals(m4_quote(m4_list_contains([lol], [lala])), [])
 m4_list_declare([FOO])
 assert_equals(m4_list_len([FOO]), 0)
 assert_equals(m4_list_len([NOLIST]), 0)

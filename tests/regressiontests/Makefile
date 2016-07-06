@@ -22,6 +22,7 @@ TESTS = \
 	test-gen \
 	test-simple \
 	test-wrapping \
+	test-wrapping-more \
 	$(NUL)
 
 PHONIES += $(TESTS)
@@ -41,6 +42,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-most.sh \
 	$(TESTDIR)/test-simple.sh \
 	$(TESTDIR)/test-wrapping.sh \
+	$(TESTDIR)/test-wrapping-more.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -131,11 +133,18 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="require exactly 1" 	$(REVERSE) $<
 
 test-wrapping: $(TESTDIR)/test-wrapping.sh
-	$< -h | grep opt-arg
-	$< -h | grep pos-arg
-	$< LOOL | grep 'POS_S=LOOL,POS_OPT=pos-default'
-	$< LOOL | grep 'POS_S=LOOL,POS_OPT=pos-default'
-	$< LOOL --boo_l --opt-arg lalala | BOOL=on,OPT_S=lalala,
+	$< -h | grep -q opt-arg
+	$< -h | grep -q pos-arg
+	@# ! negates the return code
+	! $< -h | grep -q boo_l
+	$< LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
+	$< LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
+	$< LOOL --opt-arg lalala | grep -q OPT_S=lalala,
+
+test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh
+	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'
+	$< -i -i | grep -q 'OPT_INCR=4,'
+	ERROR="nexpected argument '--opt-arg'" $(REVERSE) $< --opt-arg lalala
 
 tests-clean:
 	$(RM) $(SCRIPTS)

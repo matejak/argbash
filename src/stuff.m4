@@ -61,6 +61,11 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 )])
 
 
+m4_define([_some_opt], [m4_do(
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [__some_opt($@)])],
+)])
+
+
 dnl
 dnl Registers a command, recording its name, type etc.
 dnl $1: Long option
@@ -68,8 +73,8 @@ dnl $2: Short option (opt)
 dnl $3: Help string
 dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
-m4_define([_some_opt], [m4_do(
-	[m4_errprintn([$1 $2])],
+m4_define([__some_opt], [m4_do(
+	[m4_ifdef([WRAPPED], [m4_define([_COLLECT_]_varname([$1]), [_ARGS_]_translit(WRAPPED))])],
 	[m4_list_add([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
 ],
@@ -199,12 +204,7 @@ m4_define([ARG_POSITIONAL_MORE], [m4_do(
 
 
 m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
-	[m4_ifndef([WRAPPED], [[$0($@)]])],
-	[_ARG_OPTIONAL_SINGLE([$1], [$2], [$3], [$4])],
-)])
-
-
-m4_define([_ARG_OPTIONAL_SINGLE], [m4_do(
+	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
@@ -222,35 +222,39 @@ m4_define([ARG_VERSION], [m4_do(
 	[dnl Just record how have we called ourselves
 ],
 	[[$0($@)]],
+	[m4_bmatch(m4_expand([FLAGS]), [V], ,[_ARG_VERSIONx([$1])])],
+)])
+
+
+m4_define([_ARG_VERSIONx], [m4_do(
 	[dnl The function with underscore doesn't record what we have just recorded
 ],
-	_ARG_OPTIONAL_ACTION(
+	[_ARG_OPTIONAL_ACTION(
 		[version],
 		[v],
 		[Prints version],
 		[$1],
-	),
+	)],
 )])
 
 
 m4_define([ARG_HELP], [m4_do(
-	[m4_ifndef([WRAPPED], [[$0($@)]])],
-	[m4_errprintn(helping - pre)],
+	[[$0($@)]],
 	[dnl Skip help if we declare we don't want it
 ],
-	[m4_bmatch(m4_expand([FLAGS]), [H], ,[_ARG_HELP([$1])])],
+	[m4_bmatch(m4_expand([FLAGS]), [H], ,[_ARG_HELPx([$1])])],
 )])
 
 
-m4_define([_ARG_HELP], [m4_do(
-	[m4_errprintn(helping)],
+dnl If the name is _ARG_HELP and not _ARG_HELPx, it doesn't work. WTF!?
+m4_define([_ARG_HELPx], [m4_do(
 	[m4_define([_HELP_MSG], m4_escape([$1]))],
-	_ARG_OPTIONAL_ACTION(
+	[_ARG_OPTIONAL_ACTION(
 		[help],
 		[h],
 		[Prints help],
 		[print_help],
-	),
+	)],
 )])
 
 
@@ -408,7 +412,15 @@ m4_define([_MAKE_HELP], [m4_do(
 		["
 ],
 	)])])],
-	[}],
+	[}
+],
+)])
+
+
+m4_define([_ADD_OPTS_VALS], [m4_do(
+	[dnl If the arg comes from wrapped script/template, save it in an array
+],
+	[m4_ifdef([_COLLECT_$1], [[_COLLECT_$1]+=("$[]1"m4_if($2, 2, ["$[]2"]))])],
 )])
 
 
@@ -441,16 +453,21 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 			],
 		[dnl: TODO: Below is a problem with quoting
 ],
+		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
 		[dnl Output the body of the case
 ],
-		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
+		[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
+],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[arg], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
 			_ARGVAR[="$[]2"
+			_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
 			shift],
 			[bool], _ARGVAR[="on"
+			_ADD_OPTS_VALS(m4_expand([_ARGVAR]))
 			test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
-			[incr], m4_quote((( _ARGVAR++ ))),
+			[incr], m4_quote((( _ARGVAR++ )))
+			_ADD_OPTS_VALS(m4_expand([_ARGVAR])),
 			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
 			exit 0],
 		)],
@@ -467,17 +484,27 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 
 
 dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
-m4_define([_EVAL_POSITIONALS_CASE], [[
-		*@:}@
-		    	POSITIONALS+=("$][1")
-			;;]])
+m4_define([_EVAL_POSITIONALS_CASE], [m4_do(
+	[
+		],
+	[[*@:}@
+			]],
+	[POSITIONALS+=("$[]1")
+			],
+			[;;],
+)])
 
 
 dnl If we expect only optional arguments and we get an intruder, fail noisily.
-m4_define([_EXCEPT_OPTIONALS_CASE], [[
-		*@:}@
-			{ (echo "FATAL ERROR: Got an unexpected argument '$][1'"; print_help) >&2; exit 1; }
-			;;]])
+m4_define([_EXCEPT_OPTIONALS_CASE], [m4_do(
+	[
+		],
+	[[*@:}@
+			]],
+	[{ (echo "FATAL ERROR: Got an unexpected argument '$[]1'"; print_help) >&2; exit 1; }
+			],
+			[;;],
+)])
 
 
 dnl Store positional args inside a 'for' statement
@@ -545,7 +572,7 @@ done]],
 
 
 m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
-	[m4_pushdef([_DEFAULT], m4_dquote(m4_list_nth([_POSITIONALS_DEFAULTS], idx)))],
+	[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
 	[m4_ifnblank(m4_quote(_DEFAULT), [m4_do(
 		[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=],
 		[m4_case(m4_list_nth([_POSITIONALS_TYPES], idx),
@@ -561,7 +588,7 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 					m4_map_sep(
 						[_sh_quote],
 						[,],
-						m4_dquote(m4_dquote_elt(m4_list_contents(_DEFAULT)))))],
+						m4_dquote(m4_list_contents(_DEFAULT))))],
 				[@:}@],
 				[m4_popdef([_min_argn])],
 		)])],
@@ -614,7 +641,7 @@ m4_define([_NO_ARGS_WHATSOEVER],
 
 
 m4_define([ARGBASH_GO], [m4_do(
-	[m4_ifndef([WRAPPED], [_ARGBASH_GO([$0($@)])])],
+	[m4_ifndef([WRAPPED], [_ARGBASH_GO([$0()])])],
 )])
 
 dnl $1: The macro call (the caller is supposed to pass [$0($@)])
@@ -642,22 +669,23 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 )])
 
 
-dnl $1: Which file are we wrapping
+dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: Names of blacklisted args (list)
 dnl $3: Codes of blacklisted args (string, default is HV for help + version)
 dnl IDEA: Include the wrapped script and read the argbash stuff
 dnl However, define some macros beforehand that will act as global variables and ensure the following:
-dnl  - the defns from wrapped script won't be repeated in the wrapper
+dnl  - the defns from wrapped script won't be repeated in the wrapper (DONE, using m4_ignore, TODO: Remove ifdef WRAPPED that is used somewhere)
 dnl  - options blacklisted by name won't appear (e.g. 'outfile', 'do-this', ...)
 dnl  - blacklisted classes of options won't appear (e.g. help, version)
 m4_define([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
-	[m4_pushdef([WRAPPED], [yes])],
-	[m4_pushdef([BLACKLIST], [$2])],
+	[m4_pushdef([WRAPPED], [[$1]])],
+	[m4_list_add([BLACKLIST], $2)],
 	[m4_pushdef([FLAGS], [m4_default([$3], [HV])])],
-	[m4_ignore(m4_include([$1]))],
+	[m4_ifndef([_SCRIPT_$1], [m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
+	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
 	[m4_popdef([FLAGS])],
-	[m4_popdef([BLACKLIST])],
+	[m4_list_destroy([BLACKLIST])],
 	[m4_popdef([WRAPPED])],
 )])
 
@@ -666,3 +694,6 @@ dnl defns are applied, but not recorded
 dnl some are not even recorded
 dnl It may be that the wrapped script contains args that we already have.
 dnl In this case: Raise an error (with a good advice)
+dnl
+
+dnl TODO: Add a repeated optional arg (s.a. -I in gcc)

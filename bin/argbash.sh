@@ -32,6 +32,7 @@ function print_help
 	echo -e "\t-v,--version: Prints version"
 	echo -e "\t-h,--help: Prints help"
 }
+
 # THE PARSING ITSELF
 while test $# -gt 0
 do
@@ -40,15 +41,18 @@ do
 		-o|--output)
 			test $# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }
 			_ARG_OUTPUT="$2"
+
 			shift
 			;;
 		--no-standalone|--standalone)
 			_ARG_STANDALONE="on"
+
 			test "${1:0:5}" = "--no-" && _ARG_STANDALONE="off"
 			;;
 		--debug)
 			test $# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }
 			_ARG_DEBUG="$2"
+
 			shift
 			;;
 		-v|--version)
@@ -60,7 +64,7 @@ do
 			exit 0
 			;;
 		*)
-		    	POSITIONALS+=("$1")
+			POSITIONALS+=("$1")
 			;;
 	esac
 	shift
@@ -97,7 +101,8 @@ test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
 
 function do_stuff
 {
-	cat $M4DIR/stuff.m4 "$OUTPUT_M4" "$INFILE" \
+	echo "$WRAPPED_DEFNS" \
+		| cat - "$M4DIR/stuff.m4" "$OUTPUT_M4" "$INFILE" \
 		| autom4te $DEBUG -l m4sugar -I "$M4DIR" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
@@ -109,11 +114,36 @@ test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
 autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
+SEARCHDIRS=("." "$(dirname "$INFILE")")
+WRAPPED_DEFNS=""
+
+function settle_wrapped_fname
+{
+	# Get arguments to ARGBASH_WRAP
+	_srcfiles="$(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' $(cat "$INFILE") \
+			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1')"
+
+	test -n "$_srcfiles" || return
+	# We should use an newline IFS just for this for. Or use an array.
+	for srcstem in $_srcfiles
+	do
+		_found=no
+		for searchdir in ${SEARCHDIRS[@]}
+		do
+			test -f $searchdir/$srcstem.m4 && { _found=yes; ext=m4; break; }
+			test -f $searchdir/$srcstem.sh && { _found=yes; ext=sh; break; }
+		done
+		# The last searchdir is a correct one
+		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${SEARCHDIRS[@]}" >&2; exit 2; }
+		WRAPPED_DEFNS="${WRAPPED_DEFNS}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem.$ext]])"
+	done
+}
 
 function get_parsing_code
 {
+	# Get the argument of INCLUDE_PARSING_CODE
 	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' $(cat "$INFILE") \
-			| autom4te $DEBUG -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
+			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$INFILE")/$_srcfile"
@@ -130,6 +160,9 @@ parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
 test "$_ARG_STANDALONE" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
+
+# We may use some of the wrapping stuff, so let's fill the WRAPPED_DEFNS
+settle_wrapped_fname
 
 if test "$OUTFILE" = '-'
 then
