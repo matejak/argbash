@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [@pos-arg@])
-# ARG_POSITIONAL_MORE([pos-more], [@pos-more-arg@], 3, [f[o]o], [ba,r])
+# ARG_POSITIONAL_MULTI([pos-more], [@pos-more-arg@], 3, [f[o]o], [ba,r])
 # ARGBASH_GO
 
 # opening escape square bracket: [

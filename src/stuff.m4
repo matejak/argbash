@@ -178,7 +178,7 @@ dnl   - use them to extend POSITIONALS
 dnl  - use constructs s.a. POSITIONALS+=("${defaults[@]:0:$needed}")
 dnl  More:
 dnl   - infinitely many args = probably drop the -1 notation, inf. args can be handled in a parallel manner.
-m4_define([ARG_POSITIONAL_MORE], [m4_do(
+m4_define([ARG_POSITIONAL_MULTI], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([We already expect unknown number of arguments before '$1'. This is not supported])], [])],
@@ -289,18 +289,18 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 dnl Precedence is important, _CALL_SOME_OPT has to be defined early on
 m4_define([_CALL_SOME_OPT], [[_some_opt([$1], [$2], [$3], [$4], [$5])]])
 
-m4_define([_ARG_OPTIONAL_REPEATED_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [incr])])
-m4_define([_ARG_OPTIONAL_REPEATED], [_A_OPTIONAL[]]_ARG_OPTIONAL_REPEATED_BODY)
+m4_define([_ARG_OPTIONAL_INCREMENTAL_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [incr])])
+m4_define([_ARG_OPTIONAL_INCREMENTAL], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCREMENTAL_BODY)
 
 
 dnl $1 = long name
 dnl $2 = short name (opt)
 dnl $3 = help
 dnl $4 = default (=0)
-m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
+m4_define([ARG_OPTIONAL_INCREMENTAL], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
-	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
+	]m4_dquote(_ARG_OPTIONAL_INCREMENTAL_BODY)[,
 )])
 
 
@@ -308,7 +308,7 @@ dnl $1 = short name (opt)
 m4_define([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
-	[_ARG_OPTIONAL_REPEATED([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
+	[_ARG_OPTIONAL_INCREMENTAL([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)])],
 )])
 
 

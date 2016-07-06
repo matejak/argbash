@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_MORE([pos-more1], [@pos-more1-arg@], 2)
-# ARG_POSITIONAL_MORE([pos-more2], [@pos-more2-arg@], 2, [hu], [lu])
+# ARG_POSITIONAL_MULTI([pos-more1], [@pos-more1-arg@], 2)
+# ARG_POSITIONAL_MULTI([pos-more2], [@pos-more2-arg@], 2, [hu], [lu])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 

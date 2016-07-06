@@ -132,7 +132,7 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
 
-test-wrapping: $(TESTDIR)/test-wrapping.sh
+test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
@@ -141,7 +141,7 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh
 	$< LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< LOOL --opt-arg lalala | grep -q OPT_S=lalala,
 
-test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh
+test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	ERROR="nexpected argument '--opt-arg'" $(REVERSE) $< --opt-arg lalala

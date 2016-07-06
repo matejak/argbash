@@ -116,6 +116,21 @@ Positional arguments
   If you leave the default blank, it is understood that you don't want one.
   If you really want to have an explicit default of empty string, pass a quoted empty string (i.e. ``""`` or ``''``).
 
+* Multi-value positional argument (with optional defaults):
+  ::
+
+     ARG_POSITIONAL_MULTI([argument-name], [help message], [number of arguments], ..., [default for the second to last (i.e. penultimate) argument (optional)], [default for the last argument (optional)])
+
+  Given that your argument accepts :math:`n` values, you can specify :math:`m` defaults, :math:`(m \leq n)` for last :math:`m` values.
+
+  For example, consider that your script makes use of only one multi-value argument, which accepts 3 values with two defaults ``bar`` and ``baz``.
+  Then, it is imperative that at least one value is specified on the command-line.
+  So If you pass a value ``val1`` on the command-line, you will be able to retrieve ``val1``, ``bar`` and ``baz`` inside the script.
+  If you pass ``val1`` and ``val2``, you will be able to retrieve ``val1``, ``val2`` and ``baz``.
+  If you pass nothing, or more than three values, an error will occur.
+
+  Arguments are available as a bash array (first element has index of 0).
+
 * End of optional arguments and beginning of positional ones (the double-dash ``--``):
   ::
 
@@ -144,10 +159,10 @@ Optional arguments
 
   The default default is ``off`` (the only alternative is ``on``).
 
-* Repeated optional arguments:
+* Incremental optional arguments:
   ::
 
-     ARG_OPTIONAL_REPEATED([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+     ARG_OPTIONAL_INCREMENTAL([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
 
   The default default is 0.
   The argument accepts no values on command-line, but it tracks a numerical value internally.
@@ -184,8 +199,8 @@ Special arguments
 
      ARG_VERBOSE([short arg name])
 
-  Default default is 0, you can use a ``test $_ARG_VERBOSE -ge 1`` pattern.
-
+  Default default is 0, so you can use a ``test $_ARG_VERBOSE -ge 1`` pattern in your script.
+ 
 Convenience macros
 ++++++++++++++++++
 
