@@ -5,6 +5,7 @@ VERSION=_ARGBASH_VERSION
 # ARG_POSITIONAL_SINGLE([input], [The input template file])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([standalone],, [Whether the parsing code is in a standalone file.])
+# ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
 # ARG_VERSION([echo "argbash v$VERSION"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
@@ -43,6 +44,7 @@ test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal 
 OUTFILE="$_ARG_OUTPUT"
 autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
 SEARCHDIRS=("." "$(dirname "$INFILE")")
+_ARG_SEARCH+=("$(dirname "$INFILE")")
 WRAPPED_DEFNS=""
 
 function settle_wrapped_fname
@@ -56,13 +58,13 @@ function settle_wrapped_fname
 	for srcstem in $_srcfiles
 	do
 		_found=no
-		for searchdir in ${SEARCHDIRS[@]}
+		for searchdir in ${_ARG_SEARCH[@]}
 		do
 			test -f $searchdir/$srcstem.m4 && { _found=yes; ext=m4; break; }
 			test -f $searchdir/$srcstem.sh && { _found=yes; ext=sh; break; }
 		done
 		# The last searchdir is a correct one
-		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${SEARCHDIRS[@]}" >&2; exit 2; }
+		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_ARG_SEARCH[@]}" >&2; exit 2; }
 		WRAPPED_DEFNS="${WRAPPED_DEFNS}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem.$ext]])"
 	done
 }

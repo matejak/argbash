@@ -1,5 +1,5 @@
-1.1.2a (2015-09-19)
-------------------
+1.2.0a (2016-07-20)
+-------------------
 
 New features:
 
@@ -10,12 +10,17 @@ New features:
   something goes wrong
 * The bash code tries to be minimal - only features that are used are
   supported
-* TBD: Support for leftover args (kindof)
+* Support for wrapping of other Argbash scripts
+* Support for repeated arguments (s.a. argument `-I` of `gcc`)
+* TBD: Support for leftover args (kindof - not when upper bound of args is not
+  known)
 
 Bugfixes:
 
 * Fixed installation bug when ROOT variable was not treated properly
+* Improved error reports when number of positional args doesn't match
 * Improved m4s list implementation
+* Added `m4_list_contains`
 
 1.1.0 (2015-09-06)
 ------------------

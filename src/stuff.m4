@@ -303,6 +303,18 @@ m4_define([ARG_OPTIONAL_INCREMENTAL], [m4_do(
 	]m4_dquote(_ARG_OPTIONAL_INCREMENTAL_BODY)[,
 )])
 
+m4_define([_ARG_OPTIONAL_REPEATED_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, @{:@$[]4@:}@, [repeated])])
+
+dnl $1 = long name
+dnl $2 = short name (opt)
+dnl $3 = help
+dnl $4 = default (empty array)
+m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
+	[[$0($@)]],
+	[_A_OPTIONAL],
+	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
+)])
+
 
 dnl $1 = short name (opt)
 m4_define([ARG_VERBOSE], [m4_do(
@@ -406,9 +418,13 @@ m4_define([_MAKE_HELP], [m4_do(
 		[: m4_list_nth([_ARGS_HELP], idx)],
 		[dnl Actions don't have defaults
 ],
-		[dnl We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
+		[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [action], [], [ (default: '"m4_list_nth([_ARGS_DEFAULT], idx)"')])],
+		[dnl Now the default is expanded since it is between double quotes
+],
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx), 
+			[action], [], 
+			[ (default: 'm4_list_nth([_ARGS_DEFAULT], idx)')])],
 		["
 ],
 	)])])],
@@ -461,6 +477,10 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[arg], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
 			_ARGVAR[="$[]2"
+			_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
+			shift],
+			[repeated], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
+			_ARGVAR[+=("$[]2")
 			_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
 			shift],
 			[bool], _ARGVAR[="on"
