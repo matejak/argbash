@@ -23,6 +23,8 @@ TESTS = \
 	test-simple \
 	test-wrapping \
 	test-wrapping-more \
+	test-wrapping-excl \
+	stability-wrapping \
 	$(NUL)
 
 PHONIES += $(TESTS)
@@ -43,6 +45,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-simple.sh \
 	$(TESTDIR)/test-wrapping.sh \
 	$(TESTDIR)/test-wrapping-more.sh \
+	$(TESTDIR)/test-wrapping-excl.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -69,6 +72,15 @@ define generic_regression
 	$(REVERSE) $< LOO --opt-arg 2> /dev/null
 endef
 
+define _test_onlypos
+	$(REVERSE) grep -q case $<
+	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,
+	$< LOO ar,guma | grep -q POS_S=LOO,POS_OPT=ar,guma,
+	ERROR=spurious $(REVERSE) $< one two three
+	ERROR='between 1 and 2' $(REVERSE) $< one two three
+	ERROR='Not enough' $(REVERSE) $<
+endef
+
 args: $(TESTDIR)/test.sh
 	$(generic_regression)
 
@@ -81,7 +93,7 @@ test-gen: $(ARGBASH_BIN) $(GENTESTS)
 	ERROR=opt_arg $(REVERSE) $< $(word 5,$+) > /dev/null
 	ERROR=same-arg $(REVERSE) $< $(word 6,$+) > /dev/null
 	ERROR=same_arg $(REVERSE) $< $(word 7,$+) > /dev/null
-	ERROR="unknown number" $(REVERSE) $< $(word 8,$+) > /dev/null
+	ERROR="is unknown" $(REVERSE) $< $(word 8,$+) > /dev/null
 
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 args-salone: $(TESTDIR)/call-salone.sh
@@ -97,12 +109,7 @@ test-more: $(TESTDIR)/test-more.sh
 	$< LOO laa bus kus | grep -q "POS_S=LOO,POS_MORE=laa bus kus",
 
 test-onlypos: $(TESTDIR)/test-onlypos.sh
-	$(REVERSE) grep -q case $<
-	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,
-	$< LOO ar,guma | grep -q POS_S=LOO,POS_OPT=ar,guma,
-	ERROR=spurious $(REVERSE) $< one two three
-	ERROR='between 1 and 2' $(REVERSE) $< one two three
-	ERROR='Not enough' $(REVERSE) $<
+	$(_test_onlypos)
 
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$(REVERSE) grep -q POSITION $<
@@ -146,6 +153,12 @@ test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	ERROR="nexpected argument '--opt-arg'" $(REVERSE) $< --opt-arg lalala
+
+test-wrapping-excl: $(TESTDIR)/test-wrapping-excl.sh $(TESTDIR)/test-onlypos.m4
+	$(_test_onlypos)
+
+stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
+	diff -q $< $(word 2,$^)
 
 tests-clean:
 	$(RM) $(SCRIPTS)

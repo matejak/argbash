@@ -4,15 +4,15 @@ Argbash documentation
 Argbash
 -------
 
-``Argbash`` (`<https://github.com/matejak/argbash>`_) is a ``Bash`` code generator that can assist you in writing scripts that accept arguments.
-You declare arguments that your script should use in few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``Bash`` (Linux, OSX, MS Windows, ...).
+``Argbash`` (`<https://github.com/matejak/argbash>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
+You declare arguments that your script should use in few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, OSX, MS Windows, ...).
 ``Argbash`` is free software, you are free to use it, share it, modify it and share the modifications with the world, since it is published under the 3-clause BSD linense.
 
 :Authors:
   - `Matěj Týč <https://github.com/matejak>`_
 
 :Copyright:
-  - 2014-2015, Matěj Týč
+  - 2014-2016, Matěj Týč
 
 Requirements
 ++++++++++++

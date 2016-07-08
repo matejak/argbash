@@ -14,7 +14,7 @@ The source code for the minimal example could look like this:
 Here, we can notice multiple notable things:
 
 #. Definitions of arguments are placed before the script body.
-   From Bash point of view, they are commented out, so the "template" can be a syntactically valid script.
+   From ``bash`` point of view, they are commented out, so the "template" can be a syntactically valid script.
 
 #. You access the values of argument ``foo-bar`` as ``$_ARG_FOO_BAR`` etc. (this is covered more in-depth in :ref:`parsing_results`).
 

@@ -138,8 +138,14 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [_ARG_POSITIONAL_SINGLE($@)])],
+)])
+
+
+m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
+	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
 	[m4_define([_POSITIONALS_MAX], m4_incr(_POSITIONALS_MAX))],
@@ -179,9 +185,14 @@ dnl  - use constructs s.a. POSITIONALS+=("${defaults[@]:0:$needed}")
 dnl  More:
 dnl   - infinitely many args = probably drop the -1 notation, inf. args can be handled in a parallel manner.
 m4_define([ARG_POSITIONAL_MULTI], [m4_do(
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [_ARG_POSITIONAL_MULTI($@)])],
+)])
+
+
+m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
-	[IF_POSITIONALS_VARNUM([m4_fatal([We already expect unknown number of arguments before '$1'. This is not supported])], [])],
+	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_define([_POSITIONALS_MAX], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MAX + [$3])))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_TYPES], [more])],
@@ -211,6 +222,11 @@ m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
 
 
 m4_define([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
+	[m4_ifblank(m4_list_contains([BLACKLIST], [--]), [_ARG_POSITIONAL_DOUBLEDASH($@)])],
+)])
+
+
+m4_define([_ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 	[[$0($@)]],
 	[m4_define([HAVE_DOUBLEDASH], 1)],
 )])
@@ -584,7 +600,7 @@ test ${#POSITIONALS[@]} -gt ]],
 		[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
-	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an argbash bug." >&2; exit 1; }
+	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],
 		[m4_popdef([_NARGS_SPEC])],
 	)])],

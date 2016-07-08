@@ -16,7 +16,7 @@ Installation is simple, but as it is described in the quickstart, you don't need
 
 ``Argbash`` directly depends on two pieces of software:
 
-* ``Bash >= 3.0`` --- this is obvious.
+* ``bash >= 3.0`` --- this is obvious.
 * ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``.
 
 * ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to ``Argbash`` developers than to end-users.

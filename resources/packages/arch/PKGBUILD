@@ -3,7 +3,7 @@
 # NOTE: Please fill out the license field for your package! If it is unknown,
 # then please put 'unknown'.
 
-# Maintainer: Your Name <matej.tyc@gmail.com>
+# Maintainer: Matěj Týč <matej.tyc@gmail.com>
 pkgname=argbash
 pkgver=@VERSION@
 pkgrel=@PKGREL@
@@ -24,9 +24,9 @@ backup=()
 options=()
 install=
 changelog=
-source=("$pkgname-$pkgver.tar.gz" LICENSE)
+source=("https://github.com/matejak/argbash/archive/$pkgname-$pkgver.tar.gz" LICENSE)
 noextract=()
-md5sums=('@MD5SUM@' '@LIC_MD5UM@')
+sha256sums=('@SHA256SUM@' '@LIC_SHA256SUM@')
 validpgpkeys=()
 
 build() {

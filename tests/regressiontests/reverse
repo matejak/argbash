@@ -2,7 +2,7 @@
 
 if test -n "$ERROR"
 then
-	"$@" 2> /dev/null
+	ERRSTRING="$("$@" 2>&1)"
 else
 	"$@"
 fi
@@ -17,7 +17,7 @@ then
 	exit 0
 # We examine the error string
 else
-	if "$@" 2>&1 | grep -q "$ERROR"
+	if echo "$ERRSTRING" | grep -q "$ERROR"
 	then
 		exit 0
 	else
