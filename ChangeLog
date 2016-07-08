@@ -1,3 +1,11 @@
+1.3.0 (???)
+------------------
+
+New features:
+
+* TBD: Support for leftover args (kindof - not when upper bound of args is not
+  known)
+
 1.2.0 (2016-07-08)
 ------------------
 
@@ -12,8 +20,6 @@ New features:
   supported
 * Support for wrapping of other Argbash scripts
 * Support for repeated arguments (s.a. argument `-I` of `gcc`)
-* TBD: Support for leftover args (kindof - not when upper bound of args is not
-  known)
 
 Bugfixes:
 
