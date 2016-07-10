@@ -274,11 +274,12 @@ Plus, there are convenience macros:
     ========= ===================
 
   * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_ARGS_PROCESS_SINGLE``.
+    In the case where there may be issues with positional arguments (they are order-dependent and the wrapping script may want to inject its own to the wrapped script), you can use ``_ARGS_PROCESS_SINGLE_OPT``, or ``_ARGS_PROCESS_SINGLE_POS``, where only optional/positional arguments are stored.
     Therefore, when you finally decide to call ``process-single.sh`` in your script with all wrapped arguments (e.g. ``--some-opt foo --bar``), all you have to do is to write
 
     ::
 
-      ./process-single.sh "${_ARGS_PROCESS_SINGLE[@]}"
+      ./process-single.sh "${_ARGS_PROCESS_SINGLE_OPT[@]}"
 
     which is exactly the same as
 
