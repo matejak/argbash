@@ -32,6 +32,13 @@ m4_define([m4_list_len], [m4_do(
 )])
 
 dnl
+dnl Pefrorm an action if a given list is empty
+dnl $1: The list's ID
+dnl $2: The action to do if the list is empty or not even defined
+dnl $3: The action to do if the list is defined and non-empty
+m4_define([m4_list_ifempty], [m4_if(m4_list_len([$1]), 0, [$2], [$3])])
+
+dnl
 dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
 m4_define([m4_list_contents], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],

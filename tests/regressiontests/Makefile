@@ -9,6 +9,7 @@ REVERSE = $(TESTDIR)/reverse
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 
+# Let test-gen be last - those tests take the longest time to complete
 TESTS = \
 	test-most \
 	test-more \
@@ -19,12 +20,12 @@ TESTS = \
 	test-onlyopt \
 	test-onlypos \
 	test-ddash \
-	test-gen \
 	test-simple \
 	test-wrapping \
 	test-wrapping-more \
 	test-wrapping-excl \
 	stability-wrapping \
+	test-gen \
 	$(NUL)
 
 PHONIES += $(TESTS)
@@ -145,9 +146,10 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
 	! $< -h | grep -q boo_l
-	$< LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
-	$< LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
-	$< LOOL --opt-arg lalala | grep -q OPT_S=lalala,
+	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
+	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
 
 test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'

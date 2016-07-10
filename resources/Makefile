@@ -15,6 +15,7 @@ EXAMPLES = \
 	examples/minimal.sh \
 	examples/simple.sh \
 	examples/simple-standalone.sh \
+	examples/simple-wrapper.sh \
 	$(NUL)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))

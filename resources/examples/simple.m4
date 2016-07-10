@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([filename])
-# ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kilobytes, M for megabytes)], b)
+# ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kibibytes, M for mebibytes)], b)
 # ARG_VERSION([echo $0 v0.1])
 # ARG_OPTIONAL_BOOLEAN(verbose)
 # ARG_HELP([This program tells you size of file that you pass to it in chosen units.])
 # ARGBASH_GO
 
-# opening escape square bracket: [
+# [ <-- needed because of Argbash
 
 # ARG_HELP  <-- Unlike one above, his one does not disappear, it is behind the escape bracket.
 
@@ -22,12 +22,12 @@ FILENAME="$_ARG_FILENAME"
 if [ $VERBOSE = on ]
 then
 	_b="bytes (B)"
-	_kb="kilobytes (kB)"
-	_mb="megabytes (MB)"
+	_kb="kibibytes (kiB)"
+	_mb="mebibytes (MiB)"
 else
 	_b="B"
-	_kb="kB"
-	_mb="MB"
+	_kb="kiB"
+	_mb="MiB"
 fi
 
 SIZE_BYTES=$(wc -c "$FILENAME" | cut -f 1 -d ' ')
@@ -43,4 +43,4 @@ test "$UNIT" = M && echo $SIZE_MEGABYTES $_mb && exit 0
 test "$VERBOSE" = on && echo "The unit '$UNIT' is not supported!"
 exit 1
 
-# closing escape square bracket: ]
+# ] <-- needed because of Argbash

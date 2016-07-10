@@ -1,10 +1,14 @@
-1.3.0 (???)
+1.2.1 (???)
 ------------------
 
 New features:
 
 * TBD: Support for leftover args (kindof - not when upper bound of args is not
   known)
+
+Bugfixes:
+
+* Improved the wrapping of scripts to work with positional args
 
 1.2.0 (2016-07-08)
 ------------------
