@@ -2,7 +2,7 @@
 
 VERSION=1.2.1
 # DEFINE_SCRIPT_DIR()
-# _ARG_POSITIONAL_SINGLE([input],[The input template file])
+# ARG_POSITIONAL_SINGLE([input],[The input template file])
 # ARG_OPTIONAL_SINGLE([output],[o],[Name of the output file (pass '-' for stdout)],[-])
 # ARG_OPTIONAL_BOOLEAN([standalone],[],[Whether the parsing code is in a standalone file.])
 # ARG_OPTIONAL_REPEATED([search],[I],[Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)],["."])
@@ -81,7 +81,6 @@ done
 
 POSITIONAL_NAMES=('_ARG_INPUT' )
 test ${#POSITIONALS[@]} -lt 1 && { ( echo "FATAL ERROR: Not enough positional arguments --- we require exactly 1, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
-test ${#POSITIONALS[@]} -gt 1 && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect exactly 1, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
 for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
@@ -117,7 +116,11 @@ function do_stuff
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	_ret=$?
-	test $_ret = 0 || {  echo "Error during autom4te run, aborting!" >&2; exit $_ret; }
+	if test $_ret != 0
+	then
+		echo "Error during autom4te run, aborting!" >&2;
+		exit $_ret;
+	fi
 }
 
 test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
@@ -179,18 +182,13 @@ if test "$OUTFILE" = '-'
 then
 	do_stuff
 else
-	# vvv This should catch most of the cases when we want to overwrite the source file vvv
-	if test "$OUTFILE" = "$INFILE"
-	then
-		TEMP_OUTFILE=temp_$$
-		trap "rm -f $TEMP_OUTFILE" EXIT
-		do_stuff > "$TEMP_OUTFILE"
-		mv "$TEMP_OUTFILE" "$OUTFILE"
-	else
-		do_stuff > "$OUTFILE"
-	fi
+	# vvv This should catch most of the cases when we want to overwrite the source file
+	# vvv and we don't want to leave a file (not even an empty one) when something goes wrong.
+	TEMP_OUTFILE=temp_$$
+	trap "rm -f $TEMP_OUTFILE" EXIT
+	do_stuff > "$TEMP_OUTFILE"
+	mv "$TEMP_OUTFILE" "$OUTFILE"
 	chmod a+x "$OUTFILE"
 fi
 
-#
-# ] <-- needed because of Argbash
+# # ] <-- needed because of Argbash

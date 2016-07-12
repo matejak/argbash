@@ -36,7 +36,11 @@ function do_stuff
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	_ret=$?
-	test $_ret = 0 || {  echo "Error during autom4te run, aborting!" >&2; exit $_ret; }
+	if test $_ret != 0 
+	then	
+		echo "Error during autom4te run, aborting!" >&2; 
+		exit $_ret;
+	fi
 }
 
 test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
@@ -98,17 +102,14 @@ if test "$OUTFILE" = '-'
 then
 	do_stuff
 else
-	# vvv This should catch most of the cases when we want to overwrite the source file vvv
-	if test "$OUTFILE" = "$INFILE"
-	then
-		TEMP_OUTFILE=temp_$$
-		trap "rm -f $TEMP_OUTFILE" EXIT
-		do_stuff > "$TEMP_OUTFILE"
-		mv "$TEMP_OUTFILE" "$OUTFILE"
-	else
-		do_stuff > "$OUTFILE"
-	fi
+	# vvv This should catch most of the cases when we want to overwrite the source file
+	# vvv and we don't want to leave a file (not even an empty one) when something goes wrong.
+	TEMP_OUTFILE=temp_$$
+	trap "rm -f $TEMP_OUTFILE" EXIT
+	do_stuff > "$TEMP_OUTFILE"
+	mv "$TEMP_OUTFILE" "$OUTFILE"
 	chmod a+x "$OUTFILE"
 fi
 
-# ]
+# ]dnl
+dnl vim: filetype=sh

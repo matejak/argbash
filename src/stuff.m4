@@ -96,8 +96,10 @@ dnl Number of distinct optional args the script can accept
 m4_define([_NARGS], 0)
 dnl Minimal number of positional args the script accepts
 m4_define([_POSITIONALS_MIN], 0)
-dnl Greatest number of positional args the script can accept (-1 for infinity)
+dnl Greatest number of positional args the script can accept (infinite number of args is handled in parallel)
 m4_define([_POSITIONALS_MAX], 0)
+dnl We expect infinitely many args (keep in mind that we still need _POSITIONALS_MAX)
+m4_define([_POSITIONALS_INF], 0)
 
 dnl To be able to use _POSITIONALS_NAMES_FOREACH etc.
 m4_list_declare([_POSITIONALS_NAMES])
@@ -127,7 +129,7 @@ m4_define([_A_OPTIONAL], [m4_do(
 
 dnl Do something depending on whether there is already infinitely many args possible or not
 m4_define([IF_POSITIONALS_INF],
-	[m4_if([_POSITIONALS_MAX], -1, [$1], [$2])])
+	[m4_if([_POSITIONALS_INF], 1, [$1], [$2])])
 
 
 dnl Do something depending on whether there have been optional positional args declared beforehand or not
@@ -141,12 +143,11 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [_ARG_POSITIONAL_SINGLE($@)])],
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
 )])
 
 
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
-	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
@@ -178,11 +179,49 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 )])
 
 
+m4_define([ARG_POSITIONAL_INF], [m4_do(
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_INF($@)])],
+)])
+
+
+dnl
+dnl 
+dnl Declare sequence of multiple positional arguments
+dnl $1: Name of the arg
+dnl $2: Help for the arg
+dnl $3: How many args at least (opt., default=0)
+dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
+m4_define([_ARG_POSITIONAL_INF], [m4_do(
+	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
+	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[m4_define([_POSITIONALS_INF], 1)],
+	[m4_list_add([_POSITIONALS_NAMES], [$1])],
+	[m4_list_add([_POSITIONALS_TYPES], [mix])],
+	[m4_list_add([_POSITIONALS_MSGS], [$2])],
+	[_A_POSITIONAL_VARNUM],
+	[m4_pushdef([_min_argn], m4_default([$3], 0))],
+	[m4_list_add([_POSITIONALS_MINS], _min_argn)],
+	[m4_list_add([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
+	[dnl Make "defaults" for mandatory args (defaults are therefore empty strings). Don't do anything if there are no defaults
+],
+	[m4_if(_min_argn, 0, , [m4_list_add([_$1_DEFAULTS], m4_for(_, 1, m4_eval(1 + _min_argn), 1, ['',]))])],
+	[dnl If there are more than 3 args, add more stuff to defaults
+],
+	[m4_if(m4_cmp($#, 3), 1, [m4_list_add([_$1_DEFAULTS], m4_shiftn(3, $@))])],
+	[dnl vvv This doesn't really matter
+],
+	[m4_list_add([_POSITIONALS_MAXES], _min_argn)],
+	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + _min_argn))],
+	[m4_popdef([_min_argn])],
+	[_CHECK_ARGNAME_FREE([$1], [POS])],
+)])
+
+
 dnl
 dnl Declare sequence of multiple positional arguments
 dnl $1: Name of the arg
 dnl $2: Help for the arg
-dnl $3: How many args (-1 == infinitely many)
+dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
 dnl TODO:
 dnl  - handle defaults - now only one global default is allowed per script
@@ -190,15 +229,12 @@ dnl   - store them
 dnl   - display them in the help
 dnl   - use them to extend POSITIONALS
 dnl  - use constructs s.a. POSITIONALS+=("${defaults[@]:0:$needed}")
-dnl  More:
-dnl   - infinitely many args = probably drop the -1 notation, inf. args can be handled in a parallel manner.
 m4_define([ARG_POSITIONAL_MULTI], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [_ARG_POSITIONAL_MULTI($@)])],
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
 
 
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
-	[[$0($@)]],
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
@@ -206,7 +242,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 		[m4_set_add([_POS_VARNAMES], m4_expand([[_ARGS_]_translit(WRAPPED)_POS]))],
 		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([[_ARGS_]_translit(WRAPPED)_POS+=@{:@${_varname([$1])@<:@@@:>@}@:}@]))]
 	)])],
-	[m4_define([_POSITIONALS_MAX], m4_if([$3], -1, -1, m4_eval(_POSITIONALS_MAX + [$3])))],
+	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_TYPES], [more])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
@@ -216,7 +252,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[dnl If we have defaults, we actually accept unknown number of arguments
 ],
 	[m4_if(_min_argn, [$3], , [_A_POSITIONAL_VARNUM])],
-	[m4_list_add([_POSITIONALS_MINS], m4_if([$3], -1, -1, _min_argn))],
+	[m4_list_add([_POSITIONALS_MINS], _min_argn)],
 	[m4_list_add([_POSITIONALS_MAXES], [$3])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
@@ -599,19 +635,30 @@ done]],
 			)])],
 			[m4_popdef([_POS_MAX])],
 		)])],
-		[m4_pushdef([_NARGS_SPEC], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [exactly _POSITIONALS_MIN], [between _POSITIONALS_MIN and _POSITIONALS_MAX]))],
+		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least _POSITIONALS_MINS]], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
 test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
 		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
-test ${#POSITIONALS[@]} -gt ]],
-		[_POSITIONALS_MAX],
-		[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
-		[_NARGS_SPEC],
-		[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+]],
+		[IF_POSITIONALS_INF(, 
+		[m4_do(
+			[dnl If we allow up to infinitely many args, we prepare the array for it.
 ],
-		[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
-for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
+		)],
+		[m4_do(
+			[dnl If we allow up to infinitely many args, there is no point in warning about too many args. 
+],
+			[[test ${#POSITIONALS[@]} -gt ]],
+			[_POSITIONALS_MAX],
+			[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+			[_NARGS_SPEC],
+			[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+],
+			[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
+]],
+		)])],
+		[[for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],

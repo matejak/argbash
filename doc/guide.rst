@@ -313,10 +313,10 @@ The key is that parsing results are saved in environmental variables that relate
 The argument name is transliterated like this:
 
 #. All letters are made upper-case
-#. Dashes are transliterated to underscores (``-`` becomes ``_``)
+#. Dashes are transliterated to underscores (``include-batteries`` becomes ``include_batteries``)
 #. ``_ARG_`` is prepended to the string.
 
-   So given that you have an argument ``--input-file`` that expects a value, you can access it via environmental variable ``_ARG_INPUT_FILE``.
+   So given that you have an argument ``--include-batteries`` that expects a value, you can access it via environmental variable ``_ARG_INCLUDE_BATTERIES``.
 #. Boolean arguments have values either ``on`` or ``off``.
 
    If (a boolean argument) ``--quiet`` is passed, value of ``_ARG_QUIET`` is set to ``on``.

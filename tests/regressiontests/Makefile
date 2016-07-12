@@ -25,6 +25,7 @@ TESTS = \
 	test-wrapping-more \
 	test-wrapping-excl \
 	stability-wrapping \
+	test-infinity \
 	test-gen \
 	$(NUL)
 
@@ -47,6 +48,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-wrapping.sh \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
+	$(TESTDIR)/test-infinity.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -161,6 +163,11 @@ test-wrapping-excl: $(TESTDIR)/test-wrapping-excl.sh $(TESTDIR)/test-onlypos.m4
 
 stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
 	diff -q $< $(word 2,$^)
+
+test-infinity: $(TESTDIR)/test-infinity.sh
+	$< | grep -q 'POS_S=first,second,third,'
+	$< 1 | grep -q 'POS_S=1,second,third,'
+	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 tests-clean:
 	$(RM) $(SCRIPTS)

@@ -1,3 +1,14 @@
+1.2.2 (???)
+------------------
+
+New features:
+
+* Expanded documentation --- expanded info about related projects. 
+
+Bugfixes:
+
+* Fixed definitions in the parsing part of the script.
+
 1.2.1 (2016-07-10)
 ------------------
 
