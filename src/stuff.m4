@@ -205,7 +205,7 @@ m4_define([_ARG_POSITIONAL_INF], [m4_do(
 	[dnl Make "defaults" for mandatory args (defaults are therefore empty strings). Don't do anything if there are no defaults
 ],
 	[m4_if(_min_argn, 0, , [m4_list_add([_$1_DEFAULTS], m4_for(_, 1, m4_eval(1 + _min_argn), 1, ['',]))])],
-	[dnl If there are more than 3 args, add more stuff to defaults
+	[dnl If there are more than 3 args to this macro, add more stuff to defaults
 ],
 	[m4_if(m4_cmp($#, 3), 1, [m4_list_add([_$1_DEFAULTS], m4_shiftn(3, $@))])],
 	[dnl vvv This doesn't really matter
@@ -621,6 +621,7 @@ done]],
 		[[POSITIONAL_NAMES=@{:@]],
 		[m4_for([ii], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
 			[dnl Go through all positionals names ...
+dnl TODO: We need to handle inf number of args here
 ],
 			[m4_pushdef([_POS_MAX], m4_list_nth([_POSITIONALS_MAXES], ii))],
 			[m4_for([jj], 1, _POS_MAX, 1, [m4_do(
@@ -641,24 +642,31 @@ test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
 		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
 ]],
-		[IF_POSITIONALS_INF(, 
-		[m4_do(
-			[dnl If we allow up to infinitely many args, we prepare the array for it.
+		[IF_POSITIONALS_INF(
+			[m4_do(
+				[dnl If we allow up to infinitely many args, we prepare the array for it.
 ],
-		)],
-		[m4_do(
-			[dnl If we allow up to infinitely many args, there is no point in warning about too many args. 
+				[(( OUR_ARGS=${#POSITIONALS@<:@@@:>@} - ${#POSITIONAL_NAMES@<:@@@:>@} ))
 ],
-			[[test ${#POSITIONALS[@]} -gt ]],
-			[_POSITIONALS_MAX],
-			[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
-			[_NARGS_SPEC],
-			[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+				[for (( ii = 0; ii < $OUR_ARGS; ii++))
+	do
+		POSITIONAL_NAMES+=("FOO@<:@$ii@:>@")
+	done
 ],
-			[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
+			)],
+			[m4_do(
+				[dnl If we allow up to infinitely many args, there is no point in warning about too many args. 
+],
+				[[test ${#POSITIONALS[@]} -gt ]],
+				[_POSITIONALS_MAX],
+				[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+				[_NARGS_SPEC],
+				[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+],
+				[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
 ]],
-		)])],
-		[[for (( ii = 0; ii <  ${#POSITIONALS[@]}; ii++))
+			)])],
+		[[for (( ii = 0; ii < ${#POSITIONALS[@]}; ii++))
 do
 	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],
