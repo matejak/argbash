@@ -27,7 +27,7 @@ m4_define([_m4_list_add_single], [m4_do(
 m4_define([m4_list_len], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[],
-	[m4_ifndef(_LIST_NAME, 0, [m4_count(m4_unquote(_LIST_NAME))])],
+	[m4_ifndef(_LIST_NAME, 0, [m4_count(m4_indir(_LIST_NAME))])],
 	[m4_popdef([_LIST_NAME])],
 )])
 
@@ -65,6 +65,27 @@ m4_define([m4_list_contains], [m4_do(
 
 m4_define([m4_list_sum], [m4_do(
 	[m4_eval(m4_quote(m4_join(+, m4_unquote(m4_list_contents([$1])))))],
+)])
+
+
+dnl
+dnl $1: list name
+dnl $2: With what to join
+dnl $3: left quote
+dnl $4: right quote
+dnl $5: last join
+m4_define([m4_list_join], [m4_do(
+	[m4_pushdef([listlen], m4_list_len([$1]))],
+	[m4_if(m4_cmp(listlen - 2, 0), 1,
+		[m4_for([idx], 1, m4_eval(listlen - 2), 1, [[$3]m4_list_nth([$1], idx)[$4$2]])],
+	)],
+	[m4_if(m4_cmp(listlen - 1, 0), 1,
+		[[$3]m4_list_nth([$1], m4_decr(listlen))[$4]m4_default([$5], [$2])],
+	)],
+	[m4_if(m4_cmp(listlen - 0, 0), 1,
+		[[$3]m4_list_nth([$1], listlen)[$4]],
+	)],
+	[m4_popdef([listlen])],
 )])
 
 dnl

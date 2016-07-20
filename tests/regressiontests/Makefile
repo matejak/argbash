@@ -107,6 +107,7 @@ args-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
 
 test-most: $(TESTDIR)/test-most.sh
+	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
 	$< xx yy | grep -q "POS_MORE1=xx yy,POS_MORE2=hu lu,"
 	$< xx yy zz aa | grep -q "POS_MORE1=xx yy,POS_MORE2=zz aa,"
 
@@ -179,6 +180,7 @@ test-infinity-nodefaults: $(TESTDIR)/test-infinity-nodefaults.sh
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
+	$< -h | grep -q '<pos-arg-1> \[<pos-arg-2>\] \.\.\. \[<pos-arg-n>\]  \.\.\.'
 	ERROR="require at least 1" $(REVERSE) $<
 	$< 1 | grep -q 'POS_S=1,first,second'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'

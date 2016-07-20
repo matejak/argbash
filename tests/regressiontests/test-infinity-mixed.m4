@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_INF([pos-arg], [@pos-arg@], 1, first, second, third)
+# ARG_HELP()
 # ARGBASH_GO
 
 # opening escape square bracket: [
