@@ -26,6 +26,8 @@ TESTS = \
 	test-wrapping-excl \
 	stability-wrapping \
 	test-infinity \
+	test-infinity-nodefaults \
+	test-infinity-mixed \
 	test-gen \
 	$(NUL)
 
@@ -49,6 +51,8 @@ SCRIPTS = \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
 	$(TESTDIR)/test-infinity.sh \
+	$(TESTDIR)/test-infinity-nodefaults.sh \
+	$(TESTDIR)/test-infinity-mixed.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -167,6 +171,16 @@ stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
 test-infinity: $(TESTDIR)/test-infinity.sh
 	$< | grep -q 'POS_S=first,second,third,'
 	$< 1 | grep -q 'POS_S=1,second,third,'
+	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+
+test-infinity-nodefaults: $(TESTDIR)/test-infinity-nodefaults.sh
+	ERROR="require at least 2" $(REVERSE) $<
+	$< 1 "2 3" | grep -q 'POS_S=1,2 3'
+	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+
+test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
+	ERROR="require at least 1" $(REVERSE) $<
+	$< 1 | grep -q 'POS_S=1,first,second'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 tests-clean:

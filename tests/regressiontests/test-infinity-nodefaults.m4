@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_INF([pos-arg], [@pos-arg@], 0, first, second, third)
+# ARG_POSITIONAL_INF([pos-arg], [@pos-arg@], 2)
 # ARGBASH_GO
 
 # opening escape square bracket: [
@@ -13,3 +13,4 @@ for val in "${_ARG_POS_ARG[@]}"; do echo -n "$val,"; done
 echo
 
 # closing escape square bracket: ]
+

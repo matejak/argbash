@@ -129,7 +129,7 @@ m4_define([_A_OPTIONAL], [m4_do(
 
 dnl Do something depending on whether there is already infinitely many args possible or not
 m4_define([IF_POSITIONALS_INF],
-	[m4_if([_POSITIONALS_INF], 1, [$1], [$2])])
+	[m4_if(m4_quote(_POSITIONALS_INF), 1, [$1], [$2])])
 
 
 dnl Do something depending on whether there have been optional positional args declared beforehand or not
@@ -184,6 +184,14 @@ m4_define([ARG_POSITIONAL_INF], [m4_do(
 )])
 
 
+m4_define([_CHECK_INTEGER_TYPE], [m4_do(
+	[m4_ifnblank([$1], 
+		[m4_if(0, 1, 
+			[m4_fatal([$2])],
+			[])])],
+)])
+
+
 dnl
 dnl 
 dnl Declare sequence of multiple positional arguments
@@ -196,15 +204,15 @@ m4_define([_ARG_POSITIONAL_INF], [m4_do(
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
-	[m4_list_add([_POSITIONALS_TYPES], [mix])],
+	[m4_list_add([_POSITIONALS_TYPES], [more])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
 	[_A_POSITIONAL_VARNUM],
+	[_CHECK_INTEGER_TYPE([$3], [The third argument to ARG_POSITIONAL_INF (if supplied) is supposed to be minimal number of arguments (i.e. an integer), got '$3' instead.])],
 	[m4_pushdef([_min_argn], m4_default([$3], 0))],
+	[m4_define([_INF_ARGN], _min_argn)],
+	[m4_define([_INF_VARNAME], _varname([$1]))],
 	[m4_list_add([_POSITIONALS_MINS], _min_argn)],
 	[m4_list_add([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
-	[dnl Make "defaults" for mandatory args (defaults are therefore empty strings). Don't do anything if there are no defaults
-],
-	[m4_if(_min_argn, 0, , [m4_list_add([_$1_DEFAULTS], m4_for(_, 1, m4_eval(1 + _min_argn), 1, ['',]))])],
 	[dnl If there are more than 3 args to this macro, add more stuff to defaults
 ],
 	[m4_if(m4_cmp($#, 3), 1, [m4_list_add([_$1_DEFAULTS], m4_shiftn(3, $@))])],
@@ -624,19 +632,23 @@ done]],
 dnl TODO: We need to handle inf number of args here
 ],
 			[m4_pushdef([_POS_MAX], m4_list_nth([_POSITIONALS_MAXES], ii))],
-			[m4_for([jj], 1, _POS_MAX, 1, [m4_do(
-				[dnl And repeat each of them POSITIONALS_MAXES-times
+			[dnl If we accept inf args, it may be that _POS_MAX == 0 although we HAVE_POSITIONAL
 ],
-				['],
-				[_varname(m4_list_nth([_POSITIONALS_NAMES], ii))],
-				[dnl If we handle a multi-value arg, we assign to an array => we add '[ii - 1]' to LHS
+			[m4_if(_POS_MAX, 0, , [m4_do(
+				[m4_for([jj], 1, _POS_MAX, 1, [m4_do(
+					[dnl And repeat each of them POSITIONALS_MAXES-times
 ],
-				[m4_if(_POS_MAX, 1, , [@<:@m4_eval(jj - 1)@:>@])],
-				[' ],
+					['],
+					[_varname(m4_list_nth([_POSITIONALS_NAMES], ii))],
+					[dnl If we handle a multi-value arg, we assign to an array => we add '[ii - 1]' to LHS
+],
+					[m4_if(_POS_MAX, 1, , [@<:@m4_eval(jj - 1)@:>@])],
+					[' ],
+				)])],
 			)])],
 			[m4_popdef([_POS_MAX])],
 		)])],
-		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least _POSITIONALS_MINS]], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
+		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
 test ${#POSITIONALS[@]} -lt ]],
 		[_POSITIONALS_MIN],
@@ -649,9 +661,9 @@ test ${#POSITIONALS[@]} -lt ]],
 				[(( OUR_ARGS=${#POSITIONALS@<:@@@:>@} - ${#POSITIONAL_NAMES@<:@@@:>@} ))
 ],
 				[for (( ii = 0; ii < $OUR_ARGS; ii++))
-	do
-		POSITIONAL_NAMES+=("FOO@<:@$ii@:>@")
-	done
+do
+	POSITIONAL_NAMES+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
+done
 ],
 			)],
 			[m4_do(
