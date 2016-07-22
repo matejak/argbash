@@ -126,6 +126,8 @@ if ON_RTD:
 # documentation.
 html_theme_options = {
     "fixed_sidebar": True,
+    'github_user': 'matejak',
+    'github_repo': 'argbash',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.

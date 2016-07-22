@@ -28,6 +28,7 @@ TESTS = \
 	test-infinity \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
+	test-leftovers \
 	test-gen \
 	$(NUL)
 
@@ -53,6 +54,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-infinity.sh \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
+	$(TESTDIR)/test-leftovers.sh \
 	$(NUL)
 
 regressiontests: $(TESTS)
@@ -180,10 +182,14 @@ test-infinity-nodefaults: $(TESTDIR)/test-infinity-nodefaults.sh
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
-	$< -h | grep -q '<pos-arg-1> \[<pos-arg-2>\] \.\.\. \[<pos-arg-n>\]  \.\.\.'
+	$< -h | grep -q '<pos-arg-1> \[<pos-arg-2>\] \.\.\. \[<pos-arg-n>\] \.\.\.$$'
 	ERROR="require at least 1" $(REVERSE) $<
 	$< 1 | grep -q 'POS_S=1,first,second'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+
+test-leftovers: $(TESTDIR)/test-leftovers.sh
+	$< -h | grep -q '\[-c\|--cosi <arg>\] \[-h\|--help\] <another> \.\.\. $$'
+	$< -c ours --no-fear "ours pos" left "o ver" | grep -q 'OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 
 tests-clean:
 	$(RM) $(SCRIPTS)

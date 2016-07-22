@@ -51,7 +51,7 @@ Then, it means that we need following arguments:
 * Four optional arguments:
 
   * ``--option`` that accepts one value,
-  * ``--print`` that doesn't accept any value --- it either is or isn't specified,
+  * ``--print`` or ``--no-print`` that doesn't accept any value --- it either is or isn't specified,
   * ``--version`` that also doesn't accept any value and the program is supposed just to print its version and quit afterwards, and finally
   * ``--help`` that prints a help message and also quits.
 

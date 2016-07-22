@@ -1,7 +1,11 @@
 Others
-------
+======
 
-Here follows a list of influences and/or alternatives:
+Utilities
+---------
+
+You want to write a script that does argument parsing and don't like ``Argbash`` or you just want to find out how awesome it really is?
+Then read throgh this list of influences and/or alternatives!
 
 * Python ``argparse``: The main inspiration: https://docs.python.org/3/library/argparse.html
 
@@ -93,6 +97,22 @@ Here follows a list of influences and/or alternatives:
     * We have good documentation with examples.
     * We offer an option to produce battery-included scripts.
 
+Learning resources
+------------------
+
+Do you want to write the argument-parsing part of your script yourself or you want to improve ``Argbash``?
+Then read through this list of high-quality learing resources!
+
+* Best practices in argument parsing: http://www.shelldorado.com/goodcoding/cmdargs.html
+
+  Don't miss the list of short options and their common meaning!
+
 * StackOverflow thread about argument parsing: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
 
   It was mainly this thread which inspired ``Argbash``.
+  There are plenty of recipies and suggestions available.
+  If you are a happy user of ``Argbash``, consider upvoting `the answer that promotes it <http://stackoverflow.com/a/38297066/592892>`_ since more people know ``Argbash``, the better for them.
+
+* Argument parsing for dummies: http://wiki.bash-hackers.org/scripting/posparams
+
+  A short and nice-looking introduction with all basics covered (wiki).

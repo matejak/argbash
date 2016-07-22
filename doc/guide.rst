@@ -142,6 +142,28 @@ Positional arguments
 
   Arguments are available as a ``bash`` array (first element has index of 0).
 
+* Infinitely many-valued positional argument (with optional defaults):
+  ::
+
+     ARG_POSITIONAL_INF([argument-name], [help message], [minimal number of arguments], [default for the first non-required argument (optional)], ...)
+
+  ``Argbash`` supports arguments with arbitrary number of values.
+  However, you can require a minimal amount of values the caller has to provide and you can also assign defaults for the values that are not required.
+  Given that your argument accepts at least :math:`n` values, you can specify defaults for :math:`n + 1`:sup:`th` argument (and so on).
+
+  For example, consider that your script makes use of infinitely many-valued argument, which accepts at least 1 value and also has two defaults ``bar`` and ``baz``.
+  Then, it is imperative that at least one value is specified on the command-line.
+  So If you pass a value ``val1`` on the command-line, you will be able to retrieve ``val1``, ``bar`` and ``baz`` inside the script.
+  If you pass ``val1``, ``val2``, ``val3`` and ``val4``, you will be able to retrieve ``val1``, ``val2`` ``val3`` and ``val4``.
+
+  Arguments are available as a ``bash`` array (first element has index of 0).
+
+  .. note::
+
+     The main difference between ``ARG_POSITIONAL_MULTI`` and ``ARG_POSITIONAL_INF`` is in handling of defaults.
+     In ``ARG_POSITIONAL_MULTI``, defaults determine the number of values that are required to be supplied.
+     In ``ARG_POSITIONAL_INF``, you determine the number of required values and defaults follow.
+
 * End of optional arguments and beginning of positional ones (the double-dash ``--``):
   ::
 
@@ -219,6 +241,16 @@ Special arguments
      ARG_VERBOSE([short arg name])
 
   Default default is 0, so you can use a ``test $_ARG_VERBOSE -ge 1`` pattern in your script.
+
+* Collect leftovers:
+  ::
+
+     ARG_LEFTOVERS([help text (optional)])
+
+  This macro allows your script to accept more arguments and collect them consequently in the ``_ARG_LEFTOVERS`` array.
+
+  A use case for this is wrapping of scripts that are completely ``Argbash``-agnostic.
+  Therefore, your script can take its own arguments and the rest that is not recognized can go to the wrapped script.
 
 Convenience macros
 ++++++++++++++++++

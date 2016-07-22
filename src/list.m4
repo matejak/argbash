@@ -41,6 +41,7 @@ m4_define([m4_list_ifempty], [m4_if(m4_list_len([$1]), 0, [$2], [$3])])
 dnl
 dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
 m4_define([m4_list_contents], [m4_do(
+	[m4_if($#, 1, , [m4_fatal([$0: Expected exactly one argument, got $# instead (others were: ]m4_quote(m4_shift($@))[)])])],
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_ifndef(_LIST_NAME, [], [m4_dquote_elt(m4_indir(_LIST_NAME))])],
 	[m4_popdef([_LIST_NAME])],

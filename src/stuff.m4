@@ -179,8 +179,14 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 )])
 
 
+dnl 
+dnl Declare sequence of possibly infinitely many positional arguments
+dnl $1: Name of the arg
+dnl $2: Help for the arg
+dnl $3: How many args at least (opt., default=0)
+dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
 m4_define([ARG_POSITIONAL_INF], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_INF($@)])],
+	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_INF([$1], [$2], [$3], [],  m4_shiftn(3, $@))])],
 )])
 
 
@@ -192,17 +198,17 @@ m4_define([_CHECK_INTEGER_TYPE], [m4_do(
 )])
 
 
+dnl TODO: Have an option to show in the help message
 dnl
-dnl 
-dnl Declare sequence of multiple positional arguments
-dnl $1: Name of the arg
-dnl $2: Help for the arg
-dnl $3: How many args at least (opt., default=0)
-dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
+dnl $4: Representation of arg on command-line
+dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_define([_POSITIONALS_INF], 1)],
+	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
+],
+	[m4_define([_INF_REPR], [[$4]])],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_TYPES], [inf])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
@@ -215,8 +221,8 @@ m4_define([_ARG_POSITIONAL_INF], [m4_do(
 	[m4_list_add([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
 	[dnl If there are more than 3 args to this macro, add more stuff to defaults
 ],
-	[m4_if(m4_cmp($#, 3), 1, [m4_list_add([_$1_DEFAULTS], m4_shiftn(3, $@))])],
-	[dnl vvv This doesn't really matter
+	[m4_if(m4_cmp($#, 4), 1, [m4_list_add([_$1_DEFAULTS], m4_shiftn(4, $@))])],
+	[dnl vvv This has to be like this, additional args that are not required are handled differently
 ],
 	[m4_list_add([_POSITIONALS_MAXES], _min_argn)],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + _min_argn))],
@@ -424,6 +430,7 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
 
+dnl In case of 'inf': If _INF_REPR is not blank, use it, otherwise compose the command-line yourself
 m4_define([_POS_ARG_HELP_LINE], [m4_do(
 	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONALS_TYPES], idx))],
 	[m4_case(m4_expand([_arg_type]),
@@ -436,12 +443,16 @@ m4_define([_POS_ARG_HELP_LINE], [m4_do(
 			[m4_if(_min_argn, _max_argn, , 
 				[m4_for([idx2], m4_incr(_min_argn), _max_argn, 1, 
 					[m4_list_add([_POSITIONALS_LIST], m4_expand([@<:@<argname-idx2>@:>@]))])])])],
-		[inf], [m4_do(
+		[inf], [m4_ifnblank(_INF_REPR, [m4_list_add([_POSITIONALS_LIST], _INF_REPR)], [m4_do(
 			[m4_if(_min_argn, 0, ,
 				[m4_for([idx2], 1, _min_argn, 1, 
 					[m4_list_add([_POSITIONALS_LIST], m4_expand([<argname-idx2>]))])])],
-			[m4_list_add([_POSITIONALS_LIST], m4_expand([@<:@<argname[-]m4_incr(_min_argn)>@:>@]), [...], m4_expand([@<:@<argname[-]n>@:>@]) ,[...])])],
-	[m4_fatal([Unhandled arg type: ]'_arg_type')])],
+			[m4_list_add([_POSITIONALS_LIST], 
+				m4_expand([@<:@<argname[-]m4_incr(_min_argn)>@:>@]), 
+				[...], 
+				m4_expand([@<:@<argname[-]n>@:>@]),
+				[...])])])],
+	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
 	[m4_popdef([_arg_type])],
 )])
 
@@ -470,8 +481,18 @@ m4_define([_POS_ARG_HELP_USAGE], [m4_do(
 			)])],
 		[more], [_MAKE_USAGE_MORE],
 		[inf], [_MAKE_USAGE_MORE],
-	[m4_fatal([Unhandled arg type: ]'_arg_type')])],
+	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
 	[m4_popdef([_arg_type])],
+)])
+
+
+dnl
+dnl $1: arg index
+dnl Returns either --long or -l|--long if there is that -l
+m4_define([_ARG_FORMAT], [m4_do(
+	[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx), 
+		[-]m4_list_nth([_ARGS_SHORT], idx)|)],
+	[[--]m4_list_nth([_ARGS_LONG], idx)],
 )])
 
 
@@ -490,11 +511,11 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[m4_if(HAVE_OPTIONAL, 1,
 		[m4_for([idx], 1, _NARGS, 1, [m4_do(
-			[ @<:@--],
+			[ @<:@],
 			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-				[bool], [(no-)]m4_list_nth([_ARGS_LONG], idx),
-				[arg], m4_list_nth([_ARGS_LONG], idx)[ <arg>],
-				[m4_list_nth([_ARGS_LONG], idx)])],
+				[bool], [--(no-)]m4_list_nth([_ARGS_LONG], idx),
+				[arg], [_ARG_FORMAT(idx) <arg>],
+				[_ARG_FORMAT(idx)])],
 			[@:>@],
 		)])],
 	)],
@@ -515,12 +536,17 @@ m4_define([_MAKE_HELP], [m4_do(
 	)])],
 	["
 ],
+	[dnl Don't display extended help for an arg if it doesn't have a description
+],
 	[m4_if(HAVE_POSITIONAL, 1,
-		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-			[m4_pushdef([argname], m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)]))],
+		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_ifnblank(m4_list_nth([_POSITIONALS_MSGS], idx), [m4_do(
+			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
+],
+			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])>)],
+			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
-			[[	echo -e "\t<]argname[>: ]],
+			[[	echo -e "\t]argname[: ]],
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[dnl Check whether we have defaults
 ],
@@ -528,13 +554,16 @@ m4_define([_MAKE_HELP], [m4_do(
 			[m4_popdef([_defaults])],
 			[m4_popdef([_min_argn])],
 			[m4_popdef([argname])],
+			[m4_popdef([argname])],
 			[["
 ]],
-		)])],
+		)])])],
 	)],
 	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
 ],
-	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_do(
+	[dnl Plus, don't display extended help for an arg if it doesn't have a description
+],
+	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_ifnblank(m4_list_nth([_ARGS_HELP], idx), [m4_do(
 		[	echo -e "\t],
 		[dnl Display a short one if it is not blank
 ],
@@ -556,10 +585,10 @@ m4_define([_MAKE_HELP], [m4_do(
 			[action], [], 
 			[bool], [ (m4_list_nth([_ARGS_DEFAULT], idx) by default)],
 			[repeated], [ (default array: m4_list_nth([_ARGS_DEFAULT], idx) )],
-			[ (default: 'm4_list_nth([_ARGS_DEFAULT], idx)')])],
+			[m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: 'm4_list_nth([_ARGS_DEFAULT], idx)'], [no default])])],
 		["
 ],
-	)])])],
+	)])])])],
 	[}
 ],
 )])
@@ -690,22 +719,22 @@ done]],
 			[dnl Go through all positionals names ...
 dnl TODO: We need to handle inf number of args here
 ],
-			[m4_pushdef([_POS_MAX], m4_list_nth([_POSITIONALS_MAXES], ii))],
-			[dnl If we accept inf args, it may be that _POS_MAX == 0 although we HAVE_POSITIONAL
+			[m4_pushdef([_max_argn], m4_list_nth([_POSITIONALS_MAXES], ii))],
+			[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL
 ],
-			[m4_if(_POS_MAX, 0, , [m4_do(
-				[m4_for([jj], 1, _POS_MAX, 1, [m4_do(
+			[m4_if(_max_argn, 0, , [m4_do(
+				[m4_for([jj], 1, _max_argn, 1, [m4_do(
 					[dnl And repeat each of them POSITIONALS_MAXES-times
 ],
 					['],
 					[_varname(m4_list_nth([_POSITIONALS_NAMES], ii))],
 					[dnl If we handle a multi-value arg, we assign to an array => we add '[ii - 1]' to LHS
 ],
-					[m4_if(_POS_MAX, 1, , [@<:@m4_eval(jj - 1)@:>@])],
+					[m4_if(_max_argn, 1, , [@<:@m4_eval(jj - 1)@:>@])],
 					[' ],
 				)])],
 			)])],
-			[m4_popdef([_POS_MAX])],
+			[m4_popdef([_max_argn])],
 		)])],
 		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
@@ -880,6 +909,9 @@ m4_define([ARGBASH_WRAP], [m4_do(
 	[m4_popdef([WRAPPED])],
 )])
 
+
+m4_define([ARG_LEFTOVERS],
+	[m4_ifblank(m4_list_contains([BLACKLIST], [leftovers]), [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
 
 dnl If I am wrapped:
 dnl defns are applied, but not recorded

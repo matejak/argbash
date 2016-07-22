@@ -26,12 +26,12 @@ _ARG_DEBUG=
 function print_help
 {
 	echo "Argbash is an argument parser generator for Bash."
-	echo "Usage: $0 [--output <arg>] [--(no-)standalone] [--search] [--debug <arg>] [--version] [--help] <input>"
-	echo -e "\t<input>: The input template file"
-	echo -e "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '"-"')"
+	echo "Usage: $0 [-o|--output <arg>] [--(no-)standalone] [-I|--search] [--debug <arg>] [-v|--version] [-h|--help] <input>"
+	echo -e "\t: The input template file"
+	echo -e "\t-o,--output: Name of the output file (pass '-' for stdout)default: '"-"'"
 	echo -e "\t--standalone,--no-standalone: Whether the parsing code is in a standalone file. (off by default)"
 	echo -e "\t-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: (".") )"
-	echo -e "\t--debug: (developer option) Tell autom4te to trace a macro (default: '')"
+	echo -e "\t--debug: (developer option) Tell autom4te to trace a macrono default"
 	echo -e "\t-v,--version: Prints version"
 	echo -e "\t-h,--help: Prints help"
 }
