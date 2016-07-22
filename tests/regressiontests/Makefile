@@ -188,8 +188,8 @@ test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 test-leftovers: $(TESTDIR)/test-leftovers.sh
-	$< -h | grep -q '\[-c\|--cosi <arg>\] \[-h\|--help\] <another> \.\.\. $$'
-	$< -c ours --no-fear "ours pos" left "o ver" | grep -q 'OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
+	$< -h | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-h|--help\] <another> \.\.\. $$'
+	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 
 tests-clean:
 	$(RM) $(SCRIPTS)

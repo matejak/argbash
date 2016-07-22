@@ -179,7 +179,7 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 )])
 
 
-dnl 
+dnl
 dnl Declare sequence of possibly infinitely many positional arguments
 dnl $1: Name of the arg
 dnl $2: Help for the arg
@@ -191,8 +191,8 @@ m4_define([ARG_POSITIONAL_INF], [m4_do(
 
 
 m4_define([_CHECK_INTEGER_TYPE], [m4_do(
-	[m4_ifnblank([$1], 
-		[m4_if(0, 1, 
+	[m4_ifnblank([$1],
+		[m4_if(0, 1,
 			[m4_fatal([$2])],
 			[])])],
 )])
@@ -438,18 +438,18 @@ m4_define([_POS_ARG_HELP_LINE], [m4_do(
 			m4_expand([@<:@<argname>@:>@]), m4_expand([<argname>])))],
 		[more], [m4_do(
 			[m4_if(_min_argn, 0, ,
-				[m4_for([idx2], 1, _min_argn, 1, 
+				[m4_for([idx2], 1, _min_argn, 1,
 					[m4_list_add([_POSITIONALS_LIST], m4_expand([<argname-idx2>]))])])],
-			[m4_if(_min_argn, _max_argn, , 
-				[m4_for([idx2], m4_incr(_min_argn), _max_argn, 1, 
+			[m4_if(_min_argn, _max_argn, ,
+				[m4_for([idx2], m4_incr(_min_argn), _max_argn, 1,
 					[m4_list_add([_POSITIONALS_LIST], m4_expand([@<:@<argname-idx2>@:>@]))])])])],
 		[inf], [m4_ifnblank(_INF_REPR, [m4_list_add([_POSITIONALS_LIST], _INF_REPR)], [m4_do(
 			[m4_if(_min_argn, 0, ,
-				[m4_for([idx2], 1, _min_argn, 1, 
+				[m4_for([idx2], 1, _min_argn, 1,
 					[m4_list_add([_POSITIONALS_LIST], m4_expand([<argname-idx2>]))])])],
-			[m4_list_add([_POSITIONALS_LIST], 
-				m4_expand([@<:@<argname[-]m4_incr(_min_argn)>@:>@]), 
-				[...], 
+			[m4_list_add([_POSITIONALS_LIST],
+				m4_expand([@<:@<argname[-]m4_incr(_min_argn)>@:>@]),
+				[...],
 				m4_expand([@<:@<argname[-]n>@:>@]),
 				[...])])])],
 	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
@@ -460,7 +460,7 @@ m4_define([_POS_ARG_HELP_LINE], [m4_do(
 m4_define([_MAKE_USAGE_MORE], [m4_do(
 	[m4_list_ifempty(_defaults, , [m4_do(
 		[[ @{:@defaults for ]argname[-]m4_incr(_min_argn)],
-		[m4_if(m4_list_len(_defaults), 1, , 
+		[m4_if(m4_list_len(_defaults), 1, ,
 			[[ to ]argname[-]m4_eval(_min_argn + m4_list_len(_defaults))[ respectively]])],
 		[: ],
 		[m4_list_join(_defaults, [, ], ', ', [ and ])@:}@],
@@ -471,7 +471,7 @@ m4_define([_MAKE_USAGE_MORE], [m4_do(
 m4_define([_POS_ARG_HELP_USAGE], [m4_do(
 	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONALS_TYPES], idx))],
 	[m4_case(m4_expand([_arg_type]),
-		[single], 
+		[single],
 			[m4_if(_min_argn, 0, [m4_do(
 				[ @{:@],
 				[default: '"],
@@ -490,7 +490,7 @@ dnl
 dnl $1: arg index
 dnl Returns either --long or -l|--long if there is that -l
 m4_define([_ARG_FORMAT], [m4_do(
-	[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx), 
+	[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx),
 		[-]m4_list_nth([_ARGS_SHORT], idx)|)],
 	[[--]m4_list_nth([_ARGS_LONG], idx)],
 )])
@@ -501,7 +501,7 @@ dnl $1: The command short description
 m4_define([_MAKE_HELP], [m4_do(
 	[# THE PRINT HELP FUNCION
 ],
-	[function print_help
+	[print_help ()
 {
 ],
 	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([[	echo] "_HELP_MSG"
@@ -581,11 +581,11 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 		[dnl Now the default is expanded since it is between double quotes
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), 
-			[action], [], 
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[action], [],
 			[bool], [ (m4_list_nth([_ARGS_DEFAULT], idx) by default)],
 			[repeated], [ (default array: m4_list_nth([_ARGS_DEFAULT], idx) )],
-			[m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: 'm4_list_nth([_ARGS_DEFAULT], idx)'], [no default])])],
+			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: 'm4_list_nth([_ARGS_DEFAULT], idx)'], [no default])@:}@])],
 		["
 ],
 	)])])])],
@@ -647,7 +647,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 			[bool], _ARGVAR[="on"
 			_ADD_OPTS_VALS(m4_expand([_ARGVAR]))
 			test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
-			[incr], m4_quote((( _ARGVAR++ )))
+			[incr], m4_quote(_ARGVAR=$(($_ARGVAR + 1)))
 			_ADD_OPTS_VALS(m4_expand([_ARGVAR])),
 			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
 			exit 0],
@@ -746,7 +746,7 @@ test ${#POSITIONALS[@]} -lt ]],
 			[m4_do(
 				[dnl If we allow up to infinitely many args, we prepare the array for it.
 ],
-				[(( OUR_ARGS=${#POSITIONALS@<:@@@:>@} - ${#POSITIONAL_NAMES@<:@@@:>@} ))
+				[OUR_ARGS=$((${#POSITIONALS@<:@@@:>@} - ${#POSITIONAL_NAMES@<:@@@:>@}))
 ],
 				[for (( ii = 0; ii < $OUR_ARGS; ii++))
 do
@@ -755,7 +755,7 @@ done
 ],
 			)],
 			[m4_do(
-				[dnl If we allow up to infinitely many args, there is no point in warning about too many args. 
+				[dnl If we allow up to infinitely many args, there is no point in warning about too many args.
 ],
 				[[test ${#POSITIONALS[@]} -gt ]],
 				[_POSITIONALS_MAX],
@@ -924,6 +924,6 @@ dnl Positional args wrapped:
 dnl - we keep a list POS_WRAPPED, where we store names of positional args that we want record.
 dnl - OR: When we encounter a wrapped positional arg, we store a code block <ARGS_ARRAY>+=pos_arg
 dnl   - and at the end, we just expand this block after pos_arg vars are filled.
-dnl - after positional args are assigned, we go through this list and append to the array of passed wrapped args 
+dnl - after positional args are assigned, we go through this list and append to the array of passed wrapped args
 dnl
 dnl TODO: Implement leftover args

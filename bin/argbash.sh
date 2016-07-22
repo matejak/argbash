@@ -23,7 +23,7 @@ _ARG_SEARCH=(".")
 _ARG_DEBUG=
 
 # THE PRINT HELP FUNCION
-function print_help
+print_help ()
 {
 	echo "Argbash is an argument parser generator for Bash."
 	echo "Usage: $0 [-o|--output <arg>] [--(no-)standalone] [-I|--search] [--debug <arg>] [-v|--version] [-h|--help] <input>"
