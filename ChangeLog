@@ -1,13 +1,15 @@
-1.2.2 (???)
+1.3.0 (2016-07-23)
 ------------------
 
 New features:
 
-* Expanded documentation --- expanded info about related projects. 
+* Support for infinitely many (and leftover) arguments.
+* Partial POSIX shell compatibility.
 
 Bugfixes:
 
 * Fixed definitions in the parsing part of the script.
+* Expanded documentation --- expanded info about related projects. 
 
 1.2.1 (2016-07-10)
 ------------------
