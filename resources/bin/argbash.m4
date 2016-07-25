@@ -23,7 +23,7 @@ set -o pipefail
 INFILE="$_ARG_INPUT"
 
 M4DIR="$SCRIPT_DIR/../src"
-test -n "$_ARG_DEBUG" && DEBUG="-t $_ARG_DEBUG"
+test -n "$_ARG_DEBUG" && DEBUG=("-t" "$_ARG_DEBUG")
 
 OUTPUT_M4="$M4DIR/output.m4"
 test "$_ARG_STANDALONE" = "on" && OUTPUT_M4="$M4DIR/output-standalone.m4"
@@ -32,7 +32,7 @@ function do_stuff
 {
 	echo "$WRAPPED_DEFNS" \
 		| cat - "$M4DIR/stuff.m4" "$OUTPUT_M4" "$INFILE" \
-		| autom4te $DEBUG -l m4sugar -I "$M4DIR" \
+		| autom4te "${DEBUG[@]}" -l m4sugar -I "$M4DIR" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	_ret=$?
@@ -47,14 +47,13 @@ test -f "$INFILE" || { echo "'$INFILE' is supposed to be a file!"; exit 1; }
 test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!"; exit 1; }
 OUTFILE="$_ARG_OUTPUT"
 autom4te --version > $DISCARD 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
-SEARCHDIRS=("." "$(dirname "$INFILE")")
 _ARG_SEARCH+=("$(dirname "$INFILE")")
 WRAPPED_DEFNS=""
 
 function settle_wrapped_fname
 {
 	# Get arguments to ARGBASH_WRAP
-	_srcfiles="$(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' $(cat "$INFILE") \
+	_srcfiles="$(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$INFILE")" \
 			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1')"
 	
 	test -n "$_srcfiles" || return
@@ -62,13 +61,13 @@ function settle_wrapped_fname
 	for srcstem in $_srcfiles
 	do
 		_found=no
-		for searchdir in ${_ARG_SEARCH[@]}
+		for searchdir in "${_ARG_SEARCH[@]}"
 		do
-			test -f $searchdir/$srcstem.m4 && { _found=yes; ext=m4; break; }
-			test -f $searchdir/$srcstem.sh && { _found=yes; ext=sh; break; }
+			test -f "$searchdir/$srcstem.m4" && { _found=yes; ext=m4; break; }
+			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext=sh; break; }
 		done
 		# The last searchdir is a correct one
-		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_ARG_SEARCH[@]}" >&2; exit 2; }
+		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_ARG_SEARCH[*]}" >&2; exit 2; }
 		WRAPPED_DEFNS="${WRAPPED_DEFNS}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem.$ext]])"
 	done
 }
@@ -76,15 +75,15 @@ function settle_wrapped_fname
 function get_parsing_code
 {
 	# Get the argument of INCLUDE_PARSING_CODE
-	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' $(cat "$INFILE") \
+	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(cat "$INFILE")" \
 			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' \
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$INFILE")/$_srcfile"
-	test -f "$_thatfile" && echo $_thatfile && return
+	test -f "$_thatfile" && echo "$_thatfile" && return
 	# Take out everything after last dot (http://stackoverflow.com/questions/125281/how-do-i-remove-the-file-suffix-and-path-portion-from-a-path-string-in-bash)
 	_thatfile="${_thatfile%.*}.m4"
-	test -f "$_thatfile" && echo $_thatfile && return
+	test -f "$_thatfile" && echo "$_thatfile" && return
 	# if we are here, we are out of luck
 	test -n "$_srcfile" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1
 }

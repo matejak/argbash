@@ -2,6 +2,13 @@ dnl We don't like the # comments
 m4_changecom()
 
 
+m4_define([_SET_INDENT], [m4_define([_INDENT_], 
+	[m4_for(_, 1, m4_default($][1, 1), 1,
+		[[$1]])])])
+
+_SET_INDENT([	])
+
+
 dnl We include the version-defining macro
 m4_define([_ARGBASH_VERSION], m4_default_quoted(m4_normalize(m4_sinclude([version])), [unknown]))
 
@@ -503,9 +510,9 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([[	echo] "_HELP_MSG"
+	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_[echo] "_HELP_MSG"
 ])),
-	[	printf "Usage: $[]0],
+	[_INDENT_[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
 	[m4_if(HAVE_OPTIONAL, 1,
@@ -533,7 +540,7 @@ m4_define([_MAKE_HELP], [m4_do(
 		)])],
 		[ m4_join([ ], m4_unquote(m4_list_contents([_POSITIONALS_LIST])))],
 	)])],
-	[\n"
+	[\n' "$[]0"
 ],
 	[dnl Don't display extended help for an arg if it doesn't have a description
 ],
@@ -542,10 +549,10 @@ m4_define([_MAKE_HELP], [m4_do(
 			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
 			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])>)],
-			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)]))],
+			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)], [argname]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
-			[[	printf "\t]argname[: ]],
+			[_INDENT_[printf "\t]argname[: ]],
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[dnl Check whether we have defaults
 ],
@@ -563,7 +570,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
 	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_ifnblank(m4_list_nth([_ARGS_HELP], idx), [m4_do(
-		[	printf "\t],
+		[_INDENT_[]printf "\t],
 		[dnl Display a short one if it is not blank
 ],
 		[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx), -m4_list_nth([_ARGS_SHORT], idx)[,])],
@@ -580,12 +587,22 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 		[dnl Now the default is expanded since it is between double quotes
 ],
+		[dnl TODO: We already have defaults stored in vars, so let's use $_ARG_FOO for defaults
+],
+		[dnl TODO: Arrays: Do something like (IFS=$','; echo "${default[*]}")
+],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[action], [],
-			[bool], [ (m4_list_nth([_ARGS_DEFAULT], idx) by default)],
-			[repeated], [ (default array: m4_list_nth([_ARGS_DEFAULT], idx) )],
-			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: 'm4_list_nth([_ARGS_DEFAULT], idx)'], [no default])@:}@])],
-		[\n"
+			[bool], [ (%s by default)],
+			[repeated], [ (default array: %s )],
+			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: '%s'], [no default])@:}@])],
+		[\n"],
+		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[action], [],
+			[bool], [ m4_list_nth([_ARGS_DEFAULT], idx)],
+			[repeated], [ "m4_list_nth([_ARGS_DEFAULT], idx)"],
+			[ m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [m4_list_nth([_ARGS_DEFAULT], idx)])])],
+		[
 ],
 	)])])])],
 	[}
@@ -601,21 +618,22 @@ m4_define([_ADD_OPTS_VALS], [m4_do(
 
 
 m4_define([_EVAL_OPTIONALS], [m4_do(
-	[	_key="$[]1"
+	[_INDENT_[]_key="$[]1"
 ],
-	[m4_if(HAVE_DOUBLEDASH, 1, [[	if test "$_key" = '--'
-	then
-		shift
-		POSITIONALS+=("$][@")
-		break
-	fi
-]])],
-	[	case "$_key" in],
+	[m4_if(HAVE_DOUBLEDASH, 1, 
+[_INDENT_()if test "$_key" = '--'
+_INDENT_()then
+_INDENT_(2)shift
+_INDENT_(2)POSITIONALS+=("$][@")
+_INDENT_(2)break
+_INDENT_()fi
+])],
+	[_INDENT_[]case "$_key" in],
 	[dnl We don't do this if _NARGS == 0
 ],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
 		[
-		],
+_INDENT_(2,	)],
 		[dnl Output short option (if we have it), then |
 ],
 		[m4_ifblank(m4_list_nth([_ARGS_SHORT], idx), [], [-m4_list_nth([_ARGS_SHORT], idx)|])],
@@ -626,7 +644,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 ],
 		[--m4_list_nth([_ARGS_LONG], idx)],
 		[@:}@
-			],
+_INDENT_(3,		)],
 		[dnl: TODO: Below is a problem with quoting
 ],
 		[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
@@ -636,60 +654,60 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 ],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[arg], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
-			_ARGVAR[="$[]2"
-			_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
-			shift],
+_INDENT_(3, 		)_ARGVAR[="$[]2"
+_INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
+_INDENT_(3, 		)shift],
 			[repeated], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
-			_ARGVAR[+=("$[]2")
-			_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
-			shift],
+_INDENT_(3, 		)_ARGVAR[+=("$[]2")
+_INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
+_INDENT_(3, 		)shift],
 			[bool], _ARGVAR[="on"
-			_ADD_OPTS_VALS(m4_expand([_ARGVAR]))
-			test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
+_INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]))
+_INDENT_(3, 		)test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
 			[incr], m4_quote(_ARGVAR=$(($_ARGVAR + 1)))
-			_ADD_OPTS_VALS(m4_expand([_ARGVAR])),
+_INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR])),
 			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
-			exit 0],
+_INDENT_(3, 		)exit 0],
 		)],
 		[
-			;;],
+_INDENT_(3, 		);;],
 		[m4_popdef([_ARGVAR])],
 	)])],
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
-	[[
-	esac]],
+	[
+_INDENT_()[esac]],
 )])
 
 
 dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
 m4_define([_EVAL_POSITIONALS_CASE], [m4_do(
 	[
-		],
-	[[*@:}@
-			]],
+_INDENT_(2,	)],
+	[*@:}@
+_INDENT_(3, 		)],
 	[POSITIONALS+=("$[]1")
-			],
-			[;;],
+],
+_INDENT_(3, 		)[;;],
 )])
 
 
 dnl If we expect only optional arguments and we get an intruder, fail noisily.
 m4_define([_EXCEPT_OPTIONALS_CASE], [m4_do(
 	[
-		],
-	[[*@:}@
-			]],
+_INDENT_(2,	)],
+	[*@:}@
+_INDENT_(3, 		)],
 	[{ (echo "FATAL ERROR: Got an unexpected argument '$[]1'"; print_help) >&2; exit 1; }
-			],
-			[;;],
+_INDENT_(3, 		)],
+_INDENT_(3, 		)[;;],
 )])
 
 
 dnl Store positional args inside a 'for' statement
 m4_define([_EVAL_POSITIONALS_FOR],
-	[[	POSITIONALS+=("$][1")]])
+	[_INDENT_()[POSITIONALS+=("$][1")]])
 
 
 m4_define([_MAKE_EVAL], [m4_do(
@@ -704,7 +722,7 @@ do
 		[m4_expand([_EVAL_OPTIONALS])],
 		[m4_expand([_EVAL_POSITIONALS_FOR])])
 ],
-	[[	shift
+	[_INDENT_()[shift
 done]],
 	[
 ],
@@ -749,7 +767,7 @@ test ${#POSITIONALS[@]} -lt ]],
 ],
 				[for (( ii = 0; ii < $_OUR_ARGS; ii++))
 do
-	POSITIONAL_NAMES+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
+_INDENT_()POSITIONAL_NAMES+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
 done
 
 ],
@@ -763,13 +781,13 @@ done
 				[_NARGS_SPEC],
 				[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
-				[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[@]: -1}')."; print_help ) >&2; exit 1; }
+				[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[*]: -1}')."; print_help ) >&2; exit 1; }
 ]],
 			)])],
 		[m4_popdef([_NARGS_SPEC])],
 		[[for (( ii = 0; ii < ${#POSITIONALS[@]}; ii++))
 do
-	eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
+]_INDENT_()[eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],
 		[
 ],
