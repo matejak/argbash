@@ -248,8 +248,8 @@ dnl TODO:
 dnl  - handle defaults - now only one global default is allowed per script
 dnl   - store them
 dnl   - display them in the help
-dnl   - use them to extend POSITIONALS
-dnl  - use constructs s.a. POSITIONALS+=("${defaults[@]:0:$needed}")
+dnl   - use them to extend _positionals
+dnl  - use constructs s.a. _positionals+=("${defaults[@]:0:$needed}")
 m4_define([ARG_POSITIONAL_MULTI], [m4_do(
 	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
@@ -366,7 +366,7 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_add([_OTHER],
-		m4_quote(_sciptdir[="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"]))],
+		m4_quote(_sciptdir[="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "Couldn't determine the script's running directory, which probably matters, bailing out" >&2; exit 2; }]))],
 	[m4_popdef([_sciptdir])],
 )])
 
@@ -570,6 +570,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
 	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_ifnblank(m4_list_nth([_ARGS_HELP], idx), [m4_do(
+		[m4_pushdef([_VARNAME], _varname(m4_list_nth([_ARGS_LONG], idx)))],
 		[_INDENT_[]printf "\t],
 		[dnl Display a short one if it is not blank
 ],
@@ -590,20 +591,22 @@ m4_define([_MAKE_HELP], [m4_do(
 		[dnl TODO: We already have defaults stored in vars, so let's use $_ARG_FOO for defaults
 ],
 		[dnl TODO: Arrays: Do something like (IFS=$','; echo "${default[*]}")
+dnl [repeated], [ "$(IFS=$','; echo "${_VARNAME@<:@*@:>@}" | cat)"], or maybe not...
 ],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[action], [],
 			[bool], [ (%s by default)],
-			[repeated], [ (default array: %s )],
+			[repeated], [ (default array: (%s) )],
 			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: '%s'], [no default])@:}@])],
 		[\n"],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[action], [],
-			[bool], [ m4_list_nth([_ARGS_DEFAULT], idx)],
-			[repeated], [ "m4_list_nth([_ARGS_DEFAULT], idx)"],
-			[ m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [m4_list_nth([_ARGS_DEFAULT], idx)])])],
+			[bool], [ "${_VARNAME}"],
+			[repeated], [ "${_VARNAME@<:@*@:>@}"],
+			[ m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), ["${_VARNAME}"])])],
 		[
 ],
+		[m4_popdef([_VARNAME])],
 	)])])])],
 	[}
 ],
@@ -624,7 +627,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 [_INDENT_()if test "$_key" = '--'
 _INDENT_()then
 _INDENT_(2)shift
-_INDENT_(2)POSITIONALS+=("$][@")
+_INDENT_(2)_positionals+=("$][@")
 _INDENT_(2)break
 _INDENT_()fi
 ])],
@@ -687,7 +690,7 @@ m4_define([_EVAL_POSITIONALS_CASE], [m4_do(
 _INDENT_(2,	)],
 	[*@:}@
 _INDENT_(3, 		)],
-	[POSITIONALS+=("$[]1")
+	[_positionals+=("$[]1")
 ],
 _INDENT_(3, 		)[;;],
 )])
@@ -707,7 +710,7 @@ _INDENT_(3, 		)[;;],
 
 dnl Store positional args inside a 'for' statement
 m4_define([_EVAL_POSITIONALS_FOR],
-	[_INDENT_()[POSITIONALS+=("$][1")]])
+	[_INDENT_()[_positionals+=("$][1")]])
 
 
 m4_define([_MAKE_EVAL], [m4_do(
@@ -731,7 +734,7 @@ done]],
 ],
 		[
 ],
-		[[POSITIONAL_NAMES=@{:@]],
+		[[_positional_names=@{:@]],
 		[m4_for([ii], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
 			[dnl Go through all positionals names ...
 dnl TODO: We need to handle inf number of args here
@@ -755,19 +758,19 @@ dnl TODO: We need to handle inf number of args here
 		)])],
 		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
-test ${#POSITIONALS[@]} -lt ]],
+test ${#_positionals[@]} -lt ]],
 		[_POSITIONALS_MIN],
-		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#POSITIONALS[@]}."; print_help ) >&2; exit 1; }
+		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#_positionals[@]}."; print_help ) >&2; exit 1; }
 ]],
 		[IF_POSITIONALS_INF(
 			[m4_do(
 				[dnl If we allow up to infinitely many args, we prepare the array for it.
 ],
-				[_OUR_ARGS=$((${#POSITIONALS@<:@@@:>@} - ${#POSITIONAL_NAMES@<:@@@:>@}))
+				[_OUR_ARGS=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
 ],
 				[for (( ii = 0; ii < $_OUR_ARGS; ii++))
 do
-_INDENT_()POSITIONAL_NAMES+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
+_INDENT_()_positional_names+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
 done
 
 ],
@@ -775,19 +778,19 @@ done
 			[m4_do(
 				[dnl If we allow up to infinitely many args, there is no point in warning about too many args.
 ],
-				[[test ${#POSITIONALS[@]} -gt ]],
+				[[test ${#_positionals[@]} -gt ]],
 				[_POSITIONALS_MAX],
 				[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 				[_NARGS_SPEC],
-				[dnl The last element of POSITIONALS (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
-				[[, but got ${#POSITIONALS[@]} (the last one was: '${POSITIONALS[*]: -1}')."; print_help ) >&2; exit 1; }
+				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')."; print_help ) >&2; exit 1; }
 ]],
 			)])],
 		[m4_popdef([_NARGS_SPEC])],
-		[[for (( ii = 0; ii < ${#POSITIONALS[@]}; ii++))
+		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
-]_INDENT_()[eval "${POSITIONAL_NAMES[$ii]}=\"${POSITIONALS[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
+]_INDENT_()[eval "${_positional_names[$ii]}=\"${_positionals[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],
 		[
 ],
