@@ -5,6 +5,7 @@
 # ARG_OPTIONAL_BOOLEAN(boo_l)
 # ARG_OPTIONAL_INCREMENTAL([opt-incr], i, [@pos-opt-arg@], 2)
 # ARG_OPTIONAL_REPEATED([opt-repeated], r, [@opt-repeated@])
+# ARGBASH_SET_INDENT([  ])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 

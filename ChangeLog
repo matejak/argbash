@@ -1,3 +1,22 @@
+2.0.0 (TBD)
+------------------
+
+Incompatible changes:
+
+* Exposition of arguments has changed from uppercase to lowercase (this was neccessary to comply with bash programming conventions).
+
+1.4.0 (TBD)
+------------------
+
+New features:
+
+* Added the `ARGBASH_SET_INDENT` macro for indentation control.
+* Created scripts are more compliant to the https://www.shellcheck.net/ tool.
+
+Bugfixes:
+
+* Fixed some errors related to displaying help.
+
 1.3.0 (2016-07-23)
 ------------------
 

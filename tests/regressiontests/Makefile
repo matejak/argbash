@@ -121,7 +121,11 @@ test-more: $(TESTDIR)/test-more.sh
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(_test_onlypos)
 
+# Also check the 2-spaces indentation
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
+	grep -q '^  esac$$' $<
+	@# ! negates the return code
+	! grep -q $$'^\t' $<
 	$(REVERSE) grep -q POSITION $<
 	$< --opt-arg PoS | grep -q OPT_S=PoS,
 	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
@@ -155,6 +159,9 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
 	! $< -h | grep -q boo_l
+	@# no spaces as indentation (that test-onlyopt uses)
+	! grep -q '^  ' $<
+	grep -q $$'^\tesac' $<
 	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,

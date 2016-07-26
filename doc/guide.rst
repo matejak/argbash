@@ -257,6 +257,14 @@ Convenience macros
 
 Plus, there are convenience macros:
 
+* Set the indentation in the parsing part of the script:
+  ::
+
+     ARGBASH_SET_INDENT([indentation caracter(s)])
+
+  The default indentation is one tab per level.
+  If you wish to use two spaces as the `Google style recommends <https://google.github.io/styleguide/shell.xml>`_, simply pass two spaces (in square brackets!) as an argument to the macro.
+
 * Add a line where the directory where the script is running is stored in an environmental variable:
   ::
 
@@ -294,7 +302,7 @@ Plus, there are convenience macros:
 
   * Flags is a string that may contain some characters.
     If a flag is set, a class of arguments is excluded from the file.
-    The default ``HV`` should be enough in most scenarios --- you want your own help and version info, not one from the wrapped script, right?
+    The default ``HVI`` should be enough in most scenarios --- you want your own help, version info and indentation, not one from the wrapped script, right?
 
     Following flags are supported:
 
@@ -303,6 +311,7 @@ Plus, there are convenience macros:
     ========= ===================
     H         Don't include help.
     V         Don't include version info.
+    I         Don't use wrapped script's indentation
     ========= ===================
 
   * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_ARGS_PROCESS_SINGLE``.

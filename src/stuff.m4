@@ -5,8 +5,20 @@ m4_changecom()
 m4_define([_SET_INDENT], [m4_define([_INDENT_], 
 	[m4_for(_, 1, m4_default($][1, 1), 1,
 		[[$1]])])])
+dnl
+dnl defines _INDENT_
+dnl $1: How many times to indent (default 1)
+dnl $2, ...: Ignored
 
+dnl Sets the default (tab) indent
 _SET_INDENT([	])
+
+
+dnl
+dnl Sets the indentation character(s) in the parsing code
+dnl $1: The indentation character(s)
+m4_define([ARGBASH_SET_INDENT],
+	[m4_bmatch(m4_expand([FLAGS]), [I], ,[_SET_INDENT([$1])])])
 
 
 dnl We include the version-defining macro
@@ -667,7 +679,7 @@ _INDENT_(3, 		)shift],
 			[bool], _ARGVAR[="on"
 _INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]))
 _INDENT_(3, 		)test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
-			[incr], m4_quote(_ARGVAR=$(($_ARGVAR + 1)))
+			[incr], m4_quote(_ARGVAR=$((_ARGVAR + 1)))
 _INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR])),
 			[action], [m4_list_nth([_ARGS_DEFAULT], idx)
 _INDENT_(3, 		)exit 0],
@@ -913,7 +925,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 
 dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: Names of blacklisted args (list)
-dnl $3: Codes of blacklisted args (string, default is HV for help + version)
+dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
 dnl IDEA: Include the wrapped script and read the argbash stuff
 dnl However, define some macros beforehand that will act as global variables and ensure the following:
 dnl  - the defns from wrapped script won't be repeated in the wrapper (DONE, using m4_ignore, TODO: Remove ifdef WRAPPED that is used somewhere)
@@ -923,7 +935,7 @@ m4_define([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],
 	[m4_list_add([BLACKLIST], $2)],
-	[m4_pushdef([FLAGS], [m4_default([$3], [HV])])],
+	[m4_pushdef([FLAGS], [m4_default([$3], [HIV])])],
 	[m4_ifndef([_SCRIPT_$1], [m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
 	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
 	[m4_popdef([FLAGS])],
