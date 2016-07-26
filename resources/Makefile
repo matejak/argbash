@@ -10,7 +10,7 @@ M4_SRC = \
 PREFIX = $(HOME)/.local
 ROOT = /
 
-GENPARSE = ../bin/argbash.sh
+GENPARSE = ../bin/argbash
 EXAMPLES = \
 	examples/minimal.sh \
 	examples/simple.sh \
@@ -20,7 +20,7 @@ EXAMPLES = \
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-$(GENPARSE): bin/argbash.m4 $(M4_SRC)
+$(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
 CHANGELOG = ../ChangeLog
@@ -47,9 +47,9 @@ include ../tests/regressiontests/Makefile
 
 # We include the source dir because there is m4_include in stuff.m4
 bootstrap:
-	cat ../src/stuff.m4 ../src/output.m4 bin/argbash.m4 | autom4te -I ../src -l m4sugar > $(GENPARSE)
+	cat ../src/stuff.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar > $(GENPARSE)
 	chmod a+x $(GENPARSE)
-	touch bin/argbash.m4
+	touch ../src/argbash.m4
 
 examples: $(EXAMPLES)
 

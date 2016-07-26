@@ -3,7 +3,7 @@ PHONIES ?=
 
 NUL =
 
-ARGBASH_BIN = $(TESTDIR)/../../bin/argbash.sh
+ARGBASH_BIN = $(TESTDIR)/../../bin/argbash
 REVERSE = $(TESTDIR)/reverse
 
 %.sh: %.m4 $(ARGBASH_BIN)
