@@ -72,7 +72,7 @@ We generate the script from the template:
 
 ::
 
-   bin/argbash.sh script.m4 -o script.sh 
+   bin/argbash.sh script.m4 -o script.sh
 
 
 Now we launch it and the output is good!

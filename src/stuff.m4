@@ -2,7 +2,7 @@ dnl We don't like the # comments
 m4_changecom()
 
 
-m4_define([_SET_INDENT], [m4_define([_INDENT_], 
+m4_define([_SET_INDENT], [m4_define([_INDENT_],
 	[m4_for(_, 1, m4_default($][1, 1), 1,
 		[[$1]])])])
 dnl
@@ -635,7 +635,7 @@ m4_define([_ADD_OPTS_VALS], [m4_do(
 m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_[]_key="$[]1"
 ],
-	[m4_if(HAVE_DOUBLEDASH, 1, 
+	[m4_if(HAVE_DOUBLEDASH, 1,
 [_INDENT_()if test "$_key" = '--'
 _INDENT_()then
 _INDENT_(2)shift

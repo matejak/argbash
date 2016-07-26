@@ -15,67 +15,67 @@ Then read throgh this list of influences and/or alternatives!
     * Has more features.
 
   * Cons:
-    
+
     * It is Python, we are ``bash``.
 
   * Argbash says:
-    
+
     * We handle the boolean options better.
     * We have the :ref:`awesome wrapping functionality <argbash_wrap>`.
 
 * ``bash`` --- ``shflags``: The ``bash`` framework for argument parsing: https://github.com/kward/shflags
 
-  * Pros: 
+  * Pros:
 
     * It works great on Linux.
 
-  * Cons: 
+  * Cons:
 
     * Doesn't work with Windows ``bash``
     * Doesn't support long options on OSX.
 
-  * Argbash says: 
+  * Argbash says:
 
     * We work the same on all platforms that have ``bash``.
 
 * ``getopt``: Eternal utility for parsing command-line.
   This is what powers ``shflags``.
 
-  * Pros: 
+  * Pros:
 
     * The GNU version can work with long and short optional arguments.
 
-  * Cons: 
+  * Cons:
 
     * Its use is `discouraged <http://bash.cumulonim.biz/BashFAQ(2f)035.html#getopts>`_ --- it seems to have some issues, you still need to deal with positional arguments by other means.
 
 * ``getopts``: ``bash`` builtin for parsing command-line.
 
-  * Pros: 
+  * Pros:
 
     * Being included with ``bash``, it behaves the same on all platforms.
 
-  * Cons: 
+  * Cons:
 
     * Supports only short optional arguments.
 
 .. _easy_options:
 
-* ``EasyOptions``: ``Ruby`` utility with a ``bash`` interface as well as its pure ``bash`` implementation: https://github.com/renatosilva/easyoptions 
+* ``EasyOptions``: ``Ruby`` utility with a ``bash`` interface as well as its pure ``bash`` implementation: https://github.com/renatosilva/easyoptions
 
-  * Pros: 
+  * Pros:
 
     * Very simple to use.
     * Very elegant.
 
-  * Cons: 
-    
+  * Cons:
+
     * You have to distribute ``easyoptions.sh`` with your script.
     * The library itself proides only very basic functionality.
     * The project does not seem to have any tests (as of 07/2016).
 
-  * Argbash says: 
-    
+  * Argbash says:
+
     * We have more of nice features.
     * We offer an option to produce battery-included scripts.
     * Our declarations as not so elegant, but they are not bad either.
@@ -84,16 +84,16 @@ Then read throgh this list of influences and/or alternatives!
 * ``bash-modules`` - module ``argument``: ``bash-modules`` aims to become a standard ``bash`` framework and comes with an argument-parsing treat: https://github.com/vlisivka/bash-modules
 
   * Pros:
-    
+
     * Seems to have nice features.
 
-  * Cons: 
+  * Cons:
 
     * ``bash-modules`` have to be available at run-time to run the script.
     * The documentation is poor (as of 07/2016).
 
-  * Argbash says: 
-    
+  * Argbash says:
+
     * We have good documentation with examples.
     * We offer an option to produce battery-included scripts.
 

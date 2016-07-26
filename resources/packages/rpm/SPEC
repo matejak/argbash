@@ -2,10 +2,10 @@ Name:		argbash
 Version:	@VERSION@
 Release:	1%{?dist}
 Summary:	@DESC@
-Group:		
+Group:
 License:	BSD
 URL:		@URL@
-Source0:	
+Source0:
 
 BuildRequires:	make
 Requires:	autoconf bash

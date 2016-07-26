@@ -28,7 +28,7 @@ New features:
 Bugfixes:
 
 * Fixed definitions in the parsing part of the script.
-* Expanded documentation --- expanded info about related projects. 
+* Expanded documentation --- expanded info about related projects.
 
 1.2.1 (2016-07-10)
 ------------------
@@ -42,7 +42,7 @@ Bugfixes:
 
 New features:
 
-* Support for repeated arguments, added specialized macro for --verbose 
+* Support for repeated arguments, added specialized macro for --verbose
 * Support for double dash (separating positional and optional arguments)
 * Support for multi-valued arguments (with defaults)
 * Improved generated code so users get more descriptive messages when

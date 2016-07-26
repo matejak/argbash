@@ -22,13 +22,13 @@ filename="$_ARG_FILENAME"
 
 if [ $verbose = on ]
 then
-	_b="bytes (B)"
-	_kb="kibibytes (kiB)"
-	_mb="mebibytes (MiB)"
+  _b="bytes (B)"
+  _kb="kibibytes (kiB)"
+  _mb="mebibytes (MiB)"
 else
-	_b="B"
-	_kb="kiB"
-	_mb="MiB"
+  _b="B"
+  _kb="kiB"
+  _mb="MiB"
 fi
 
 size_bytes=$(wc -c "$filename" | cut -f 1 -d ' ')

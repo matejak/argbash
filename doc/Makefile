@@ -63,7 +63,7 @@ $(MANDIR):
 # Man files should be part of the repo.
 argbash.1: argbash.rst | $(MANDIR)
 	grep -v ':ref:' $< | sed -e 's/^\.\.\s\+code-block.*/::/' | rst2man > $@
-	
+
 argbash.5: config.rst | $(MANDIR)
 	grep -v ':ref:' $< | sed -e 's/^\.\.\s\+code-block.*/::/' | rst2man > $@
 

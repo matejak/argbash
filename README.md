@@ -20,13 +20,14 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 
 ## What it is
 
-Argbash is not a parsing library, but it is rather a code generator.
-It lets you to describe arguments your script should take and then, you can generate `BASH` code that you can include in your script (and from then on, forget about `argbash` altogether).
-`argbash` is very simple to use and the generated code is also rather nice to read (at if you don't have allergy to tabs).
-Moreover, argument definitions stay embedded in the script, so when you need to update the parsing logic, you just re-run `argbash` on the already generated script.
+Argbash is not a parsing library, but it is rather a code generator that generates a library tailor-made for your script.
+It lets you to describe arguments your script should take and then, you can generate the `bash` code.
+You can either include in your script or let `Argbash` do it for you (in any case, from then on, you can forget about `Argbash` altogether).
+`Argbash` is very simple to use and the generated code is relatively nice to read.
+Moreover, argument definitions stay embedded in the script, so when you need to update the parsing logic, you just re-run the `argbash` script on the already generated script.
 
-So by writing few comments to your script and running the Argbash's `bin/argbash.sh` over it, you will get a BASH script with argument parsing.
-See the `resources/examples/simple.m4s` for source and `resources/examples/simple.sh` for the result.
+So by writing few comments to your script and running the Argbash's `bin/argbash` over it, you will get a `bash` script with argument parsing.
+See the [simple example source template](resources/examples/simple.m4) and [simple example script](resources/examples/simple.sh) for the result.
 
 Following arguments are supported:
 
@@ -34,8 +35,8 @@ Following arguments are supported:
 - optional arguments that take one value,
 - boolean optional arguments,
 - repeated (i.e. non-overwriting) optional arguments,
-- incrementing (such as --verbose) optional arguments and
-- action optional arguments (such as --version, --help).
+- incrementing (such as `--verbose`) optional arguments and
+- action optional arguments (such as `--version`, `--help`).
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
@@ -43,5 +44,5 @@ The utility has been inspired by Python's `argparse` and the `shflags` project.
 
 ## Requirements
 
- - `BASH` that can work with arrays (most likely `bash >= 3.0`)
+ - `bash` that can work with arrays (most likely `bash >= 3.0`)
  - `autom4te` utility that can work with sets (part of `autoconf >= 2.63` suite)

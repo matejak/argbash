@@ -9,8 +9,8 @@ Installation is simple, but as it is described in the quickstart, you don't need
 #. Run some checks: ``make check``.
    You should get no errors.
 
-#. According to whether you have your ``$HOME/.local/bin`` folder in the ``PATH``: 
-   
+#. According to whether you have your ``$HOME/.local/bin`` folder in the ``PATH``:
+
    * If so, run ``make install PREFIX=$HOME/.local``,
    * else, run ``sudo make install PREFIX=/usr``.
 
@@ -62,4 +62,4 @@ Releasing
 * ``make check`` runs the tests.
 * ``make version VERSION=1.0.0`` sets the projct's version to all corners of the project where it should go.
 * ``make release [VERSION=1.0.0]`` refreshes date in the ``ChangeLog`` and regenerates all of the stuff (and runs tests).
-* ``make tag`` tags the version. 
+* ``make tag`` tags the version.

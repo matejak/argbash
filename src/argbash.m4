@@ -23,9 +23,9 @@ do_stuff ()
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	local _ret=$?
-	if test $_ret != 0 
-	then	
-		echo "Error during autom4te run, aborting!" >&2; 
+	if test $_ret != 0
+	then
+		echo "Error during autom4te run, aborting!" >&2;
 		exit $_ret;
 	fi
 }
@@ -37,7 +37,7 @@ settle_wrapped_fname ()
 	# Based on http://stackoverflow.com/a/19772067/592892
 	IFS=$'\n' _srcfiles=($(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
 			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1'))
-	
+
 	test -n "$_srcfiles" || return
 	for srcstem in "${_srcfiles[@]}"
 	do
