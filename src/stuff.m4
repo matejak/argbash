@@ -802,7 +802,7 @@ done
 		[m4_popdef([_NARGS_SPEC])],
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
-]_INDENT_()[eval "${_positional_names[$ii]}=\"${_positionals[$ii]}\"" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
+]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
 done]],
 		[
 ],

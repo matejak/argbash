@@ -34,22 +34,23 @@ do_stuff ()
 settle_wrapped_fname ()
 {
 	# Get arguments to ARGBASH_WRAP
-	_srcfiles="$(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
-			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1')"
+	# Based on http://stackoverflow.com/a/19772067/592892
+	IFS=$'\n' _srcfiles=($(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
+			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1'))
 	
 	test -n "$_srcfiles" || return
-	# We should use an newline IFS just for this for. Or use an array.
-	for srcstem in $_srcfiles
+	for srcstem in "${_srcfiles[@]}"
 	do
 		_found=no
 		for searchdir in "${_ARG_SEARCH[@]}"
 		do
-			test -f "$searchdir/$srcstem.m4" && { _found=yes; ext=m4; break; }
-			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext=sh; break; }
+			test -f "$searchdir/$srcstem.m4" && { _found=yes; ext='.m4'; break; }
+			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext='.sh'; break; }
+			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext=''; break; }
 		done
 		# The last searchdir is a correct one
 		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_ARG_SEARCH[*]}" >&2; exit 2; }
-		_wrapped_defns="${_wrapped_defns}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem.$ext]])"
+		_wrapped_defns="${_wrapped_defns}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem$ext]])"
 	done
 }
 
