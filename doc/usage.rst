@@ -25,8 +25,8 @@ You have three options here, they are sorted by the estimated preference:
 
 .. note::
 
-   We assume that you have installed (see :ref:`install`) the ``argbash.sh``, so it is available as a command ``argbash``.
-   If it is not the case, you just have to substitute ``argbash`` by direct invocation of ``bin/argbash.sh``.
+   We assume that you have installed (see :ref:`install`) the ``argbash`` script, so it is available in your terminal as a command ``argbash``.
+   If it is not the case, you just have to substitute ``argbash`` by direct invocation of ``bin/argbash``.
 
 Parsing code and script body together
 +++++++++++++++++++++++++++++++++++++

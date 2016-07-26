@@ -1,7 +1,7 @@
 Template writing guide
 ======================
 
-This section tells you how to write templates, the next one is about ``argbash.sh`` invocation.
+This section tells you how to write templates, the next one is about ``argbash`` script invocation.
 
 Definitions
 -----------
@@ -49,7 +49,7 @@ Then, run the following command to your file:
 
 ::
 
-  bin/argbash.sh myfile.m4 -o myfile.sh
+  bin/argbash myfile.m4 -o myfile.sh
 
 to either get a script that should just work, or a file that you include in your script.
 
