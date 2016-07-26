@@ -125,7 +125,7 @@ test-onlypos: $(TESTDIR)/test-onlypos.sh
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	grep -q '^  esac$$' $<
 	@# ! negates the return code
-	! grep -q $$'^\t' $<
+	! grep -q $$'^	' $<
 	$(REVERSE) grep -q POSITION $<
 	$< --opt-arg PoS | grep -q OPT_S=PoS,
 	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
@@ -161,7 +161,7 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	! $< -h | grep -q boo_l
 	@# no spaces as indentation (that test-onlyopt uses)
 	! grep -q '^  ' $<
-	grep -q $$'^\tesac' $<
+	grep -q $$'^	esac' $<
 	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,

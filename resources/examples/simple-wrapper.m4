@@ -12,7 +12,7 @@ test -d "$_ARG_DIRECTORY" || { echo "We expected a directory, got '$_ARG_DIRECTO
 
 for file in $_ARG_DIRECTORY/*
 do
-	test -f "$file" && echo "$file: $(./simple.sh "${_ARGS_SIMPLE_OPT[@]}" "$file")"
+	test -f "$file" && echo "$file: $(./simple.sh "${_ARGS_SIMPLE_OPT[*]}" "$file")"
 done
 
 # ] <-- needed because of Argbash
