@@ -18,7 +18,7 @@ dnl
 dnl Sets the indentation character(s) in the parsing code
 dnl $1: The indentation character(s)
 m4_define([ARGBASH_SET_INDENT],
-	[m4_bmatch(m4_expand([FLAGS]), [I], ,[_SET_INDENT([$1])])])
+	[m4_bmatch(m4_expand([FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
 
 
 dnl We include the version-defining macro
