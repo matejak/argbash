@@ -74,7 +74,7 @@ develop: $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
-	test -n "$(ARGBASH_TO)" && ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
+	test -z "$(ARGBASH_TO)" || ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE) $(ARGBASH_TO)
@@ -85,7 +85,7 @@ install: $(GENPARSE) $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
 	sed -e 's|M4DIR=.*|M4DIR=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
-	test -n "$(ARGBASH_TO)" && cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*
+	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
