@@ -1,3 +1,10 @@
+1.4.1 (2016-08-02)
+------------------
+
+Bugfixes:
+
+* Fixed broken `Makefile` that prevented (un)installs.
+
 1.4.0 (2016-08-02)
 ------------------
 
