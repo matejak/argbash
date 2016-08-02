@@ -14,11 +14,11 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-verbose=$_ARG_VERBOSE
-unit=$_ARG_UNIT
+verbose=$_arg_verbose
+unit=$_arg_unit
 
-test -f $_ARG_FILENAME || { echo "Filename $_ARG_FILENAME doesn't seem to belong to a file"; exit 1; }
-filename="$_ARG_FILENAME"
+test -f $_arg_filename || { echo "Filename $_arg_filename doesn't seem to belong to a file"; exit 1; }
+filename="$_arg_filename"
 
 if [ $verbose = on ]
 then

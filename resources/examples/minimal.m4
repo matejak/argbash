@@ -9,10 +9,10 @@
 
 # [ <-- needed because of Argbash
 
-if [ "$_ARG_PRINT" = on ]
+if [ "$_arg_print" = on ]
 then
-	echo "Positional arg value: '$_ARG_POSITIONAL_ARG'"
-	echo "Optional arg '--option' value: '$_ARG_OPTION'"
+	echo "Positional arg value: '$_arg_positional_arg'"
+	echo "Optional arg '--option' value: '$_arg_option'"
 else
 	echo "Not telling anything, print not requested"
 fi

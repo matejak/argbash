@@ -40,15 +40,12 @@ m4_define([_HELP_MSG])
 dnl
 dnl The operation on command names that makes stem of variable names
 m4_define([_translit], [m4_translit(m4_translit([$1], [A-Z], [a-z]), [-], [_])])
-m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 
 
 dnl
 dnl The operation on command names that converts them to variable names (where command values are stored)
 m4_define([_arg_prefix], [[_arg_]])
-m4_define([_arg_prefix], [[_ARG_]])
 m4_define([_args_prefix], [[_args_]])
-m4_define([_args_prefix], [[_ARGS_]])
 m4_define([_varname], [_arg_prefix[]_translit([$1])])
 
 
@@ -99,8 +96,8 @@ dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
 m4_define([__some_opt], [m4_do(
 	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([[_ARGS_]_translit(WRAPPED)]))],
-		[m4_define([_COLLECT_]_varname([$1]),  [_ARGS_]_translit(WRAPPED)_OPT)],
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
+		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit(WRAPPED)_OPT)],
 	)])],
 	[m4_list_add([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
@@ -175,9 +172,9 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([[_ARGS_]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([[_ARGS_]_translit(WRAPPED)_POS]))],
-		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([[_ARGS_]_translit(WRAPPED)_POS+=@{:@"${_varname([$1])}"@:}@]))],
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)_POS]))],
+		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)_POS+=@{:@"${_varname([$1])}"@:}@]))],
 	)])],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
@@ -281,9 +278,9 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([[_ARGS_]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([[_ARGS_]_translit(WRAPPED)_POS]))],
-		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([[_ARGS_]_translit(WRAPPED)_POS+=@{:@${_varname([$1])@<:@@@:>@}@:}@]))]
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)_POS]))],
+		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)_POS+=@{:@${_varname([$1])@<:@@@:>@}@:}@]))]
 	)])],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
@@ -365,7 +362,7 @@ m4_define([_ARG_HELPx], [m4_do(
 )])
 
 
-m4_define([_DEFAULT_SCRIPTDIR], [[SCRIPT_DIR]])
+m4_define([_DEFAULT_SCRIPTDIR], [[script_dir]])
 
 
 dnl

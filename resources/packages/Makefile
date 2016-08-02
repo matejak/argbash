@@ -39,10 +39,10 @@ endef
 build:
 	mkdir $@
 
-build/PKGBUILD: arch/PKGBUILD $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
+build/PKGBUILD: arch/PKGBUILD.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
 	$(substitute)
 
-archlinux: build/PKGBUILD
+archlinux: build/PKGBUILD.in
 	cd build && makepkg -f && makepkg --printsrcinfo > .SRCINFO
 
 build/SPEC: rpm/SPEC $(SOURCE)

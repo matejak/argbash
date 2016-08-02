@@ -1,3 +1,16 @@
+2.0.0 (2016-08-03)
+------------------
+
+This release descends from `1.4.2`.
+
+Incompatible changes:
+
+* The variable name in which argument values are stored is different (lowercase) as the `bash` style guides recommend.
+
+Bugfixes:
+
+* Fixed a error handling bug in the `argbash-1to2` script.
+
 1.4.2 (2016-08-02)
 ------------------
 

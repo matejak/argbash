@@ -12,17 +12,19 @@ version=_ARGBASH_VERSION
 
 do_stuff ()
 {
+	# SCRIPT_DIR is likely also a default, but maybe not - it may have been set explicitly
+	grep -q '\${\?SCRIPT_DIR' -- "$infname" && echo "You probably use a variable 'SCRIPT_DIR' in your script. It may be that you should rename it to 'script_dir', but this is not certain :-(" >&2
 	# We match $_ARG_FOO as well as ${ARG_FOO...
 	# and _ARGS_FOO
 	sed 's/\(\${\?_ARGS\?_\w\+\)/\L\1\l/g' "$infname"
 }
 
-outfname="$_ARG_OUTPUT"
-for infname in "${_ARG_INPUT[@]}"
+outfname="$_arg_output"
+for infname in "${_arg_input[@]}"
 do
-	test -f "$infname" || die "The input parameter has to be a file (got: '$infname')"
+	test -f "$infname" || { echo "The input parameter has to be a file (got: '$infname')" >&2; exit 1; }
 
-	test -n "$_ARG_OUTPUT" || outfname="$infname"
+	test -n "$_arg_output" || outfname="$infname"
 	if test "$outfname" = '-'
 	then
 		do_stuff

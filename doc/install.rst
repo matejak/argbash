@@ -1,7 +1,7 @@
 Installation
 ============
 
-Installation is simple, but as it is described in the quickstart, you don't need it to use ``Argbash``.
+Installation is simple, but as it is described in the :ref:`quickstart`, you don't need it to use ``Argbash``.
 
 #. Go to the ``resources`` folder.
    There is a ``Makefile``.
@@ -14,22 +14,29 @@ Installation is simple, but as it is described in the quickstart, you don't need
    * If so, run ``make install PREFIX=$HOME/.local``,
    * else, run ``sudo make install PREFIX=/usr``.
 
-``Argbash`` directly depends on two pieces of software:
+``Argbash`` has this audience:
 
-* ``bash >= 3.0`` --- this is obvious.
-* ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``.
+* Users --- people that use scripts that make use of ``Argbash``.
+* Developers --- people that use ``Argbash`` to write scripts.
+* Tinkerers --- people that come in contact with ``Argbash`` internals, typically curious Developers.
 
-* ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to ``Argbash`` developers than to end-users.
+* ``bash >= 3.0`` --- this is obvious, everybody needs ``bash``. There is only one exception --- in cases of simple scripts, a ``POSIX`` shell s.a. ``dash`` will be enough for Users.
+* ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``. Developers and Tinkerers need this. ``autoconf`` is available on Linux, OSX, BSDs and can be installed on MS Windows.
+* ``grep``, ``sed``, ``coreutils`` --- The ``argbash`` script uses ``grep``, ``sed``, ``cat``, and ``test``. If you have ``autoconf``, you probably have those already.
+* ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to Tinkerers.
 
 Argbash components
 ------------------
 
-The main application is the ``argbash`` script.
+The main part of ``Argbash`` is the ``argbash`` script.
 It is basically a wrapper around the ``autom4te`` utility that uses the ``Argbash`` "source code" located in the ``src`` directory.
 In course of an installation, both the script and the source are copied under the prefix --- script goes to ``$PREFIX/bin`` and source to ``$PREFIX/lib/argbash``.
 
 The ``argbash`` script itself is generated using ``Argbash``.
 It can be (re)generated using a Makefile that can be found in the ``resources`` folder.
+
+Next, there are ``argbash-xtoy`` scripts (x, y are version numbers) that assist users in modifying their scripts in case that ``Argbash`` :ref:`changes its API <api_change>`.
+For example, ``Argbash 2.1.4`` (we say ``Argbash`` of major version 2) has ``argbash-1to2`` script and ``Argbash`` of major version 3 will have scripts ``argbash-1to3`` and ``argbash-2to3``.
 
 The main Makefile
 -----------------

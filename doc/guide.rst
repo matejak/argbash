@@ -6,6 +6,9 @@ This section tells you how to write templates, the next one is about ``argbash``
 Definitions
 -----------
 
+Positional and optional arguments
++++++++++++++++++++++++++++++++++
+
 There are two major types of arguments --- thake an example:
 
 ::
@@ -27,37 +30,9 @@ On the other hand, the ``grep`` command requires at least one positional argumen
 The first one is supposed to be the regular expression you want to match against, and the other ones correspond to filenames, so they are not treated the same.
 The first positional argument ``grep`` accepts (i.e. the regular expression), doesn't have a default, whereas the second one normally defaults to ``-``, which means ``grep`` will try to read input from ``stdin``.
 
-Your script
------------
 
-You have to decide what arguments should your script support.
-As of this version, ``Argbash`` lets you choose from:
-
-* Single-value positional arguments (with optional defaults),
-* single-value optional arguments,
-* boolean optional arguments,
-* action optional arguments (i.e. the ``--version`` and ``--help`` type of args) and
-* incremental arguments that "remember" how many times they have been repeated (e.g. ``--verbose``) and
-* repeatable arguments that sequentially store their values into an array (e.g. ``-I``).
-
-Plus, there are convenience macros that don't relate to argument parsing, but they might help you to write better scripts and a helper that enables you to easily wrap other ``Argbash``-aware scripts without fuss.
-
-Take a look at the API and place the declarations either to your script or in a separate file.
-Let yourself be inspired by the ``resources/examples/simple.m4`` example (``bash`` syntax highlighting is recommended, despite the extension).
-
-Then, run the following command to your file:
-
-::
-
-  bin/argbash myfile.m4 -o myfile.sh
-
-to either get a script that should just work, or a file that you include in your script.
-
-Argbash API
------------
-
-Nomenclature
-++++++++++++
+Option, Value, and others
++++++++++++++++++++++++++
 
 We have positional and optional arguments sorted out, so let's define some other terms now keeping the example of ``ls -l --sort time /home``:
 
@@ -101,8 +76,35 @@ So let's get back to argument types.
 Below, is a list of argument types and macros that you have to write to support those.
 Place those macros in your files as ``bash`` comments.
 
-Syntax
-++++++
+
+Your script
+-----------
+
+You have to decide what arguments should your script support.
+As of this version, ``Argbash`` lets you choose from:
+
+* Single-value positional arguments (with optional defaults),
+* single-value optional arguments,
+* boolean optional arguments,
+* action optional arguments (i.e. the ``--version`` and ``--help`` type of args) and
+* incremental arguments that "remember" how many times they have been repeated (e.g. ``--verbose``) and
+* repeatable arguments that sequentially store their values into an array (e.g. ``-I``).
+
+Plus, there are convenience macros that don't relate to argument parsing, but they might help you to write better scripts and a helper that enables you to easily wrap other ``Argbash``-aware scripts without fuss.
+
+Take a look at the API and place the declarations either to your script or in a separate file.
+Let yourself be inspired by the ``resources/examples/simple.m4`` example (``bash`` syntax highlighting is recommended, despite the extension).
+
+Then, run the following command to your file:
+
+::
+
+  bin/argbash myfile.m4 -o myfile.sh
+
+to either get a script that should just work, or a file that you include in your script.
+
+Argbash API
+-----------
 
 Put macro parameters in square brackets.
 Parameters marked as optional can be left out blank:
@@ -240,14 +242,14 @@ Special arguments
 
      ARG_VERBOSE([short arg name])
 
-  Default default is 0, so you can use a ``test $_ARG_VERBOSE -ge 1`` pattern in your script.
+  Default default is 0, so you can use a ``test $_arg_verbose -ge 1`` pattern in your script.
 
 * Collect leftovers:
   ::
 
      ARG_LEFTOVERS([help text (optional)])
 
-  This macro allows your script to accept more arguments and collect them consequently in the ``_ARG_LEFTOVERS`` array.
+  This macro allows your script to accept more arguments and collect them consequently in the ``_arg_leftovers`` array.
 
   A use case for this is wrapping of scripts that are completely ``Argbash``-agnostic.
   Therefore, your script can take its own arguments and the rest that is not recognized can go to the wrapped script.
@@ -268,7 +270,7 @@ Plus, there are convenience macros:
 * Add a line where the directory where the script is running is stored in an environmental variable:
   ::
 
-     DEFINE_SCRIPT_DIR([variable name (optional, default is SCRIPT_DIR)])
+     DEFINE_SCRIPT_DIR([variable name (optional, default is script_dir)])
 
 * Include a file (let's say a ``parse.sh`` file) that is in the same directory during runtime.
   If you use this in your script, ``Argbash`` finds out and attempts to regenerate ``parse.sh`` using ``parse.sh`` or ``parse.m4`` if the former is not available.
@@ -276,7 +278,7 @@ Plus, there are convenience macros:
 
   ::
 
-     INCLUDE_PARSING_CODE([filename], [SCRIPT_DIR variable name (optional, default is SCRIPT_DIR)])
+     INCLUDE_PARSING_CODE([filename], [SCRIPT_DIR variable name (optional, default is script_dir)])
 
   In order to make use of ``INCLUDE_PARSING_CODE``, you have to use ``DEFINE_SCRIPT_DIR`` on preceding lines, but you will be told so if you don't.
 
@@ -314,23 +316,23 @@ Plus, there are convenience macros:
     I         Don't use wrapped script's indentation
     ========= ===================
 
-  * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_ARGS_PROCESS_SINGLE``.
-    In the case where there may be issues with positional arguments (they are order-dependent and the wrapping script may want to inject its own to the wrapped script), you can use ``_ARGS_PROCESS_SINGLE_OPT``, or ``_ARGS_PROCESS_SINGLE_POS``, where only optional/positional arguments are stored.
+  * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_args_process_single``.
+    In the case where there may be issues with positional arguments (they are order-dependent and the wrapping script may want to inject its own to the wrapped script), you can use ``_args_process_single_opt``, or ``_args_process_single_pos``, where only optional/positional arguments are stored.
     Therefore, when you finally decide to call ``process-single.sh`` in your script with all wrapped arguments (e.g. ``--some-opt foo --bar``), all you have to do is to write
 
     ::
 
-      ./process-single.sh "${_ARGS_PROCESS_SINGLE_OPT[@]}"
+      ./process-single.sh "${_args_process_single_opt[@]}"
 
     which is exactly the same as
 
     ::
 
       MAYBE_BAR=
-      test $_ARG_BAR = on && MAYBE_BAR='--bar'
-      ./process-single.sh --some-opt "$_ARG_SOME_OPT" $MAYBE_BAR
+      test $_arg_bar = on && MAYBE_BAR='--bar'
+      ./process-single.sh --some-opt "$_arg_some_opt" $MAYBE_BAR
 
-    The stem to array name conversion is the same as with `argument names`__ except the prefix ``_ARGS_`` is prepended.
+    The stem to array name conversion is the same as with `argument names`__ except the prefix ``_args_`` is prepended.
 
 __ parsing_results_
 
@@ -353,12 +355,12 @@ Using parsing results
 The key is that parsing results are saved in environmental variables that relate to argument (long) names.
 The argument name is transliterated like this:
 
-#. All letters are made upper-case
+#. All letters are made lower-case
 #. Dashes are transliterated to underscores (``include-batteries`` becomes ``include_batteries``)
-#. ``_ARG_`` is prepended to the string.
+#. ``_arg_`` is prepended to the string.
 
-   So given that you have an argument ``--include-batteries`` that expects a value, you can access it via environmental variable ``_ARG_INCLUDE_BATTERIES``.
+   So given that you have an argument ``--include-batteries`` that expects a value, you can access it via environmental variable ``_arg_include_batteries``.
 #. Boolean arguments have values either ``on`` or ``off``.
 
-   If (a boolean argument) ``--quiet`` is passed, value of ``_ARG_QUIET`` is set to ``on``.
-   Conversely, if ``--no-quiet`` is passed, value of ``_ARG_QUIET`` is set to ``off``.
+   If (a boolean argument) ``--quiet`` is passed, value of ``_arg_quiet`` is set to ``on``.
+   Conversely, if ``--no-quiet`` is passed, value of ``_arg_quiet`` is set to ``off``.

@@ -10,6 +10,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "POS_S0=$_ARG_POS_ARG0,POS_S=$_ARG_POS_ARG,POS_OPT=$_ARG_POS_OPT,OPT_S=$_ARG_OPT_ARG,POS_S=$_ARG_POS_ARG,POS_OPT=$_ARG_POS_OPT,OPT_INCR=$_ARG_OPT_INCR,CMDLINE=${_ARGS_TEST_ONLYOPT[@]} ${_ARGS_TEST_ONLYPOS[@]},"
+echo "POS_S0=$_arg_pos_arg0,POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_S=$_arg_opt_arg,POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_INCR=$_arg_opt_incr,CMDLINE=${_args_test_onlyopt[@]} ${_args_test_onlypos[@]},"
 
 # closing escape square bracket: ]

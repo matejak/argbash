@@ -4,6 +4,7 @@ PHONIES ?=
 NUL =
 
 ARGBASH_BIN = $(TESTDIR)/../../bin/argbash
+ARGBASH_1TO2 = $(TESTDIR)/../../bin/argbash-1to2
 REVERSE = $(TESTDIR)/reverse
 
 %.sh: %.m4 $(ARGBASH_BIN)
@@ -134,6 +135,9 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
+
+$(TESTDIR)/test-ddash.m4: $(TESTDIR)/test-ddash-old.m4 $(ARGBASH_1TO2)
+	$(ARGBASH_1TO2) $< -o $@
 
 test-ddash: $(TESTDIR)/test-ddash.sh
 	$< --boo_l | grep -q 'BOOL=on,'

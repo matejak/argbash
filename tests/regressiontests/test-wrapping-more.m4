@@ -8,7 +8,7 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "POS_S=$_ARG_POS_ARG,POS_OPT=$_ARG_POS_OPT,OPT_INCR=$_ARG_OPT_INCR,CMDLINE=${_ARGS_TEST_ONLYOPT[@]},"
+echo "POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_INCR=$_arg_opt_incr,CMDLINE=${_args_test_onlyopt[@]},"
 
 # closing escape square bracket: ]
 

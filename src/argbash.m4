@@ -42,14 +42,14 @@ settle_wrapped_fname ()
 	for srcstem in "${_srcfiles[@]}"
 	do
 		_found=no
-		for searchdir in "${_ARG_SEARCH[@]}"
+		for searchdir in "${_arg_search[@]}"
 		do
 			test -f "$searchdir/$srcstem.m4" && { _found=yes; ext='.m4'; break; }
 			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext='.sh'; break; }
 			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext=''; break; }
 		done
 		# The last searchdir is a correct one
-		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_ARG_SEARCH[*]}" >&2; exit 2; }
+		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_arg_search[*]}" >&2; exit 2; }
 		_wrapped_defns="${_wrapped_defns}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem$ext]])"
 	done
 }
@@ -81,26 +81,26 @@ test -e $discard || discard=NUL
 
 set -o pipefail
 
-infile="$_ARG_INPUT"
+infile="$_arg_input"
 
-m4dir="$SCRIPT_DIR/../src"
-test -n "$_ARG_DEBUG" && DEBUG=('-t' "$_ARG_DEBUG")
+m4dir="$script_dir/../src"
+test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
 output_m4="$m4dir/output.m4"
-test "$_ARG_STANDALONE" = "on" && output_m4="$m4dir/output-standalone.m4"
+test "$_arg_standalone" = "on" && output_m4="$m4dir/output-standalone.m4"
 
 test -f "$infile" || { echo "'$infile' is supposed to be a file!" >&2; exit 1; }
-test -n "$_ARG_OUTPUT" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
-outfname="$_ARG_OUTPUT"
+test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
+outfname="$_arg_output"
 autom4te --version > "$discard" 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
-_ARG_SEARCH+=("$(dirname "$infile")")
+_arg_search+=("$(dirname "$infile")")
 _wrapped_defns=""
 
 # So let's settle the parsing code first. Hopefully we won't create a loop.
 parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
-test "$_ARG_STANDALONE" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
+test "$_arg_standalone" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname

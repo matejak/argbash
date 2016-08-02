@@ -89,6 +89,43 @@ If you want/have to take care of including the parsing code yourself, just make 
 
 Then, you just generate ``my-parsing.sh`` using ``--standalone`` option:
 
-::
+.. code-block:: bash
 
    argbash my-parsing.m4 -o my-parsing.sh --standalone
+
+.. _api_change:
+
+API changes
+-----------
+
+The API of the ``Argbash`` project may change.
+This typically means that
+
+* names, parameters or effect of macros change, or
+* parsed arguments are exposed differently
+
+in a way that is not compatible with the previous API.
+
+In case that you regenerate a script, ``argbash`` is able to deduce that it has been created with another version of ``Argbash`` and warns you.
+In that case, you can use a ``argbash-xtoy`` script, where ``x`` is the version of ``Argbash`` your script is written for and ``y`` is version of ``Argbash`` you use now.
+
+To upgrade your script from ``Argbash`` version 1 to 2, you simply invoke:
+
+.. code-block:: bash
+
+   argbash-1to2 my-script.sh -o my-script.sh
+ 
+You can use the utility to convert scripts as well as ``.m4`` templates.
+
+.. warning::
+
+   Always back your scripts up and perform diff between the output and the original after using ``argbash-xtoy``.
+
+API 2
++++++
+
+Parsed arguments were exposed as uppercase (``_ARG_LONG_OPTION`` vs ``_arg_long_option``).
+The change was motivated by effort to comply to bash standard variable naming convention [#]_, [#]_.
+
+.. [#] `Unix StackExchange <http://unix.stackexchange.com/a/42849>`_
+.. [#] `Google bash styleguide <https://google.github.io/styleguide/shell.xml#Naming_Conventions>`_

@@ -21,6 +21,9 @@ You need:
 
 * ``bash>=3.0``
 * ``autoconf>=2.64`` (``Argbash`` makes use of the ``autom4te`` utility)
+* ``grep``, ``sed``, etc. (if you have ``autoconf``, you probably have those already)
+
+.. _quickstart:
 
 Quickstart
 ----------
@@ -28,11 +31,11 @@ Quickstart
 In a nutshell, using ``Argbash`` consists of these simple steps:
 
 #. You write a simple template of your script based on arguments your script is supposed to accept.
-#. You run the ``argbash.sh`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
+#. You run the ``argbash`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
 
 Eventually, you may want to add/remove/rename arguments your script accepts.
 In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
-Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash.sh`` on top of the script to get it updated.
+Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash`` on top of the script to get it updated.
 
 Writing a template
 ++++++++++++++++++
@@ -72,7 +75,7 @@ We generate the script from the template:
 
 ::
 
-   bin/argbash.sh script.m4 -o script.sh
+   bin/argbash script.m4 -o script.sh
 
 
 Now we launch it and the output is good!
@@ -102,7 +105,7 @@ Limitations
 #. Clustering of short arguments (e.g. using ``-xzf`` instead of ``-x -z -f``) is not supported.
 #. The square brackets in your script should match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``).
    More precisely, the number of closing square brackets ``]`` must not exceed the number of opening ``[``.
-   This limitation does apply to files that are processed by ``argbash.sh`` --- you are fine if you have the argument parsing code in a separate file and you don't use the ``INCLUDE_PARSING_CODE``.
+   This limitation does apply to files that are processed by ``argbash`` --- you are fine if you have the argument parsing code in a separate file and you don't use the ``INCLUDE_PARSING_CODE``.
 #. The generated code generally contains bashisms as it --- relies heavily on ``bash`` arrays to process any kind of positional arguments and multi-valued optional arguments.
    That said, if you stick with optional arguments only, a POSIX shell s.a. ``dash`` will be able to process the ``Argbash``-generated parsing code.
 

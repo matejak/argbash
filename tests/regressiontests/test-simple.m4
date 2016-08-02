@@ -10,6 +10,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "OPT_S=$_ARG_OPT_ARG,POS_S=$_ARG_POS_ARG,"
+echo "OPT_S=$_arg_opt_arg,POS_S=$_arg_pos_arg,"
 
 # ] <-- needed because of Argbash
