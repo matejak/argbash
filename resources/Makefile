@@ -61,7 +61,7 @@ bootstrap:
 
 examples: $(EXAMPLES)
 
-check: unittests regressiontests
+check: unittests regressiontests $(GENPARSE) $(ARGBASH_TO)
 	$(MAKE) tests-clean
 	@echo "*** All is OK ***"
 

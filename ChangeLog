@@ -1,3 +1,10 @@
+2.0.1 (TBA)
+------------------
+
+Bugfixes:
+
+* Fixed handling of `argbash-xtoy` in Makefiles for tests/packaging.
+
 2.0.0 (2016-08-03)
 ------------------
 

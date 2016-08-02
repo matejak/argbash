@@ -36,6 +36,7 @@ TESTS = \
 PHONIES += $(TESTS)
 
 # test-salone is side-effect of call-salone
+# test-ddash.m4 is generated from ...-old.m4
 SCRIPTS = \
 	$(TESTDIR)/test.sh \
 	$(TESTDIR)/test2.sh \
@@ -45,6 +46,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-salone.sh \
 	$(TESTDIR)/test-onlyopt.sh \
 	$(TESTDIR)/test-onlypos.sh \
+	$(TESTDIR)/test-ddash.m4 \
 	$(TESTDIR)/test-ddash.sh \
 	$(TESTDIR)/test-more.sh \
 	$(TESTDIR)/test-most.sh \
