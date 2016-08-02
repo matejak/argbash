@@ -43,7 +43,7 @@ build/PKGBUILD: arch/PKGBUILD $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE b
 	$(substitute)
 
 archlinux: build/PKGBUILD
-	cd build && makepkg -f
+	cd build && makepkg -f && makepkg --printsrcinfo > .SRCINFO
 
 build/SPEC: rpm/SPEC $(SOURCE)
 	$(substitute)

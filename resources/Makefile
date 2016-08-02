@@ -23,6 +23,14 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
+major_version ?= $(shell cat ../src/version | sed -e 's/\..*//')
+
+../bin/argbash-%to$(major_version): ../src/argbash-%to$(major_version).m4 $(GENPARSE)
+	bash $(GENPARSE) $< -o $@
+
+lesser_versions = $(shell seq 1 $$(($(major_version) - 1)))
+ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_version))
+
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
@@ -60,15 +68,16 @@ check: unittests regressiontests
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
 
-develop:
+develop: $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
+	ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
-install: $(GENPARSE)
+install: $(GENPARSE) $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash"
@@ -76,7 +85,8 @@ install: $(GENPARSE)
 	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
 	sed -e 's|M4DIR=.*|M4DIR=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
-	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
+	cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash" "$(ROOT)/$(PREFIX)"/bin/argbash-*
 
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
