@@ -74,7 +74,7 @@ develop: $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
-	ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
+	test -n "$(ARGBASH_TO)" && ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE) $(ARGBASH_TO)
@@ -85,13 +85,14 @@ install: $(GENPARSE) $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
 	sed -e 's|M4DIR=.*|M4DIR=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
-	cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
-	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash" "$(ROOT)/$(PREFIX)"/bin/argbash-*
+	test -n "$(ARGBASH_TO)" && cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
 	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/"*.m4
 	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/version"
+	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
 	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
 
 version:
@@ -105,4 +106,4 @@ release: version $(GENPARSE) examples check
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master
-	git push --tags
+	git push --follow-tags
