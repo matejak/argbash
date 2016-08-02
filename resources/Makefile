@@ -101,7 +101,7 @@ version:
 	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
 	touch $(M4_SRC)
 
-release: version $(GENPARSE) examples check
+release: version $(GENPARSE) $(ARGBASH_TO) examples check
 	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
 
 tag:

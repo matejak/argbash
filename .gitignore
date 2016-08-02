@@ -2,8 +2,6 @@
 *2.sh
 *3.sh
 
-bin/argbash-*to*
-
 tests/regressiontests/test-standalone.sh
 tests/regressiontests/test.sh
 

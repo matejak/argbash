@@ -12,7 +12,9 @@ version=_ARGBASH_VERSION
 
 do_stuff ()
 {
-	sed 's/\(_ARG_\w\+\)/\L\1\l/g' "$_ARG_INPUT"
+	# We match $_ARG_FOO as well as ${ARG_FOO...
+	# and _ARGS_FOO
+	sed 's/\(\${\?_ARGS\?_\w\+\)/\L\1\l/g' "$infname"
 }
 
 outfname="$_ARG_OUTPUT"

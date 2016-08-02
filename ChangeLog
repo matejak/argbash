@@ -1,3 +1,10 @@
+1.4.2 (2016-08-02)
+------------------
+
+Bugfixes:
+
+* Fixed the broken `argbash-1to2` script.
+
 1.4.1 (2016-08-02)
 ------------------
 
@@ -12,7 +19,7 @@ New features:
 
 * Added the `ARGBASH_SET_INDENT` macro for indentation control.
 * Created scripts are more compliant to the https://www.shellcheck.net/ tool.
-* Introduced argbash-1to2 script for migration to Argbash2
+* Introduced `argbash-1to2` script for migration to Argbash2
 
 Bugfixes:
 

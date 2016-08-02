@@ -45,8 +45,11 @@ m4_define([_translit], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 
 dnl
 dnl The operation on command names that converts them to variable names (where command values are stored)
-m4_define([_varname], [_arg_[]_translit([$1])])
-m4_define([_varname], [_ARG_[]_translit([$1])])
+m4_define([_arg_prefix], [[_arg_]])
+m4_define([_arg_prefix], [[_ARG_]])
+m4_define([_args_prefix], [[_args_]])
+m4_define([_args_prefix], [[_ARGS_]])
+m4_define([_varname], [_arg_prefix[]_translit([$1])])
 
 
 dnl
