@@ -147,7 +147,7 @@ Positional arguments
 * Infinitely many-valued positional argument (with optional defaults):
   ::
 
-     ARG_POSITIONAL_INF([argument-name], [help message], [minimal number of arguments], [default for the first non-required argument (optional)], ...)
+     ARG_POSITIONAL_INF([argument-name], [help message], [minimal number of arguments (optional, default=0)], [default for the first non-required argument (optional)], ...)
 
   ``Argbash`` supports arguments with arbitrary number of values.
   However, you can require a minimal amount of values the caller has to provide and you can also assign defaults for the values that are not required.
@@ -267,10 +267,14 @@ Plus, there are convenience macros:
   The default indentation is one tab per level.
   If you wish to use two spaces as the `Google style recommends <https://google.github.io/styleguide/shell.xml>`_, simply pass two spaces (in square brackets!) as an argument to the macro.
 
+.. _script_dir:
+
 * Add a line where the directory where the script is running is stored in an environmental variable:
   ::
 
      DEFINE_SCRIPT_DIR([variable name (optional, default is script_dir)])
+
+  You can use this variable to e.g. source ``bash`` snippets that are in a known location relative to the script's parent directory.
 
 * Include a file (let's say a ``parse.sh`` file) that is in the same directory during runtime.
   If you use this in your script, ``Argbash`` finds out and attempts to regenerate ``parse.sh`` using ``parse.sh`` or ``parse.m4`` if the former is not available.
@@ -348,6 +352,16 @@ The macro doesn't take any parameters.
    ARGBASH_GO
 
 .. _parsing_results:
+
+Available shell stuff
++++++++++++++++++++++
+
+* Variable ``script_dir`` that is available if the :ref:`DEFINE_SCRIPT_DIR <script_dir>` is used.
+
+* Function ``die``.
+
+  Accepts two parameters --- string that is printed to ``stderr`` and exit status number (optional, default is 1).
+  If an environmental variable ``_PRINT_HELP`` is set to ``yes``, it prints help before the error message.
 
 Using parsing results
 +++++++++++++++++++++

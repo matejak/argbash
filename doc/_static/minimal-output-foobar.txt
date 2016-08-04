@@ -1,6 +1,4 @@
-::
+../resources/examples/minimal.sh foo -o bar --print
 
-    ../resources/examples/minimal.sh foo -o bar --print
-
-    Positional arg value: 'foo'
-    Optional arg '--option' value: 'bar'
+Positional arg value: 'foo'
+Optional arg '--option' value: 'bar'

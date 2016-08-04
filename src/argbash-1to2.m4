@@ -1,9 +1,9 @@
 #!/bin/bash
 
 version=_ARGBASH_VERSION
-# DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_INF([input], [The input file to transform], 1)
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout and empty string for the same as input file)], "")
+# ARG_VERSION([echo "argbash-1to2 v$version"])
 # ARG_HELP([Convert a template for argbash<2 to argbash>=2,<3])
 
 # ARGBASH_GO
@@ -20,6 +20,8 @@ do_stuff ()
 }
 
 outfname="$_arg_output"
+test "${#infname[@]}" -gt 1 && test -n "$outfname" && die "You have specified more than one (${#infname[@]}) input filenames, so you probably want to modify the corresponding files in-place. In order to do so, you can't specify an output filename, even '-' does make no sense (currently: '$outfname')"
+
 for infname in "${_arg_input[@]}"
 do
 	test -f "$infname" || { echo "The input parameter has to be a file (got: '$infname')" >&2; exit 1; }
@@ -35,7 +37,8 @@ do
 		trap "rm -f $temp_outfile" EXIT
 		do_stuff > "$temp_outfile"
 		mv "$temp_outfile" "$outfname"
-		chmod a+x "$outfname"
+		# So we don't make .m4 scripts executable
+		chmod --reference "$infname" "$outfname"
 	fi
 done
 

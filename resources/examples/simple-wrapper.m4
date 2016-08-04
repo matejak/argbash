@@ -1,18 +1,26 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_SINGLE([directory])
+# DEFINE_SCRIPT_DIR
+# ARG_POSITIONAL_INF([directory], [Directories to go through], 1)
+# ARG_OPTIONAL_SINGLE([glob], , [What files to match in the directory], [*])
 # ARGBASH_WRAP([simple], [filename])
-# ARG_HELP([This program tells you size of files in a given directory in units you choose.])
+# ARG_HELP([This program tells you size of specified files in given directories in units you choose.])
+# ARGBASH_SET_INDENT([  ])
 # ARGBASH_GO
 
 # [ <-- needed because of Argbash
 
-test -f simple.sh || { echo "Missing the wrapped script, execute me from the directory where 'simple.sh' is."; exit 1; }
-test -d "$_arg_directory" || { echo "We expected a directory, got '$_arg_directory'."; exit 1; }
+script="$script_dir/simple.sh"
+test -f "$script" || { echo "Missing the wrapped script, was expecting it nex to me, in '$script_dir'."; exit 1; }
 
-for file in $_arg_directory/*
+for directory in "${_arg_directory[@]}"
 do
-	test -f "$file" && echo "$file: $(./simple.sh "${_args_simple_opt[*]}" "$file")"
+  test -d "$directory" || die "We expected a directory, got '$directory', bailing out."
+  printf "Contents of '%s' matching '%s':\n" "$directory" "$_arg_glob"
+  for file in "$directory"/$_arg_glob
+  do
+    test -f "$file" && printf "\t%s: %s\n" "$(basename "$file")" "$("$script" "${_args_simple_opt[@]}" "$file")"
+  done
 done
 
 # ] <-- needed because of Argbash

@@ -4,6 +4,8 @@
 Bugfixes:
 
 * Fixed handling of `argbash-xtoy` in Makefiles for tests/packaging.
+* Added the `die` function to all generated scripts.
+* Beautification of the underlying code.
 
 2.0.0 (2016-08-03)
 ------------------

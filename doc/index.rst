@@ -17,9 +17,12 @@ You declare arguments that your script should use in few lines and then, you run
 Requirements
 ++++++++++++
 
-You need:
+Both you and your users need:
 
 * ``bash>=3.0``
+
+Only you need those on the top:
+
 * ``autoconf>=2.64`` (``Argbash`` makes use of the ``autom4te`` utility)
 * ``grep``, ``sed``, etc. (if you have ``autoconf``, you probably have those already)
 

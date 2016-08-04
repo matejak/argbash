@@ -1,11 +1,9 @@
-::
+../resources/examples/minimal.sh -h
 
-    ../resources/examples/minimal.sh -h
-
-    This is a minimal demo of Argbash potential
-    Usage: ../resources/examples/minimal.sh [-o|--option <arg>] [--(no-)print] [-v|--version] [-h|--help] <positional-arg>
-    	<positional-arg>: Positional arg description
-    	-o,--option: A option with short and long flags and default (default: 'b')
-    	--print,--no-print: A boolean option with long flag (and implicit default: off) (off by default)
-    	-v,--version: Prints version
-    	-h,--help: Prints help
+This is a minimal demo of Argbash potential
+Usage: ../resources/examples/minimal.sh [-o|--option <arg>] [--(no-)print] [-v|--version] [-h|--help] <positional-arg>
+	<positional-arg->: Positional arg description
+	-o,--option: A option with short and long flags and default (default: 'b')
+	--print,--no-print: A boolean option with long flag (and implicit default: off) (off by default)
+	-v,--version: Prints version
+	-h,--help: Prints help

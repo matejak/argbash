@@ -1,5 +1,3 @@
-::
+../resources/examples/minimal.sh foo -o bar
 
-    ../resources/examples/minimal.sh foo -o bar
-
-    Not telling anything, print not requested
+Not telling anything, print not requested

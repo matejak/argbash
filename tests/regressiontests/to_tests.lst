@@ -1,0 +1,5 @@
+arg_positional_inf accepts 0 args by default
+
+wrapping correctly sets the _opt and _pos subsets of wrapped script args
+wrapping is stable
+

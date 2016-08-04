@@ -38,7 +38,7 @@ settle_wrapped_fname ()
 	IFS=$'\n' _srcfiles=($(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
 			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1'))
 
-	test -n "$_srcfiles" || return
+	test "${#_srcfiles[@]}" -gt 0 || return
 	for srcstem in "${_srcfiles[@]}"
 	do
 		_found=no

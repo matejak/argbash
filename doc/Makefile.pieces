@@ -2,6 +2,9 @@ DOCDIR ?= .
 RESOURCES ?= ../resources
 
 MINIMAL = $(RESOURCES)/examples/minimal.sh
+SIMPLE = $(RESOURCES)/examples/simple.sh
+WRAPPER = $(RESOURCES)/examples/simple-wrapper.sh
+
 STATICDIR = _static
 
 NUL =
@@ -10,16 +13,17 @@ PIECES = \
 	$(STATICDIR)/minimal-output-help.txt \
 	$(STATICDIR)/minimal-output-foobar.txt \
 	$(STATICDIR)/minimal-output-noverbose.txt \
+	$(STATICDIR)/simple-output-help.txt \
+	$(STATICDIR)/wrapper-output-help.txt \
+	$(STATICDIR)/wrapper-output-action.txt \
 	$(NUL)
 
 pieces: $(PIECES)
 
 define CMD_OUT
-	echo "::" > $@
+	echo "$< $(FLAGS)" > $@
 	echo >> $@
-	echo "    $< $(FLAGS)" >> $@
-	echo >> $@
-	$< $(FLAGS) | sed -e 's/^/    /' >> $@
+	$< $(FLAGS) >> $@
 endef
 
 $(STATICDIR)/minimal-output-help.txt: $(MINIMAL)
@@ -32,6 +36,18 @@ $(STATICDIR)/minimal-output-foobar.txt: $(MINIMAL)
 
 $(STATICDIR)/minimal-output-noverbose.txt: $(MINIMAL)
 	$(eval FLAGS := foo -o bar)
+	$(CMD_OUT)
+
+$(STATICDIR)/simple-output-help.txt: $(SIMPLE)
+	$(eval FLAGS := -h)
+	$(CMD_OUT)
+
+$(STATICDIR)/wrapper-output-help.txt: $(WRAPPER)
+	$(eval FLAGS := -h)
+	$(CMD_OUT)
+
+$(STATICDIR)/wrapper-output-action.txt: $(WRAPPER)
+	$(eval FLAGS := --glob '*.m4' ../src ../resources/examples -u k)
 	$(CMD_OUT)
 
 clean-pieces:

@@ -1,6 +1,15 @@
 dnl We don't like the # comments
 m4_changecom()
 
+dnl
+dnl $1: How many indents
+dnl $2, $3, ...: What to put there
+m4_define([_JOIN_INDENTED],[m4_do(
+	[m4_bmatch([$1], [[0-9\+]], , [m4_fatal([The first parameter of '$0' has to be a number (depth of indentation), got '$1'])])],
+	[m4_foreach([line], [m4_shift($@)], [_INDENT_([$1])[]line
+])],
+)])
+
 
 m4_define([_SET_INDENT], [m4_define([_INDENT_],
 	[m4_for(_, 1, m4_default($][1, 1), 1,
@@ -44,6 +53,8 @@ m4_define([_translit], [m4_translit(m4_translit([$1], [A-Z], [a-z]), [-], [_])])
 
 dnl
 dnl The operation on command names that converts them to variable names (where command values are stored)
+m4_define([_opt_suffix], [[_opt]])
+m4_define([_pos_suffix], [[_pos]])
 m4_define([_arg_prefix], [[_arg_]])
 m4_define([_args_prefix], [[_args_]])
 m4_define([_varname], [_arg_prefix[]_translit([$1])])
@@ -52,10 +63,11 @@ m4_define([_varname], [_arg_prefix[]_translit([$1])])
 dnl
 dnl Encloses string into "" if its first char is not ' or "
 dnl The string si also []-quoted
-dnl Property: Quoting a blank input results in non-blank result
+dnl Property: Quoting a blank input results in blank result
 dnl to AVOID it, pass string like ""ls -l or "ls" -l
 m4_define([_sh_quote], [m4_do(
 	[m4_if(
+		[$1], , ,
 		m4_index([$1], [']), 0, [[$1]],
 		m4_index([$1], ["]), 0, [[$1]],
 		[["$1"]])],
@@ -97,7 +109,7 @@ dnl $5: Type
 m4_define([__some_opt], [m4_do(
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit(WRAPPED)_OPT)],
+		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit(WRAPPED)[]_opt_suffix)],
 	)])],
 	[m4_list_add([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
@@ -173,8 +185,8 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)_POS]))],
-		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)_POS+=@{:@"${_varname([$1])}"@:}@]))],
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
+		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=@{:@"${_varname([$1])}"@:}@]))],
 	)])],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
@@ -194,7 +206,7 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
 	[m4_list_add([_POSITIONALS_TYPES], [single])],
 	[m4_list_add([_POSITIONALS_MSGS], [$2])],
-	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
+	[dnl Here, the _sh_quote actually does not ensure that the default is NOT BLANK!
 ],
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
@@ -279,8 +291,8 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)_POS]))],
-		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)_POS+=@{:@${_varname([$1])@<:@@@:>@}@:}@]))]
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
+		[m4_list_add([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=@{:@${_varname([$1])@<:@@@:>@}@:}@]))]
 	)])],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_add([_POSITIONALS_NAMES], [$1])],
@@ -385,7 +397,7 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_add([_OTHER],
-		m4_quote(_sciptdir[="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "Couldn't determine the script's running directory, which probably matters, bailing out" >&2; exit 2; }]))],
+		m4_quote(_sciptdir[="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
 	[m4_popdef([_sciptdir])],
 )])
 
@@ -484,9 +496,9 @@ m4_define([_POS_ARG_HELP_LINE], [m4_do(
 
 m4_define([_MAKE_USAGE_MORE], [m4_do(
 	[m4_list_ifempty(_defaults, , [m4_do(
-		[[ @{:@defaults for ]argname[-]m4_incr(_min_argn)],
+		[[ @{:@defaults for ]argname(m4_incr(_min_argn))],
 		[m4_if(m4_list_len(_defaults), 1, ,
-			[[ to ]argname[-]m4_eval(_min_argn + m4_list_len(_defaults))[ respectively]])],
+			[[ to ]argname(m4_eval(_min_argn + m4_list_len(_defaults)))[ respectively]])],
 		[: ],
 		[m4_list_join(_defaults, [, ], ', ', [ and ])@:}@],
 	)])],
@@ -567,8 +579,8 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_ifnblank(m4_list_nth([_POSITIONALS_MSGS], idx), [m4_do(
 			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
-			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])>)],
-			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)], [argname]))],
+			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
+			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)], [argname($][@)]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
 			[_INDENT_[printf "\t]argname[: ]],
@@ -643,12 +655,13 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_[]_key="$[]1"
 ],
 	[m4_if(HAVE_DOUBLEDASH, 1,
-[_INDENT_()if test "$_key" = '--'
-_INDENT_()then
-_INDENT_(2)shift
-_INDENT_(2)_positionals+=("$][@")
-_INDENT_(2)break
-_INDENT_()fi
+		[_JOIN_INDENTED(1,
+			[if test "$_key" = '--'],
+			[then],
+			[_INDENT_()shift],
+			[_INDENT_()_positionals+=("@S|@@")],
+			[_INDENT_()break],
+			[fi])
 ])],
 	[_INDENT_[]case "$_key" in],
 	[dnl We don't do this if _NARGS == 0
@@ -675,11 +688,11 @@ _INDENT_(3,		)],
 		[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[arg], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
+			[arg], [test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1]
 _INDENT_(3, 		)_ARGVAR[="$[]2"
 _INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
 _INDENT_(3, 		)shift],
-			[repeated], [test $[]# -lt 2 && { echo "Missing value for the optional argument '$_key'." >&2; exit 1; }]
+			[repeated], [test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1]
 _INDENT_(3, 		)_ARGVAR[+=("$[]2")
 _INDENT_(3, 		)_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)
 _INDENT_(3, 		)shift],
@@ -699,31 +712,32 @@ _INDENT_(3, 		);;],
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
 	[
-_INDENT_()[esac]],
+],
+	[_INDENT_()[esac]],
 )])
 
 
 dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
 m4_define([_EVAL_POSITIONALS_CASE], [m4_do(
 	[
-_INDENT_(2,	)],
+_INDENT_(2)],
 	[*@:}@
-_INDENT_(3, 		)],
-	[_positionals+=("$[]1")
 ],
-_INDENT_(3, 		)[;;],
+	[_JOIN_INDENTED(3,
+		[_positionals+=("$[]1")],
+		[;;])],
 )])
 
 
 dnl If we expect only optional arguments and we get an intruder, fail noisily.
 m4_define([_EXCEPT_OPTIONALS_CASE], [m4_do(
 	[
-_INDENT_(2,	)],
+_INDENT_(2)],
 	[*@:}@
-_INDENT_(3, 		)],
-	[{ (echo "FATAL ERROR: Got an unexpected argument '$[]1'"; print_help) >&2; exit 1; }
-_INDENT_(3, 		)],
-_INDENT_(3, 		)[;;],
+],
+	[_JOIN_INDENTED(3,
+		[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1],
+		[;;])],
 )])
 
 
@@ -779,7 +793,7 @@ dnl TODO: We need to handle inf number of args here
 		[[@:}@
 test ${#_positionals[@]} -lt ]],
 		[_POSITIONALS_MIN],
-		[[ && { ( echo "FATAL ERROR: Not enough positional arguments --- we require ]_NARGS_SPEC[, but got only ${#_positionals[@]}."; print_help ) >&2; exit 1; }
+		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]_NARGS_SPEC[, but got only ${#_positionals[@]}." 1
 ]],
 		[IF_POSITIONALS_INF(
 			[m4_do(
@@ -787,7 +801,7 @@ test ${#_positionals[@]} -lt ]],
 ],
 				[_OUR_ARGS=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
 ],
-				[for (( ii = 0; ii < $_OUR_ARGS; ii++))
+				[for (( ii = 0; ii < _OUR_ARGS; ii++))
 do
 _INDENT_()_positional_names+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
 done
@@ -799,17 +813,17 @@ done
 ],
 				[[test ${#_positionals[@]} -gt ]],
 				[_POSITIONALS_MAX],
-				[[ && { ( echo "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 				[_NARGS_SPEC],
 				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
-				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')."; print_help ) >&2; exit 1; }
+				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 ]],
 			)])],
 		[m4_popdef([_NARGS_SPEC])],
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
-]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || { echo "Error during argument parsing, possibly an Argbash bug." >&2; exit 1; }
+]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
 done]],
 		[
 ],
@@ -876,13 +890,27 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 )])
 
 
+m4_define([_MAKE_UTILS], [m4_do(
+	[[die()
+{
+]],
+	[_JOIN_INDENTED(1,
+		[local _ret=$[]2],
+		[test -n "$_ret" || _ret=1],
+		[test "$_PRINT_HELP" = yes && print_help >&2],
+		[echo "$[]1" >&2],
+		[exit ${_ret}])],
+	[}
+],
+)])
+
+
 m4_define([_MAKE_OTHER], [m4_do(
 	[[# OTHER STUFF GENERATED BY Argbash
 ]],
 	dnl Put the stuff below into some condition block
-,	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup=@{:@"${agroup[_OPT]@<:@@@:>@}" "${agroup[_POS]@<:@@@:>@}"@:}@
+,	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup=@{:@"${agroup[]_opt_suffix@<:@@@:>@}" "${agroup[]_pos_suffix@<:@@@:>@}"@:}@
 ])],
-	[],
 	[m4_list_declare([_OTHER])],
 	[_OTHER_FOREACH([item
 ])],
@@ -918,6 +946,8 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 # Argbash is FREE SOFTWARE, know your rights: https://github.com/matejak/argbash
 
 ]],
+	[_MAKE_UTILS
+],
 	[m4_if(_NO_ARGS_WHATSOEVER, 1, [], [m4_do(
 		[_MAKE_DEFAULTS
 ],
@@ -935,11 +965,6 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: Names of blacklisted args (list)
 dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
-dnl IDEA: Include the wrapped script and read the argbash stuff
-dnl However, define some macros beforehand that will act as global variables and ensure the following:
-dnl  - the defns from wrapped script won't be repeated in the wrapper (DONE, using m4_ignore, TODO: Remove ifdef WRAPPED that is used somewhere)
-dnl  - options blacklisted by name won't appear (e.g. 'outfile', 'do-this', ...)
-dnl  - blacklisted classes of options won't appear (e.g. help, version)
 m4_define([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],

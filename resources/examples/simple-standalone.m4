@@ -5,4 +5,5 @@
 # ARG_VERSION([echo $0 v0.1])
 # ARG_OPTIONAL_BOOLEAN(verbose)
 # ARG_HELP
+# ARGBASH_SET_INDENT([  ])
 # ARGBASH_GO
