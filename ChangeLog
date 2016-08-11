@@ -1,4 +1,4 @@
-2.0.1 (TBA)
+2.1.0 (TBA)
 ------------------
 
 Bugfixes:
@@ -6,6 +6,7 @@ Bugfixes:
 * Fixed handling of `argbash-xtoy` in Makefiles for tests/packaging.
 * Added the `die` function to all generated scripts.
 * Beautification of the underlying code.
+* Documentation improvements in the Examples section.
 
 2.0.0 (2016-08-03)
 ------------------

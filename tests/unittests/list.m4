@@ -17,30 +17,30 @@ assert_equals(m4_quote(m4_list_contains([lol], [lala])), [])
 m4_list_declare([FOO])
 assert_equals(m4_list_len([FOO]), 0)
 assert_equals(m4_list_len([NOLIST]), 0)
-assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [])
+assert_equals(m4_quote(m4_argn(1, m4_list_foreach([FOO], [item], [-item-,]))), [])
 m4_list_ifempty([FOO], ,[m4_fatal([The list is supposed to be empty now])])
-m4_list_add([FOO], [BOMB])
+m4_list_append([FOO], [BOMB])
 m4_list_ifempty([FOO], [m4_fatal([The list is supposed to be non-empty now])],)
 assert_equals(m4_list_len([FOO]), 1)
-m4_list_add([FOO], [ANTIFUSE(list)])
-m4_list_add([FOO], [BOMB], [BAZ])
+m4_list_append([FOO], [ANTIFUSE(list)])
+m4_list_append([FOO], [BOMB], [BAZ])
 assert_equals(m4_list_nth([FOO], 4), [BAZ])
 assert_equals(m4_list_join([FOO], -), [BOMB-ANTIFUSE(list)-BOMB-BAZ])
 assert_equals(m4_list_join([FOO], -, ", ', [ and ]), ["BOMB'-"ANTIFUSE(list)'-"BOMB' and "BAZ'])
-m4_list_add([FOO], [BAZ2])
+m4_list_append([FOO], [BAZ2])
 assert_equals(m4_list_len([FOO]), 5)
 
 dnl Try a simple sum
-m4_list_add([nums], [1])
-m4_list_add([nums], [8])
-m4_list_add([nums],[-5])
-m4_list_add([nums],[12])
-m4_list_add([nums], [0])
+m4_list_append([nums], [1])
+m4_list_append([nums], [8])
+m4_list_append([nums],[-5])
+m4_list_append([nums],[12])
+m4_list_append([nums], [0])
 dnl Sum is ........ 16
 assert_equals(m4_list_sum([nums]), 16)
 
-m4_ifnblank(m4_expand([m4_list_add([FOO], [])m4_list_add([FOO], [--LALA])]),
-	[m4_fatal([Leaking text in m4_list_add])])
+m4_ifnblank(m4_expand([m4_list_append([FOO], [])m4_list_append([FOO], [--LALA])]),
+	[m4_fatal([Leaking text in m4_list_append])])
 assert_equals(m4_list_nth([FOO], 1), [BOMB])
 m4_ifnblank(
 	m4_list_nth([FOO], 6),
@@ -49,7 +49,7 @@ assert_equals(m4_list_nth([FOO], 7), [--LALA])
 dnl The list items should be single-quoted only, so passing them to m4_expand should expand them.
 m4_expand(m4_list_nth([FOO], 2))
 ANTIBOMB([list])
-assert_equals(m4_quote(m4_argn(1, FOO_FOREACH([-item-,]))), [-BOMB-])
+assert_equals(m4_quote(m4_argn(1, m4_list_foreach([FOO], [item], [-item-,]))), [-BOMB-])
 assert_equals(m4_list_len([FOO]), 7)
 assert_equals(m4_quote(m4_list_contains([FOO], [BOMB])), [0,2])
 assert_equals(m4_quote(m4_list_contains([FOO], [BAZ])), 3)
@@ -62,8 +62,8 @@ assert_equals(m4_list_len([FOO]), 5)
 dnl After pop
 assert_equals(m4_list_nth([FOO], 2), [BOMB])
 
-m4_list_add([EMPTY], [])
-m4_list_add([EMPTY], [second])
+m4_list_append([EMPTY], [])
+m4_list_append([EMPTY], [second])
 dnl The first element is the empty string
 assert_equals(m4_list_nth([EMPTY], 2), [second])
 assert_equals(m4_list_len([EMPTY]), 2)

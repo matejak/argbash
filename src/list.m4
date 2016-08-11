@@ -1,21 +1,19 @@
-m4_define([m4_list_declare], [_m4_list_declare([$1], m4_expand($[]1))])
-
-m4_define([_m4_list_declare], [m4_do(
-	[m4_define([$1_GET], [m4_expand([m4_list_nth([$1], [$2])])])],
-	[m4_define([$1_FOREACH], [m4_if(m4_list_len([$1]),
-		0, [],
-		[m4_foreach([item], [m4_dquote_elt(m4_list_contents([$1]))], [m4_unquote($2)])])])],
-)])
+dnl
+dnl $1: List name
+dnl $2: Variable name
+dnl $3: Foreach body
+m4_define([m4_list_foreach], [m4_list_ifempty([$1], ,
+	[m4_foreach([$2], m4_quote(m4_dquote_elt(m4_list_contents([$1]))), [$3])])])
 
 dnl
 dnl $1: The list's ID
 dnl $2, ... Items to be appended: DON'T QUOTE items too much before you add them, quotes will be escaped (m4_escape) and therefore ineffective in m4sugar!
-m4_define([m4_list_add], [m4_do(
+m4_define([m4_list_append], [m4_do(
 	[m4_for([idx], 2, $#, 1,
-		[_m4_list_add_single($1, m4_argn(idx, $@))])],
+		[_m4_list_append_single($1, m4_argn(idx, $@))])],
 )])
 
-m4_define([_m4_list_add_single], [m4_do(
+m4_define([_m4_list_append_single], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
 	[m4_ifndef(_LIST_NAME,
 		[m4_define(_LIST_NAME, m4_dquote(m4_escape([$2])))],
@@ -40,6 +38,7 @@ m4_define([m4_list_ifempty], [m4_if(m4_list_len([$1]), 0, [$2], [$3])])
 
 dnl
 dnl Given a list name, it expands to its contents, suitable to use e.g. in m4_foreach
+dnl TODO: It produces a list of double-quoted items, which we maybe don't want
 m4_define([m4_list_contents], [m4_do(
 	[m4_if($#, 1, , [m4_fatal([$0: Expected exactly one argument, got $# instead (others were: ]m4_quote(m4_shift($@))[)])])],
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],

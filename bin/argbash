@@ -25,8 +25,8 @@ die()
 	exit ${_ret}
 }
 
-# THE DEFAULTS INITIALIZATION --- POSITIONALS
-# THE DEFAULTS INITIALIZATION --- OPTIONALS
+# THE DEFAULTS INITIALIZATION - POSITIONALS
+# THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output="-"
 _arg_standalone=off
 _arg_search=(".")
@@ -54,24 +54,20 @@ do
 		-o|--output)
 			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 			_arg_output="$2"
-
 			shift
 			;;
 		--no-standalone|--standalone)
 			_arg_standalone="on"
-
 			test "${1:0:5}" = "--no-" && _arg_standalone="off"
 			;;
 		-I|--search)
 			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 			_arg_search+=("$2")
-
 			shift
 			;;
 		--debug)
 			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 			_arg_debug="$2"
-
 			shift
 			;;
 		-v|--version)

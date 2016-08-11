@@ -35,13 +35,13 @@ size_bytes=$(wc -c "$filename" | cut -f 1 -d ' ')
 
 test "$unit" = b && echo $size_bytes $_b && exit 0
 
-size_kilobytes=$(expr $size_bytes / 1024)
-test "$unit" = k && echo $size_kilobytes $_kb && exit 0
+size_kibibytes=$(expr $size_bytes / 1024)
+test "$unit" = k && echo $size_kibibytes $_kb && exit 0
 
-size_megabytes=$(expr $size_kilobytes / 1024)
-test "$unit" = M && echo $size_megabytes $_mb && exit 0
+size_mebibytes=$(expr $size_kibibytes / 1024)
+test "$unit" = M && echo $size_mebibytes $_mb && exit 0
 
-test "$verbose" = on && echo "The unit '$unit' is not supported!"
+test "$verbose" = on && echo "The unit '$unit' is not supported"
 exit 1
 
 # ] <-- needed because of Argbash
