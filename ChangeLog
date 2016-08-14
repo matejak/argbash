@@ -1,6 +1,10 @@
 2.1.0 (TBA)
 ------------------
 
+New features:
+
+* Support for `=`-style of argument passing (`--some-opt=value` as well as `--some-opt value` are supported)
+
 Bugfixes:
 
 * Fixed handling of `argbash-xtoy` in Makefiles for tests/packaging.

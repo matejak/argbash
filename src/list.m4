@@ -51,7 +51,7 @@ dnl	[m4_ifndef(_LIST_NAME, [], m4_expand([m4_dquote_elt(m4_indir(_LIST_NAME))]))
 dnl
 dnl Given a list name and an element, it returns list of indices of the element in the list
 dnl or nothing if it has not been found
-m4_define([m4_list_contains], [m4_do(
+m4_define([m4_list_indices], [m4_do(
 	[m4_define([_FOUND_IDX], 0)],
 	[m4_define([_FOUND_RESULT], [])],
 	[m4_foreach([elem], [m4_list_contents([$1])], [m4_do(
@@ -62,6 +62,16 @@ m4_define([m4_list_contains], [m4_do(
 	[m4_undefine([_FOUND_RESULT])],
 	[m4_undefine([_FOUND_IDX])],
 )])
+
+
+dnl
+dnl Do something if the item is (isn't) in the list
+dnl $1: List name
+dnl $2: What
+dnl $3: If it is there
+dnl $4: If it is not there
+m4_define([m4_list_contains], 
+	[m4_ifnblank(m4_list_indices([$1], [$2]), [$3], [$4])])
 
 m4_define([m4_list_sum], [m4_do(
 	[m4_eval(m4_quote(m4_join(+, m4_unquote(m4_list_contents([$1])))))],

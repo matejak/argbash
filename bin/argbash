@@ -51,24 +51,42 @@ while test $# -gt 0
 do
 	_key="$1"
 	case "$_key" in
-		-o|--output)
-			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-			_arg_output="$2"
-			shift
+		-o|--output|--output=*)
+			_val="${_key##--output=}"
+			if test "$_val" != "$_key"
+			then
+				_arg_output="$_val"
+			else
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_output="$2"
+				shift
+			fi
 			;;
 		--no-standalone|--standalone)
 			_arg_standalone="on"
 			test "${1:0:5}" = "--no-" && _arg_standalone="off"
 			;;
-		-I|--search)
-			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-			_arg_search+=("$2")
-			shift
+		-I|--search|--search=*)
+			_val="${_key##--search=}"
+			if test "$_val" != "$_key"
+			then
+				_arg_search+=("$_val")
+			else
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_search+=("$2")
+				shift
+			fi
 			;;
-		--debug)
-			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-			_arg_debug="$2"
-			shift
+		--debug|--debug=*)
+			_val="${_key##--debug=}"
+			if test "$_val" != "$_key"
+			then
+				_arg_debug="$_val"
+			else
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_arg_debug="$2"
+				shift
+			fi
 			;;
 		-v|--version)
 			echo "argbash v$version"

@@ -46,6 +46,7 @@ define generic_regression
 	$< LOO | grep -q OPT_S=x,
 	$< LOO --opt-arg PoS | grep -q OPT_S=PoS,
 	$< LOO --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< LOO --opt-arg="PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
 	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos-default,'
 	$< LOO | grep -q 'OPT_INCR=2,'

@@ -103,8 +103,6 @@ Limitations
 
   Please read this carefuly.
 
-#. The delimiter between optional argument name and value is whitespace, ``=`` is not supported.
-   Create an issue if this disturbs you, it should be quite easy to implement.
 #. Clustering of short arguments (e.g. using ``-xzf`` instead of ``-x -z -f``) is not supported.
 #. The square brackets in your script should match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``).
    More precisely, the number of closing square brackets ``]`` must not exceed the number of opening ``[``.

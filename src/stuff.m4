@@ -1,12 +1,9 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Reduce some of the code duplication
-dnl TODO: Expand documentation of macros here
 dnl TODO: Add support for opt types via arg groups
 dnl TODO: Produce code completition
-dnl TODO: Support for --arg=val (aside from --arg val)
-dnl TODO: Support for -czf foo (now only -c -z -f foo)
+dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl
 dnl Arg groups:
 dnl ARGS_TYPE_CHOICES([list of args], [name], [value1], [value2], ...)
@@ -30,7 +27,20 @@ m4_define([_CHECK_INTEGER_TYPE], __CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1),
 
 
 dnl
-dnl Makes _FLAGS_D_IF etc. macros
+dnl Checks that the first argument (long option) doesn't contain illegal characters
+dnl $1: The long option string
+m4_define([_CHECK_OPTION_TYPE], [m4_do(
+	[m4_pushdef([_forbidden], [= ])],
+	[dnl Should produce the [= ] regexp
+],
+	[m4_bmatch([$1], m4_dquote(_forbidden),
+		[m4_fatal([The option name '$1' is illegal, because it contains forbidden characters (one of: ']_forbidden[').])])],
+	[m4_popdef([_forbidden])],
+)])
+
+
+dnl
+dnl Factory macro - makes _FLAGS_D_IF etc. macros
 m4_define([_FLAGS_WHATEVER_IF_FACTORY],
 	[m4_define([_FLAGS_$1_IF], [m4_bmatch(m4_quote($][1), [$1], m4_dquote($][2), m4_dquote($][3))])])
 _FLAGS_WHATEVER_IF_FACTORY(D)
@@ -46,7 +56,7 @@ m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
 	[m4_pushdef([_fname], [[validate_file_]_flags])],
 	[dnl Maybe we already have requested this function
 ],
-	[m4_ifblank(m4_list_contains([_VALIDATE_FILE], _fname), [m4_do(
+	[m4_list_contains([_VALIDATE_FILE], _fname, , [m4_do(
 		[m4_list_append([_VALIDATE_FILE], _fname)],
 		[_fname[]()
 ],
@@ -185,7 +195,8 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 
 
 m4_define([_some_opt], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [__some_opt($@)])],
+	[_CHECK_OPTION_TYPE([$1])],
+	[m4_list_contains([BLACKLIST], [$1], , [__some_opt($@)])],
 )])
 
 
@@ -264,7 +275,6 @@ m4_define([_POS_WRAPPED],[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
 		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
 		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=([$1])]))],
-		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=(${m4_quote(_varname([$1]))@<:@@@:>@})]))]
 )])])
 
 dnl
@@ -273,7 +283,8 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
+	[_CHECK_OPTION_TYPE([$1])],
+	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
 )])
 
 
@@ -312,7 +323,8 @@ dnl $2: Help for the arg
 dnl $3: How many args at least (opt., default=0)
 dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
 m4_define([ARG_POSITIONAL_INF], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [m4_do(
+	[_CHECK_OPTION_TYPE([$1])],
+	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
 		[m4_if($#, 3,
 			[_ARG_POSITIONAL_INF($@)],
@@ -361,7 +373,8 @@ dnl $2: Help for the arg
 dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
 m4_define([ARG_POSITIONAL_MULTI], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [$1]), [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
+	[_CHECK_OPTION_TYPE([$1])],
+	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
 
 
@@ -398,7 +411,7 @@ m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
 
 
 m4_define([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
-	[m4_ifblank(m4_list_contains([BLACKLIST], [--]), [[$0($@)]_ARG_POSITIONAL_DOUBLEDASH($@)])],
+	[m4_list_contains([BLACKLIST], [--], , [[$0($@)]_ARG_POSITIONAL_DOUBLEDASH($@)])],
 )])
 
 
@@ -594,9 +607,9 @@ m4_define([_POS_ARG_HELP_USAGE], [m4_do(
 		[single],
 			[m4_if(_min_argn, 0, [m4_do(
 				[ @{:@],
-				[default: '\n"],
+				[default: '"],
 				[_defaults],
-				[\n"'],
+				["'],
 				[@:}@],
 			)])],
 		[more], [_MAKE_USAGE_MORE],
@@ -723,10 +736,91 @@ m4_define([_MAKE_HELP], [m4_do(
 )])
 
 
+m4_define([_OPTS_VALS_LOOP_BODY], [m4_do(
+	[
+_INDENT_(2,	)],
+	[dnl Output short option (if we have it), then |
+],
+	[m4_pushdef([_argname], m4_list_nth([_ARGS_LONG], [$1]))],
+	[m4_ifblank(m4_list_nth([_ARGS_SHORT], [$1]), [], [-m4_list_nth([_ARGS_SHORT], [$1])|])],
+	[dnl If we are dealing with bool, also look for --no-...
+],
+	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [bool], [[--no-]_argname|])],
+	[dnl and then long option for the case.
+],
+	[--_argname],
+	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [arg], [|--_argname=*])],
+	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [repeated], [|--_argname=*])],
+	[@:}@
+],
+	[m4_pushdef([_ARGVAR], [_varname(m4_expand([_argname]))])],
+	[dnl Output the body of the case
+],
+	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
+],
+	[m4_case(m4_list_nth([_ARGS_TYPE], [$1]),
+		[arg],
+		[_JOIN_INDENTED(3,
+			[_val="${_key##--m4_list_nth([_ARGS_LONG], [$1])=}"],
+			[if test "$_val" != "$_key"],
+			[then],
+			[_INDENT_()_ARGVAR="$_val"],
+			[else],
+			_INDENT_MORE(
+				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+				[_ARGVAR="$[]2"],
+				[shift]),
+			[fi],
+			[_ADD_OPTS_VALS($_ARGVAR)],
+		)],
+		[repeated],
+		[_JOIN_INDENTED(3,
+			[_val="${_key##--m4_list_nth([_ARGS_LONG], [$1])=}"],
+			[if test "$_val" != "$_key"],
+			[then],
+			[_INDENT_()_ARGVAR+=("$_val")],
+			[else],
+			_INDENT_MORE(
+				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+				[_ARGVAR+=("@S|@2")],
+				[shift]),
+			[fi],
+			[_ADD_OPTS_VALS($_ARGVAR)],
+		)],
+		[bool],
+		[_JOIN_INDENTED(3,
+			_ARGVAR[="on"],
+			[_ADD_OPTS_VALS()],
+			[test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
+		)],
+		[incr],
+		[_JOIN_INDENTED(3,
+			m4_quote(_ARGVAR=$((_ARGVAR + 1))),
+			[_ADD_OPTS_VALS()],
+		)],
+		[action],
+		[_JOIN_INDENTED(3,
+			[m4_list_nth([_ARGS_DEFAULT], idx)],
+			[exit 0],
+		)],
+	)],
+	[_INDENT_(3);;],
+	[m4_popdef([_ARGVAR])],
+	[m4_popdef([_argname])],
+)])
+
+
+dnl
+dnl $1: The value of the option arg
+dnl Uses:
+dnl _ARGVAR - name of the variable
+dnl _key - the run-time shell variable
 m4_define([_ADD_OPTS_VALS], [m4_do(
 	[dnl If the arg comes from wrapped script/template, save it in an array
 ],
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("$[]1"m4_if($2, 2, [ "$[]2"]))])],
+	[dnl Strip everything after the first = sign (= the optionwithout value)
+],
+	[m4_ifdef([_COLLECT_]_ARGVAR, [[_COLLECT_]_ARGVAR+=("${_key%%=*}"m4_ifnblank([$1], [ "$1"]))])],
 )])
 
 
@@ -746,60 +840,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _NARGS == 0
 ],
-	[m4_for([idx], 1, _NARGS, 1, [m4_do(
-		[
-_INDENT_(2,	)],
-		[dnl Output short option (if we have it), then |
-],
-		[m4_ifblank(m4_list_nth([_ARGS_SHORT], idx), [], [-m4_list_nth([_ARGS_SHORT], idx)|])],
-		[dnl If we are dealing with bool, also look for --no-...
-],
-		[m4_if(m4_list_nth([_ARGS_TYPE], idx), [bool], [--no-m4_list_nth([_ARGS_LONG], idx)|])],
-		[dnl and then long option for the case.
-],
-		[--m4_list_nth([_ARGS_LONG], idx)],
-		[@:}@
-],
-		[m4_pushdef([_ARGVAR], [_varname(m4_expand([m4_list_nth([_ARGS_LONG], idx)]))])],
-		[dnl Output the body of the case
-],
-		[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
-],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
-			[arg],
-			[_JOIN_INDENTED(3,
-				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-				[_ARGVAR="$[]2"],
-				[_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)],
-				[shift],
-			)],
-			[repeated],
-			[_JOIN_INDENTED(3,
-				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-				[_ARGVAR+=("$[]2")],
-				[_ADD_OPTS_VALS(m4_expand([_ARGVAR]), 2)],
-				[shift],
-			)],
-			[bool],
-			[_JOIN_INDENTED(3,
-				_ARGVAR[="on"],
-				[_ADD_OPTS_VALS(m4_expand([_ARGVAR]))],
-				[test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
-			)],
-			[incr],
-			[_JOIN_INDENTED(3,
-				m4_quote(_ARGVAR=$((_ARGVAR + 1))),
-				[_ADD_OPTS_VALS(m4_expand([_ARGVAR]))],
-			)],
-			[action],
-			[_JOIN_INDENTED(3,
-				[m4_list_nth([_ARGS_DEFAULT], idx)],
-				[exit 0],
-			)],
-		)],
-		[_INDENT_(3);;],
-		[m4_popdef([_ARGVAR])],
-	)])],
+	[m4_for([idx], 1, _NARGS, 1, [_OPTS_VALS_LOOP_BODY(idx)])],
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
@@ -843,8 +884,6 @@ m4_define([_MAKE_EVAL], [m4_do(
 ],
 	[while test $[]# -gt 0
 do
-],
-	[dnl We assume that we have either optional args (with possibility of positionals), or that we have only positional args.
 ],
 	[m4_if(HAVE_OPTIONAL, 1,
 		[m4_expand([_EVAL_OPTIONALS])],
@@ -926,6 +965,8 @@ done]],
 )])
 
 
+dnl
+dnl Make defaults for arguments that possibly accept more than one value
 m4_define([_MAKE_DEFAULTS_MORE], [m4_do(
 	[m4_pushdef([_min_argn], m4_list_nth([_POSITIONALS_MINS], idx))],
 	[@{:@],
@@ -962,6 +1003,7 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 	[m4_popdef([_DEFAULT])],
 )])
 
+
 dnl
 dnl Create the part of the script where default values for arguments are assigned.
 m4_define([_MAKE_DEFAULTS], [m4_do(
@@ -986,6 +1028,9 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 )])
 
 
+dnl
+dnl Make some utility stuff.
+dnl Those include the die function as well as optional validators
 m4_define([_MAKE_UTILS], [m4_do(
 	[[die()
 {
@@ -1086,7 +1131,7 @@ m4_define([ARGBASH_WRAP], [m4_do(
 
 
 m4_define([ARG_LEFTOVERS],
-	[m4_ifblank(m4_list_contains([BLACKLIST], [leftovers]), [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
+	[m4_list_contains([BLACKLIST], [leftovers], , [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
 
 dnl If I am wrapped:
 dnl It may be that the wrapped script contains args that we already have.

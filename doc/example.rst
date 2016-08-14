@@ -62,6 +62,7 @@ Wrapping scripts
 We will show how to write a script that accepts a list of directories and a glob pattern, combines them together, and displays filesize of files using the script below.
 In order to do this, we will introduce positional argument that can accept an arbitrary amount of values and we will also use the wrapping functionality that ``Argbash`` possesses.
 
+We want to wrap the ``simple.m4`` (or ``simple.sh``)
 The script's template is still quite simple:
 
 .. literalinclude:: ../resources/examples/simple-wrapper.m4
