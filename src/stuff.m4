@@ -1,9 +1,25 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Remove thos ugly _INDENT_ stuffs
 dnl TODO: Reduce some of the code duplication
 dnl TODO: Expand documentation of macros here
+dnl TODO: Add support for opt types via arg groups
+dnl TODO: Produce code completition
+dnl TODO: Support for --arg=val (aside from --arg val)
+dnl TODO: Support for -czf foo (now only -c -z -f foo)
+dnl
+dnl Arg groups:
+dnl ARGS_TYPE_CHOICES([list of args], [name], [value1], [value2], ...)
+dnl
+dnl flags: R, W, X, D --- search only for existing files (dirs)
+dnl ARGS_TYPE_FILE([list of args], [fname], [flags])
+dnl
+dnl ARGS_TYPE_OUTFILE([list of args], [fname])  dnl Filename that may exist (file must be W) or may not exist (then the dirname of the file must be W)
+dnl
+dnl ARGS_TYPE_INTEGER([list of args])
+dnl ARGS_TYPE_FLOAT([list of args])
+dnl typeid: int for integer, uint for non-negative integer, float for whatever
+dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
 
 dnl
 dnl Checks that the n-th argument is an integer.
@@ -11,6 +27,51 @@ dnl Should be called upon the macro definition outside of quotes, e.g. m4_define
 dnl $1: The argument number
 dnl $2: The error message (optional)
 m4_define([_CHECK_INTEGER_TYPE], __CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
+
+
+dnl
+dnl Makes _FLAGS_D_IF etc. macros
+m4_define([_FLAGS_WHATEVER_IF_FACTORY],
+	[m4_define([_FLAGS_$1_IF], [m4_bmatch(m4_quote($][1), [$1], m4_dquote($][2), m4_dquote($][3))])])
+_FLAGS_WHATEVER_IF_FACTORY(D)
+_FLAGS_WHATEVER_IF_FACTORY(R)
+_FLAGS_WHATEVER_IF_FACTORY(W)
+_FLAGS_WHATEVER_IF_FACTORY(X)
+
+
+dnl
+dnl $1: FLAGS: Any of RWXD, default is nothing (= an existing file)
+m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
+	[m4_pushdef([_flags], [$1])],
+	[m4_pushdef([_fname], [[validate_file_]_flags])],
+	[dnl Maybe we already have requested this function
+],
+	[m4_ifblank(m4_list_contains([_VALIDATE_FILE], _fname), [m4_do(
+		[m4_list_append([_VALIDATE_FILE], _fname)],
+		[_fname[]()
+],
+		[{
+],
+		[_JOIN_INDENTED(1,
+			[_FLAGS_D_IF([_flags], [m4_do(
+				[m4_pushdef([_what], [[directory]])],
+				[m4_pushdef([_xperm], [[browsable]])],
+				[[test -d "@S|@1" || die "Argument '@S|@2' has to be a directory, got '@S|@1'" 4]],
+				)], [m4_do(
+				[m4_pushdef([_what], [[file]])],
+				[m4_pushdef([_xperm], [[executable]])],
+				[[test -f "@S|@1" || die "Argument '@S|@2' has to be a file, got '@S|@1'" 4]],
+			)])],
+			[_FLAGS_R_IF([_flags], [[test -r "@S|@1" || die "Argument '@S|@2' has to be a readable ]_what[, '@S|@1' isn't." 4]])],
+			[_FLAGS_W_IF([_flags], [[test -w "@S|@1" || die "Argument '@S|@2' has to be a writable ]_what[, '@S|@1' isn't." 4]])],
+			[_FLAGS_X_IF([_flags], [[test -x "@S|@1" || die "Argument '@S|@2' has to be a ]_xperm _what[, '@S|@1' isn't." 4]])],
+		)],
+		[}
+],
+	)])],
+	[m4_popdef([_fname])],
+	[m4_popdef([_flags])],
+)])
 
 
 dnl
@@ -49,6 +110,7 @@ m4_define([_INDENT_MORE], [m4_do(
 m4_define([_SET_INDENT], [m4_define([_INDENT_],
 	[m4_for(_, 1, m4_default($][1, 1), 1,
 		[[$1]])])])
+
 dnl
 dnl defines _INDENT_
 dnl $1: How many times to indent (default 1)
@@ -69,19 +131,9 @@ dnl We include the version-defining macro
 m4_define([_ARGBASH_VERSION], m4_default_quoted(m4_normalize(m4_sinclude([version])), [unknown]))
 
 
-m4_ignore([
-m4_define([DEFINE_VERSION], [m4_do(
-	[m4_define([USER_VERSION], m4_expand([m4_esyscmd_s([$1])]))],
-	[m4_expand([USER_VERSION])],
-)])
-])
-
-
 dnl Contains implementation of m4_list_...
 m4_include([list.m4])
 
-
-m4_define([_HELP_MSG])
 
 dnl
 dnl The operation on command names that makes stem of variable names
@@ -115,7 +167,7 @@ m4_define([_sh_quote], [m4_do(
 dnl
 dnl $1: Argument name
 dnl $2: Argument type (OPT or POS)
-dnl
+dnl Check whether an argument has not (long or short) options that conflict with already defined args.
 dnl Also writes the argname to the right set
 m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 	[m4_pushdef([_TLIT], m4_dquote(_translit([$1])))],
@@ -208,6 +260,13 @@ m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
 
+m4_define([_POS_WRAPPED],[m4_ifdef([WRAPPED], [m4_do(
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
+		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=([$1])]))],
+		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=(${m4_quote(_varname([$1]))@<:@@@:>@})]))]
+)])])
+
 dnl
 dnl Declare one positional argument with default
 dnl $1: Name of the arg
@@ -221,11 +280,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
-	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
-		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=("${m4_quote(_varname([$1]))}")]))],
-	)])],
+	[_POS_WRAPPED("${m4_quote(_varname([$1]))}")],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
 	[m4_define([_POSITIONALS_MAX], m4_incr(_POSITIONALS_MAX))],
@@ -273,6 +328,7 @@ dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_POS_WRAPPED(${m4_quote(_varname([$1]))@<:@@@:>@})],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
 ],
@@ -312,11 +368,7 @@ m4_define([ARG_POSITIONAL_MULTI], [m4_do(
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
-	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
-		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=(${m4_quote(_varname([$1]))@<:@@@:>@})]))]
-	)])],
+	[_POS_WRAPPED(${m4_quote(_varname([$1]))@<:@@@:>@})],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
 	[m4_list_append([_POSITIONALS_TYPES], [more])],
@@ -385,6 +437,7 @@ m4_define([ARG_HELP], [m4_do(
 )])
 
 
+m4_define([_HELP_MSG])
 dnl TODO: If the name is _ARG_HELP and not _ARG_HELPx, it doesn't work. WTF!?
 m4_define([_ARG_HELPx], [m4_do(
 	[m4_define([_HELP_MSG], m4_escape([$1]))],
@@ -397,6 +450,8 @@ m4_define([_ARG_HELPx], [m4_do(
 )])
 
 
+dnl
+dnl Just define name of the script dir variable
 m4_define([_DEFAULT_SCRIPTDIR], [[script_dir]])
 
 
@@ -416,7 +471,8 @@ m4_define([INCLUDE_PARSING_CODE], [m4_do(
 
 
 dnl
-dnl
+dnl $1: Name of the holding variable
+dnl TODO: Add the source of the method here
 m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
@@ -492,6 +548,8 @@ m4_define([ARG_OPTIONAL_ACTION], [m4_do(
 m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
 
+dnl
+dnl uses macros argname, _min_argn, _max_argn
 dnl In case of 'inf': If _INF_REPR is not blank, use it, otherwise compose the command-line yourself
 m4_define([_POS_ARG_HELP_LINE], [m4_do(
 	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONALS_TYPES], idx))],
@@ -566,9 +624,9 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_[echo] "_HELP_MSG"
+	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_()[echo] "_HELP_MSG"
 ])),
-	[_INDENT_[]printf 'Usage: %s],
+	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
 	[m4_if(HAVE_OPTIONAL, 1,
@@ -576,7 +634,8 @@ m4_define([_MAKE_HELP], [m4_do(
 			[ @<:@],
 			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 				[bool], [--(no-)]m4_list_nth([_ARGS_LONG], idx),
-				[arg], [_ARG_FORMAT(idx) <arg>],
+				[arg], [_ARG_FORMAT(idx) ]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
+					[<arg>]),
 				[_ARG_FORMAT(idx)])],
 			[@:>@],
 		)])],
@@ -608,7 +667,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)], [argname($][@)]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
-			[_INDENT_[printf "\t]argname[: ]],
+			[_INDENT_()[printf "\t]argname[: ]],
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[dnl Check whether we have defaults
 ],
@@ -627,7 +686,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_ifnblank(m4_list_nth([_ARGS_HELP], idx), [m4_do(
 		[m4_pushdef([_VARNAME], [_varname(m4_list_nth([_ARGS_LONG], idx))])],
-		[_INDENT_[]printf "\t],
+		[_INDENT_()printf "\t],
 		[dnl Display a short one if it is not blank
 ],
 		[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx), -m4_list_nth([_ARGS_SHORT], idx)[,])],
@@ -672,7 +731,7 @@ m4_define([_ADD_OPTS_VALS], [m4_do(
 
 
 m4_define([_EVAL_OPTIONALS], [m4_do(
-	[_INDENT_[]_key="$[]1"
+	[_INDENT_()_key="$[]1"
 ],
 	[m4_if(HAVE_DOUBLEDASH, 1,
 		[_JOIN_INDENTED(1,
@@ -684,7 +743,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 				[break]),
 			[fi])
 ])],
-	[_INDENT_[]case "$_key" in],
+	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _NARGS == 0
 ],
 	[m4_for([idx], 1, _NARGS, 1, [m4_do(
@@ -885,14 +944,14 @@ m4_define([_MAKE_DEFAULTS_MORE], [m4_do(
 
 
 dnl
-dnl The outer loop sets idx.
+dnl $1: The item index
 dnl If the corresponding arg has a default, save it according to its type.
 dnl If it doesn't have one, do nothing (TODO: to be reconsidered)
 m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
-	[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], idx))],
+	[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], [$1]))],
 	[m4_ifnblank(m4_quote(_DEFAULT), [m4_do(
-		[_varname(m4_list_nth([_POSITIONALS_NAMES], idx))=],
-		[m4_case(m4_list_nth([_POSITIONALS_TYPES], idx),
+		[_varname(m4_list_nth([_POSITIONALS_NAMES], [$1]))=],
+		[m4_case(m4_list_nth([_POSITIONALS_TYPES], [$1]),
 			[single], [_DEFAULT],
 			[more], [_MAKE_DEFAULTS_MORE],
 			[inf], [_MAKE_DEFAULTS_MORE],
@@ -910,7 +969,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 		[# THE DEFAULTS INITIALIZATION - POSITIONALS
 ],
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1,
-			[_MAKE_DEFAULTS_POSITIONALS_LOOP])],
+			[_MAKE_DEFAULTS_POSITIONALS_LOOP(idx)])],
 	)])],
 	[m4_if(HAVE_OPTIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS

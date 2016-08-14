@@ -20,7 +20,7 @@ dnl $1: What
 dnl $2: deps
 dnl $2: body
 m4_define([ADD_RULE], [m4_do(
-	[m4_set_add([_TEST_SCRIPTS], [$1])])
+	[m4_set_add([_TEST_SCRIPTS], [$1])]
 	[m4_divert_text([STDOUT3], [m4_do(
 		[$1: $2],
 		[
