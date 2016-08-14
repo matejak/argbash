@@ -50,18 +50,21 @@ CHANGELOG = ../ChangeLog
 
 # Must be included AFTER we have rules for .sh stuff
 TESTDIR = ../tests/regressiontests
+
 include ../tests/regressiontests/Makefile
 
 
 # We include the source dir because there is m4_include in stuff.m4
 bootstrap:
-	cat ../src/stuff.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar > $(GENPARSE)
+	cat ../src/stuff.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar -o $(GENPARSE)
 	chmod a+x $(GENPARSE)
 	touch ../src/argbash.m4
 
 examples: $(EXAMPLES)
 
-check: unittests regressiontests $(GENPARSE) $(ARGBASH_TO)
+check: $(TESTDIR)/Makefile $(GENPARSE) $(ARGBASH_TO)
+	$(MAKE) unittests
+	$(MAKE) regressiontests
 	$(MAKE) tests-clean
 	@echo "*** All is OK ***"
 

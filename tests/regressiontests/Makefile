@@ -1,3 +1,7 @@
+TESTS =
+SCRIPTS =
+TESTS_GEN =
+
 TESTDIR ?= ../regressiontests
 PHONIES ?=
 
@@ -9,17 +13,15 @@ REVERSE = $(TESTDIR)/reverse
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
-
-# Let test-gen be last - those tests take the longest time to complete
-TESTS = \
+TESTS += \
+	stability \
+	basic \
+	call-salone \
 	test-most \
 	test-more \
-	stability \
-	args \
-	stability-salone \
-	args-salone \
-	test-onlyopt \
 	test-onlypos \
+	test-onlyopt \
+	stability-salone \
 	test-ddash \
 	test-simple \
 	test-wrapping \
@@ -30,40 +32,42 @@ TESTS = \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
 	test-leftovers \
-	test-gen \
 	$(NUL)
+TESTS += tests-gen
 
-PHONIES += $(TESTS)
-
-# test-salone is side-effect of call-salone
-# test-ddash.m4 is generated from ...-old.m4
-SCRIPTS = \
-	$(TESTDIR)/test.sh \
-	$(TESTDIR)/test2.sh \
-	$(TESTDIR)/test-standalone.sh \
-	$(TESTDIR)/test-standalone2.sh \
-	$(TESTDIR)/call-salone.sh \
+SCRIPTS += \
+	$(TESTDIR)/basic2.sh \
+	$(TESTDIR)/basic.sh \
 	$(TESTDIR)/test-salone.sh \
-	$(TESTDIR)/test-onlyopt.sh \
+	$(TESTDIR)/call-salone.sh \
+	$(TESTDIR)/test-most.sh \
+	$(TESTDIR)/test-more.sh \
 	$(TESTDIR)/test-onlypos.sh \
+	$(TESTDIR)/test-onlyopt.sh \
+	$(TESTDIR)/test-standalone2.sh \
+	$(TESTDIR)/test-standalone.sh \
 	$(TESTDIR)/test-ddash.m4 \
 	$(TESTDIR)/test-ddash.sh \
-	$(TESTDIR)/test-more.sh \
-	$(TESTDIR)/test-most.sh \
 	$(TESTDIR)/test-simple.sh \
 	$(TESTDIR)/test-wrapping.sh \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
+	$(TESTDIR)/test-wrapping2.sh \
 	$(TESTDIR)/test-infinity.sh \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
 	$(TESTDIR)/test-leftovers.sh \
 	$(NUL)
 
-regressiontests: $(TESTS)
-
-stability: $(TESTDIR)/test.sh $(TESTDIR)/test2.sh
-	diff -q $< $(word 2,$^)
+TESTS_GEN += \
+	gen-test-pos \
+	gen-test-opt \
+	gen-test-pos2 \
+	gen-test-opt2 \
+	gen-test-pos-opt \
+	gen-test-pos-opt2 \
+	gen-test-more \
+	$(NUL)
 
 define generic_regression
 	$< LOO | grep -q POS_S=LOO,
@@ -93,22 +97,18 @@ define _test_onlypos
 	ERROR='Not enough' $(REVERSE) $<
 endef
 
-args: $(TESTDIR)/test.sh
+regressiontests: $(TESTDIR)/Makefile $(TESTS)
+
+$(TESTDIR)/Makefile: $(TESTDIR)/make/defns.m4 $(TESTDIR)/make/make.m4 $(wildcard $(TESTDIR)/make/tests/*)
+	autom4te -l m4sugar -I $(TESTDIR)/make $< -o $@
+
+stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
+	diff -q $< $(word 2,$^)
+
+basic: $(TESTDIR)/basic.sh
 	$(generic_regression)
 
-GENTESTS = $(foreach tname,pos opt pos2 opt2 pos-opt pos-opt2 more,$(TESTDIR)/gen-test-$(tname).m4)
-
-test-gen: $(ARGBASH_BIN) $(GENTESTS)
-	ERROR=pos-arg $(REVERSE) $< $(word 2,$+) > /dev/null
-	ERROR=opt-arg $(REVERSE) $< $(word 3,$+) > /dev/null
-	ERROR=pos_arg $(REVERSE) $< $(word 4,$+) > /dev/null
-	ERROR=opt_arg $(REVERSE) $< $(word 5,$+) > /dev/null
-	ERROR=same-arg $(REVERSE) $< $(word 6,$+) > /dev/null
-	ERROR=same_arg $(REVERSE) $< $(word 7,$+) > /dev/null
-	ERROR="is unknown" $(REVERSE) $< $(word 8,$+) > /dev/null
-
-#  the dependency $(TESTDIR)/test-standalone.sh should be assumed
-args-salone: $(TESTDIR)/call-salone.sh
+call-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
 
 test-most: $(TESTDIR)/test-most.sh
@@ -124,7 +124,6 @@ test-more: $(TESTDIR)/test-more.sh
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(_test_onlypos)
 
-# Also check the 2-spaces indentation
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	grep -q '^  esac$$' $<
 	@# ! negates the return code
@@ -137,9 +136,6 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
-
-$(TESTDIR)/test-ddash.m4: $(TESTDIR)/test-ddash-old.m4 $(ARGBASH_1TO2)
-	$(ARGBASH_1TO2) $< -o $@
 
 test-ddash: $(TESTDIR)/test-ddash.sh
 	$< --boo_l | grep -q 'BOOL=on,'
@@ -204,7 +200,31 @@ test-leftovers: $(TESTDIR)/test-leftovers.sh
 	$< -h | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-h|--help\] <another> \.\.\. $$'
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 
+gen-test-pos: $(TESTDIR)/gen-test-pos.m4 $(ARGBASH_BIN)
+	ERROR="pos-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-opt: $(TESTDIR)/gen-test-opt.m4 $(ARGBASH_BIN)
+	ERROR="opt-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-pos2: $(TESTDIR)/gen-test-pos2.m4 $(ARGBASH_BIN)
+	ERROR="pos_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-opt2: $(TESTDIR)/gen-test-opt2.m4 $(ARGBASH_BIN)
+	ERROR="opt_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-pos-opt: $(TESTDIR)/gen-test-pos-opt.m4 $(ARGBASH_BIN)
+	ERROR="same-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-pos-opt2: $(TESTDIR)/gen-test-pos-opt2.m4 $(ARGBASH_BIN)
+	ERROR="same_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
+	ERROR="is unknown" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+tests-gen: $(TESTS_GEN)
+
 tests-clean:
 	$(RM) $(SCRIPTS)
 
 .PHONY: $(PHONIES)
+
