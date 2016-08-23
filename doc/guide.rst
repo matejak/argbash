@@ -336,7 +336,14 @@ Plus, there are convenience macros:
       test $_arg_bar = on && MAYBE_BAR='--bar'
       ./process-single.sh --some-opt "$_arg_some_opt" $MAYBE_BAR
 
-    The stem to array name conversion is the same as with `argument names`__ except the prefix ``_args_`` is prepended.
+    The stem to array name conversion is the same as with `:ref:argument names <argument_names>` except the prefix ``_args_`` is prepended.
+
+ .. note::
+
+    The wrapping functionality actually only makes your script to inherit (all or some of the) the wrapped script's arguments.
+    If you really wish to call the wrapped script, it is your responsibility to know its location, ``Argbash`` essentially can't and won't help you with that.
+
+    However, if you know the relative location of the wrapped script to the wrapper, you can use the :ref:`DEFINE_SCRIPT_DIR <script_dir>` macro.
 
 __ parsing_results_
 
@@ -362,6 +369,8 @@ Available shell stuff
 
   Accepts two parameters --- string that is printed to ``stderr`` and exit status number (optional, default is 1).
   If an environmental variable ``_PRINT_HELP`` is set to ``yes``, it prints help before the error message.
+
+.. _argument_names:
 
 Using parsing results
 +++++++++++++++++++++

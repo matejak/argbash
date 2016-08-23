@@ -4,6 +4,7 @@ m4_changecom()
 dnl TODO: Add support for opt types via arg groups
 dnl TODO: Produce code completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
+dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl
 dnl Arg groups:
 dnl ARGS_TYPE_CHOICES([list of args], [name], [value1], [value2], ...)
@@ -478,14 +479,14 @@ m4_define([INCLUDE_PARSING_CODE], [m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
 	[m4_list_append([_OTHER],
-		m4_expand([[source "$]m4_default([$2], _DEFAULT_SCRIPTDIR)[/$1]"
-]))],
+		m4_expand([[. "$]m4_default([$2], _DEFAULT_SCRIPTDIR)[/$1]"  [# '.' means 'source'
+]]))],
 )])
 
 
 dnl
 dnl $1: Name of the holding variable
-dnl TODO: Add the source of the method here
+dnl TODO: Add the reference to the source of the method here
 m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
@@ -1094,9 +1095,9 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 # Argbash is FREE SOFTWARE, know your rights: https://github.com/matejak/argbash
 
 ]],
-	[_MAKE_UTILS
-],
 	[m4_if(_NO_ARGS_WHATSOEVER, 1, [], [m4_do(
+		[_MAKE_UTILS
+],
 		[_MAKE_DEFAULTS
 ],
 		[_MAKE_HELP

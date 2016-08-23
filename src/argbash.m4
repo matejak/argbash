@@ -4,7 +4,7 @@ version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
-# ARG_OPTIONAL_BOOLEAN([standalone],, [Whether the parsing code is in a standalone file.])
+# ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
 # ARG_VERSION([echo "argbash v$version"])
@@ -87,7 +87,7 @@ m4dir="$script_dir/../src"
 test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
 output_m4="$m4dir/output.m4"
-test "$_arg_standalone" = "on" && output_m4="$m4dir/output-standalone.m4"
+test "$_arg_library" = "on" && output_m4="$m4dir/output-standalone.m4"
 
 test -f "$infile" || { echo "'$infile' is supposed to be a file!" >&2; exit 1; }
 test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
@@ -100,7 +100,7 @@ _wrapped_defns=""
 parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
-test "$_arg_standalone" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
+test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing_code" -o "$parsing_code_out")
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname

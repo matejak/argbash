@@ -23,7 +23,7 @@ Here, we can notice multiple notable things:
 
 #. You access the values of argument ``foo-bar`` as ``$_arg_foo_bar`` etc. (this is covered more in-depth in :ref:`parsing_results`).
 
-So let's try the script in action! Let's see what happens when we pass the -h option:
+So let's try the script in action! Let's see what happens when we pass the ``-h`` option:
 
 .. literalinclude:: _static/minimal-output-help.txt
    :language: text
@@ -43,32 +43,48 @@ Another example
 
 Let's take a look at a script that takes filename as the only positional argument and prints size of the corresponding file.
 The caller can influence the unit of display using optional argument ``--unit``.
+This script is a bit artificial, but hang on --- we will try to use it from within a wrapping script.
 
-The script's template is really simple:
+This time, we will separate the parsing code and the script itself.
+
+The script's parsing section template is really simple:
+
+.. literalinclude:: ../resources/examples/simple-parsing.m4
+   :language: bash
+
+Then, let's take a look at the script's body:
 
 .. literalinclude:: ../resources/examples/simple.m4
    :language: bash
+
+We obtain the script by running ``argbash`` over it --- it detects the parsing template and interconnects those two.
+
+.. code-block:: bash
+
+   argbash simple.m4 -o simple.sh
 
 When invoked with the help option, we get:
 
 .. literalinclude:: _static/simple-output-help.txt
    :language: text
 
-This script is a bit artificial, but hang on --- we will try to use it from within a wrapping script.
+It will work as long as the parsing code's location (next to the script itself) doesn't change:
 
 Wrapping scripts
 ++++++++++++++++
 
-We will show how to write a script that accepts a list of directories and a glob pattern, combines them together, and displays filesize of files using the script below.
+We will show how to write a script that accepts a list of directories and a glob pattern, combines them together, and displays size of files using the previous script.
 In order to do this, we will introduce positional argument that can accept an arbitrary amount of values and we will also use the wrapping functionality that ``Argbash`` possesses.
 
-We want to wrap the ``simple.m4`` (or ``simple.sh``)
+We want to wrap the ``simple.m4`` (or ``simple.sh``).
+However, since the script doesn't include any command definitions, we have to wrap the parsing component ``simple-parsing.``.
 The script's template is still quite simple:
 
 .. literalinclude:: ../resources/examples/simple-wrapper.m4
    :language: bash
 
-The ``simple`` in ``ARGBASH_WRAP`` argument refers to the script from the previous section.
+The ``simple-parsing`` in `:ref:ARGBASH_WRAP <argbash_wrap>` argument refers to the parsing part of the script from the previous section.
+Remember, we say that we are wrapping a script, but in fact, we just inherit a subset of its arguments and the actual wrapping (i.e. calling the wrapped script)  is still up to us, although it is made easy by a great deal.
 ``filename`` means that our wrapping script won't "inherit" the ``filename`` argument --- that's correct, it is the wrapping script that decides what arguments make it to the wrapped one.
 
 When invoked with the help option, we get:

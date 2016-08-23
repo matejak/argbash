@@ -1,11 +1,7 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_SINGLE([filename])
-# ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kibibytes, M for mebibytes)], b)
-# ARG_VERSION([echo $0 v0.1])
-# ARG_OPTIONAL_BOOLEAN(verbose)
-# ARG_HELP([This program tells you size of file that you pass to it in chosen units.])
-# ARGBASH_SET_INDENT([  ])
+# DEFINE_SCRIPT_DIR()
+# INCLUDE_PARSING_CODE([simple-parsing.sh])
 # ARGBASH_GO
 
 # [ <-- needed because of Argbash
@@ -35,10 +31,10 @@ size_bytes=$(wc -c "$filename" | cut -f 1 -d ' ')
 
 test "$unit" = b && echo $size_bytes $_b && exit 0
 
-size_kibibytes=$(expr $size_bytes / 1024)
+size_kibibytes=$(($size_bytes / 1024))
 test "$unit" = k && echo $size_kibibytes $_kb && exit 0
 
-size_mebibytes=$(expr $size_kibibytes / 1024)
+size_mebibytes=$(($size_kibibytes / 1024))
 test "$unit" = M && echo $size_mebibytes $_mb && exit 0
 
 test "$verbose" = on && echo "The unit '$unit' is not supported"

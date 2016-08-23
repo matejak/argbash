@@ -14,7 +14,6 @@ GENPARSE = ../bin/argbash
 EXAMPLES = \
 	examples/minimal.sh \
 	examples/simple.sh \
-	examples/simple-standalone.sh \
 	examples/simple-wrapper.sh \
 	$(NUL)
 
@@ -34,10 +33,10 @@ ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_ver
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
-	$(GENPARSE) $< -o $@ --standalone
+	$(GENPARSE) $< -o $@ --library
 
 %-standalone2.sh: %-standalone.sh $(GENPARSE)
-	$(GENPARSE) $< -o $@ --standalone
+	$(GENPARSE) $< -o $@ --library
 
 %.sh: %.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@

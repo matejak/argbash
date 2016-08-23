@@ -4,7 +4,7 @@ version=2.0.0
 # DEFINE_SCRIPT_DIR()
 # ARG_POSITIONAL_SINGLE([input],[The input template file])
 # ARG_OPTIONAL_SINGLE([output],[o],[Name of the output file (pass '-' for stdout)],[-])
-# ARG_OPTIONAL_BOOLEAN([standalone],[],[Whether the parsing code is in a standalone file.])
+# ARG_OPTIONAL_BOOLEAN([library],[],[Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_REPEATED([search],[I],[Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)],["."])
 # ARG_OPTIONAL_SINGLE([debug],[],[(developer option) Tell autom4te to trace a macro])
 # ARG_VERSION([echo "argbash v$version"])
@@ -28,7 +28,7 @@ die()
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output="-"
-_arg_standalone=off
+_arg_library=off
 _arg_search=(".")
 _arg_debug=
 
@@ -36,10 +36,10 @@ _arg_debug=
 print_help ()
 {
 	echo "Argbash is an argument parser generator for Bash."
-	printf 'Usage: %s [-o|--output <arg>] [--(no-)standalone] [-I|--search] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [-I|--search] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
 	printf "\t<input->: The input template file\n"
 	printf "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '%s')\n" "${_arg_output}"
-	printf "\t--standalone,--no-standalone: Whether the parsing code is in a standalone file. (%s by default)\n" "${_arg_standalone}"
+	printf "\t--library,--no-library: Whether the input file if the pure parsing library. (%s by default)\n" "${_arg_library}"
 	printf "\t-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: (%s) )\n" "${_arg_search[*]}"
 	printf "\t--debug: (developer option) Tell autom4te to trace a macro (no default)\n"
 	printf "\t-v,--version: Prints version\n"
@@ -62,9 +62,9 @@ do
 				shift
 			fi
 			;;
-		--no-standalone|--standalone)
-			_arg_standalone="on"
-			test "${1:0:5}" = "--no-" && _arg_standalone="off"
+		--no-library|--library)
+			_arg_library="on"
+			test "${1:0:5}" = "--no-" && _arg_library="off"
 			;;
 		-I|--search|--search=*)
 			_val="${_key##--search=}"
@@ -193,7 +193,7 @@ m4dir="$script_dir/../src"
 test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
 output_m4="$m4dir/output.m4"
-test "$_arg_standalone" = "on" && output_m4="$m4dir/output-standalone.m4"
+test "$_arg_library" = "on" && output_m4="$m4dir/output-standalone.m4"
 
 test -f "$infile" || { echo "'$infile' is supposed to be a file!" >&2; exit 1; }
 test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
@@ -206,7 +206,7 @@ _wrapped_defns=""
 parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
-test "$_arg_standalone" = off && test -n "$parsing_code" && ($0 --standalone "$parsing_code" -o "$parsing_code_out")
+test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing_code" -o "$parsing_code_out")
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname

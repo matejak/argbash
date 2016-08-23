@@ -6,9 +6,10 @@ Contents of '../src' matching '*.m4':
 	list.m4: 4 kiB
 	output.m4: 0 kiB
 	output-standalone.m4: 0 kiB
-	stuff.m4: 31 kiB
+	stuff.m4: 35 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
 	simple.m4: 1 kiB
+	simple-parsing.m4: 0 kiB
 	simple-standalone.m4: 0 kiB
 	simple-wrapper.m4: 0 kiB

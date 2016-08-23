@@ -3,6 +3,8 @@ Argbash invocation
 
 So, you have a template and now it is time to (re)generate a shell script from it!
 
+.. _file_layout:
+
 File layout
 -----------
 
@@ -87,11 +89,11 @@ If you want/have to take care of including the parsing code yourself, just make 
 
     # HERE GOES THE SCRIPT BODY
 
-Then, you just generate ``my-parsing.sh`` using ``--standalone`` option:
+Then, you just generate ``my-parsing.sh`` using ``--library`` option:
 
 .. code-block:: bash
 
-   argbash my-parsing.m4 -o my-parsing.sh --standalone
+   argbash my-parsing.m4 -o my-parsing.sh --library
 
 .. _api_change:
 

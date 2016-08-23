@@ -1,6 +1,10 @@
 2.1.0 (TBA)
 ------------------
 
+Incompatible changes (minor):
+
+* `argbash` option `--standalone` has been renamed to `--library`.
+
 New features:
 
 * Support for `=`-style of argument passing (`--some-opt=value` as well as `--some-opt value` are supported)
