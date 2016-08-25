@@ -135,7 +135,7 @@ dnl
 dnl Sets the indentation character(s) in the parsing code
 dnl $1: The indentation character(s)
 m4_define([ARGBASH_SET_INDENT],
-	[m4_bmatch(m4_expand([FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
+	[m4_bmatch(m4_expand([_W_FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
 
 
 dnl We include the version-defining macro
@@ -427,7 +427,7 @@ m4_define([ARG_VERSION], [m4_do(
 	[dnl Just record how have we called ourselves
 ],
 	[[$0($@)]],
-	[m4_bmatch(m4_expand([FLAGS]), [V], ,[_ARG_VERSIONx([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [V], ,[_ARG_VERSIONx([$1])])],
 )])
 
 
@@ -447,7 +447,7 @@ m4_define([ARG_HELP], [m4_do(
 	[[$0($@)]],
 	[dnl Skip help if we declare we don't want it
 ],
-	[m4_bmatch(m4_expand([FLAGS]), [H], ,[_ARG_HELPx([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [H], ,[_ARG_HELPx([$1])])],
 )])
 
 
@@ -720,21 +720,136 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[action], [],
 			[bool], [ (%s by default)],
-			[repeated], [ (default array: (%s) )],
+			[repeated], [ (default array: %s )],
 			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: '%s'], [no default])@:}@])],
 		[\n"],
+		[m4_pushdef([_default], m4_list_nth([_ARGS_DEFAULT], idx))],
+		[dnl Single: We are already quoted
+],
 		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 			[action], [],
-			[bool], [ "${_VARNAME}"],
-			[repeated], [ "${_VARNAME@<:@*@:>@}"],
-			[ m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), ["${_VARNAME}"])])],
+			[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
+			[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
+			[m4_ifnblank(m4_quote(_default), [ "_default"])])],
+		[m4_errprintn(m4_list_nth([_ARGS_TYPE], idx) _default)],
 		[
 ],
+		[m4_popdef([_default])],
 		[m4_popdef([_VARNAME])],
 	)])])])],
 	[}
 ],
 )])
+
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (if applicable)
+dnl $3: Action
+dnl
+dnl .. note::
+dnl    If the equal-delimited option has a short version, we allow space-delimited short option and value
+m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
+	[_val="${_key##--[$1]=}"],
+	m4_ifnblank([$2], 
+		[[if test "$_key" = "-$2"],
+		[then],
+		_INDENT_MORE(
+			[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+			[_val="@S|@2"],
+			[shift]),
+		[fi],]),
+	[$3],
+	[_ADD_OPTS_VALS($_ARGVAR)],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (if applicable)
+dnl $3: Action
+m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
+	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+	[_val="@S|@2"],
+	[shift],
+	[$3],
+	[_ADD_OPTS_VALS($_ARGVAR)],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (if applicable)
+dnl $3: Action - the variable containing the value to assign is '_val'
+m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
+	[_val="${_key##--[$1]=}"],
+	[if test "$_val" = "$_key"],
+	[then],
+	_INDENT_MORE(
+		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+		[_val="@S|@2"],
+		[shift]),
+	[fi],
+	[$3],
+	[_ADD_OPTS_VALS($_ARGVAR)],
+)])
+
+
+dnl
+dnl Macro factory, define _MAYBE_EQUALS_MATCH depending on what delimiters are effective.
+dnl
+dnl $1: What to do. Typically one of [], =*, |--$[]2=*
+m4_define([_MAYBE_EQUALS_MATCH_FACTORY], [m4_define([_MAYBE_EQUALS_MATCH],
+	[m4_case(m4_quote($][1), 
+		[arg], [$1],
+		[repeated], [$1], [])])])
+dnl
+dnl Defines macro:
+dnl
+dnl $1: Option type (be effective only for 'arg' and 'repeated')
+dnl $2: Option name
+dnl
+dnl Before this macros is called, we output e.g. '--option' in the case match statement.
+dnl If delimiter is
+dnl  - space only: Do nothing,
+dnl  - equals only: Add '=*',
+dnl  - both: Add '|--option=*'.
+
+
+dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
+dnl
+dnl Globally set the option-value delimiter according to a directive.
+dnl $1: The directive
+m4_define([_SET_OPTION_DELIMITER], 
+	[m4_bmatch([$1], [ ],
+		[m4_bmatch([$1], [=], [m4_do(
+			[dnl BOTH
+],
+			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
+			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
+		)], [m4_do(
+			[dnl SPACE
+],
+			[_MAYBE_EQUALS_MATCH_FACTORY([])],
+			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
+		)])],
+		[m4_bmatch([$1], [=], [m4_do(
+			[dnl EQUALS
+],
+			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
+			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
+		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
+
+dnl
+dnl Sets the option--value separator (i.e. --option=val or --option val
+dnl $1: The directive (' ', '=', or ' =' or '= ')
+m4_define([ARGBASH_SET_DELIM],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_DELIMITER([$1])])])
+
+
+dnl The default is both ' ' and '='
+_SET_OPTION_DELIMITER([ =])
 
 
 m4_define([_OPTS_VALS_LOOP_BODY], [m4_do(
@@ -743,15 +858,15 @@ _INDENT_(2,	)],
 	[dnl Output short option (if we have it), then |
 ],
 	[m4_pushdef([_argname], m4_list_nth([_ARGS_LONG], [$1]))],
-	[m4_ifblank(m4_list_nth([_ARGS_SHORT], [$1]), [], [-m4_list_nth([_ARGS_SHORT], [$1])|])],
+	[m4_pushdef([_argname_s], m4_list_nth([_ARGS_SHORT], [$1]))],
+	[m4_ifblank(_argname_s, [], [-_argname_s|])],
 	[dnl If we are dealing with bool, also look for --no-...
 ],
 	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [bool], [[--no-]_argname|])],
 	[dnl and then long option for the case.
 ],
 	[--_argname],
-	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [arg], [|--_argname=*])],
-	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [repeated], [|--_argname=*])],
+	[_MAYBE_EQUALS_MATCH(m4_list_nth([_ARGS_TYPE], [$1]), _argname)],
 	[@:}@
 ],
 	[m4_pushdef([_ARGVAR], [_varname(m4_expand([_argname]))])],
@@ -760,34 +875,8 @@ _INDENT_(2,	)],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case(m4_list_nth([_ARGS_TYPE], [$1]),
-		[arg],
-		[_JOIN_INDENTED(3,
-			[_val="${_key##--m4_list_nth([_ARGS_LONG], [$1])=}"],
-			[if test "$_val" != "$_key"],
-			[then],
-			[_INDENT_()_ARGVAR="$_val"],
-			[else],
-			_INDENT_MORE(
-				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-				[_ARGVAR="$[]2"],
-				[shift]),
-			[fi],
-			[_ADD_OPTS_VALS($_ARGVAR)],
-		)],
-		[repeated],
-		[_JOIN_INDENTED(3,
-			[_val="${_key##--m4_list_nth([_ARGS_LONG], [$1])=}"],
-			[if test "$_val" != "$_key"],
-			[then],
-			[_INDENT_()_ARGVAR+=("$_val")],
-			[else],
-			_INDENT_MORE(
-				[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-				[_ARGVAR+=("@S|@2")],
-				[shift]),
-			[fi],
-			[_ADD_OPTS_VALS($_ARGVAR)],
-		)],
+		[arg], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[="$_val"])],
+		[repeated], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[+=("$_val")])],
 		[bool],
 		[_JOIN_INDENTED(3,
 			_ARGVAR[="on"],
@@ -807,6 +896,7 @@ _INDENT_(2,	)],
 	)],
 	[_INDENT_(3);;],
 	[m4_popdef([_ARGVAR])],
+	[m4_popdef([_argname_s])],
 	[m4_popdef([_argname])],
 )])
 
@@ -1122,13 +1212,16 @@ m4_define([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],
 	[m4_list_append([BLACKLIST], $2)],
-	[m4_pushdef([FLAGS], [m4_default([$3], [HIV])])],
+	[m4_pushdef([_W_FLAGS], [m4_default([$3], [HIV])])],
 	[m4_ifndef([_SCRIPT_$1], [m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
 	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
-	[m4_popdef([FLAGS])],
+	[m4_popdef([_W_FLAGS])],
 	[m4_list_destroy([BLACKLIST])],
 	[m4_popdef([WRAPPED])],
 )])
+
+dnl Empty the FLAGS macro (so it isn't F,L,A,G,S)
+m4_define([_W_FLAGS], [])
 
 
 m4_define([ARG_LEFTOVERS],

@@ -32,6 +32,9 @@ TESTS += \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
 	test-leftovers \
+	test-delim-space \
+	test-delim-equals \
+	test-delim-both \
 	$(NUL)
 TESTS += tests-gen
 
@@ -57,6 +60,9 @@ SCRIPTS += \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
 	$(TESTDIR)/test-leftovers.sh \
+	$(TESTDIR)/test-delim-space.sh \
+	$(TESTDIR)/test-delim-equals.sh \
+	$(TESTDIR)/test-delim-both.sh \
 	$(NUL)
 
 TESTS_GEN += \
@@ -228,6 +234,23 @@ gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
 
 gen-test-illegal: $(TESTDIR)/gen-test-illegal.m4 $(ARGBASH_BIN)
 	ERROR="contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+test-delim-space: $(TESTDIR)/test-delim-space.sh
+	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something
+	$< --opt something | grep -q 'OPT_S=something,'
+	ERROR="unexpected argument '--add=three'" $(REVERSE) $< -a one --add two --add=three
+	$< -a one --add two | grep -q 'OPT_REP=one two,'
+
+test-delim-equals: $(TESTDIR)/test-delim-equals.sh
+	ERROR="unexpected argument '--opt'" $(REVERSE) $< --opt something
+	$< --opt=something | grep -q 'OPT_S=something,'
+	ERROR="unexpected argument '--add'" $(REVERSE) $< -a one --add two --add=three
+	$< -a one --add=two | grep -q 'OPT_REP=one two,'
+
+test-delim-both: $(TESTDIR)/test-delim-both.sh
+	$< --opt something | grep -q 'OPT_S=something,'
+	$< --opt=something | grep -q 'OPT_S=something,'
+	$< -a one --add two --add=three | grep -q 'OPT_REP=one two three'
 
 tests-gen: $(TESTS_GEN)
 

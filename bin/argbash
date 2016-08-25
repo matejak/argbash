@@ -38,9 +38,9 @@ print_help ()
 	echo "Argbash is an argument parser generator for Bash."
 	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [-I|--search] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
 	printf "\t<input->: The input template file\n"
-	printf "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '%s')\n" "${_arg_output}"
-	printf "\t--library,--no-library: Whether the input file if the pure parsing library. (%s by default)\n" "${_arg_library}"
-	printf "\t-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: (%s) )\n" "${_arg_search[*]}"
+	printf "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '%s')\n" "-"
+	printf "\t--library,--no-library: Whether the input file if the pure parsing library. (%s by default)\n" "off"
+	printf "\t-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: %s )\n" "(\".\")"
 	printf "\t--debug: (developer option) Tell autom4te to trace a macro (no default)\n"
 	printf "\t-v,--version: Prints version\n"
 	printf "\t-h,--help: Prints help\n"
@@ -53,14 +53,13 @@ do
 	case "$_key" in
 		-o|--output|--output=*)
 			_val="${_key##--output=}"
-			if test "$_val" != "$_key"
+			if test "$_val" = "$_key"
 			then
-				_arg_output="$_val"
-			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_output="$2"
+				_val="$2"
 				shift
 			fi
+			_arg_output="$_val"
 			;;
 		--no-library|--library)
 			_arg_library="on"
@@ -68,25 +67,23 @@ do
 			;;
 		-I|--search|--search=*)
 			_val="${_key##--search=}"
-			if test "$_val" != "$_key"
+			if test "$_val" = "$_key"
 			then
-				_arg_search+=("$_val")
-			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_search+=("$2")
+				_val="$2"
 				shift
 			fi
+			_arg_search+=("$_val")
 			;;
 		--debug|--debug=*)
 			_val="${_key##--debug=}"
-			if test "$_val" != "$_key"
+			if test "$_val" = "$_key"
 			then
-				_arg_debug="$_val"
-			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_debug="$2"
+				_val="$2"
 				shift
 			fi
+			_arg_debug="$_val"
 			;;
 		-v|--version)
 			echo "argbash v$version"

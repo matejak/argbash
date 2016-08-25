@@ -38,30 +38,42 @@ Oops, we have forgot to turn print on! Let's fix that...
 .. literalinclude:: _static/minimal-output-foobar.txt
    :language: text
 
-Another example
-+++++++++++++++
+.. _ex_separating:
+
+Separating the parsing code
++++++++++++++++++++++++++++
 
 Let's take a look at a script that takes filename as the only positional argument and prints size of the corresponding file.
 The caller can influence the unit of display using optional argument ``--unit``.
 This script is a bit artificial, but hang on --- we will try to use it from within a wrapping script.
 
-This time, we will separate the parsing code and the script itself.
+This time, we will :ref:`separate the parsing code and the script itself <file_layout>`.
+The parsing code will be in the ``simple-parsing.sh`` file and the script then in ``simple.sh``.
 
-The script's parsing section template is really simple:
+The template for the script's parsing section is really simple.
+Below are the sole contents of ``simple-parsing.m4`` file:
 
 .. literalinclude:: ../resources/examples/simple-parsing.m4
    :language: bash
 
-Then, let's take a look at the script's body:
+Then, let's take a look at the script's template body (i.e. the ``simple.m4`` file):
 
 .. literalinclude:: ../resources/examples/simple.m4
    :language: bash
 
-We obtain the script by running ``argbash`` over it --- it detects the parsing template and interconnects those two.
+We obtain the script from the template by running ``argbash`` over it --- it detects the parsing template and interconnects those two.
 
 .. code-block:: bash
 
    argbash simple.m4 -o simple.sh
+
+In other words, it will examine the ``simple.m4`` template, finding out that there is the :ref:`INCLUDE_PARSING_CODE <parsing_code>` macro.
+If the parsing template (in our case ``simple-parsing.m4`` or ``simple-parsing.sh``) is found, a parsing script is produced out of it (otherwise, an error occurs).
+Finally, the ``simple.sh`` script is (re)generated --- basically only the source directive is added, see those few lines:
+
+.. literalinclude:: ../resources/examples/simple.sh
+   :language: bash
+   :end-before: # [ <-
 
 When invoked with the help option, we get:
 
@@ -69,6 +81,8 @@ When invoked with the help option, we get:
    :language: text
 
 It will work as long as the parsing code's location (next to the script itself) doesn't change:
+
+.. _ex_wrapping:
 
 Wrapping scripts
 ++++++++++++++++

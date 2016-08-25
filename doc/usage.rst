@@ -78,6 +78,8 @@ Finally, you just make sure that ``my-script.sh`` and ``my-parsing.m4`` are next
 
 which finds ``my-parsing.m4`` (it would find ``my-parsing.sh`` too) and generates new ``my-parsing.sh`` and ``my-script.sh`` that you can use right away.
 
+.. _usage_manual:
+
 Separate file for parsing
 +++++++++++++++++++++++++
 

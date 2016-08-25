@@ -32,7 +32,7 @@ print_help ()
 	echo "Convert a template for argbash<2 to argbash>=2<3"
 	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
 	printf "\t<input>: The input file to transform\n"
-	printf "\t-o,--output: Name of the output file (pass '-' for stdout and empty string for the same as input file) (default: '%s')\n" "${_arg_output}"
+	printf "\t-o,--output: Name of the output file (pass '-' for stdout and empty string for the same as input file) (default: '%s')\n" ""
 	printf "\t-v,--version: Prints version\n"
 	printf "\t-h,--help: Prints help\n"
 }
@@ -44,14 +44,13 @@ do
 	case "$_key" in
 		-o|--output|--output=*)
 			_val="${_key##--output=}"
-			if test "$_val" != "$_key"
+			if test "$_val" = "$_key"
 			then
-				_arg_output="$_val"
-			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_output="$2"
+				_val="$2"
 				shift
 			fi
+			_arg_output="$_val"
 			;;
 		-v|--version)
 			echo "argbash-1to2 v$version"

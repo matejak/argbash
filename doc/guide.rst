@@ -73,9 +73,8 @@ We have positional and optional arguments sorted out, so let's define some other
     Also note that it is perfectly possible to pass an empty string as an argument value.
 
 So let's get back to argument types.
-Below, is a list of argument types and macros that you have to write to support those.
+Below, is a list of argument types and macros that you have to write to support those (e.g. ``ARGBASH_GO`` is a macro and ``ARG_OPTIONAL_BOOLEAN([verbose], [Verbose mode])`` is a macro called wit two arguments --- ``verbose`` and ``Verbose mode``).
 Place those macros in your files as ``bash`` comments.
-
 
 Your script
 -----------
@@ -262,10 +261,29 @@ Plus, there are convenience macros:
 * Set the indentation in the parsing part of the script:
   ::
 
-     ARGBASH_SET_INDENT([indentation caracter(s)])
+     ARGBASH_SET_INDENT([indentation character(s)])
 
   The default indentation is one tab per level.
   If you wish to use two spaces as the `Google style recommends <https://google.github.io/styleguide/shell.xml>`_, simply pass two spaces (in square brackets!) as an argument to the macro.
+
+* Set the delimiter between option and value:
+  ::
+
+     ARGBASH_SET_DELIM([option-value delimiter caracter(s)])
+
+  The default delimiter is either space or equal sign.
+  You can either restrict delimiter to only space or only equal sign, or you can keep both.
+  Assuming you have an option accepting value (can be either single-valued or repeated) ``--option`` with short option ``-o``, the following works with these arguments to the macro:
+
+  * ``ARGBASH_SET_DELIM([ ])``: Either of ``--option value``, ``--o value`` assigns value to the ``option`` argument.
+    ``--option=value`` will be considered as a single positional argument.
+
+  * ``ARGBASH_SET_DELIM([=])``: Either of ``--option=value``, ``--o value`` assigns value to the ``option`` argument. 
+    ``--option value`` will result in both ``--option`` and ``value`` to be considered as two positional arguments.
+    ``-o=value`` will also be considered as a positional argument.
+
+  * ``ARGBASH_SET_DELIM([= ])`` (or ``[ =]``): Either of ``--option=value``, ``--o value``, ``--option value`` assigns value to the ``option`` argument; they are treated the same way.
+    This is the default behavior.
 
 .. _script_dir:
 
@@ -276,6 +294,8 @@ Plus, there are convenience macros:
 
   You can use this variable to e.g. source ``bash`` snippets that are in a known location relative to the script's parent directory.
 
+.. _parsing_code:
+
 * Include a file (let's say a ``parse.sh`` file) that is in the same directory during runtime.
   If you use this in your script, ``Argbash`` finds out and attempts to regenerate ``parse.sh`` using ``parse.sh`` or ``parse.m4`` if the former is not available.
   Thanks to this, managing a script with body and parsing logic in separate files is really easy.
@@ -285,6 +305,10 @@ Plus, there are convenience macros:
      INCLUDE_PARSING_CODE([filename], [SCRIPT_DIR variable name (optional, default is script_dir)])
 
   In order to make use of ``INCLUDE_PARSING_CODE``, you have to use ``DEFINE_SCRIPT_DIR`` on preceding lines, but you will be told so if you don't.
+
+  .. seealso::
+
+     Check out the example: :ref:`ex_separating`
 
 .. _argbash_wrap:
 
@@ -308,7 +332,7 @@ Plus, there are convenience macros:
 
   * Flags is a string that may contain some characters.
     If a flag is set, a class of arguments is excluded from the file.
-    The default ``HVI`` should be enough in most scenarios --- you want your own help, version info and indentation, not one from the wrapped script, right?
+    The default ``HVIS`` should be enough in most scenarios --- you want your own help, version info, indentation and option--value separator, not ones from the wrapped script, right?
 
     Following flags are supported:
 
@@ -318,6 +342,7 @@ Plus, there are convenience macros:
     H         Don't include help.
     V         Don't include version info.
     I         Don't use wrapped script's indentation
+    S         Don't use wrapped script's option--value separator
     ========= ===================
 
   * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_args_process_single``.
@@ -336,14 +361,18 @@ Plus, there are convenience macros:
       test $_arg_bar = on && MAYBE_BAR='--bar'
       ./process-single.sh --some-opt "$_arg_some_opt" $MAYBE_BAR
 
-    The stem to array name conversion is the same as with `:ref:argument names <argument_names>` except the prefix ``_args_`` is prepended.
+    The stem to array name conversion is the same as with :ref:`argument names <argument_names>` except the prefix ``_args_`` is prepended.
 
- .. note::
+    .. note::
 
-    The wrapping functionality actually only makes your script to inherit (all or some of the) the wrapped script's arguments.
-    If you really wish to call the wrapped script, it is your responsibility to know its location, ``Argbash`` essentially can't and won't help you with that.
+       The wrapping functionality actually only makes your script to inherit (all or some of the) the wrapped script's arguments.
+       If you really wish to call the wrapped script, it is your responsibility to know its location, ``Argbash`` essentially can't and won't help you with that.
 
-    However, if you know the relative location of the wrapped script to the wrapper, you can use the :ref:`DEFINE_SCRIPT_DIR <script_dir>` macro.
+       However, if you know the relative location of the wrapped script to the wrapper, you can use the :ref:`DEFINE_SCRIPT_DIR <script_dir>` macro.
+
+    .. seealso::
+
+       Check out the example: :ref:`ex_wrapping`
 
 __ parsing_results_
 
