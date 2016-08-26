@@ -731,7 +731,6 @@ m4_define([_MAKE_HELP], [m4_do(
 			[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
 			[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
 			[m4_ifnblank(m4_quote(_default), [ "_default"])])],
-		[m4_errprintn(m4_list_nth([_ARGS_TYPE], idx) _default)],
 		[
 ],
 		[m4_popdef([_default])],

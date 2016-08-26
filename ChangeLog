@@ -1,4 +1,4 @@
-2.1.0 (TBA)
+2.1.0 (2016-08-26)
 ------------------
 
 Incompatible changes (minor):
@@ -7,7 +7,7 @@ Incompatible changes (minor):
 
 New features:
 
-* Support for `=`-style of argument passing (`--some-opt=value` as well as `--some-opt value` are supported)
+* Support for configuration of argument-value delimiters (space and equal sign are supported - `--some-opt=value` as well as `--some-opt value` may work)
 
 Bugfixes:
 
