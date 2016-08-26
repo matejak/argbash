@@ -5,6 +5,7 @@ dnl TODO: Add support for opt types via arg groups
 dnl TODO: Produce code completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
+dnl TODO: Make argbash-init template builder
 dnl
 dnl Arg groups:
 dnl ARGS_TYPE_CHOICES([list of args], [name], [value1], [value2], ...)
@@ -648,7 +649,9 @@ m4_define([_MAKE_HELP], [m4_do(
 			[ @<:@],
 			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
 				[bool], [--(no-)]m4_list_nth([_ARGS_LONG], idx),
-				[arg], [_ARG_FORMAT(idx) ]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
+				[arg], [_ARG_FORMAT(idx)_DELIM_IN_HELP]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
+					[<arg>]),
+				[repeated], [_ARG_FORMAT(idx)_DELIM_IN_HELP]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
 					[<arg>]),
 				[_ARG_FORMAT(idx)])],
 			[@:>@],
@@ -827,17 +830,22 @@ m4_define([_SET_OPTION_DELIMITER],
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
+			[dnl We won't try to show that = and ' ' are possible in the help message
+],
+			[m4_define([_DELIM_IN_HELP], [ ])],
 		)], [m4_do(
 			[dnl SPACE
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
+			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
 		[m4_bmatch([$1], [=], [m4_do(
 			[dnl EQUALS
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
+			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
 
 dnl

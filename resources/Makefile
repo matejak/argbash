@@ -86,7 +86,7 @@ install: $(GENPARSE) $(ARGBASH_TO)
 	mkdir -p "$(ROOT)/$(PREFIX)/lib/argbash"
 	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
-	sed -e 's|M4DIR=.*|M4DIR=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
+	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
@@ -105,6 +105,7 @@ version:
 
 release: version $(GENPARSE) $(ARGBASH_TO) examples check
 	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
+	cd ../doc && make clean && make html
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

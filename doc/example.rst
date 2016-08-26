@@ -21,7 +21,7 @@ Here, we can notice multiple notable things:
 #. Definitions of arguments are placed before the script body.
    From ``bash`` point of view, they are commented out, so the "template" can be a syntactically valid script.
 
-#. You access the values of argument ``foo-bar`` as ``$_arg_foo_bar`` etc. (this is covered more in-depth in :ref:`parsing_results`).
+#. You access the values of argument ``foo-bar`` as ``$_arg_foo_bar`` etc. (this is covered more in-depth in :ref:`argument_names`).
 
 So let's try the script in action! Let's see what happens when we pass the ``-h`` option:
 

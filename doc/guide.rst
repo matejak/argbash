@@ -374,8 +374,6 @@ Plus, there are convenience macros:
 
        Check out the example: :ref:`ex_wrapping`
 
-__ parsing_results_
-
 Action macro
 ++++++++++++
 
@@ -386,8 +384,6 @@ The macro doesn't take any parameters.
 ::
 
    ARGBASH_GO
-
-.. _parsing_results:
 
 Available shell stuff
 +++++++++++++++++++++
