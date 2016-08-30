@@ -8,14 +8,19 @@ dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute
 dnl TODO: Make argbash-init template builder
 dnl
 dnl Arg groups:
+dnl name is used both in help and internally as an ID
+dnl two arguments of different types may not have same type (e.g. choices and file).
+dnl if two different choices type have the same name, behavior is undefined.
 dnl ARGS_TYPE_CHOICES([list of args], [name], [value1], [value2], ...)
 dnl
 dnl flags: R, W, X, D --- search only for existing files (dirs)
 dnl ARGS_TYPE_FILE([list of args], [fname], [flags])
 dnl
-dnl ARGS_TYPE_OUTFILE([list of args], [fname])  dnl Filename that may exist (file must be W) or may not exist (then the dirname of the file must be W)
+dnl ARGS_TYPE_OUTFILE([list of args], [fname])  
+dnl Filename that may exist (file must be W) or may not exist (then the dirname of the file must be W)
 dnl
-dnl ARGS_TYPE_INTEGER([list of args])
+dnl flags: -+0, defautlt is exactly -+0
+dnl ARGS_TYPE_INTEGER([list of args], [flags])
 dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
@@ -31,7 +36,7 @@ m4_define([_CHECK_INTEGER_TYPE], __CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1),
 dnl
 dnl Checks that the first argument (long option) doesn't contain illegal characters
 dnl $1: The long option string
-m4_define([_CHECK_OPTION_TYPE], [m4_do(
+m4_define([_CHECK_OPTION_NAME], [m4_do(
 	[m4_pushdef([_forbidden], [= ])],
 	[dnl Should produce the [= ] regexp
 ],
@@ -107,7 +112,7 @@ m4_define([_MK_VALIDATE_GROUP_FUNCTION], [m4_do(
 		[done],
 		[echo "Value '$_seeking' (of argument '@S|@2') hasn't doesn't match the list of allowed values: ${_allowed}"],
 		[return 4],
-	)])],
+	)],
 	[}],
 )])
 
@@ -230,7 +235,7 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 
 
 m4_define([_some_opt], [m4_do(
-	[_CHECK_OPTION_TYPE([$1])],
+	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [__some_opt($@)])],
 )])
 
@@ -257,7 +262,7 @@ m4_define([__some_opt], [m4_do(
 		[m4_set_add([_ARGS_SHORT], [$2])])],
 	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
-	[m4_list_append([_ARGS_TYPE], [$5])],
+	[m4_list_append([_ARGS_CATH], [$5])],
 	[m4_define([_NARGS], m4_eval(_NARGS + 1))],
 )])
 
@@ -318,7 +323,7 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
 m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
-	[_CHECK_OPTION_TYPE([$1])],
+	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
 )])
 
@@ -343,7 +348,7 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 		)])],
 	[m4_list_append([_POSITIONALS_MAXES], 1)],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONALS_TYPES], [single])],
+	[m4_list_append([_POSITIONAL_CATHS], [single])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
 	[dnl Here, the _sh_quote actually does not ensure that the default is NOT BLANK!
 ],
@@ -358,7 +363,7 @@ dnl $2: Help for the arg
 dnl $3: How many args at least (opt., default=0)
 dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
 m4_define([ARG_POSITIONAL_INF], [m4_do(
-	[_CHECK_OPTION_TYPE([$1])],
+	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
 		[m4_if($#, 3,
@@ -381,7 +386,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 ],
 	[m4_define([_INF_REPR], [[$4]])],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONALS_TYPES], [inf])],
+	[m4_list_append([_POSITIONAL_CATHS], [inf])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
 	[_A_POSITIONAL_VARNUM],
 	[m4_pushdef([_min_argn], m4_default([$3], 0))],
@@ -408,7 +413,7 @@ dnl $2: Help for the arg
 dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
 m4_define([ARG_POSITIONAL_MULTI], [m4_do(
-	[_CHECK_OPTION_TYPE([$1])],
+	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
 
@@ -419,7 +424,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[_POS_WRAPPED(${m4_quote(_varname([$1]))@<:@@@:>@})],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONALS_TYPES], [more])],
+	[m4_list_append([_POSITIONAL_CATHS], [more])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
 	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))
 ],
@@ -600,7 +605,7 @@ dnl
 dnl uses macros argname, _min_argn, _max_argn
 dnl In case of 'inf': If _INF_REPR is not blank, use it, otherwise compose the command-line yourself
 m4_define([_POS_ARG_HELP_LINE], [m4_do(
-	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONALS_TYPES], idx))],
+	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONAL_CATHS], idx))],
 	[m4_case(m4_expand([_arg_type]),
 		[single], [m4_list_append([_POSITIONALS_LIST], m4_if(_min_argn, 0,
 			m4_expand([@<:@<argname>@:>@]), m4_expand([<argname>])))],
@@ -637,7 +642,7 @@ m4_define([_MAKE_USAGE_MORE], [m4_do(
 
 
 m4_define([_POS_ARG_HELP_USAGE], [m4_do(
-	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONALS_TYPES], idx))],
+	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONAL_CATHS], idx))],
 	[m4_case(m4_expand([_arg_type]),
 		[single],
 			[m4_if(_min_argn, 0, [m4_do(
@@ -680,7 +685,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[m4_if(HAVE_OPTIONAL, 1,
 		[m4_for([idx], 1, _NARGS, 1, [m4_do(
 			[ @<:@],
-			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[m4_case(m4_list_nth([_ARGS_CATH], idx),
 				[bool], [--(no-)]m4_list_nth([_ARGS_LONG], idx),
 				[arg], [_ARG_FORMAT(idx)_DELIM_IN_HELP]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
 					[<arg>]),
@@ -714,7 +719,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
 			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
-			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONALS_TYPES, idx), [inf], [m4_default(_INF_REPR, argname)], [argname($][@)]))],
+			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONAL_CATHS, idx), [inf], [m4_default(_INF_REPR, argname)], [argname($][@)]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
 			[_INDENT_()[printf "\t]argname[: ]],
@@ -745,7 +750,7 @@ m4_define([_MAKE_HELP], [m4_do(
 		[--m4_list_nth([_ARGS_LONG], idx)],
 		[dnl Bool have a long beginning with --no-
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx), [bool], [,--no-]m4_list_nth([_ARGS_LONG], idx))],
+		[m4_case(m4_list_nth([_ARGS_CATH], idx), [bool], [,--no-]m4_list_nth([_ARGS_LONG], idx))],
 		[: m4_list_nth([_ARGS_HELP], idx)],
 		[dnl Actions don't have defaults
 ],
@@ -753,7 +758,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 		[dnl Now the default is expanded since it is between double quotes
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+		[m4_case(m4_list_nth([_ARGS_CATH], idx),
 			[action], [],
 			[bool], [ (%s by default)],
 			[repeated], [ (default array: %s )],
@@ -762,7 +767,7 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_pushdef([_default], m4_list_nth([_ARGS_DEFAULT], idx))],
 		[dnl Single: We are already quoted
 ],
-		[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+		[m4_case(m4_list_nth([_ARGS_CATH], idx),
 			[action], [],
 			[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
 			[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
@@ -902,11 +907,11 @@ _INDENT_(2,	)],
 	[m4_ifblank(_argname_s, [], [-_argname_s|])],
 	[dnl If we are dealing with bool, also look for --no-...
 ],
-	[m4_if(m4_list_nth([_ARGS_TYPE], [$1]), [bool], [[--no-]_argname|])],
+	[m4_if(m4_list_nth([_ARGS_CATH], [$1]), [bool], [[--no-]_argname|])],
 	[dnl and then long option for the case.
 ],
 	[--_argname],
-	[_MAYBE_EQUALS_MATCH(m4_list_nth([_ARGS_TYPE], [$1]), _argname)],
+	[_MAYBE_EQUALS_MATCH(m4_list_nth([_ARGS_CATH], [$1]), _argname)],
 	[@:}@
 ],
 	[m4_pushdef([_ARGVAR], [_varname(m4_expand([_argname]))])],
@@ -914,7 +919,7 @@ _INDENT_(2,	)],
 ],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
-	[m4_case(m4_list_nth([_ARGS_TYPE], [$1]),
+	[m4_case(m4_list_nth([_ARGS_CATH], [$1]),
 		[arg], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[="$_val"])],
 		[repeated], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[+=("$_val")])],
 		[bool],
@@ -1123,7 +1128,7 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 	[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], [$1]))],
 	[m4_ifnblank(m4_quote(_DEFAULT), [m4_do(
 		[_varname(m4_list_nth([_POSITIONALS_NAMES], [$1]))=],
-		[m4_case(m4_list_nth([_POSITIONALS_TYPES], [$1]),
+		[m4_case(m4_list_nth([_POSITIONAL_CATHS], [$1]),
 			[single], [_DEFAULT],
 			[more], [_MAKE_DEFAULTS_MORE],
 			[inf], [_MAKE_DEFAULTS_MORE],
@@ -1149,7 +1154,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 ],
 		[m4_for([idx], 1, _NARGS, 1, [m4_do(
 			[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
-			[m4_case(m4_list_nth([_ARGS_TYPE], idx),
+			[m4_case(m4_list_nth([_ARGS_CATH], idx),
 				[action], [],
 				m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)
 ]))],
