@@ -4,7 +4,7 @@ version=_ARGBASH_VERSION
 # ARG_POSITIONAL_INF([input], [The input file to transform], 1)
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout and empty string for the same as input file)], "")
 # ARG_VERSION([echo "argbash-1to2 v$version"])
-# ARG_HELP([Convert a template for argbash<2 to argbash>=2,<3])
+# ARG_HELP([Convert a template for argbash>=1,<2 to argbash>=2,<3])
 
 # ARGBASH_GO
 

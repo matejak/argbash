@@ -4,6 +4,7 @@ m4_changecom()
 dnl TODO: Add support for opt types via arg groups
 dnl TODO: Produce code completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
+dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Make argbash-init template builder
 dnl
@@ -1260,7 +1261,7 @@ m4_define([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],
 	[m4_list_append([BLACKLIST], $2)],
-	[m4_pushdef([_W_FLAGS], [m4_default([$3], [HIV])])],
+	[m4_pushdef([_W_FLAGS], [m4_default([$3], [HVI])])],
 	[m4_ifndef([_SCRIPT_$1], [m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
 	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
 	[m4_popdef([_W_FLAGS])],
@@ -1278,3 +1279,14 @@ m4_define([ARG_LEFTOVERS],
 dnl If I am wrapped:
 dnl It may be that the wrapped script contains args that we already have.
 dnl TODO: In this case: Raise an error (with a good advice)
+
+
+dnl Types:
+dnl #. Register group name, assert uniquness
+dnl #. Assign the validator to the name.
+dnl #. Assign the name to args.
+dnl #. Add the validator to the list of validators to be generated
+dnl
+dnl * Upon arg encounter, validate the value. Die in case of no compliance.
+dnl * Help: optional args - value should take the name.
+dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
