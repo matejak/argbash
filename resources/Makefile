@@ -22,6 +22,9 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
+../bin/argbash-init: ../src/argbash-init.m4 $(GENPARSE)
+	bash $(GENPARSE) $< -o $@
+
 major_version ?= $(shell cat ../src/version | sed -e 's/\..*//')
 
 ../bin/argbash-%to$(major_version): ../src/argbash-%to$(major_version).m4 $(GENPARSE)

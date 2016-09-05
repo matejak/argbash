@@ -2,11 +2,12 @@
 
 Contents of '../src' matching '*.m4':
 	argbash-1to2.m4: 1 kiB
+	argbash-init.m4: 1 kiB
 	argbash.m4: 4 kiB
 	list.m4: 4 kiB
 	output.m4: 0 kiB
 	output-standalone.m4: 0 kiB
-	stuff.m4: 38 kiB
+	stuff.m4: 40 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
 	simple.m4: 1 kiB

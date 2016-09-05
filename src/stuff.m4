@@ -35,6 +35,16 @@ m4_define([_CHECK_INTEGER_TYPE], __CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1),
 
 
 dnl
+dnl Checks that the an argument is a correct short option arg
+dnl $1: The short option "string"
+dnl $2: The argument name
+m4_define([_CHECK_SHORT_OPT_TYPE], [m4_do(
+	[m4_ifnblank([$1], [m4_bmatch([$1], [[a-zA-z]], , 
+		[m4_fatal(['$1' is not a valid short option (for argument '$2') - it has to be one letter.])])])],
+)])
+
+
+dnl
 dnl Checks that the first argument (long option) doesn't contain illegal characters
 dnl $1: The long option string
 m4_define([_CHECK_OPTION_NAME], [m4_do(
@@ -237,6 +247,7 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 
 m4_define([_some_opt], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
+	[_CHECK_SHORT_OPT_TYPE([$2], [$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [__some_opt($@)])],
 )])
 
@@ -759,17 +770,19 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 		[dnl Now the default is expanded since it is between double quotes
 ],
+		[m4_pushdef([_default], m4_quote(m4_list_nth([_ARGS_DEFAULT], idx)))],
 		[m4_case(m4_list_nth([_ARGS_CATH], idx),
 			[action], [],
+			[incr], [],
 			[bool], [ (%s by default)],
-			[repeated], [ (default array: %s )],
-			[ @{:@m4_ifnblank(m4_list_nth([_ARGS_DEFAULT], idx), [default: '%s'], [no default])@:}@])],
+			[repeated], [ m4_if(m4_quote(_default), [()], [(empty by default)], [(default array: %s )])],
+			[ @{:@m4_ifnblank(m4_quote(_default), [default: '%s'], [no default])@:}@])],
 		[\n"],
-		[m4_pushdef([_default], m4_list_nth([_ARGS_DEFAULT], idx))],
 		[dnl Single: We are already quoted
 ],
 		[m4_case(m4_list_nth([_ARGS_CATH], idx),
 			[action], [],
+			[incr], [],
 			[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
 			[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
 			[m4_ifnblank(m4_quote(_default), [ "_default"])])],
