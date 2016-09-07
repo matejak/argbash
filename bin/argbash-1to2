@@ -4,7 +4,7 @@ version=2.1.1
 # ARG_POSITIONAL_INF([input],[The input file to transform],[1])
 # ARG_OPTIONAL_SINGLE([output],[o],[Name of the output file (pass '-' for stdout and empty string for the same as input file)],[""])
 # ARG_VERSION([echo "argbash-1to2 v$version"])
-# ARG_HELP([Convert a template for argbash<2 to argbash>=2,<3])
+# ARG_HELP([Convert a template for argbash>=1,<2 to argbash>=2,<3])
 
 # ARGBASH_GO()
 # needed because of Argbash --> m4_ignore([
@@ -29,7 +29,7 @@ _arg_output=""
 # THE PRINT HELP FUNCION
 print_help ()
 {
-	echo "Convert a template for argbash<2 to argbash>=2<3"
+	echo "Convert a template for argbash>=1<2 to argbash>=2<3"
 	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
 	printf "\t<input>: The input file to transform\n"
 	printf "\t-o,--output: Name of the output file (pass '-' for stdout and empty string for the same as input file) (default: '%s')\n" ""

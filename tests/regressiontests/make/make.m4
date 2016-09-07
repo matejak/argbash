@@ -9,16 +9,17 @@ m4_define([TEST_BODY], [m4_foreach([arg], [$@], [	arg
 
 dnl
 dnl Use in the case that some test produce scripts as side-effect
-dnl $1: The script stem (preppend $(TESTDIR)/), append (.sh)
+dnl $1: The script stem (preppend $(TESTDIR)/), append suffix (.$2)
+dnl $2: The suffix, (optional, by default 'sh')
 m4_define([ADD_SCRIPT],
-	[m4_set_add([_TEST_SCRIPTS], [$(TESTDIR)/$1.sh])])
+	[m4_set_add([_TEST_SCRIPTS], [$(TESTDIR)/$1.]m4_default([$2], [sh]))])
 
 
 dnl
 dnl Use in the case that you need a rule without registering a test
 dnl $1: What
 dnl $2: deps
-dnl $2: body
+dnl $3: body
 m4_define([ADD_RULE], [m4_do(
 	[m4_set_add([_TEST_SCRIPTS], [$1])]
 	[m4_divert_text([STDOUT3], [m4_do(
@@ -51,7 +52,7 @@ dnl No trailing newline because the test body already has it
 
 
 dnl 
-dnl $1: The test stem
+dnl $1: The test stem (gen-test-<stem>.m4)
 dnl $2: The test error
 m4_define([ADD_GENTEST], [m4_do(
 	[m4_pushdef([_tname], [gen-test-$1])],

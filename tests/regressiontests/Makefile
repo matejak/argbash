@@ -9,6 +9,7 @@ NUL =
 
 ARGBASH_BIN = $(TESTDIR)/../../bin/argbash
 ARGBASH_1TO2 = $(TESTDIR)/../../bin/argbash-1to2
+ARGBASH_INIT = $(TESTDIR)/../../bin/argbash-init
 REVERSE = $(TESTDIR)/reverse
 
 %.sh: %.m4 $(ARGBASH_BIN)
@@ -35,6 +36,9 @@ TESTS += \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
+	test-init_simple \
+	test-init_simple-s \
+	test-init_simple-ss \
 	$(NUL)
 TESTS += tests-gen
 
@@ -63,6 +67,17 @@ SCRIPTS += \
 	$(TESTDIR)/test-delim-space.sh \
 	$(TESTDIR)/test-delim-equals.sh \
 	$(TESTDIR)/test-delim-both.sh \
+	$(TESTDIR)/test-init_simple.sh \
+	$(TESTDIR)/test-init_simple-s.sh \
+	$(TESTDIR)/test-init_simple-ss.sh \
+	$(TESTDIR)/test-init_simple.m4 \
+	$(TESTDIR)/test-init_simple-s-parsing.sh \
+	$(TESTDIR)/test-init_simple-s-parsing.m4 \
+	$(TESTDIR)/test-init_simple-s.m4 \
+	$(TESTDIR)/test-init_simple-ss-parsing.sh \
+	$(TESTDIR)/test-init_simple-ss-parsing.m4 \
+	$(TESTDIR)/gen-test-init_name_char.m4 \
+	$(TESTDIR)/gen-test-init_name_dash.m4 \
 	$(NUL)
 
 TESTS_GEN += \
@@ -74,6 +89,8 @@ TESTS_GEN += \
 	gen-test-pos-opt2 \
 	gen-test-more \
 	gen-test-illegal \
+	gen-test-init_name_dash \
+	gen-test-init_name_char \
 	$(NUL)
 
 define generic_regression
@@ -252,10 +269,60 @@ test-delim-both: $(TESTDIR)/test-delim-both.sh
 	$< --opt=something | grep -q 'OPT_S=something,'
 	$< -a one --add two --add=three | grep -q 'OPT_REP=one two three'
 
+test-init_simple: $(TESTDIR)/test-init_simple.sh
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "pos: foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+
+test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "pos: foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+
+test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simple-ss-parsing.sh
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "pos: foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+
+$(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
+	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@
+
+$(TESTDIR)/test-init_simple-s.m4: $(ARGBASH_INIT)
+	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@ -s
+
+$(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
+	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@ -s -s
+
+$(TESTDIR)/test-init_simple-ss-parsing.m4: $(TESTDIR)/test-init_simple-ss.sh
+	@
+
+$(TESTDIR)/gen-test-init_name_char.m4: $(ARGBASH_INIT)
+	$< --opt-bool foo/bar-baz $@
+
+$(TESTDIR)/gen-test-init_name_dash.m4: $(ARGBASH_INIT)
+	$< --pos -bool $@
+
+gen-test-init_name_dash: $(TESTDIR)/gen-test-init_name_dash.m4 $(ARGBASH_BIN)
+	ERROR="'-bool' .* begins with a dash" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-init_name_char: $(TESTDIR)/gen-test-init_name_char.m4 $(ARGBASH_BIN)
+	ERROR="'foo/bar-baz' .* contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
 tests-gen: $(TESTS_GEN)
 
 tests-clean:
 	$(RM) $(SCRIPTS)
 
 .PHONY: $(PHONIES)
-

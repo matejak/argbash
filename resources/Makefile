@@ -10,6 +10,7 @@ M4_SRC = \
 PREFIX = $(HOME)/.local
 ROOT = /
 
+A_INIT = ../bin/argbash-init
 GENPARSE = ../bin/argbash
 EXAMPLES = \
 	examples/minimal.sh \
@@ -22,7 +23,7 @@ ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
-../bin/argbash-init: ../src/argbash-init.m4 $(GENPARSE)
+$(A_INIT): ../src/argbash-init.m4 $(GENPARSE)
 	bash $(GENPARSE) $< -o $@
 
 major_version ?= $(shell cat ../src/version | sed -e 's/\..*//')
@@ -36,6 +37,10 @@ ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_ver
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
+	$(GENPARSE) $< -o $@ --library
+
+# argbash-init uses the -parsing suffix to denote standalone parsing sections of scripts
+%-parsing.sh: %-parsing.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@ --library
 
 %-standalone2.sh: %-standalone.sh $(GENPARSE)
@@ -64,7 +69,7 @@ bootstrap:
 
 examples: $(EXAMPLES)
 
-check: $(TESTDIR)/Makefile $(GENPARSE) $(ARGBASH_TO)
+check: $(TESTDIR)/Makefile $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	$(MAKE) unittests
 	$(MAKE) regressiontests
 	$(MAKE) tests-clean
@@ -80,9 +85,10 @@ develop: $(ARGBASH_TO)
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
+	ln -s -r $(A_INIT) "$(ROOT)/$(PREFIX)/bin"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
-install: $(GENPARSE) $(ARGBASH_TO)
+install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash"
@@ -91,6 +97,7 @@ install: $(GENPARSE) $(ARGBASH_TO)
 	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
 	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
+	cp $(A_INIT) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:

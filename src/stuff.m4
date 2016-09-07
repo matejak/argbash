@@ -48,9 +48,11 @@ dnl
 dnl Checks that the first argument (long option) doesn't contain illegal characters
 dnl $1: The long option string
 m4_define([_CHECK_OPTION_NAME], [m4_do(
-	[m4_pushdef([_forbidden], [= ])],
-	[dnl Should produce the [= ] regexp
+	[m4_pushdef([_forbidden], [= /])],
+	[dnl Should produce the [= etc.] regexp
 ],
+	[m4_bmatch([$1], [^-],
+		[m4_fatal([The option name '$1' is illegal, because it begins with a dash ('-'). Names can contain dashes, but not at the beginning.])])],
 	[m4_bmatch([$1], m4_dquote(_forbidden),
 		[m4_fatal([The option name '$1' is illegal, because it contains forbidden characters (one of: ']_forbidden[').])])],
 	[m4_popdef([_forbidden])],
@@ -548,10 +550,11 @@ m4_define([DEFINE_SCRIPT_DIR], [m4_do(
 )])
 
 
+dnl TODO: This looks a bit like a nightmare
 dnl Precedence is important, _CALL_SOME_OPT has to be defined early on
 m4_define([_CALL_SOME_OPT], [[_some_opt([$1], [$2], [$3], [$4], [$5])]])
 
-m4_define([_ARG_OPTIONAL_INCREMENTAL_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [incr])])
+m4_define([_ARG_OPTIONAL_INCREMENTAL_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, [m4_default($][4, 0)], [incr])])
 m4_define([_ARG_OPTIONAL_INCREMENTAL], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCREMENTAL_BODY)
 
 

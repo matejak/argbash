@@ -64,17 +64,28 @@ do_header()
 {
 	echo "#!/bin/bash"
 	echo
+	# We if separate == 2, we don't want to pass this to argbash at all
+	test "$_arg_separate" = 2 && test "$1" = "script" && echo "# Created by argbash-init v$version" && return
+	echo "# m4_ignore("
+	if test "$1" = "lib"
+	then
+		echo "echo \"This is just a parsing library template, not the library - pass the parent script '$outfname' to 'argbash' to fix this.\" >&2"
+	else
+		echo "echo \"This is just a script template, not the script (yet) - pass it to 'argbash' to fix this.\" >&2"
+	fi
+	echo "exit 11  #)Created by argbash-init v$version"
 }
 
 
 do_args()
 {
-	for name in "${_arg_pos[@]}"
-	do do_pos "$name"; done
+	test "$_arg_hints" = on && echo "# Rearrange the order of options below according to what you would like to see in the help message."
 	for name in "${_arg_opt[@]}"
 	do do_opt "$name"; done
 	for name in "${_arg_opt_bool[@]}"
 	do do_opt_bool "$name"; done
+	for name in "${_arg_pos[@]}"
+	do do_pos "$name"; done
 }
 
 
@@ -87,10 +98,10 @@ do_args_footer()
 
 do_script_assisted()
 {
-	do_header
+	do_header script
 	
 	echo "# DEFINE_SCRIPT_DIR()"
-	echo "# INCLUDE_PARSING_CODE([${_arg_output%.sh}-parsing.sh])"
+	echo "# INCLUDE_PARSING_CODE([$(basename "${parse_fname_stem}.sh")])"
 	echo "# ARGBASH_GO"
 
 	do_body_protected
@@ -99,11 +110,12 @@ do_script_assisted()
 
 do_script_bare()
 {
-	do_header
+	do_header script
+	parse_fname=${parse_fname_stem}.sh
 	
-	echo "scipt_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)""
-	echo '. "${script_dir}'"${_arg_output%.sh}-parsing.sh\""
-	echo "# ARGBASH_GO"
+	echo 'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"'
+	echo '. "${script_dir}/'"$(basename "$parse_fname")\" || { echo \"Couldn't find '$(basename "$parse_fname")' parsing library in the '"'$script_dir'"' directory\"; exit 1; }"
+	echo 
 
 	do_body
 }
@@ -131,7 +143,7 @@ do_body_protected()
 
 do_stuff()
 {
-	do_header
+	do_header "$1"
 	do_args
 	do_args_footer
 
@@ -143,16 +155,18 @@ test "$outfname" = "-" -a "$_arg_separate" -gt 0 && die "If you want to separate
 
 if test "$outfname" = '-'
 then
-	do_stuff
+	do_stuff 'script'
 else
-	test "$_arg_separate" = 0 && do_stuff > "$outfname" || parse_fname="${outfname%.sh}-parsing.sh"
+	test "$_arg_separate" = 0 && do_stuff 'script' > "$outfname" || parse_fname_stem="$(echo "${outfname}" | sed -e 's/\.\(sh\|m4\)$//')-parsing"
+	# IMPORTANT NOTION:
+	# do_stuff has to be called FIRST, because it sets the _variables array content as its side-effect
 	test "$_arg_separate" = 1 && {
+		do_stuff 'lib' > "${parse_fname_stem}.m4"
 		do_script_assisted > "$outfname"
-		do_stuff > "$parse_fname"
 	}
 	test "$_arg_separate" = 2 && {
+		do_stuff 'lib'  > "${parse_fname_stem}.m4"
 		do_script_bare > "$outfname"
-		do_stuff > "$parse_fname"
 	}
 	chmod a+x "$outfname"
 fi
