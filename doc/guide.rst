@@ -1,3 +1,5 @@
+.. _templates:
+
 Template writing guide
 ======================
 
@@ -106,7 +108,7 @@ Argbash API
 -----------
 
 Put macro parameters in square brackets.
-Parameters marked as optional can be left out blank:
+Parameters marked as optional can be left out blank.
 
 The following code leaves second and last parameters blank.
 Values of first and third parameters are ``verbose`` and ``Turn on verbose mode`` respectively.
@@ -408,7 +410,11 @@ The argument name is transliterated like this:
 #. ``_arg_`` is prepended to the string.
 
    So given that you have an argument ``--include-batteries`` that expects a value, you can access it via environmental variable ``_arg_include_batteries``.
-#. Boolean arguments have values either ``on`` or ``off``.
 
-   If (a boolean argument) ``--quiet`` is passed, value of ``_arg_quiet`` is set to ``on``.
-   Conversely, if ``--no-quiet`` is passed, value of ``_arg_quiet`` is set to ``off``.
+* Boolean arguments have values either ``on`` or ``off``.
+  If (a boolean argument) ``--quiet`` is passed, value of ``_arg_quiet`` is set to ``on``.
+  Conversely, if ``--no-quiet`` is passed, value of ``_arg_quiet`` is set to ``off``.
+
+* Repeated arguments collect values to a `bash array <http://>`_.
+
+* Incremental arguments have a default value (0 by default) and their value in the script corresponds to the default plus the number of times the argument was specified.

@@ -1,0 +1,5 @@
+./script.sh --option1 one --option2 two zero
+
+Value of --option1: one
+Value of --option2: two
+Value of positional: zero

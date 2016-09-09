@@ -1,0 +1,2 @@
+bin/argbash-init --pos positional --opt option1 --opt option2  template.m4
+

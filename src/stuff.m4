@@ -733,8 +733,8 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_ifnblank(m4_list_nth([_POSITIONALS_MSGS], idx), [m4_do(
 			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
-			[m4_pushdef([argname], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
-			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONAL_CATHS, idx), [inf], [m4_default(_INF_REPR, argname)], [argname($][@)]))],
+			[m4_pushdef([argname0], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
+			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONAL_CATHS, idx), [inf], [m4_default(_INF_REPR, argname0)], [[argname0($][@)]]))],
 			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
 			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
 			[_INDENT_()[printf "\t]argname[: ]],
@@ -745,7 +745,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[m4_popdef([_defaults])],
 			[m4_popdef([_min_argn])],
 			[m4_popdef([argname])],
-			[m4_popdef([argname])],
+			[m4_popdef([argname0])],
 			[[\n"
 ]],
 		)])])],

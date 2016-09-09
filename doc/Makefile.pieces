@@ -1,6 +1,7 @@
 DOCDIR ?= .
 RESOURCES ?= ../resources
 
+MINIMAL_INIT = script.sh
 MINIMAL = $(RESOURCES)/examples/minimal.sh
 SIMPLE = $(RESOURCES)/examples/simple.sh
 WRAPPER = $(RESOURCES)/examples/simple-wrapper.sh
@@ -10,6 +11,9 @@ STATICDIR = _static
 NUL =
 
 PIECES = \
+	$(STATICDIR)/minimal_init-create.txt \
+	$(STATICDIR)/minimal_init-help.txt \
+	$(STATICDIR)/minimal_init-output.txt \
 	$(STATICDIR)/minimal-output-help.txt \
 	$(STATICDIR)/minimal-output-foobar.txt \
 	$(STATICDIR)/minimal-output-noverbose.txt \
@@ -21,10 +25,33 @@ PIECES = \
 pieces: $(PIECES)
 
 define CMD_OUT
-	echo "$< $(FLAGS)" > $@
+	echo "$< $(FLAGS)" | sed -e 's/^\.\.\///' > $@
 	echo >> $@
 	$< $(FLAGS) >> $@
 endef
+
+define CMD_OUT_LOCAL
+	echo "./$< $(FLAGS)" > $@
+	echo >> $@
+	./$< $(FLAGS) >> $@
+endef
+
+A_INIT_OPTS = --pos positional --opt option1 --opt option2 
+$(STATICDIR)/minimal_init-create.txt: ../bin/argbash-init
+	$(eval FLAGS := $(A_INIT_OPTS) template.m4)
+	$(CMD_OUT)
+	$(RM) template.m4
+
+$(MINIMAL_INIT):
+	../bin/argbash-init $(A_INIT_OPTS) | ../bin/argbash - -o $@
+
+$(STATICDIR)/minimal_init-output.txt: $(MINIMAL_INIT)
+	$(eval FLAGS := --option1 one --option2 two zero)
+	$(CMD_OUT_LOCAL)
+
+$(STATICDIR)/minimal_init-help.txt: $(MINIMAL_INIT)
+	$(eval FLAGS := -h)
+	$(CMD_OUT_LOCAL)
 
 $(STATICDIR)/minimal-output-help.txt: $(MINIMAL)
 	$(eval FLAGS := -h)
@@ -52,3 +79,4 @@ $(STATICDIR)/wrapper-output-action.txt: $(WRAPPER)
 
 clean-pieces:
 	$(RM) $(PIECES)
+	$(RM) $(MINIMAL_INIT)

@@ -1,3 +1,15 @@
+2.2.0 (TBA)
+------------------
+
+New features:
+
+* Introduced the `argbash-init` simple template generator.
+* `argbash` can read from stdin.
+
+Bugfixes:
+
+* Improved defaults indications in help messages.
+
 2.1.1 (2016-08-26)
 ------------------
 

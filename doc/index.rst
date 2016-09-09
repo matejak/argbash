@@ -35,17 +35,47 @@ Quickstart
 
 In a nutshell, using ``Argbash`` consists of these simple steps:
 
-#. You write a simple template of your script based on arguments your script is supposed to accept.
+#. You write (or generate) a simple template of your script based on arguments your script is supposed to accept.
 #. You run the ``argbash`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
 
 Eventually, you may want to add/remove/rename arguments your script accepts.
 In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
 Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash`` on top of the script to get it updated.
 
+Generating a template
++++++++++++++++++++++
+
+``Argbash`` features the ``argbash-init`` script that you can use :ref:`to generate <argbash_init>` a template in one step.
+Assume that you want a script that accepts one (mandatory) positional argument and two optional ones.
+
+In other words, we want to support these arguments:
+
+* ``--option1`` and ``--option2``, both accept one value, and
+* an argument we are going to refer to as ``positional`` that must be passed and that is not preceeded by *options* (such as ``--foo``, ``-f``).
+
+We call ``argbash-init``:
+
+.. literalinclude:: _static/minimal_init-create.txt
+   :language: text
+
+You can take a look at the template, but ultimately, you want to generate a script from it:
+
+.. code-block:: text
+
+  bin/argbash template.m4 -o script.sh
+
+Finally, let's test it!
+
+.. literalinclude:: _static/minimal_init-help.txt
+   :language: text
+
+.. literalinclude:: _static/minimal_init-output.txt
+   :language: text
+
 Writing a template
 ++++++++++++++++++
 
-Let's stick with a testing script that accepts some arguments and then it just prints their values.
+Now, let's explore more advanced argument types on a trivial script that accepts some arguments and then prints their values.
 So, let's say that we would like a script that produces the following help message:
 
 .. literalinclude:: _static/minimal-output-help.txt
@@ -55,7 +85,7 @@ So, let's say that we would like a script that produces the following help messa
 Then, it means that we need following arguments:
 
 * One mandatory positional argument.
-  (In other words, an argument that must be passed and that is not preceeded by *options* such as ``--foo``, ``-f``.)
+  (In other words, an argument that must be passed and that is not preceeded by options)
 * Four optional arguments:
 
   * ``--option`` that accepts one value,

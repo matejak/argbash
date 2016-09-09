@@ -1,4 +1,4 @@
-../resources/examples/simple.sh -h
+resources/examples/simple.sh -h
 
 This program tells you size of file that you pass to it in chosen units.
 Usage: ../resources/examples/simple.sh [-u|--unit <arg>] [-v|--version] [--(no-)verbose] [-h|--help] <filename>

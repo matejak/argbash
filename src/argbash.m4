@@ -2,7 +2,7 @@
 
 version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
-# ARG_POSITIONAL_SINGLE([input], [The input template file])
+# ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdout)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
@@ -13,6 +13,8 @@ version=_ARGBASH_VERSION
 # ARGBASH_GO
 
 # [
+
+_trap=
 
 # The main function that generates the parsing script body
 do_stuff ()
@@ -83,6 +85,16 @@ set -o pipefail
 
 infile="$_arg_input"
 
+# If we are reading from stdout, then create a temp file
+if test "$infile" = '-'
+then
+	infile=temp_in_$$
+	rm_temp="yes"
+	_trap="$_trap rm -f $infile;"
+	trap "$_trap" EXIT
+	cat > "$infile"
+fi
+
 m4dir="$script_dir/../src"
 test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
@@ -111,8 +123,9 @@ then
 else
 	# vvv This should catch most of the cases when we want to overwrite the source file
 	# vvv and we don't want to leave a file (not even an empty one) when something goes wrong.
-	temp_outfile=temp_$$
-	trap "rm -f $temp_outfile" EXIT
+	temp_outfile=temp_out_$$
+	_trap="$_trap rm -f $temp_outfile;" EXIT
+	trap "$_trap" EXIT
 	do_stuff > "$temp_outfile"
 	mv "$temp_outfile" "$outfname"
 	chmod a+x "$outfname"

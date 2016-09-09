@@ -1,18 +1,17 @@
-Argbash invocation
-==================
+.. _invocation:
 
-So, you have a template and now it is time to (re)generate a shell script from it!
+Argbash tools
+=============
 
 .. _file_layout:
 
-File layout
------------
-
+``Argbash`` is a code generator, so what it does, it gives you code that has the ability to parse command-line arguments.
+The question is --- what to do with the generated code?
 You have three options here, they are sorted by the estimated preference:
 
 #. One file with both parsing code and script body.
 
-   This is a both simple and functional approach, but your script will be polluted with the auto-generated argument parsing code.
+   This is a both simple and functional approach, but the argument parsing code will pollute your script.
 
 #. Two files --- one for the parsing code and one for the script body, both taken care of by ``Argbash``.
 
@@ -29,6 +28,27 @@ You have three options here, they are sorted by the estimated preference:
 
    We assume that you have installed (see :ref:`install`) the ``argbash`` script, so it is available in your terminal as a command ``argbash``.
    If it is not the case, you just have to substitute ``argbash`` by direct invocation of ``bin/argbash``.
+
+.. _argbash_init:
+
+Template generator
+------------------
+
+It is not advisable to write a template from scratch, since ``Argbash`` contains a tool for that.
+The ``argbash-init`` will generate a good starting template for you, so you can get started within minutes.
+
+On its command-line, you specify names and types of arguments, and you can also select the way how the parsing code is handled (via the ``-s``, ``--standalone`` option):
+
+* If you don't specify it, you get the case 1 from above --- the parsing code is embedded in the script.
+
+* If you specify it exactly once, you get the case 2 from above --- parsing code is in a separate file, but both files contain ``Argbash`` directives.
+
+* If you specify twice, you get the case 3 from above --- parsing code is in a separate file, the script includes it without any magic involved.
+
+Argbash
+-------
+
+So, you have a template and now it is time to (re)generate a shell script from it!
 
 Parsing code and script body together
 +++++++++++++++++++++++++++++++++++++
@@ -83,7 +103,7 @@ which finds ``my-parsing.m4`` (it would find ``my-parsing.sh`` too) and generate
 Separate file for parsing
 +++++++++++++++++++++++++
 
-If you want/have to take care of including the parsing code yourself, just make sure you do it in the script:
+If you want/have to take care of including the parsing code yourself, just make sure you do it in the script --- for example:
 
 .. code-block:: bash
 
@@ -99,8 +119,8 @@ Then, you just generate ``my-parsing.sh`` using ``--library`` option:
 
 .. _api_change:
 
-API changes
------------
+API changes support
+-------------------
 
 The API of the ``Argbash`` project may change.
 This typically means that

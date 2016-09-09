@@ -1,4 +1,4 @@
-../resources/examples/simple-wrapper.sh -h
+resources/examples/simple-wrapper.sh -h
 
 This program tells you size of specified files in given directories in units you choose.
 Usage: ../resources/examples/simple-wrapper.sh [--glob <arg>] [-u|--unit <arg>] [--(no-)verbose] [-h|--help] <directory-1> [<directory-2>] ... [<directory-n>] ...

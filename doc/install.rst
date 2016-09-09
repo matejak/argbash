@@ -28,15 +28,20 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
 Argbash components
 ------------------
 
-The main part of ``Argbash`` is the ``argbash`` script.
-It is basically a wrapper around the ``autom4te`` utility that uses the ``Argbash`` "source code" located in the ``src`` directory.
-In course of an installation, both the script and the source are copied under the prefix --- script goes to ``$PREFIX/bin`` and source to ``$PREFIX/lib/argbash``.
+The ``Argbash`` package consists of these scripts:
 
-The ``argbash`` script itself is generated using ``Argbash``.
-It can be (re)generated using a Makefile that can be found in the ``resources`` folder.
+* ``argbash``, the main part of ``Argbash``.
+  It is basically a wrapper around the ``autom4te`` utility that uses the ``Argbash`` "source code" located in the ``src`` directory.
+  In course of an installation, both the script and the source are copied under the prefix --- script goes to ``$PREFIX/bin`` and source to ``$PREFIX/lib/argbash``.
 
-Next, there are ``argbash-xtoy`` scripts (x, y are version numbers) that assist users in modifying their scripts in case that ``Argbash`` :ref:`changes its API <api_change>`.
-For example, ``Argbash 2.1.4`` (we say ``Argbash`` of major version 2) has ``argbash-1to2`` script and ``Argbash`` of major version 3 will have scripts ``argbash-1to3`` and ``argbash-2to3``.
+  The ``argbash`` script itself is generated using ``Argbash``.
+  It can be (re)generated using a Makefile that can be found in the ``resources`` folder.
+
+* ``argbash-xtoy`` scripts (``x``, ``y`` are major version numbers) that assist users in modifying their scripts in case that ``Argbash`` :ref:`changes its API <api_change>`.
+  For example, ``Argbash 2.1.4`` (we say ``Argbash`` of major version 2) has ``argbash-1to2`` script and ``Argbash`` of major version 3 will have scripts ``argbash-1to3`` and ``argbash-2to3``.
+
+* ``argbash-init`` is a quickstart script --- it enables you to create a basic :ref:`template <templates>` for your script.
+  Then, you just have to make some slight modifications, :ref:`feed it to argbash <invocation>` and you are done.
 
 The main Makefile
 -----------------

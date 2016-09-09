@@ -11,11 +11,12 @@ Aren't you tired of that? `getopt` is discouraged, `getopts` doesn't support lon
 
 Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
-* Fast, minimalistic declaration of arguments your script expects (positional, optional, long, short, boolean).
-* Generate script from definitions once and use it afterwards on all platforms that have `Bash`!
+* Make your existing script powered by `Argbash` [in a couple of minutes]()!
+* Fast, minimalistic declaration of arguments your script expects (see below for supported argument types).
+* Generate script from definitions once and use it afterwards on all platforms that have `bash`!
 * Definitions will stay embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
-* You can re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
-* Easy installation. Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
+* Re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
+* Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
 ## What it is
@@ -28,8 +29,9 @@ Moreover, argument definitions stay embedded in the script, so when you need to 
 
 So by writing few comments to your script and running the Argbash's `bin/argbash` over it, you will get a `bash` script with argument parsing.
 See the [simple example source template](resources/examples/simple.m4) and [simple example script](resources/examples/simple.sh) for the result.
+If you are not into long reading, let `bin/argbash-init` generate the template for you.
 
-Following arguments are supported:
+Following argument types are supported:
 
 - Positional arguments (defaults supported, possibiliy of fixed, variable or infinite number of arguments),
 - optional arguments that take one value,
