@@ -124,7 +124,7 @@ else
 	# vvv This should catch most of the cases when we want to overwrite the source file
 	# vvv and we don't want to leave a file (not even an empty one) when something goes wrong.
 	temp_outfile=temp_out_$$
-	_trap="$_trap rm -f $temp_outfile;" EXIT
+	_trap="$_trap rm -f $temp_outfile;"
 	trap "$_trap" EXIT
 	do_stuff > "$temp_outfile"
 	mv "$temp_outfile" "$outfname"

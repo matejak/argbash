@@ -496,11 +496,14 @@ m4_define([_ARG_VERSIONx], [m4_do(
 )])
 
 
+dnl
+dnl $1: The main help message
+dnl $2: The bottom help message
 m4_define([ARG_HELP], [m4_do(
 	[[$0($@)]],
 	[dnl Skip help if we declare we don't want it
 ],
-	[m4_bmatch(m4_expand([_W_FLAGS]), [H], ,[_ARG_HELPx([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [H], ,[_ARG_HELPx([$1], [$2])])],
 )])
 
 
@@ -508,6 +511,7 @@ m4_define([_HELP_MSG])
 dnl TODO: If the name is _ARG_HELP and not _ARG_HELPx, it doesn't work. WTF!?
 m4_define([_ARG_HELPx], [m4_do(
 	[m4_define([_HELP_MSG], m4_escape([$1]))],
+	[m4_define([_HELP_MSG_EX], m4_escape([$2]))],
 	[_ARG_OPTIONAL_ACTION(
 		[help],
 		[h],
@@ -794,6 +798,10 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_popdef([_default])],
 		[m4_popdef([_VARNAME])],
 	)])])])],
+	[dnl Print a more verbose help message to the end of the help (if requested)
+],
+	[m4_ifnblank(m4_expand([_HELP_MSG_EX]), m4_expand([_INDENT_()[printf "\n]_HELP_MSG_EX[\n]"
+]))],
 	[}
 ],
 )])
@@ -997,8 +1005,6 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
-	[
-],
 	[_INDENT_()[esac]],
 )])
 

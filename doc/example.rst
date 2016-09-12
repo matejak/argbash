@@ -11,6 +11,11 @@ Templates
 Minimal example
 +++++++++++++++
 
+Let's call minimal example a script that accepts some arguments and prints their values.
+Let's consider a positional, optional, optional boolean, ``--version`` and ``--help`` arguments with parsing code embedded in the script.
+First of all, we can generate the template using ``argbash-init``.
+Then, we will edit it and add the script body.
+
 The source code for the minimal example could look like this:
 
 .. literalinclude:: ../resources/examples/minimal.m4

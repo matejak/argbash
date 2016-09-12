@@ -35,7 +35,7 @@ Template generator
 ------------------
 
 It is not advisable to write a template from scratch, since ``Argbash`` contains a tool for that.
-The ``argbash-init`` will generate a good starting template for you, so you can get started within minutes.
+The ``argbash-init`` :ref:`can generate <minimal_example>` a good starting template for you, so you can get started within minutes.
 
 On its command-line, you specify names and types of arguments, and you can also select the way how the parsing code is handled (via the ``-s``, ``--standalone`` option):
 

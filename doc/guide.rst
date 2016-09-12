@@ -228,10 +228,12 @@ Special arguments
 * Help argument (a special case of an optional action argument):
   ::
 
-     ARG_HELP([program description (optional)])
+     ARG_HELP([short program description (optional)], [long program description (optional)])
 
   This will generate the ``--help`` and ``-h`` action arguments that will print the usage information.
   Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
+
+  The long program desription is a string passed to ``printf`` (so you may use ``\n`` to make it multiline etc.).
 
 * Version argument (a special case of an action argument):
   ::
