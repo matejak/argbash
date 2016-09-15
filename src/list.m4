@@ -5,6 +5,39 @@ dnl $3: Foreach body
 m4_define([m4_list_foreach], [m4_list_ifempty([$1], ,
 	[m4_foreach([$2], m4_quote(m4_dquote_elt(m4_list_contents([$1]))), [$3])])])
 
+
+dnl $1: List names
+dnl $2: If yes
+dnl $3: If not
+m4_define([_lists_same_len], [m4_if(m4_count($1), 1, [$2],
+	[m4_if(m4_list_len(m4_car($1)), m4_list_len(m4_argn(2, $1)), 
+		[_lists_same_len(m4_expand([m4_shift($1)]), [$2], [$3])], [$3])])])
+
+
+dnl
+dnl $1: List of list names
+dnl $2: List of var names
+dnl $3: What
+m4_define([m4_lists_foreach], [_lists_same_len([$1], 
+	[m4_do(
+		[m4_pushdef([_varnames2], m4_quote(m4_dquote_elt($2)))],
+		[m4_pushdef([l_len], [m4_list_len(m4_car($1))])],
+		[m4_pushdef([l_count], [m4_count($1)])],
+		[m4_if(l_count, 0, ,
+			[m4_if(l_len, 0, , [m4_for([_idx_item], 1, l_len, 1, [m4_do(
+				[m4_for([_idx_list], 1, l_count, 1, [m4_do(
+					[m4_pushdef(m4_argn(_idx_list, _varnames2), m4_list_nth(m4_argn(_idx_list, $1), _idx_item))],
+				)])],
+				[$3],
+				[m4_for([_idx_list], 1, l_count, 1, [m4_do(
+					[m4_popdef(m4_argn(_idx_list, _varnames2))],
+				)])],
+		)])])])],
+		[m4_popdef([l_count])],
+		[m4_popdef([l_len])],
+		[m4_popdef([_varnames2])],
+	)], [m4_fatal([Lists $1 don't have the same length.])])])
+
 dnl
 dnl $1: The list's ID
 dnl $2, ... Items to be appended: DON'T QUOTE items too much before you add them, quotes will be escaped (m4_escape) and therefore ineffective in m4sugar!
@@ -24,7 +57,6 @@ m4_define([_m4_list_append_single], [m4_do(
 
 m4_define([m4_list_len], [m4_do(
 	[m4_pushdef([_LIST_NAME], [[_LIST_$1]])],
-	[],
 	[m4_ifndef(_LIST_NAME, 0, [m4_count(m4_indir(_LIST_NAME))])],
 	[m4_popdef([_LIST_NAME])],
 )])

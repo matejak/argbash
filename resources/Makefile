@@ -77,6 +77,7 @@ check: $(TESTDIR)/Makefile $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 
 unittests:
 	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
+	autom4te -l m4sugar -I ../src/ ../tests/unittests/utils.m4
 
 develop: $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"

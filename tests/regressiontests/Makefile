@@ -88,7 +88,8 @@ TESTS_GEN += \
 	gen-test-pos-opt \
 	gen-test-pos-opt2 \
 	gen-test-more \
-	gen-test-illegal \
+	gen-test-illegal-pos \
+	gen-test-illegal-opt \
 	gen-test-init_name_dash \
 	gen-test-init_name_char \
 	$(NUL)
@@ -249,8 +250,11 @@ gen-test-pos-opt2: $(TESTDIR)/gen-test-pos-opt2.m4 $(ARGBASH_BIN)
 gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
 	ERROR="is unknown" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
-gen-test-illegal: $(TESTDIR)/gen-test-illegal.m4 $(ARGBASH_BIN)
+gen-test-illegal-pos: $(TESTDIR)/gen-test-illegal-pos.m4 $(ARGBASH_BIN)
 	ERROR="contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-illegal-opt: $(TESTDIR)/gen-test-illegal-opt.m4 $(ARGBASH_BIN)
+	ERROR="one character" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
 test-delim-space: $(TESTDIR)/test-delim-space.sh
 	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something

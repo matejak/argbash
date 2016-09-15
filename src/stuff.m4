@@ -7,6 +7,10 @@ dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f 
 dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Make argbash-init template builder
+dnl TODO: Test bad values for short (or even long?) options, it doesn't work.
+dnl TODO: Add env variables handling (possible for help output too?)
+dnl TODO: Add manpage generator
+dnl TODO: Add app finder wrappers
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -39,8 +43,8 @@ dnl Checks that the an argument is a correct short option arg
 dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPT_TYPE], [m4_do(
-	[m4_ifnblank([$1], [m4_bmatch([$1], [[a-zA-z]], , 
-		[m4_fatal(['$1' is not a valid short option (for argument '$2') - it has to be one letter.])])])],
+	[m4_ifnblank([$1], [m4_bmatch([$1], [^[a-zA-z]$], , 
+		[m4_fatal([Short option '$1' for argument '--$2' is not valid - it has to be exactly one character.])])])],
 )])
 
 
@@ -649,7 +653,8 @@ m4_define([_POS_ARG_HELP_LINE], [m4_do(
 )])
 
 
-m4_define([_MAKE_USAGE_MORE], [m4_do(
+dnl TODO: Get rid of those pesky global variables
+m4_define([_MAKE_DEFAULTS_MORE], [m4_do(
 	[m4_list_ifempty(_defaults, , [m4_do(
 		[[ @{:@defaults for ]argname(m4_incr(_min_argn))],
 		[m4_if(m4_list_len(_defaults), 1, ,
@@ -660,7 +665,7 @@ m4_define([_MAKE_USAGE_MORE], [m4_do(
 )])
 
 
-m4_define([_POS_ARG_HELP_USAGE], [m4_do(
+m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONAL_CATHS], idx))],
 	[m4_case(m4_expand([_arg_type]),
 		[single],
@@ -671,8 +676,8 @@ m4_define([_POS_ARG_HELP_USAGE], [m4_do(
 				["'],
 				[@:}@],
 			)])],
-		[more], [_MAKE_USAGE_MORE],
-		[inf], [_MAKE_USAGE_MORE],
+		[more], [_MAKE_DEFAULTS_MORE],
+		[inf], [_MAKE_DEFAULTS_MORE],
 	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
 	[m4_popdef([_arg_type])],
 )])
@@ -688,19 +693,7 @@ m4_define([_ARG_FORMAT], [m4_do(
 )])
 
 
-dnl
-dnl $1: The command short description
-m4_define([_MAKE_HELP], [m4_do(
-	[# THE PRINT HELP FUNCION
-],
-	[print_help ()
-{
-],
-	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_()[echo] "_HELP_MSG"
-])),
-	[_INDENT_()[]printf 'Usage: %s],
-	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
-],
+m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 	[m4_if(HAVE_OPTIONAL, 1,
 		[m4_for([idx], 1, _NARGS, 1, [m4_do(
 			[ @<:@],
@@ -729,7 +722,23 @@ m4_define([_MAKE_HELP], [m4_do(
 		)])],
 		[ m4_join([ ], m4_unquote(m4_list_contents([_POSITIONALS_LIST])))],
 	)])],
-	[\n' "$[]0"
+)])
+
+dnl
+dnl $1: The command short description
+m4_define([_MAKE_HELP], [m4_do(
+	[# THE PRINT HELP FUNCION
+],
+	[print_help ()
+{
+],
+	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_()[echo] "_HELP_MSG"
+])),
+	[_INDENT_()[]printf 'Usage: %s],
+	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
+],
+	[_MAKE_HELP_SYNOPSIS],
+	[\n' "@S|@0"
 ],
 	[dnl Don't display extended help for an arg if it doesn't have a description
 ],
@@ -745,7 +754,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[m4_list_nth([_POSITIONALS_MSGS], idx)],
 			[dnl Check whether we have defaults
 ],
-			[_POS_ARG_HELP_USAGE],
+			[_POS_ARG_HELP_DEFAULTS],
 			[m4_popdef([_defaults])],
 			[m4_popdef([_min_argn])],
 			[m4_popdef([argname])],
@@ -1297,6 +1306,97 @@ m4_define([_W_FLAGS], [])
 
 m4_define([ARG_LEFTOVERS],
 	[m4_list_contains([BLACKLIST], [leftovers], , [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
+
+
+dnl
+dnl Macro:
+dnl no args
+dnl Function:
+dnl $1: Name of the env var
+dnl $2: The program name
+dnl $3: The error message
+m4_define([_CHECK_PROG_FACTORY_INDIR], [m4_do(
+	[check_prog
+],
+	[{
+],
+	[_JOIN_INDENTED(1,
+		[local _msg="@S|@3"],
+		[test -n "$_msg" || _msg="Unable to find a reachable executable '@S|@2'"],
+		[eval "test -n \"@S|@@S|@1\" || @S|@1=\"@S|@2\""],
+		[eval "test -x \"$(which \"@S|@2\")\" && @S|@1=\"$(which \"@S|@2\")\" || die \"$_msg\" 1"],
+	)],
+	[}
+],
+)])
+
+
+dnl
+dnl Macro:
+dnl $1: The env var name
+dnl $2: The prog name
+dnl $3: The msg
+dnl Function:
+dnl no args
+m4_define([_CHECK_PROG_FACTORY_SINGLE], [m4_do(
+	[check_prog
+],
+	[{
+],
+	[_JOIN_INDENTED(1,
+		[test -n "@S|@$1" || $1="$2"],
+		[test -x "$(which "@S|@$1")" && $1="$(which "@S|@$1")" || die "m4_default([$3], [Unable to find a reachable executable '$2'])" 1],
+	)],
+	[}
+],
+)])
+
+
+dnl
+dnl Given a program name, error messages and variable name, do this:
+dnl  - if a var name is not empty, test the prog (find the file with rx permissions), if not OK, die with our msg
+dnl  - else try: progname until RC == 0
+dnl  - if nothing is found, die with provided msg
+dnl  - if successful, save the form that works in a variable (i.e. don't try to make it an absolute path at all costs)
+dnl  $1 - env var (default: argbash translit of prog name)
+dnl  $2 - prog name
+dnl  $3 - msg if not OK
+dnl  $4 - help message (if you want to mention existence of this in the help)
+dnl
+dnl  In case of path issues (i.e. script is in a crontab), update the PATH variable yourself above the argbash code.
+dnl
+dnl  internally:
+dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS
+m4_define([DEINE_PROG], [m4_ifndef([WRAPPED], [m4_do(
+	[m4_list_append([PROG_VARS], m4_default([$1], _translit([$2])))],
+	[m4_list_append([PROG_NAMES], [$2])],
+	[m4_list_append([PROG_MSGS], [$3])],
+	[m4_list_append([PROG_HELPS], [$4])],
+)])])
+
+
+dnl
+dnl $1: A prologue message
+m4_define([_HELP_PROGS], [m4_list_ifempty([PROG_VARS], ,
+	[$1
+m4_for([idx], 1, m4_list_len([PROG_VARS]), 1, [m4_do(
+		[],
+)])])])
+
+
+dnl
+dnl Given an env variable name, assign a default value to it (if it is empty)
+dnl  $1 - env var
+dnl  $2 - default value (optional, shouldn't be blank unless we have $# >=4)
+dnl  $3 - help message (optional)
+dnl  $4 - arg name the env var can default to (none by default, the env default's priority is higher than default's priority, but lower than actual argument value)
+dnl
+dnl  internally:
+dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
+m4_define([DEINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
+	[],
+)])])
+
 
 dnl If I am wrapped:
 dnl It may be that the wrapped script contains args that we already have.
