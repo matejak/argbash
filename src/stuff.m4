@@ -625,61 +625,69 @@ m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
 
 dnl
-dnl uses macros argname, _min_argn, _max_argn
+dnl $1: argname
+dnl $2: _arg_type
+dnl $3: _min_argn
+dnl $4: _max_argn
 dnl In case of 'inf': If _INF_REPR is not blank, use it, otherwise compose the command-line yourself
 m4_define([_POS_ARG_HELP_LINE], [m4_do(
-	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONAL_CATHS], idx))],
-	[m4_case(m4_expand([_arg_type]),
-		[single], [m4_list_append([_POSITIONALS_LIST], m4_if(_min_argn, 0,
-			m4_expand([@<:@<argname>@:>@]), m4_expand([<argname>])))],
+	[m4_case([$2],
+		[single], [m4_list_append([_POSITIONALS_LIST], m4_if([$3], 0,
+			[@<:@<$1>@:>@], [<$1>]))],
 		[more], [m4_do(
-			[m4_if(_min_argn, 0, ,
-				[m4_for([idx2], 1, _min_argn, 1,
-					[m4_list_append([_POSITIONALS_LIST], m4_expand([<argname-idx2>]))])])],
-			[m4_if(_min_argn, _max_argn, ,
-				[m4_for([idx2], m4_incr(_min_argn), _max_argn, 1,
-					[m4_list_append([_POSITIONALS_LIST], m4_expand([@<:@<argname-idx2>@:>@]))])])])],
+			[m4_if([$3], 0, ,
+				[m4_for([idx2], 1, [$3], 1,
+					[m4_list_append([_POSITIONALS_LIST], m4_expand([[<$1-]idx2>]))])])],
+			[m4_if([$3], [$4], ,
+				[m4_for([idx2], m4_incr([$3]), [$4], 1,
+					[m4_list_append([_POSITIONALS_LIST], m4_expand([[@<:@<$1-]idx2>@:>@]))])])])],
 		[inf], [m4_ifnblank(_INF_REPR, [m4_list_append([_POSITIONALS_LIST], _INF_REPR)], [m4_do(
-			[m4_if(_min_argn, 0, ,
-				[m4_for([idx2], 1, _min_argn, 1,
-					[m4_list_append([_POSITIONALS_LIST], m4_expand([<argname-idx2>]))])])],
+			[m4_if([$3], 0, ,
+				[m4_for([idx2], 1, [$3], 1,
+					[m4_list_append([_POSITIONALS_LIST], m4_expand([[<$1-]idx2>]))])])],
 			[m4_list_append([_POSITIONALS_LIST],
-				m4_expand([@<:@<argname[-]m4_incr(_min_argn)>@:>@]),
+				m4_expand([[@<:@<$1-]m4_incr($3)>@:>@]),
 				[...],
-				m4_expand([@<:@<argname[-]n>@:>@]),
+				[@<:@<$1-n>@:>@],
 				[...])])])],
-	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
-	[m4_popdef([_arg_type])],
+	[m4_fatal([$0: Unhandled arg type: '$1'])])],
 )])
 
 
-dnl TODO: Get rid of those pesky global variables
-m4_define([_MAKE_DEFAULTS_MORE], [m4_do(
-	[m4_list_ifempty(_defaults, , [m4_do(
-		[[ @{:@defaults for ]argname(m4_incr(_min_argn))],
-		[m4_if(m4_list_len(_defaults), 1, ,
-			[[ to ]argname(m4_eval(_min_argn + m4_list_len(_defaults)))[ respectively]])],
+dnl
+dnl $1: argname macro
+dnl $2: _arg_type
+dnl $3: _min_argn
+dnl $4: _defaults
+m4_define([_MAKE_DEFAULTS_MORE_MSG], [m4_do(
+	[m4_list_ifempty([$4], , [m4_do(
+		[[ @{:@defaults for ]$1(m4_incr([$3]))],
+		[m4_if(m4_list_len([$4]), 1, ,
+			[[ to ]$1(m4_eval([$3] + m4_list_len([$4])))[ respectively]])],
 		[: ],
-		[m4_list_join(_defaults, [, ], ', ', [ and ])@:}@],
+		[m4_list_join([$4], [, ], ', ', [ and ])@:}@],
 	)])],
 )])
 
 
+dnl
+dnl $1: argname macro
+dnl $2: _arg_type
+dnl $3: _min_argn
+dnl $4: _defaults
 m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
-	[m4_pushdef([_arg_type], m4_list_nth([_POSITIONAL_CATHS], idx))],
-	[m4_case(m4_expand([_arg_type]),
+	[m4_case([$2],
 		[single],
-			[m4_if(_min_argn, 0, [m4_do(
+			[m4_if([$3], 0, [m4_do(
 				[ @{:@],
 				[default: '"],
-				[_defaults],
+				[$4],
 				["'],
 				[@:}@],
 			)])],
-		[more], [_MAKE_DEFAULTS_MORE],
-		[inf], [_MAKE_DEFAULTS_MORE],
-	[m4_fatal([$0: Unhandled arg type: ]'_arg_type')])],
-	[m4_popdef([_arg_type])],
+		[more], [_MAKE_DEFAULTS_MORE_MSG([$1], [$2], [$3], [$4])],
+		[inf], [_MAKE_DEFAULTS_MORE_MSG([$1], [$2], [$3], [$4])],
+	[m4_fatal([$0: Unhandled arg type: '$2'])])],
 )])
 
 
@@ -711,15 +719,8 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
-		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
-			[m4_pushdef([argname], m4_expand(m4_list_nth([_POSITIONALS_NAMES], idx)))],
-			[m4_pushdef([_min_argn], m4_expand(m4_list_nth([_POSITIONALS_MINS], idx)))],
-			[m4_pushdef([_max_argn], m4_expand(m4_list_nth([_POSITIONALS_MAXES], idx)))],
-			[_POS_ARG_HELP_LINE],
-			[m4_popdef([_max_argn])],
-			[m4_popdef([_min_argn])],
-			[m4_popdef([argname])],
-		)])],
+		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_MAXES,_POSITIONAL_CATHS], [argname,_min_argn,_max_argn,_arg_type],
+			[_POS_ARG_HELP_LINE(m4_expand([argname]), m4_expand([_arg_type]), m4_expand([_min_argn]), m4_expand([_max_argn]))])],
 		[ m4_join([ ], m4_unquote(m4_list_contents([_POSITIONALS_LIST])))],
 	)])],
 )])
@@ -743,25 +744,21 @@ m4_define([_MAKE_HELP], [m4_do(
 	[dnl Don't display extended help for an arg if it doesn't have a description
 ],
 	[m4_if(HAVE_POSITIONAL, 1,
-		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_ifnblank(m4_list_nth([_POSITIONALS_MSGS], idx), [m4_do(
+		[m4_lists_foreach(
+			[_POSITIONALS_NAMES,_POSITIONAL_CATHS,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONALS_MSGS],
+			[argname0,_arg_type,_min_argn,_defaults,_msg], [m4_ifnblank(m4_quote(_msg),
+			[m4_do(
 			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
-			[m4_pushdef([argname0], <m4_expand([m4_list_nth([_POSITIONALS_NAMES], idx)])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
-			[m4_pushdef([argname], m4_if(m4_list_nth(_POSITIONAL_CATHS, idx), [inf], [m4_default(_INF_REPR, argname0)], [[argname0($][@)]]))],
-			[m4_pushdef([_min_argn], m4_expand([m4_list_nth([_POSITIONALS_MINS], idx)]))],
-			[m4_pushdef([_defaults], m4_expand([m4_list_nth([_POSITIONALS_DEFAULTS], idx)]))],
-			[_INDENT_()[printf "\t]argname[: ]],
-			[m4_list_nth([_POSITIONALS_MSGS], idx)],
-			[dnl Check whether we have defaults
-],
-			[_POS_ARG_HELP_DEFAULTS],
-			[m4_popdef([_defaults])],
-			[m4_popdef([_min_argn])],
+			[m4_pushdef([argname1], <m4_expand([argname0])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
+			[m4_pushdef([argname], m4_if(m4_quote(_arg_type), [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
+			[_INDENT_()[printf "\t]argname[: ]_msg],
+			[_POS_ARG_HELP_DEFAULTS([argname], m4_expand([_arg_type]), m4_expand([_min_argn]), m4_expand([_defaults]))],
 			[m4_popdef([argname])],
-			[m4_popdef([argname0])],
+			[m4_popdef([argname1])],
 			[[\n"
 ]],
-		)])])],
+			)])])],
 	)],
 	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
 ],
@@ -1134,41 +1131,47 @@ done]],
 
 
 dnl
+dnl $1: argname macro
+dnl $2: _arg_type
+dnl $3: _min_argn
+dnl $4: _defaults
+dnl
 dnl Make defaults for arguments that possibly accept more than one value
-m4_define([_MAKE_DEFAULTS_MORE], [m4_do(
-	[m4_pushdef([_min_argn], m4_list_nth([_POSITIONALS_MINS], idx))],
+m4_define([_MAKE_DEFAULTS_MORE_VALS], [m4_do(
 	[@{:@],
 	[dnl m4_for([foo], 1, 0) doesn't work
 ],
-	[m4_if(_min_argn, 0, ,
-		[m4_for([foo], 1, _min_argn, 1, ['' ])])],
+	[m4_if([$3], 0, ,
+		[m4_for([foo], 1, [$3], 1, ['' ])])],
 	[m4_join([ ],
 		m4_map_sep(
 			[_sh_quote],
 			[,],
-			m4_dquote(m4_list_contents(_DEFAULT))))],
+			m4_dquote(m4_list_contents([$4]))))],
 	[@:}@],
-	[m4_popdef([_min_argn])],
 )])
 
 
+dnl
+dnl $1: argname macro
+dnl $2: _arg_type
+dnl $3: _min_argn
+dnl $4: _defaults
 dnl
 dnl $1: The item index
 dnl If the corresponding arg has a default, save it according to its type.
 dnl If it doesn't have one, do nothing (TODO: to be reconsidered)
 m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
-	[m4_pushdef([_DEFAULT], m4_list_nth([_POSITIONALS_DEFAULTS], [$1]))],
-	[m4_ifnblank(m4_quote(_DEFAULT), [m4_do(
-		[_varname(m4_list_nth([_POSITIONALS_NAMES], [$1]))=],
-		[m4_case(m4_list_nth([_POSITIONAL_CATHS], [$1]),
-			[single], [_DEFAULT],
-			[more], [_MAKE_DEFAULTS_MORE],
-			[inf], [_MAKE_DEFAULTS_MORE],
+	[m4_ifnblank([$4], [m4_do(
+		[_varname([$1])=],
+		[m4_case([$2],
+			[single], [$4],
+			[more], [_MAKE_DEFAULTS_MORE_VALS([$1], [$2], [$3], [$4])],
+			[inf], [_MAKE_DEFAULTS_MORE_VALS([$1], [$2], [$3], [$4])],
 		)],
 		[
 ],
 	)])],
-	[m4_popdef([_DEFAULT])],
 )])
 
 
@@ -1178,8 +1181,8 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION - POSITIONALS
 ],
-		[m4_for([idx], 1, m4_list_len([_POSITIONALS_NAMES]), 1,
-			[_MAKE_DEFAULTS_POSITIONALS_LOOP(idx)])],
+		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONAL_CATHS], [argname,_min_argn,_defaults,_arg_type],
+			[_MAKE_DEFAULTS_POSITIONALS_LOOP(m4_expand([argname]), m4_expand([_arg_type]), m4_expand([_min_argn]), m4_expand([_defaults]))])],
 	)])],
 	[m4_if(HAVE_OPTIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
@@ -1412,3 +1415,7 @@ dnl
 dnl * Upon arg encounter, validate the value. Die in case of no compliance.
 dnl * Help: optional args - value should take the name.
 dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
+dnl
+dnl defauls handling:
+dnl - X -> _MAKE_DEFAULTS -> _MAKE_DEFAULTS_POSITIONALS_LOOP -> _MAKE_DEFAULTS_MORE_VALS
+dnl - X -> _MAKE_HELP -> _POS_ARG_HELP_DEFAULTS -> _MAKE_DEFAULTS_MORE_MSG

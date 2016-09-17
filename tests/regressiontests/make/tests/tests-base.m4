@@ -17,6 +17,9 @@ ADD_TEST([test-most], [[
 	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
 	$< xx yy | grep -q "POS_MORE1=xx yy,POS_MORE2=hu lu,"
 	$< xx yy zz aa | grep -q "POS_MORE1=xx yy,POS_MORE2=zz aa,"
+	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
+	$< -h | grep -q '<pos-more1>: @pos-more1-arg@'
+	$< -h | grep -q "<pos-more2>: @pos-more2-arg@ (defaults for <pos-more2-1> to <pos-more2-2> respectively: 'hu' and 'lu')"
 ]])
 
 ADD_TEST([test-more], [[

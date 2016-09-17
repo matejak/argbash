@@ -77,7 +77,6 @@ do
     *)
       _positionals+=("$1")
       ;;
-
   esac
   shift
 done

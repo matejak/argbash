@@ -31,7 +31,7 @@ print_help ()
 {
   echo "This is a minimal demo of Argbash potential"
   printf 'Usage: %s [-o|--option <arg>] [--(no-)print] [-v|--version] [-h|--help] <positional-arg>\n' "$0"
-  printf "\t<positional-arg->: Positional arg description\n"
+  printf "\t<positional-arg>: Positional arg description\n"
   printf "\t-o,--option: A option with short and long flags and default (default: '%s')\n" "b"
   printf "\t--print,--no-print: A boolean option with long flag (and implicit default: off) (%s by default)\n" "off"
   printf "\t-v,--version: Prints version\n"
@@ -68,7 +68,6 @@ do
     *)
       _positionals+=("$1")
       ;;
-
   esac
   shift
 done
