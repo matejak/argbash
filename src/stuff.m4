@@ -806,6 +806,13 @@ m4_define([_MAKE_HELP], [m4_do(
 	)])])])],
 	[dnl Print a more verbose help message to the end of the help (if requested)
 ],
+	[_ENV_HELP()],
+	[m4_list_ifempty([LIST_ENV_HELP], ,[m4_do(
+		[printf 'Environment variables that are supported:\n'
+],
+		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t[]_msg\n"
+])],
+	)])],
 	[m4_ifnblank(m4_expand([_HELP_MSG_EX]), m4_expand([_INDENT_()[printf "\n]_HELP_MSG_EX[\n]"
 ]))],
 	[}
@@ -1268,6 +1275,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 # Argbash is FREE SOFTWARE, know your rights: https://github.com/matejak/argbash
 
 ]],
+	[_SETTLE_ENV],
 	[m4_if(_NO_ARGS_WHATSOEVER, 1, [], [m4_do(
 		[_MAKE_UTILS
 ],
@@ -1390,15 +1398,45 @@ m4_for([idx], 1, m4_list_len([PROG_VARS]), 1, [m4_do(
 dnl
 dnl Given an env variable name, assign a default value to it (if it is empty)
 dnl  $1 - env var
-dnl  $2 - default value (optional, shouldn't be blank unless we have $# >=4)
+dnl  $2 - default value (optional, but maybe it shouldn't be blank unless we have $# >=4)
 dnl  $3 - help message (optional)
-dnl  $4 - arg name the env var can default to (none by default, the env default's priority is higher than default's priority, but lower than actual argument value)
+dnl  $4 - (don't implement now) arg name the env var can default to (none by default, the env default's priority is higher than default's priority, but lower than actual argument value)
 dnl
 dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
-m4_define([DEINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
-	[],
+dnl TODO: Hanlde the case of wrapping correctly
+m4_define([DEFINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
+	[[$0($@)]],
+	[m4_list_append([ENV_NAMES], [$1])],
+	[m4_list_append([ENV_DEFAULTS], [$2])],
+	[m4_list_append([ENV_HELPS], [$3])],
+	[m4_list_append([ENV_ARGNAMES], [$4])],
 )])])
+
+
+m4_define([_SETTLE_ENV], [m4_list_ifempty([ENV_NAMES], , [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS], [_name,_default], [m4_do(
+	[# Setting environmental variables
+],
+	[m4_ifnblank(m4_quote(_default), [m4_list_append([_OTHER], 
+		m4_expand([__SETTLE_ENV(m4_expand([_name]), m4_expand([_default]))]))])],
+)])]
+)])
+
+
+m4_define([_ENV_HELP], [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], [m4_do(
+	[m4_ifnblank(m4_quote(_help), [m4_list_append([LIST_ENV_HELP], [m4_do(
+		[m4_expand([_name: _help.])],
+		[m4_ifnblank(m4_quote(_default), m4_expand([[(default: ']_default')]))],
+	)])])],
+)])])
+
+dnl
+dnl $1: name
+dnl $2: default
+m4_define([__SETTLE_ENV], [m4_do(
+	[test -n "@S|@$1" || $1="$2"
+],
+)])
 
 
 dnl If I am wrapped:

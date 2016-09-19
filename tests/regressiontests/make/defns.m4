@@ -3,6 +3,7 @@ m4_include([make.m4])
 m4_include([tests/tests-base.m4])
 m4_include([tests/tests-delimiters.m4])
 m4_include([tests/tests-init.m4])
+m4_include([tests/tests-env.m4])
 
 m4_divert_push(STDOUT1)dnl
 TESTS = 
