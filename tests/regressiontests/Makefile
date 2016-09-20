@@ -332,15 +332,15 @@ gen-test-init_name_char: $(TESTDIR)/gen-test-init_name_char.m4 $(ARGBASH_BIN)
 	ERROR="'foo/bar-baz' .* contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
 test-env-base: $(TESTDIR)/test-env-base.sh
-	$< | grep -q 'ENVI_FOO=default,'
+	$< | grep -q 'ENVI_FOO=def,ault,'
 	$< | grep -q 'ENVI_BAR=,'
 	ENVI_FOO=something $< | grep -q 'ENVI_FOO=something'
-	$< -h | grep -q "ENVI_FOO: A sample env, variable. (default: 'something')"
+	$< -h | grep -q "ENVI_FOO: A sample env, variable. (default: 'def,ault')"
 	$< -h | grep -q "ENVI_BAR: A sample env, variable."
 
 test-env-simple: $(TESTDIR)/test-env-simple.sh
-	$< | grep -q 'ENVI_FOO=something,'
-	$(REVERSE) $< -h | grep -q 'ENVI_FOO'
+	$< | grep -q 'ENVI_FOO=def,ault,'
+	! $< -h | grep -q 'ENVI_FOO'
 
 tests-gen: $(TESTS_GEN)
 

@@ -204,7 +204,8 @@ m4_include([list.m4])
 
 dnl
 dnl The operation on command names that makes stem of variable names
-m4_define([_translit], [m4_translit(m4_translit([$1], [A-Z], [a-z]), [-], [_])])
+m4_define([_translit_var], [m4_translit(m4_translit([$1], [A-Z], [a-z]), [-], [_])])
+m4_define([_translit_prog], [m4_translit(m4_translit([$1], [a-z], [A-Z]), [-], [_])])
 
 
 dnl
@@ -213,7 +214,7 @@ m4_define([_opt_suffix], [[_opt]])
 m4_define([_pos_suffix], [[_pos]])
 m4_define([_arg_prefix], [[_arg_]])
 m4_define([_args_prefix], [[_args_]])
-m4_define([_varname], [_arg_prefix[]_translit([$1])])
+m4_define([_varname], [_arg_prefix[]_translit_var([$1])])
 
 
 dnl
@@ -237,7 +238,7 @@ dnl $2: Argument type (OPT or POS)
 dnl Check whether an argument has not (long or short) options that conflict with already defined args.
 dnl Also writes the argname to the right set
 m4_define([_CHECK_ARGNAME_FREE], [m4_do(
-	[m4_pushdef([_TLIT], m4_dquote(_translit([$1])))],
+	[m4_pushdef([_TLIT], m4_dquote(_translit_var([$1])))],
 	[m4_set_contains([_ARGS_LONG], _TLIT,
 		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a long option used earlier.])])])],
 	[m4_set_contains([_POSITIONALS], _TLIT,
@@ -267,8 +268,8 @@ dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
 m4_define([__some_opt], [m4_do(
 	[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_define([_COLLECT_]m4_quote(_varname([$1])),  _args_prefix[]_translit(WRAPPED)[]_opt_suffix)],
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+		[m4_define([_COLLECT_]m4_quote(_varname([$1])),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
 	)])],
 	[m4_list_append([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
@@ -330,9 +331,9 @@ m4_define([IF_POSITIONALS_VARNUM],
 
 
 m4_define([_POS_WRAPPED],[m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix]))],
-		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit(WRAPPED)[]_pos_suffix+=([$1])]))],
+		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit_var(WRAPPED)[]_pos_suffix]))],
+		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit_var(WRAPPED)[]_pos_suffix+=([$1])]))],
 )])])
 
 dnl
@@ -808,7 +809,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[_ENV_HELP()],
 	[m4_list_ifempty([LIST_ENV_HELP], ,[m4_do(
-		[printf 'Environment variables that are supported:\n'
+		[printf '\nEnvironment variables that are supported:\n'
 ],
 		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t[]_msg\n"
 ])],
@@ -1373,16 +1374,20 @@ dnl  $1 - env var (default: argbash translit of prog name)
 dnl  $2 - prog name
 dnl  $3 - msg if not OK
 dnl  $4 - help message (if you want to mention existence of this in the help)
+dnl  $5 - args (if you want to check args)
 dnl
 dnl  In case of path issues (i.e. script is in a crontab), update the PATH variable yourself above the argbash code.
 dnl
 dnl  internally:
 dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS
-m4_define([DEINE_PROG], [m4_ifndef([WRAPPED], [m4_do(
-	[m4_list_append([PROG_VARS], m4_default([$1], _translit([$2])))],
+m4_define([DEFINE_PROG], [m4_ifndef([WRAPPED], [m4_do(
+	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
 	[m4_list_append([PROG_NAMES], [$2])],
 	[m4_list_append([PROG_MSGS], [$3])],
 	[m4_list_append([PROG_HELPS], [$4])],
+	[dnl Even if $# == 5, $5 can be blank, which we support.
+],
+	[m4_list_append([PROG_ARGS], m4_if([$#], 5, [[$5]], []))],
 )])])
 
 
@@ -1405,6 +1410,7 @@ dnl
 dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
 dnl TODO: Hanlde the case of wrapping correctly
+dnl TODO: Find out a proper name for this
 m4_define([DEFINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
 	[[$0($@)]],
 	[m4_list_append([ENV_NAMES], [$1])],
@@ -1424,11 +1430,12 @@ m4_define([_SETTLE_ENV], [m4_list_ifempty([ENV_NAMES], , [m4_lists_foreach([ENV_
 
 
 m4_define([_ENV_HELP], [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], [m4_do(
-	[m4_ifnblank(m4_quote(_help), [m4_list_append([LIST_ENV_HELP], [m4_do(
+	[m4_ifnblank(m4_quote(_help), [m4_list_append([LIST_ENV_HELP], m4_expand([m4_do(
 		[m4_expand([_name: _help.])],
-		[m4_ifnblank(m4_quote(_default), m4_expand([[(default: ']_default')]))],
-	)])])],
+		[m4_ifnblank(m4_quote(_default), m4_expand([[ (default: ']_default')]))],
+	)]))])],
 )])])
+
 
 dnl
 dnl $1: name

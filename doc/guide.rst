@@ -378,6 +378,33 @@ Plus, there are convenience macros:
 
        Check out the example: :ref:`ex_wrapping`
 
+* Declare that your script uses an environment variable, set a default for it if it is blank upon the script's invocatino and optionally mention it in the script's help:
+
+  ::
+
+    DEFINE_ENV([variable name], [default if empty (optional)], [help message (optional)])
+
+  For instance, if you declare ``DEFINE_ENV([ENV], [production], [The default environment])`` 
+  
+* Declare that your script calls a program and enable the caller to set it using an environmental variable.
+
+  ::
+
+    DEFINE_PROG([variable name], [default if empty (optional)], [help message (optional)], [args (optional)])
+
+  For instance, if you declare ``DEFINE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` in later.
+  This macro operates in two modes:
+
+  * ``args`` are not given:
+    The program name is searched for using the ``which`` utility and if it isn't a executable, the script will terminate with an error.
+    ``DEFINE_PROG([PYTHON], [python], ,)``
+  * ``args`` are given:
+    The program is called with ``args`` and if the return code is non-zero, the script will terminate with an error.
+    If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``DEFINE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
+    
+    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the ``Python`` shell) and you should use ``DEFINE_PROG([PYTHON], [python], , [--version])`` instead.
+  In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller set.
+
 Action macro
 ++++++++++++
 
