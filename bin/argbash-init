@@ -40,7 +40,7 @@ _arg_wrap=()
 print_help ()
 {
 	echo "Make a template for scripts."
-	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-v|--version] [-h|--help] [<output>]\n' "$0"
+	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos_DELIM_IN_HELParg] [--opt_DELIM_IN_HELParg] [--opt-bool_DELIM_IN_HELParg] [--wrap_DELIM_IN_HELParg] [-v|--version] [-h|--help] [<output>]\n' "$0"
 	printf "\t<output>: Name of the output template (default: '""-""')\n"
 	printf "\t-s,--separate: Separate the parsing logic (specify two times for complete separation)\n"
 	printf "\t--hints,--no-hints: Whether to write hints to the script template (%s by default)\n" "off"

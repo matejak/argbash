@@ -384,7 +384,8 @@ Plus, there are convenience macros:
 
     DEFINE_ENV([variable name], [default if empty (optional)], [help message (optional)])
 
-  For instance, if you declare ``DEFINE_ENV([ENV], [production], [The default environment])`` 
+  For instance, if you declare ``DEFINE_ENV([ENVIRONMENT], [production], [The default environment])``, the value of the ``ENVIRONMENT`` environmental variable won't be empty --- if the user doesn't do anything, it will be ``production`` and if the user overrides it, it will stay that way.
+  It is undefined whether the user can override it, so it has a blank value in the script due to the user override (i.e. it is not possible now, but it may become possible in a later release.).
   
 * Declare that your script calls a program and enable the caller to set it using an environmental variable.
 

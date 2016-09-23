@@ -41,6 +41,7 @@ TESTS += \
 	test-init_simple-ss \
 	test-env-base \
 	test-env-simple \
+	test-int \
 	$(NUL)
 TESTS += tests-gen
 
@@ -82,6 +83,7 @@ SCRIPTS += \
 	$(TESTDIR)/gen-test-init_name_dash.m4 \
 	$(TESTDIR)/test-env-base.sh \
 	$(TESTDIR)/test-env-simple.sh \
+	$(TESTDIR)/test-int.sh \
 	$(NUL)
 
 TESTS_GEN += \
@@ -341,6 +343,18 @@ test-env-base: $(TESTDIR)/test-env-base.sh
 test-env-simple: $(TESTDIR)/test-env-simple.sh
 	$< | grep -q 'ENVI_FOO=def,ault,'
 	! $< -h | grep -q 'ENVI_FOO'
+
+test-int: $(TESTDIR)/test-int.sh
+	$< 1 | grep -q "POS_S=1,"
+	ERROR="integer" $(REVERSE) $< a
+	ERROR="integer" $(REVERSE) $< 1.5
+	$< 1 --num 2 | grep -q "OPT_S=2,"
+	ERROR="integer" $(REVERSE) $< 1 --num b
+	$< 01 | grep -q "POS_S=1,"
+	$< +1 | grep -q "POS_S=1,"
+	$< -1 | grep -q "POS_S=-1,"
+	$< -1776 | grep -q "POS_S=1776,"
+	$< -h | grep -q "INT"
 
 tests-gen: $(TESTS_GEN)
 

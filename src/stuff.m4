@@ -7,8 +7,6 @@ dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f 
 dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Make argbash-init template builder
-dnl TODO: Test bad values for short (or even long?) options, it doesn't work.
-dnl TODO: Add env variables handling (possible for help output too?)
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl
@@ -131,6 +129,15 @@ m4_define([_MK_VALIDATE_GROUP_FUNCTION], [m4_do(
 		[return 4],
 	)],
 	[}],
+)])
+
+
+dnl
+dnl Given the value as $1, construct a statement that will validate whether it is an integer
+dnl $1: The value
+dnl $2: The argument name
+m4_define([_MK_VALIDATE_INT], [m4_do(
+	[[echo $1 | grep -q '[+-]?[0-9]+' || die "Value of the argument '$2' has to be an integer, got '$1'." 2]],
 )])
 
 
@@ -693,26 +700,25 @@ m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 
 
 dnl
-dnl $1: arg index
+dnl $1: _argname
+dnl $2: short arg
 dnl Returns either --long or -l|--long if there is that -l
 m4_define([_ARG_FORMAT], [m4_do(
-	[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx),
-		[-]m4_list_nth([_ARGS_SHORT], idx)|)],
-	[[--]m4_list_nth([_ARGS_LONG], idx)],
+	[m4_ifnblank([$2],
+		[-$2|])],
+	[[--$1]],
 )])
 
 
 m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 	[m4_if(HAVE_OPTIONAL, 1,
-		[m4_for([idx], 1, _NARGS, 1, [m4_do(
+		[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
 			[ @<:@],
-			[m4_case(m4_list_nth([_ARGS_CATH], idx),
-				[bool], [--(no-)]m4_list_nth([_ARGS_LONG], idx),
-				[arg], [_ARG_FORMAT(idx)_DELIM_IN_HELP]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
-					[<arg>]),
-				[repeated], [_ARG_FORMAT(idx)_DELIM_IN_HELP]m4_case([m4_list_nth([_ARGS_VAL_TYPE], idx)-unquote when _ARGS_VAL_TYPE is avail],
-					[<arg>]),
-				[_ARG_FORMAT(idx)])],
+			[m4_case(_arg_type,
+				[bool], [--(no-)]_argname,
+				[arg], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+				[repeated], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+				[_ARG_FORMAT(_argname, _arg_short)])],
 			[@:>@],
 		)])],
 	)],
@@ -765,45 +771,46 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
-	[m4_if(_NARGS, 0, [], [m4_for([idx], 1, _NARGS, 1, [m4_ifnblank(m4_list_nth([_ARGS_HELP], idx), [m4_do(
-		[m4_pushdef([_VARNAME], [_varname(m4_list_nth([_ARGS_LONG], idx))])],
-		[_INDENT_()printf "\t],
-		[dnl Display a short one if it is not blank
+	[m4_if(_NARGS, 0, [], [m4_lists_foreach(
+		[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
+		[_argname,_arg_short,_arg_type,_default,_arg_help],
+		[m4_ifnblank(_arg_help, [m4_do(
+			[m4_pushdef([_VARNAME], [_varname(_argname)])],
+			[_INDENT_()printf "\t],
+			[dnl Display a short one if it is not blank
 ],
-		[m4_ifnblank(m4_list_nth([_ARGS_SHORT], idx), -m4_list_nth([_ARGS_SHORT], idx)[,])],
-		[dnl Long one is never blank
+			[m4_ifnblank(_arg_short, -_arg_short[,])],
+			[dnl Long one is never blank
 ],
-		[--m4_list_nth([_ARGS_LONG], idx)],
-		[dnl Bool have a long beginning with --no-
+			[--_argname],
+			[dnl Bool have a long beginning with --no-
 ],
-		[m4_case(m4_list_nth([_ARGS_CATH], idx), [bool], [,--no-]m4_list_nth([_ARGS_LONG], idx))],
-		[: m4_list_nth([_ARGS_HELP], idx)],
-		[dnl Actions don't have defaults
+			[m4_case(_arg_type, [bool], [,--no-]_argname)],
+			[: _arg_help],
+			[dnl Actions don't have defaults
 ],
-		[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
+			[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
 ],
-		[dnl Now the default is expanded since it is between double quotes
+			[dnl Now the default is expanded since it is between double quotes
 ],
-		[m4_pushdef([_default], m4_quote(m4_list_nth([_ARGS_DEFAULT], idx)))],
-		[m4_case(m4_list_nth([_ARGS_CATH], idx),
-			[action], [],
-			[incr], [],
-			[bool], [ (%s by default)],
-			[repeated], [ m4_if(m4_quote(_default), [()], [(empty by default)], [(default array: %s )])],
-			[ @{:@m4_ifnblank(m4_quote(_default), [default: '%s'], [no default])@:}@])],
-		[\n"],
-		[dnl Single: We are already quoted
+			[m4_case(_arg_type,
+				[action], [],
+				[incr], [],
+				[bool], [ (%s by default)],
+				[repeated], [ m4_if(m4_quote(_default), [()], [(empty by default)], [(default array: %s )])],
+				[ @{:@m4_ifnblank(m4_quote(_default), [default: '%s'], [no default])@:}@])],
+			[\n"],
+			[dnl Single: We are already quoted
 ],
-		[m4_case(m4_list_nth([_ARGS_CATH], idx),
-			[action], [],
-			[incr], [],
-			[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
-			[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
-			[m4_ifnblank(m4_quote(_default), [ "_default"])])],
-		[
+			[m4_case(_arg_type,
+				[action], [],
+				[incr], [],
+				[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
+				[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
+				[m4_ifnblank(m4_quote(_default), [ "_default"])])],
+			[
 ],
-		[m4_popdef([_default])],
-		[m4_popdef([_VARNAME])],
+			[m4_popdef([_VARNAME])],
 	)])])])],
 	[dnl Print a more verbose help message to the end of the help (if requested)
 ],
@@ -849,7 +856,7 @@ dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
 dnl $3: Action
 m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
-	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+	[test @S|@# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[_val="@S|@2"],
 	[shift],
 	[$3],
@@ -884,7 +891,7 @@ m4_define([_MAYBE_EQUALS_MATCH_FACTORY], [m4_define([_MAYBE_EQUALS_MATCH],
 		[arg], [$1],
 		[repeated], [$1], [])])])
 dnl
-dnl Defines macro:
+dnl Defines macro _MAYBE_EQUALS_MATCH:
 dnl
 dnl $1: Option type (be effective only for 'arg' and 'repeated')
 dnl $2: Option name
@@ -925,6 +932,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
 
+
+
 dnl
 dnl Sets the option--value separator (i.e. --option=val or --option val
 dnl $1: The directive (' ', '=', or ' =' or '= ')
@@ -936,31 +945,34 @@ dnl The default is both ' ' and '='
 _SET_OPTION_DELIMITER([ =])
 
 
+dnl
+dnl $1: _argname
+dnl $2: short opt.
+dnl $3: _arg_type
+dnl $4: _default
 m4_define([_OPTS_VALS_LOOP_BODY], [m4_do(
 	[
 _INDENT_(2,	)],
 	[dnl Output short option (if we have it), then |
 ],
-	[m4_pushdef([_argname], m4_list_nth([_ARGS_LONG], [$1]))],
-	[m4_pushdef([_argname_s], m4_list_nth([_ARGS_SHORT], [$1]))],
-	[m4_ifblank(_argname_s, [], [-_argname_s|])],
+	[m4_ifblank([$2], [], [[-$2|]])],
 	[dnl If we are dealing with bool, also look for --no-...
 ],
-	[m4_if(m4_list_nth([_ARGS_CATH], [$1]), [bool], [[--no-]_argname|])],
+	[m4_if([$3], [bool], [[--no-$1|]])],
 	[dnl and then long option for the case.
 ],
-	[--_argname],
-	[_MAYBE_EQUALS_MATCH(m4_list_nth([_ARGS_CATH], [$1]), _argname)],
+	[[--$1]],
+	[_MAYBE_EQUALS_MATCH([$3], [$1])],
 	[@:}@
 ],
-	[m4_pushdef([_ARGVAR], [_varname(m4_expand([_argname]))])],
+	[m4_pushdef([_ARGVAR], [_varname([$1])])],
 	[dnl Output the body of the case
 ],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
-	[m4_case(m4_list_nth([_ARGS_CATH], [$1]),
-		[arg], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[="$_val"])],
-		[repeated], [_VAL_OPT_ADD(_argname, _argname_s, _ARGVAR[+=("$_val")])],
+	[m4_case([$3],
+		[arg], [_VAL_OPT_ADD([$1], [$2], _ARGVAR[="$_val"])],
+		[repeated], [_VAL_OPT_ADD([$1], [$2], _ARGVAR[+=("$_val")])],
 		[bool],
 		[_JOIN_INDENTED(3,
 			_ARGVAR[="on"],
@@ -974,14 +986,12 @@ _INDENT_(2,	)],
 		)],
 		[action],
 		[_JOIN_INDENTED(3,
-			[m4_list_nth([_ARGS_DEFAULT], idx)],
+			[[$4]],
 			[exit 0],
 		)],
 	)],
 	[_INDENT_(3);;],
 	[m4_popdef([_ARGVAR])],
-	[m4_popdef([_argname_s])],
-	[m4_popdef([_argname])],
 )])
 
 
@@ -1015,7 +1025,8 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _NARGS == 0
 ],
-	[m4_for([idx], 1, _NARGS, 1, [_OPTS_VALS_LOOP_BODY(idx)])],
+	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default], 
+		[_OPTS_VALS_LOOP_BODY(_argname, _arg_short, _arg_type, _default)])],
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
@@ -1072,10 +1083,9 @@ done]],
 		[
 ],
 		[[_positional_names=@{:@]],
-		[m4_for([ii], 1, m4_list_len([_POSITIONALS_NAMES]), 1, [m4_do(
+		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 			[dnl Go through all positionals names ...
 ],
-			[m4_pushdef([_max_argn], m4_list_nth([_POSITIONALS_MAXES], ii))],
 			[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL
 ],
 			[m4_if(_max_argn, 0, , [m4_do(
@@ -1083,14 +1093,13 @@ done]],
 					[dnl And repeat each of them POSITIONALS_MAXES-times
 ],
 					['],
-					[_varname(m4_list_nth([_POSITIONALS_NAMES], ii))],
+					[_varname(_pos_name)],
 					[dnl If we handle a multi-value arg, we assign to an array => we add '[ii - 1]' to LHS
 ],
 					[m4_if(_max_argn, 1, , [@<:@m4_eval(jj - 1)@:>@])],
 					[' ],
 				)])],
 			)])],
-			[m4_popdef([_max_argn])],
 		)])],
 		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
@@ -1166,7 +1175,6 @@ dnl $2: _arg_type
 dnl $3: _min_argn
 dnl $4: _defaults
 dnl
-dnl $1: The item index
 dnl If the corresponding arg has a default, save it according to its type.
 dnl If it doesn't have one, do nothing (TODO: to be reconsidered)
 m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
@@ -1195,11 +1203,11 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 	[m4_if(HAVE_OPTIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
 ],
-		[m4_for([idx], 1, _NARGS, 1, [m4_do(
-			[m4_pushdef([_ARGVAR], _varname(m4_list_nth([_ARGS_LONG], idx)))],
-			[m4_case(m4_list_nth([_ARGS_CATH], idx),
+		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_type,_default], [m4_do(
+			[m4_pushdef([_ARGVAR], _varname(_argname))],
+			[m4_case(_arg_type,
 				[action], [],
-				m4_expand([_ARGVAR=m4_list_nth([_ARGS_DEFAULT], idx)
+				m4_expand([_ARGVAR=_default
 ]))],
 			[m4_popdef([_ARGVAR])],
 		)])],
@@ -1379,15 +1387,16 @@ dnl
 dnl  In case of path issues (i.e. script is in a crontab), update the PATH variable yourself above the argbash code.
 dnl
 dnl  internally:
-dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS
+dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS, PROG_ARGS, PROG_HAVE_ARGS
 m4_define([DEFINE_PROG], [m4_ifndef([WRAPPED], [m4_do(
 	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
 	[m4_list_append([PROG_NAMES], [$2])],
 	[m4_list_append([PROG_MSGS], [$3])],
 	[m4_list_append([PROG_HELPS], [$4])],
+	[m4_list_append([PROG_ARGS], [$5])],
 	[dnl Even if $# == 5, $5 can be blank, which we support.
 ],
-	[m4_list_append([PROG_ARGS], m4_if([$#], 5, [[$5]], []))],
+	[m4_list_append([PROG_HAVE_ARGS], m4_if([$#], 5, 1, 0))],
 )])])
 
 
@@ -1440,6 +1449,7 @@ m4_define([_ENV_HELP], [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_n
 dnl
 dnl $1: name
 dnl $2: default
+dnl TODO: Try to use declare to see whether the variable is even defined
 m4_define([__SETTLE_ENV], [m4_do(
 	[test -n "@S|@$1" || $1="$2"
 ],
@@ -1451,11 +1461,52 @@ dnl It may be that the wrapped script contains args that we already have.
 dnl TODO: In this case: Raise an error (with a good advice)
 
 
+dnl
+dnl $1: The value type
+dnl $2: The type group name (optional, try to infer from value type)
+dnl $3: Concerned arguments (as a list)
+m4_define([DEFINE_VALUE_TYPE], [m4_do(
+	[[$0($@)]],
+	[m4_pushdef([_gname], m4_dquote(m4_default([$2], [m4_fatal([Name inference not implemented yet])])))],
+	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([The type '$1' is unknown.])])],
+	[m4_set_contains([VALUE_GROUPS], _gname, [m4_fatal([Value group ]_gname[ already exists!])])],
+	[m4_set_add([VALUE_GROUPS], _gname)],
+	[m4_foreach([_argname], m4_dquote($3), [m4_do(
+		[m4_set_add([VALUE_GROUP_$1], _argname)],
+		[m4_set_add([TYPED_ARGS], _argname)],
+		[m4_define(_argname[_VAL_TYPE], [$1])],
+		[m4_define(_argname[_VAL_GROUP], _gname)],
+	)])],
+	[m4_define(_gname[_VALIDATOR], [$1])],
+	[m4_popdef([_gname])],
+)])
+
+
+dnl 
+dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
+dnl
+dnl $1: argname
+m4_define([_GET_VALUE_STR], [m4_do(
+	[m4_ifdef([$1_VAL_GROUP], [m4_indir([$1_VAL_GROUP])], [arg])],
+)])
+
+dnl 
+dnl Given an argname, return the argument type code or 'generic'
+dnl
+dnl $1: argname
+m4_define([_GET_VALUE_TYPE], [m4_do(
+	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])], [generic])],
+)])
+
 dnl Types:
 dnl #. Register group name, assert uniquness
 dnl #. Assign the validator to the name.
 dnl #. Assign the name to args.
 dnl #. Add the validator to the list of validators to be generated
+dnl #. Group name is used in help, the type is used in val assignment (i.e. validated)
+dnl #. Pos args: In the eval section, we use an array of names. Let's use an array of validators, too. Arrays can be sparse
+dnl
+dnl Introduce _VALIDATE_FOO functions. As they are used, make sure that the prerequisities are met
 dnl
 dnl * Upon arg encounter, validate the value. Die in case of no compliance.
 dnl * Help: optional args - value should take the name.
