@@ -19,7 +19,7 @@ dnl
 dnl flags: R, W, X, D --- search only for existing files (dirs)
 dnl ARGS_TYPE_FILE([list of args], [fname], [flags])
 dnl
-dnl ARGS_TYPE_OUTFILE([list of args], [fname])  
+dnl ARGS_TYPE_OUTFILE([list of args], [fname])
 dnl Filename that may exist (file must be W) or may not exist (then the dirname of the file must be W)
 dnl
 dnl flags: -+0, defautlt is exactly -+0
@@ -41,7 +41,7 @@ dnl Checks that the an argument is a correct short option arg
 dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPT_TYPE], [m4_do(
-	[m4_ifnblank([$1], [m4_bmatch([$1], [^[a-zA-z]$], , 
+	[m4_ifnblank([$1], [m4_bmatch([$1], [^[a-zA-z]$], ,
 		[m4_fatal([Short option '$1' for argument '--$2' is not valid - it has to be exactly one character.])])])],
 )])
 
@@ -838,7 +838,7 @@ dnl .. note::
 dnl    If the equal-delimited option has a short version, we allow space-delimited short option and value
 m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 	[_val="${_key##--[$1]=}"],
-	m4_ifnblank([$2], 
+	m4_ifnblank([$2],
 		[[if test "$_key" = "-$2"],
 		[then],
 		_INDENT_MORE(
@@ -887,7 +887,7 @@ dnl Macro factory, define _MAYBE_EQUALS_MATCH depending on what delimiters are e
 dnl
 dnl $1: What to do. Typically one of [], =*, |--$[]2=*
 m4_define([_MAYBE_EQUALS_MATCH_FACTORY], [m4_define([_MAYBE_EQUALS_MATCH],
-	[m4_case(m4_quote($][1), 
+	[m4_case(m4_quote($][1),
 		[arg], [$1],
 		[repeated], [$1], [])])])
 dnl
@@ -907,7 +907,7 @@ dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to d
 dnl
 dnl Globally set the option-value delimiter according to a directive.
 dnl $1: The directive
-m4_define([_SET_OPTION_DELIMITER], 
+m4_define([_SET_OPTION_DELIMITER],
 	[m4_bmatch([$1], [ ],
 		[m4_bmatch([$1], [=], [m4_do(
 			[dnl BOTH
@@ -1025,7 +1025,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _NARGS == 0
 ],
-	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default], 
+	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
 		[_OPTS_VALS_LOOP_BODY(_argname, _arg_short, _arg_type, _default)])],
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
@@ -1230,6 +1230,7 @@ m4_define([_MAKE_UTILS], [m4_do(
 		[exit ${_ret}])],
 	[}
 ],
+	[_PUT_VALIDATORS],
 )])
 
 
@@ -1244,6 +1245,7 @@ m4_define([_MAKE_OTHER], [m4_do(
 ])],
 	[m4_list_foreach([_OTHER], [item], [item
 ])],
+	[_VALIDATE_VALUES],
 )])
 
 
@@ -1432,7 +1434,7 @@ m4_define([DEFINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
 m4_define([_SETTLE_ENV], [m4_list_ifempty([ENV_NAMES], , [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS], [_name,_default], [m4_do(
 	[# Setting environmental variables
 ],
-	[m4_ifnblank(m4_quote(_default), [m4_list_append([_OTHER], 
+	[m4_ifnblank(m4_quote(_default), [m4_list_append([_OTHER],
 		m4_expand([__SETTLE_ENV(m4_expand([_name]), m4_expand([_default]))]))])],
 )])]
 )])
@@ -1462,27 +1464,86 @@ dnl TODO: In this case: Raise an error (with a good advice)
 
 
 dnl
+dnl Define a validator for a particular type. Instead of using m4_define, use this:
+dnl $1: The type ID
+dnl $2: The validator body (a shell function accepting $1 - the value, $2 - the argument name)
+m4_define([_define_validator], [m4_do(
+	[m4_set_add([VALUE_TYPES], [$1])],
+	[m4_define([_validator_$1], [$2
+])],
+)])
+
+
+dnl
+dnl Put definitions of validating functions if they are needed
+m4_define([_PUT_VALIDATORS], [m4_do(
+	[m4_set_empty([VALUE_TYPES], , [# validators
+])],
+	[m4_set_foreach([VALUE_TYPES], [_val_type], [m4_do(
+		[m4_set_empty(m4_expand([[VALUE_GROUP_]_val_type]), ,
+			m4_expand([[_validator_]_val_type]))],
+	)])],
+)])
+
+
+dnl
+dnl Define an int validator
+dnl double quoting is important because of the [] group inside
+_define_validator([int],
+[[function int
+{
+	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
+	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+}]])
+
+
+dnl
+dnl For all arguments we know that are typed, re-assign their values using the validator function, e.g.
+dnl arg_val=$(validate $arg_val argument-name) || exit 1
+dnl Remarks:
+dnl  - The argument name misses -- if it is an optional argument, because we don't know what type of arg this is
+dnl  - The subshell won't propagate the die call, so that's why we have to exit "manually"
+dnl  - Validator is not only a validator - it is a cannonizer.
+m4_define([_VALIDATE_VALUES], [m4_do(
+	[m4_set_empty([TYPED_ARGS], , [# Validation of values
+])],
+	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_do(
+		[_varname(_arg)="@S|@@{:@],
+		[m4_indir(m4_quote(_arg[_VAL_TYPE]))],
+		[ "$_varname(_arg)" "_arg"@:}@"],
+		[ || exit 1
+],
+	)])],
+)])
+
+
+dnl
 dnl $1: The value type
 dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)
+dnl TODO: Integrate with help (and not only with the help synopsis)
 m4_define([DEFINE_VALUE_TYPE], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([_gname], m4_dquote(m4_default([$2], [m4_fatal([Name inference not implemented yet])])))],
-	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([The type '$1' is unknown.])])],
+	[m4_set_contains([VALUE_TYPES], [$1], , [m4_fatal([The type '$1' is unknown.])])],
+	[m4_set_add([VALUE_TYPES_USED], [$1])],
 	[m4_set_contains([VALUE_GROUPS], _gname, [m4_fatal([Value group ]_gname[ already exists!])])],
 	[m4_set_add([VALUE_GROUPS], _gname)],
 	[m4_foreach([_argname], m4_dquote($3), [m4_do(
+		[dnl TODO: Test that vvv this check vvv works
+],
+		[m4_set_contains([TYPED_ARGS], _argname,
+			[m4_fatal([Argument ]_argname[ already has a type ](m4_indir(m4_quote(_argname[_VAL_TYPE])))!)])],
 		[m4_set_add([VALUE_GROUP_$1], _argname)],
 		[m4_set_add([TYPED_ARGS], _argname)],
 		[m4_define(_argname[_VAL_TYPE], [$1])],
 		[m4_define(_argname[_VAL_GROUP], _gname)],
 	)])],
-	[m4_define(_gname[_VALIDATOR], [$1])],
+	[m4_define(_gname[_VALIDATOR], [[_validator_$1]])],
 	[m4_popdef([_gname])],
 )])
 
-
-dnl 
+dnl
 dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
 dnl
 dnl $1: argname
@@ -1490,7 +1551,7 @@ m4_define([_GET_VALUE_STR], [m4_do(
 	[m4_ifdef([$1_VAL_GROUP], [m4_indir([$1_VAL_GROUP])], [arg])],
 )])
 
-dnl 
+dnl
 dnl Given an argname, return the argument type code or 'generic'
 dnl
 dnl $1: argname

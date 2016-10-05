@@ -20,6 +20,7 @@ die()
 	echo "$1" >&2
 	exit ${_ret}
 }
+# validators
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _arg_input=('' )
@@ -30,7 +31,7 @@ _arg_output=""
 print_help ()
 {
 	echo "Convert a template for argbash>=1<2 to argbash>=2<3"
-	printf 'Usage: %s [-o|--output_DELIM_IN_HELParg] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
 	printf "\t<input>: The input file to transform\n"
 	printf "\t-o,--output: Name of the output file (pass '-' for stdout and empty string for the same as input file) (default: '%s')\n" ""
 	printf "\t-v,--version: Prints version\n"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
-# ARG_OPTIONAL_SINGLE([opt-arg])
+# ARG_OPTIONAL_SINGLE([opt-arg], , ,[0])
 # DEFINE_VALUE_TYPE([int], [INT], [pos-arg,opt-arg])
 # ARG_HELP([Testing program])
 # ARGBASH_GO

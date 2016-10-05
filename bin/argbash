@@ -24,6 +24,7 @@ die()
 	echo "$1" >&2
 	exit ${_ret}
 }
+# validators
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 # THE DEFAULTS INITIALIZATION - OPTIONALS
@@ -36,7 +37,7 @@ _arg_debug=
 print_help ()
 {
 	echo "Argbash is an argument parser generator for Bash."
-	printf 'Usage: %s [-o|--output_DELIM_IN_HELParg] [--(no-)library] [-I|--search_DELIM_IN_HELParg] [--debug_DELIM_IN_HELParg] [-v|--version] [-h|--help] <input>\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
 	printf "\t<input>: The input template file (pass '-' for stdout)\n"
 	printf "\t-o,--output: Name of the output file (pass '-' for stdout) (default: '%s')\n" "-"
 	printf "\t--library,--no-library: Whether the input file if the pure parsing library. (%s by default)\n" "off"
