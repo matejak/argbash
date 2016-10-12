@@ -1,8 +1,12 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
-# ARG_OPTIONAL_SINGLE([opt-arg], , ,[0])
-# DEFINE_VALUE_TYPE([int], [INT], [pos-arg,opt-arg])
+# ARG_OPTIONAL_SINGLE([int], , ,[0])
+# DEFINE_VALUE_TYPE([int], [INT], [pos-arg,int])
+# ARG_OPTIONAL_SINGLE([nnint], , ,[0])
+# DEFINE_VALUE_TYPE([nnint], [INT+0], [nnint])
+# ARG_OPTIONAL_SINGLE([pint], , ,[1])
+# DEFINE_VALUE_TYPE([pint], [INT+], [pint])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 
@@ -10,6 +14,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "POS_S=$_arg_pos_arg,OPT_S=$_arg_opt_arg,"
+echo "POS_S=$_arg_pos_arg,OPT_S=$_arg_int,NN=$_arg_nnint,P=$_arg_pint,"
 
 # closing escape square bracket: ]

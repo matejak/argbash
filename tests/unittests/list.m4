@@ -27,6 +27,7 @@ m4_list_append([FOO], [BOMB], [BAZ])
 assert_equals(m4_list_nth([FOO], 4), [BAZ])
 assert_equals(m4_list_join([FOO], -), [BOMB-ANTIFUSE(list)-BOMB-BAZ])
 assert_equals(m4_list_join([FOO], -, ", ', [ and ]), ["BOMB'-"ANTIFUSE(list)'-"BOMB' and "BAZ'])
+assert_equals(m4_expand([m4_list_join([FOO], [,], ", ', [ , ])]), ["BOMB',"ANTIFUSE(list)',"BOMB' , "BAZ'])
 m4_list_append([FOO], [BAZ2])
 assert_equals(m4_list_len([FOO]), 5)
 

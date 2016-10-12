@@ -109,35 +109,31 @@ m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
 dnl
 dnl Given a arg type ID, it treats as a group type and creates a function to examine whether the value is in the list.
 dnl $1: The group stem
+dnl $2: If blank, don't bother with the index recording functionality
 dnl
 dnl The bash function accepts:
 dnl $1: The value to check
 dnl $2: What was the option that was associated with the value
 m4_define([_MK_VALIDATE_GROUP_FUNCTION], [m4_do(
-	[array_contains ()
+	[$1()
 ],
 	[{
 ],
 	[_JOIN_INDENTED(1,
-		[local _allowed=(m4_list_contents([_VALUES_VALIDATE_$1]))],
+		[local _allowed=(m4_list_join([_LIST_$1_QUOTED], [ ]))],
 		[local _seeking="@S|@1"],
-		[for element in "${_allowed[@]}"],
+		m4_ifnblank([$2], [[local _idx=0],],[[dnl nothing
+],])
+		[for element in "${_allowed@<:@@@:>@}"],
 		[do],
-		[_INDENT_()test "$element" = "$_seeking" && return 0],
+		m4_ifnblank([$2], 
+			[[_INDENT_()test "$element" = "$_seeking" && { test "@S|@3" = "idx" && echo "$_idx" || echo "$element"; } && return 0],
+			 [_INDENT_()_idx=$((_idx + 1))],],
+			[[_INDENT_()test "$element" = "$_seeking" && echo "$element" && return 0],])
 		[done],
-		[echo "Value '$_seeking' (of argument '@S|@2') hasn't doesn't match the list of allowed values: ${_allowed}"],
-		[return 4],
+		[die "Value '$_seeking' (of argument '@S|@2') doesn't match the list of allowed values: m4_list_join([_LIST_$1], [, ], ', ', [ and ])" 4],
 	)],
 	[}],
-)])
-
-
-dnl
-dnl Given the value as $1, construct a statement that will validate whether it is an integer
-dnl $1: The value
-dnl $2: The argument name
-m4_define([_MK_VALIDATE_INT], [m4_do(
-	[[echo $1 | grep -q '[+-]?[0-9]+' || die "Value of the argument '$2' has to be an integer, got '$1'." 2]],
 )])
 
 
@@ -1217,7 +1213,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 
 dnl
 dnl Make some utility stuff.
-dnl Those include the die function as well as optional validators
+dnl Those include the die function as well as optional nalidators
 m4_define([_MAKE_UTILS], [m4_do(
 	[[die()
 {
@@ -1468,6 +1464,7 @@ dnl Define a validator for a particular type. Instead of using m4_define, use th
 dnl $1: The type ID
 dnl $2: The validator body (a shell function accepting $1 - the value, $2 - the argument name)
 m4_define([_define_validator], [m4_do(
+	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([We already have the validator for '$1'.])])],
 	[m4_set_add([VALUE_TYPES], [$1])],
 	[m4_define([_validator_$1], [$2
 ])],
@@ -1494,7 +1491,52 @@ _define_validator([int],
 {
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}]])
+}
+]])
+
+
+dnl Define a positive int validator
+_define_validator([pint],
+[[function pint
+{
+	printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."
+	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+}
+]])
+
+
+dnl Define a non-negative int validator
+_define_validator([nnint],
+[[function nnint
+{
+	printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."
+	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+}
+]])
+
+
+dnl Define a float number validator
+_define_validator([float],
+[[function float
+{
+	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."
+	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+}
+]])
+
+
+dnl Define a decimal number validator
+_define_validator([decimal],
+[[function decimal
+{
+	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."
+	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+}
+]])
+
+
+dnl The string validator is a null validator
+_define_validator([string])
 
 
 dnl
@@ -1504,44 +1546,96 @@ dnl Remarks:
 dnl  - The argument name misses -- if it is an optional argument, because we don't know what type of arg this is
 dnl  - The subshell won't propagate the die call, so that's why we have to exit "manually"
 dnl  - Validator is not only a validator - it is a cannonizer.
+dnl  - The type 'string' does not undergo validation
 m4_define([_VALIDATE_VALUES], [m4_do(
 	[m4_set_empty([TYPED_ARGS], , [# Validation of values
 ])],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_do(
-		[_varname(_arg)="@S|@@{:@],
-		[m4_indir(m4_quote(_arg[_VAL_TYPE]))],
-		[ "$_varname(_arg)" "_arg"@:}@"],
-		[ || exit 1
+	[dnl Don't do anything if we are string
 ],
+	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_if(_GET_VALUE_TYPE(m4_quote(_arg), 1), [string], , [m4_do(
+		[_varname(_arg)="@S|@@{:@],
+		[_GET_VALUE_TYPE(_arg, 1)],
+		[ "$_varname(_arg)" "_arg"@:}@"],
+		[ || exit 1],
+		[
+],
+	)])])],
+	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
+		[_VALIDATE_VALUES_IDX(m4_quote(_arg), m4_expand([_]_arg[_SUFFIX]))],
 	)])],
 )])
 
 
 dnl
+dnl $1: argname
+dnl $2: suffix
+m4_define([_VALIDATE_VALUES_IDX], [m4_ifnblank([$2], [m4_do(
+	[_varname([$1])[_$2="@S|@@{:@]],
+	[_GET_VALUE_TYPE([$1], 1)],
+	[ "$_varname([$1])" "[$1]" idx@:}@"],
+	[
+],
+)])])
+
+
+dnl
+dnl The common stuff to perform when adding a typed group
 dnl $1: The value type
-dnl $2: The type group name (optional, try to infer from value type)
+dnl $2: The type group name (NOT optional)
 dnl $3: Concerned arguments (as a list)
-dnl TODO: Integrate with help (and not only with the help synopsis)
-m4_define([DEFINE_VALUE_TYPE], [m4_do(
-	[[$0($@)]],
-	[m4_pushdef([_gname], m4_dquote(m4_default([$2], [m4_fatal([Name inference not implemented yet])])))],
+m4_define([_TYPED_GROUP_STUFF], [m4_do(
 	[m4_set_contains([VALUE_TYPES], [$1], , [m4_fatal([The type '$1' is unknown.])])],
 	[m4_set_add([VALUE_TYPES_USED], [$1])],
-	[m4_set_contains([VALUE_GROUPS], _gname, [m4_fatal([Value group ]_gname[ already exists!])])],
-	[m4_set_add([VALUE_GROUPS], _gname)],
+	[m4_set_contains([VALUE_GROUPS], [$2], [m4_fatal([Value group $2 already exists!])])],
+	[m4_set_add([VALUE_GROUPS], [$2])],
 	[m4_foreach([_argname], m4_dquote($3), [m4_do(
 		[dnl TODO: Test that vvv this check vvv works
 ],
 		[m4_set_contains([TYPED_ARGS], _argname,
-			[m4_fatal([Argument ]_argname[ already has a type ](m4_indir(m4_quote(_argname[_VAL_TYPE])))!)])],
+			[m4_fatal([Argument ]_argname[ already has a type ](_GET_VALUE_TYPE(m4_quote(_argname), 1))!)])],
 		[m4_set_add([VALUE_GROUP_$1], _argname)],
 		[m4_set_add([TYPED_ARGS], _argname)],
 		[m4_define(_argname[_VAL_TYPE], [$1])],
-		[m4_define(_argname[_VAL_GROUP], _gname)],
+		[m4_define(_argname[_VAL_GROUP], [$2])],
 	)])],
-	[m4_define(_gname[_VALIDATOR], [[_validator_$1]])],
-	[m4_popdef([_gname])],
+	[m4_define([$2_VALIDATOR], [[_validator_$1]])],
 )])
+
+
+dnl
+dnl $1: The value type string (code)
+dnl $2: The type group name (optional, try to infer from value type)
+dnl $3: Concerned arguments (as a list)
+dnl TODO: Integrate with help (and not only with the help synopsis)
+dnl TODO: Validate the type value (code) string
+m4_define([DEFINE_VALUE_TYPE], [m4_do(
+	[[$0($@)]],
+	[m4_ifblank([$2], [m4_fatal([Name inference not implemented yet])])],
+	[_TYPED_GROUP_STUFF([$1], m4_dquote(m4_default([$2], [???])), [$3])],
+)])
+
+
+dnl
+dnl $1: The value type string (code)
+dnl $2: The type group name
+dnl $3: Concerned arguments (as a list)
+dnl $4: The set of possible values (as a list)
+dnl $5: The index variable suffix
+dnl TODO: Integrate with help (and not only with the help synopsis)
+m4_define([DEFINE_VALUE_TYPE_SET], [m4_do(
+	[[$0($@)]],
+	[m4_foreach([_val], [$4], [m4_do(
+		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],
+		[m4_list_append([_LIST_$1], m4_quote(_val))],
+	)])],
+	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]))],
+	[m4_foreach([_argname], [$3], [m4_do(
+		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
+		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],
+	)])],
+	[_TYPED_GROUP_STUFF([$1], [$2], [$3])],
+)])
+
 
 dnl
 dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
@@ -1553,10 +1647,13 @@ m4_define([_GET_VALUE_STR], [m4_do(
 
 dnl
 dnl Given an argname, return the argument type code or 'generic'
+dnl If strict is not blank, raise an error if there is not a type code stored
 dnl
 dnl $1: argname
+dnl $2: strict
 m4_define([_GET_VALUE_TYPE], [m4_do(
-	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])], [generic])],
+	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])], 
+		[m4_ifnblank([$2], [m4_fatal([There is no type defined for argument '$1'.])], [generic])])],
 )])
 
 dnl Types:

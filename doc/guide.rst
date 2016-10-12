@@ -257,6 +257,75 @@ Special arguments
   A use case for this is wrapping of scripts that are completely ``Argbash``-agnostic.
   Therefore, your script can take its own arguments and the rest that is not recognized can go to the wrapped script.
 
+Typing macros
++++++++++++++
+
+``Argbash`` supports typed argument values.
+For example, you can declare that a certain argument requires an integer value, and if its value by the time of conclusion of the parsing part of the script is not of an integer type, an error is raised.
+The validator sometimes retutrns the value in a cannonical form (e.g. it may trim leading and trailing whitespaces).
+
+.. note::
+
+    Users of your script have to have a working ``grep`` in order to use this.
+
+Generally, macros accept these parameters:
+
+* Type code.
+  In some cases, you make it up and in other cases, you have to know the right one.
+  End-users of your script won't even see it.
+* Type string.
+  This is used in the script's help.
+* List of arguments whose values are of the given type.
+  Typically, ``[arg1, arg2]`` is OK\ [*]_.
+
+.. [*] Passing ``arg1, arg2`` won't work (of course --- this represents two arguments, not one that is a list), ``[arg1, arg2]`` will work in most cases (when neither ``arg1`` or ``arg2`` have been defined as a macro), whereas ``[[arg1],[arg2]]`` will work no matter what.
+
+
+You have these possibilities:
+
+* Built-in types:
+
+  ::
+    
+     DEFINE_VALUE_TYPE([type code], [type string], [list of arguments of that type])
+
+  Type code is a code of one of the types that are supported, type string is used in help.
+
+  ==============        ===============================================
+  Type code             Description
+  ==============        ===============================================
+  int                   integer
+  pint                  positive integer
+  nnint                 non-negative integer
+  float                 floating-point number (e.g. 4.2e1)
+  decimal               float without the exponential stuff (e.g. 42.0)
+  string                anything [*]_
+  ==============        ===============================================
+  
+  .. [*] The type ``string`` is used as a means to modify the help message, no validation or conversion takes place.
+
+  As an example, if you have an argument ``--iterations`` that accepts a value representing how many times to repeat something, you use
+
+  ::
+
+     DEFINE_VALUE_TYPE([nnint], [COUNT], [iterations])
+
+* One-of values (i.e. values are restricted to be members of a set).
+
+  ::
+
+     DEFINE_VALUE_TYPE_SET([type code], [type string], [list of arguments of that type], [list of values of that type])
+
+  Remarks:
+
+  * Pass the list of values shell-quoted, as the interior of array init statement.
+
+  ::
+
+     DEFINE_VALUE_TYPE_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install])
+
+
+
 Convenience macros
 ++++++++++++++++++
 
@@ -404,6 +473,7 @@ Plus, there are convenience macros:
     If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``DEFINE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
     
     Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the ``Python`` shell) and you should use ``DEFINE_PROG([PYTHON], [python], , [--version])`` instead.
+
   In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller set.
 
 Action macro
