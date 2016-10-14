@@ -314,16 +314,26 @@ You have these possibilities:
 
   ::
 
-     DEFINE_VALUE_TYPE_SET([type code], [type string], [list of arguments of that type], [list of values of that type])
+     DEFINE_VALUE_TYPE_SET([type code], [type string], [list of arguments of that type], [list of values of that type], [suffix of the index variable (optional)])
+
+  If the suffix of the index variable is provided, each argument of the type will have a variable ``_arg_<stem>_<suffix>`` that contains the 0-based index of the argument value in the allowed values list. 
+  You will typically want to use it as described in the next example:
 
   Remarks:
 
-  * Pass the list of values shell-quoted, as the interior of array init statement.
+  * Pass the list of values without shell-quoting.
+    It will be applied later.
 
   ::
 
      DEFINE_VALUE_TYPE_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install])
 
+  and later in the code, you can use a construct like
+
+  .. code-block:: bash
+
+     # fail e.g. when we start-with make and stop-with configure. It would work if it was the other way.
+     test $_arg_stop_with_index -gt $_arg_start_with_index || die "The last operation has to be a successor of the first one, which is not the case."
 
 
 Convenience macros

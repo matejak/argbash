@@ -6,6 +6,7 @@ New features:
 * Introduced the `argbash-init` simple template generator.
 * `argbash` can read from stdin.
 * `ARG_HELP` gains second argument.
+* Preview support for argument values types
 
 Bugfixes:
 

@@ -148,7 +148,7 @@ You can use the utility to convert scripts as well as ``.m4`` templates.
 API 2
 +++++
 
-Parsed arguments were exposed as uppercase (``_ARG_LONG_OPTION`` vs ``_arg_long_option``).
+Parsed arguments were exposed as lowercase (``_ARG_LONG_OPTION`` became ``_arg_long_option``).
 The change was motivated by effort to comply to bash standard variable naming convention [#]_, [#]_.
 
 .. [#] `Unix StackExchange <http://unix.stackexchange.com/a/42849>`_

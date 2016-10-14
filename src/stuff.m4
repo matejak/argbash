@@ -9,6 +9,7 @@ dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute
 dnl TODO: Make argbash-init template builder
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
+dnl TODO: Add protection against misspelled macros (m4_pattern_forbid/allow)
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
