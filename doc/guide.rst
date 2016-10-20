@@ -335,6 +335,18 @@ You have these possibilities:
      # fail e.g. when we start-with make and stop-with configure. It would work if it was the other way.
      test $_arg_stop_with_index -gt $_arg_start_with_index || die "The last operation has to be a successor of the first one, which is not the case."
 
+* Filenames
+
+  ::
+
+     DEFINE_VALUE_TYPE_FILE([type], [mode], [type string], [list of arguments of that type])
+
+  * The ``type`` string is either ``in`` or ``out``.
+    Input files have to exist, output files have to have their parent directory writable.
+    
+  * ``mode`` string is a ``rwx``-type of string.
+
+
 
 Convenience macros
 ++++++++++++++++++

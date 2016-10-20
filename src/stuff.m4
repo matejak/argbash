@@ -498,7 +498,7 @@ m4_define([_ARG_VERSIONx], [m4_do(
 ],
 	[_ARG_OPTIONAL_ACTION(
 		[version],
-		[v],
+		[v]
 		[Prints version],
 		[$1],
 	)],
