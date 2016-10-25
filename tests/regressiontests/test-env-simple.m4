@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# DEFINE_ENV([ENVI_FOO], [def,ault])
+# ARG_USE_ENV([ENVI_FOO], [def,ault])
 # ARG_HELP()
 # ARGBASH_GO
 

@@ -2,11 +2,11 @@
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
 # ARG_OPTIONAL_SINGLE([int], , ,[0])
-# DEFINE_VALUE_TYPE([int], [INT], [pos-arg,int])
+# ARG_TYPE_GROUP([int], [INT], [pos-arg,int])
 # ARG_OPTIONAL_SINGLE([nnint], , ,[0])
-# DEFINE_VALUE_TYPE([nnint], [INT+0], [nnint])
+# ARG_TYPE_GROUP([nnint], [INT+0], [nnint])
 # ARG_OPTIONAL_SINGLE([pint], , ,[1])
-# DEFINE_VALUE_TYPE([pint], [INT+], [pint])
+# ARG_TYPE_GROUP([pint], [INT+], [pint])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 

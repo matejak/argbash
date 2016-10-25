@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([action], [], [foo])
-# DEFINE_VALUE_TYPE_SET([act], [ACTION], [action], [foo,baz,bar bar,[foo,baz]])
+# ARG_TYPE_GROUP_SET([act], [ACTION], [action], [foo,baz,bar bar,[foo,baz]])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 #[

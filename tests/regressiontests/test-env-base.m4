@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# DEFINE_ENV([ENVI_FOO], [def,ault], [A sample env, variable])
-# DEFINE_ENV([ENVI_BAR], [], [A sample env, variable])
+# ARG_USE_ENV([ENVI_FOO], [def,ault], [A sample env, variable])
+# ARG_USE_ENV([ENVI_BAR], [], [A sample env, variable])
 # ARG_HELP()
 # ARGBASH_GO
 

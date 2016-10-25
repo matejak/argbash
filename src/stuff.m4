@@ -75,8 +75,7 @@ _FLAGS_WHATEVER_IF_FACTORY(X)
 dnl
 dnl $1: FLAGS: Any of RWXD, default is nothing (= an existing file)
 m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
-	[m4_pushdef([_flags], [$1])],
-	[m4_pushdef([_fname], [[validate_file_]_flags])],
+	[m4_pushdef([_fname], [[validate_file_$1]])],
 	[dnl Maybe we already have requested this function
 ],
 	[m4_list_contains([_VALIDATE_FILE], _fname, , [m4_do(
@@ -86,24 +85,23 @@ m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
 		[{
 ],
 		[_JOIN_INDENTED(1,
-			[_FLAGS_D_IF([_flags], [m4_do(
+			[_FLAGS_D_IF([$1], [m4_do(
 				[m4_pushdef([_what], [[directory]])],
-				[m4_pushdef([_xperm], [[browsable]])],
+				[m4_pushdef([_xperm], [[browsable directory]])],
 				[[test -d "@S|@1" || die "Argument '@S|@2' has to be a directory, got '@S|@1'" 4]],
 				)], [m4_do(
 				[m4_pushdef([_what], [[file]])],
-				[m4_pushdef([_xperm], [[executable]])],
+				[m4_pushdef([_xperm], [[executable file]])],
 				[[test -f "@S|@1" || die "Argument '@S|@2' has to be a file, got '@S|@1'" 4]],
 			)])],
-			[_FLAGS_R_IF([_flags], [[test -r "@S|@1" || { echo "Argument '@S|@2' has to be a readable ]_what[, '@S|@1' isn't."; return 4; }]])],
-			[_FLAGS_W_IF([_flags], [[test -w "@S|@1" || { echo "Argument '@S|@2' has to be a writable ]_what[, '@S|@1' isn't."; return 4; }]])],
-			[_FLAGS_X_IF([_flags], [[test -x "@S|@1" || { echo "Argument '@S|@2' has to be a ]_xperm _what[, '@S|@1' isn't."; return 4; }]])],
+			[_FLAGS_R_IF([$1], [[test -r "@S|@1" || { echo "Argument '@S|@2' has to be a readable ]_what[, '@S|@1' isn't."; return 4; }]])],
+			[_FLAGS_W_IF([$1], [[test -w "@S|@1" || { echo "Argument '@S|@2' has to be a writable ]_what[, '@S|@1' isn't."; return 4; }]])],
+			[_FLAGS_X_IF([$1], [[test -x "@S|@1" || { echo "Argument '@S|@2' has to be a ]_xperm[, '@S|@1' isn't."; return 4; }]])],
 		)],
 		[}
 ],
 	)])],
 	[m4_popdef([_fname])],
-	[m4_popdef([_flags])],
 )])
 
 
@@ -498,7 +496,7 @@ m4_define([_ARG_VERSIONx], [m4_do(
 ],
 	[_ARG_OPTIONAL_ACTION(
 		[version],
-		[v]
+		[v],
 		[Prints version],
 		[$1],
 	)],
@@ -1387,7 +1385,7 @@ dnl  In case of path issues (i.e. script is in a crontab), update the PATH varia
 dnl
 dnl  internally:
 dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS, PROG_ARGS, PROG_HAVE_ARGS
-m4_define([DEFINE_PROG], [m4_ifndef([WRAPPED], [m4_do(
+m4_define([ARG_USE_PROG], [m4_ifndef([WRAPPED], [m4_do(
 	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
 	[m4_list_append([PROG_NAMES], [$2])],
 	[m4_list_append([PROG_MSGS], [$3])],
@@ -1419,7 +1417,7 @@ dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
 dnl TODO: Hanlde the case of wrapping correctly
 dnl TODO: Find out a proper name for this
-m4_define([DEFINE_ENV], [m4_ifndef([WRAPPED], [m4_do(
+m4_define([ARG_USE_ENV], [m4_ifndef([WRAPPED], [m4_do(
 	[[$0($@)]],
 	[m4_list_append([ENV_NAMES], [$1])],
 	[m4_list_append([ENV_DEFAULTS], [$2])],
@@ -1609,7 +1607,7 @@ dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)
 dnl TODO: Integrate with help (and not only with the help synopsis)
 dnl TODO: Validate the type value (code) string
-m4_define([DEFINE_VALUE_TYPE], [m4_do(
+m4_define([ARG_TYPE_GROUP], [m4_do(
 	[[$0($@)]],
 	[m4_ifblank([$2], [m4_fatal([Name inference not implemented yet])])],
 	[_TYPED_GROUP_STUFF([$1], m4_dquote(m4_default([$2], [???])), [$3])],
@@ -1623,7 +1621,7 @@ dnl $3: Concerned arguments (as a list)
 dnl $4: The set of possible values (as a list)
 dnl $5: The index variable suffix
 dnl TODO: Integrate with help (and not only with the help synopsis)
-m4_define([DEFINE_VALUE_TYPE_SET], [m4_do(
+m4_define([ARG_TYPE_GROUP_SET], [m4_do(
 	[[$0($@)]],
 	[m4_foreach([_val], [$4], [m4_do(
 		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],

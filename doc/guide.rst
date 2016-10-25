@@ -287,7 +287,7 @@ You have these possibilities:
 
   ::
     
-     DEFINE_VALUE_TYPE([type code], [type string], [list of arguments of that type])
+     ARG_TYPE_GROUP([type code], [type string], [list of arguments of that type])
 
   Type code is a code of one of the types that are supported, type string is used in help.
 
@@ -308,13 +308,13 @@ You have these possibilities:
 
   ::
 
-     DEFINE_VALUE_TYPE([nnint], [COUNT], [iterations])
+     ARG_TYPE_GROUP([nnint], [COUNT], [iterations])
 
 * One-of values (i.e. values are restricted to be members of a set).
 
   ::
 
-     DEFINE_VALUE_TYPE_SET([type code], [type string], [list of arguments of that type], [list of values of that type], [suffix of the index variable (optional)])
+     ARG_TYPE_GROUP_SET([type code], [type string], [list of arguments of that type], [list of values of that type], [suffix of the index variable (optional)])
 
   If the suffix of the index variable is provided, each argument of the type will have a variable ``_arg_<stem>_<suffix>`` that contains the 0-based index of the argument value in the allowed values list. 
   You will typically want to use it as described in the next example:
@@ -326,7 +326,7 @@ You have these possibilities:
 
   ::
 
-     DEFINE_VALUE_TYPE_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install])
+     ARG_TYPE_GROUP_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install])
 
   and later in the code, you can use a construct like
 
@@ -473,28 +473,28 @@ Plus, there are convenience macros:
 
   ::
 
-    DEFINE_ENV([variable name], [default if empty (optional)], [help message (optional)])
+    ARG_USE_ENV([variable name], [default if empty (optional)], [help message (optional)])
 
-  For instance, if you declare ``DEFINE_ENV([ENVIRONMENT], [production], [The default environment])``, the value of the ``ENVIRONMENT`` environmental variable won't be empty --- if the user doesn't do anything, it will be ``production`` and if the user overrides it, it will stay that way.
+  For instance, if you declare ``ARG_USE_ENV([ENVIRONMENT], [production], [The default environment])``, the value of the ``ENVIRONMENT`` environmental variable won't be empty --- if the user doesn't do anything, it will be ``production`` and if the user overrides it, it will stay that way.
   It is undefined whether the user can override it, so it has a blank value in the script due to the user override (i.e. it is not possible now, but it may become possible in a later release.).
   
 * Declare that your script calls a program and enable the caller to set it using an environmental variable.
 
   ::
 
-    DEFINE_PROG([variable name], [default if empty (optional)], [help message (optional)], [args (optional)])
+    ARG_USE_PROG([variable name], [default if empty (optional)], [help message (optional)], [args (optional)])
 
-  For instance, if you declare ``DEFINE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` in later.
+  For instance, if you declare ``ARG_USE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` in later.
   This macro operates in two modes:
 
   * ``args`` are not given:
     The program name is searched for using the ``which`` utility and if it isn't a executable, the script will terminate with an error.
-    ``DEFINE_PROG([PYTHON], [python], ,)``
+    ``ARG_USE_PROG([PYTHON], [python], ,)``
   * ``args`` are given:
     The program is called with ``args`` and if the return code is non-zero, the script will terminate with an error.
-    If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``DEFINE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
+    If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``ARG_USE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
     
-    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the ``Python`` shell) and you should use ``DEFINE_PROG([PYTHON], [python], , [--version])`` instead.
+    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the ``Python`` shell) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
 
   In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller set.
 
