@@ -4,6 +4,7 @@ M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
 	../src/stuff.m4 \
+	../src/list.m4 \
 	../src/version \
 	$(NUL)
 
