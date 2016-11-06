@@ -6,7 +6,9 @@ Argbash
 
 ``Argbash`` (`<https://github.com/matejak/argbash>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
 You declare arguments that your script should use in few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, OSX, MS Windows, ...).
-You :ref:`can have <file_layout>` your parsing code in the script, you can have ``Argbash`` to help you to use it as a ``bash`` library, or you can generate the library yorself and include it yourself too, it's up to you.
+
+You :ref:`can have <file_layout>` your parsing code in the script, you can have ``Argbash`` to help you to use it as a ``bash`` library, or you can generate the library yourself and include it yourself too, it's up to you.
+A basic template generator ``argbash-init`` is part of the package, and you can :ref:`get started with it <quickstart_init>` in a couple of seconds.
 
 ``Argbash`` is free software, you are free to use it, share it, modify it and share the modifications with the world, since it is published under the 3-clause BSD linense.
 
@@ -42,35 +44,36 @@ Eventually, you may want to add/remove/rename arguments your script accepts.
 In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
 Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash`` on top of the script to get it updated.
 
+.. _quickstart_init:
+
 Generating a template
 +++++++++++++++++++++
 
 ``Argbash`` features the ``argbash-init`` script that you can use :ref:`to generate <argbash_init>` a template in one step.
-Assume that you want a script that accepts one (mandatory) positional argument and two optional ones.
+Assume that you want a script that accepts one (mandatory) positional argument ``positional-arg`` and two optional ones ``--option`` and ``--print``, where the latter is a boolean argument.
 
 In other words, we want to support these arguments:
 
-* ``--option1`` and ``--option2``, both accept one value, and
-* an argument we are going to refer to as ``positional`` that must be passed and that is not preceeded by *options* (such as ``--foo``, ``-f``).
+* ``--option`` that accepts one value,
+* ``--print`` or ``--no-print`` that doesn't accept any value, and
+* an argument named ``positional-arg`` that we are going to refer to as positional that must be passed and that is not preceeded by *options* (such as ``--foo``, ``-f``).
 
-We call ``argbash-init``:
+We call ``argbash-init`` and as the desired result is a script, we directly pipe the output of ``argbash-init`` to ``argbash``:
 
-.. literalinclude:: _static/minimal_init-create.txt
+.. literalinclude:: _static/index_script-create.txt
    :language: text
 
-You can take a look at the template, but ultimately, you want to generate a script from it:
+Let's see what the auto-generated script can do!
 
-.. code-block:: text
-
-  bin/argbash template.m4 -o script.sh
-
-Finally, let's test it!
-
-.. literalinclude:: _static/minimal_init-help.txt
+.. literalinclude:: _static/index_script-help.txt
    :language: text
 
-.. literalinclude:: _static/minimal_init-output.txt
+.. literalinclude:: _static/index_script-output.txt
    :language: text
+
+We didn't have to do much, yet the script is pretty capable.
+We can easily
+
 
 Writing a template
 ++++++++++++++++++
@@ -91,9 +94,14 @@ Then, it means that we need following arguments:
   * ``--option`` that accepts one value,
   * ``--print`` or ``--no-print`` that doesn't accept any value --- it either is or isn't specified,
   * ``--version`` that also doesn't accept any value and the program is supposed just to print its version and quit afterwards, and finally
-  * ``--help`` that prints a help message and also quits.
+  * ``--help`` that prints a help message and quits afterwards.
 
-Therefore, we write this to the template:
+Therefore, we call ``argbash-init`` like we did before:
+
+.. literalinclude:: _static/minimal_init-create.txt
+   :language: bash
+
+Next, we edit the template so it looks like this:
 
 .. literalinclude:: ../resources/examples/minimal.m4
    :language: bash
@@ -139,6 +147,7 @@ Limitations
 #. The square brackets in your script should match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``).
    More precisely, the number of closing square brackets ``]`` must not exceed the number of opening ``[``.
    This limitation does apply to files that are processed by ``argbash`` --- you are fine if you have the argument parsing code in a separate file and you :ref:`don't use <usage_manual>` the ``INCLUDE_PARSING_CODE`` macro.
+   (You are also OK if you use :ref:`argbash-init <argbash_init>` in the *decoupled mode*.)
 #. The generated code generally contains bashisms as it relies heavily on ``bash`` arrays to process any kind of positional arguments and multi-valued optional arguments.
    That said, if you stick with optional arguments only, a POSIX shell s.a. ``dash`` should be able to process the ``Argbash``-generated parsing code.
 

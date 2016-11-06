@@ -1,2 +1,2 @@
-bin/argbash-init --pos positional --opt option1 --opt option2  template.m4
+bin/argbash-init --pos positional-arg --opt option --opt-bool print  minimal.m4
 

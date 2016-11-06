@@ -1,0 +1,5 @@
+./script.sh --print --option opt-value pos-value
+
+Value of --option: opt-value
+print is on
+Value of positional-arg: pos-value

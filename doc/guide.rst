@@ -104,6 +104,8 @@ Then, run the following command to your file:
 
 to either get a script that should just work, or a file that you include in your script.
 
+.. _argbash_api:
+
 Argbash API
 -----------
 
@@ -260,6 +262,15 @@ Special arguments
 Typing macros
 +++++++++++++
 
+.. warning::
+
+   Features described in this section are experimental.
+   Macros in the type-related section below are not an official part of the API yet --- their names and/or signature may change.
+
+   The documentation here is just a peek into the ``Argbash`` future.
+   Please raise an issue if you feel you can provide helpful feedback!
+
+
 ``Argbash`` supports typed argument values.
 For example, you can declare that a certain argument requires an integer value, and if its value by the time of conclusion of the parsing part of the script is not of an integer type, an error is raised.
 The validator sometimes retutrns the value in a cannonical form (e.g. it may trim leading and trailing whitespaces).
@@ -322,18 +333,20 @@ You have these possibilities:
   Remarks:
 
   * Pass the list of values without shell-quoting.
-    It will be applied later.
+    Double quotes will be applied later.
 
   ::
 
-     ARG_TYPE_GROUP_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install])
+     ARG_TYPE_GROUP_SET([operations], [OPERATION], [start-with,stop-with], [configure,make,install], [index])
 
   and later in the code, you can use a construct like
 
   .. code-block:: bash
 
-     # fail e.g. when we start-with make and stop-with configure. It would work if it was the other way.
-     test $_arg_stop_with_index -gt $_arg_start_with_index || die "The last operation has to be a successor of the first one, which is not the case."
+     # fail e.g. when we start-with make and stop-with configure.
+     # It would work if it was the other way.
+     test "$_arg_stop_with_index" -gt "$_arg_start_with_index" \
+        || die "The last operation has to be a successor of the first one, which is not the case."
 
 * Filenames
 
@@ -469,14 +482,24 @@ Plus, there are convenience macros:
 
        Check out the example: :ref:`ex_wrapping`
 
-* Declare that your script uses an environment variable, set a default for it if it is blank upon the script's invocatino and optionally mention it in the script's help:
+
+.. warning::
+
+   Features described at the rest of this section are experimental.
+   Convenience macros below are not an official part of the API yet --- their names and/or signature may change.
+
+   The documentation here is just a peek into the ``Argbash`` future.
+   Please raise an issue if you feel you can provide helpful feedback!
+
+
+* Declare that your script uses an environment variable, set a default for it if it is blank upon the script's invocation and optionally mention it in the script's help:
 
   ::
 
     ARG_USE_ENV([variable name], [default if empty (optional)], [help message (optional)])
 
   For instance, if you declare ``ARG_USE_ENV([ENVIRONMENT], [production], [The default environment])``, the value of the ``ENVIRONMENT`` environmental variable won't be empty --- if the user doesn't do anything, it will be ``production`` and if the user overrides it, it will stay that way.
-  It is undefined whether the user can override it, so it has a blank value in the script due to the user override (i.e. it is not possible now, but it may become possible in a later release.).
+  It is undefined whether the user can override it so it has a blank value in the script due to the user override (i.e. it is not possible now, but it may become possible in a later release.).
   
 * Declare that your script calls a program and enable the caller to set it using an environmental variable.
 
@@ -484,7 +507,7 @@ Plus, there are convenience macros:
 
     ARG_USE_PROG([variable name], [default if empty (optional)], [help message (optional)], [args (optional)])
 
-  For instance, if you declare ``ARG_USE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` in later.
+  For instance, if you declare ``ARG_USE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` later.
   This macro operates in two modes:
 
   * ``args`` are not given:
@@ -494,9 +517,9 @@ Plus, there are convenience macros:
     The program is called with ``args`` and if the return code is non-zero, the script will terminate with an error.
     If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``ARG_USE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
     
-    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the ``Python`` shell) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
+    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the interactive Python interpreter) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
 
-  In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller set.
+  In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
 
 Action macro
 ++++++++++++

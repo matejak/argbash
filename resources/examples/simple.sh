@@ -17,8 +17,6 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't dete
 # [ <-- needed because of Argbash
 
 
-# ARG_HELP  <-- Unlike one above, his one does not disappear, it is behind the escape bracket.
-
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
 verbose=$_arg_verbose

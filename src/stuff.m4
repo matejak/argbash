@@ -1472,6 +1472,7 @@ m4_define([_define_validator], [m4_do(
 
 dnl
 dnl Put definitions of validating functions if they are needed
+dnl TODO: The fact that we are aware of VALUE_TYPES doesn't mean that we use them
 m4_define([_PUT_VALIDATORS], [m4_do(
 	[m4_set_empty([VALUE_TYPES], , [# validators
 ])],

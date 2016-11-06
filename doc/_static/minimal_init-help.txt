@@ -1,8 +1,0 @@
-./script.sh -h
-
-<The general help message of my script>
-Usage: ./script.sh [--option1 <arg>] [--option2 <arg>] [-h|--help] <positional>
-	<positional>: <positional's help message goes here>
-	--option1: <option1's help message goes here> (no default)
-	--option2: <option2's help message goes here> (no default)
-	-h,--help: Prints help

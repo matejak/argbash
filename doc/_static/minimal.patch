@@ -1,0 +1,32 @@
+--- minimal-raw.m4	2016-11-04 19:06:36.816634721 +0100
++++ minimal.m4	2016-11-04 19:10:23.043297242 +0100
+@@ -3,16 +3,22 @@
+ # m4_ignore(
+ echo "This is just a script template, not the script (yet) - pass it to 'argbash' to fix this." >&2
+ exit 11  #)Created by argbash-init v2.1.1
+-# ARG_OPTIONAL_SINGLE([option], , [<option's help message goes here>])
+-# ARG_OPTIONAL_BOOLEAN([print], , [<print's help message goes here>])
+-# ARG_POSITIONAL_SINGLE([positional-arg], [<positional-arg's help message goes here>], )
+-# ARG_HELP([<The general help message of my script>])
++# ARG_OPTIONAL_SINGLE([option], o, [A option with short and long flags and default], [boo])
++# ARG_OPTIONAL_BOOLEAN([print], , [A boolean option with long flag (and implicit default: off)])
++# ARG_POSITIONAL_SINGLE([positional-arg], [Positional arg description], )
++# ARG_HELP([This is a minimal demo of Argbash potential])
++# ARG_VERSION([echo $0 v0.1])
++# ARGBASH_SET_INDENT([  ])
+ # ARGBASH_GO
+ 
+ # [ <-- needed because of Argbash
+ 
+-echo "Value of --option: $_arg_option"
+-echo "print is $_arg_print"
+-echo "Value of positional-arg: $_arg_positional_arg"
++if [ "$_arg_print" = on ]
++then
++  echo "Positional arg value: '$_arg_positional_arg'"
++  echo "Optional arg '--option' value: '$_arg_option'"
++else
++  echo "Not telling anything, print not requested"
++fi
+ 
+ # ] <-- needed because of Argbash

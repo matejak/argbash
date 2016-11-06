@@ -24,7 +24,7 @@ die()
 	echo "$1" >&2
 	exit ${_ret}
 }
-# validators
+# validators intpintnnintfloatdecimalstring
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 # THE DEFAULTS INITIALIZATION - OPTIONALS

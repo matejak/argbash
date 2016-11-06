@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_SINGLE([positional-arg],[Positional arg description])
-# ARG_OPTIONAL_SINGLE([option],[o],[A option with short and long flags and default],[b])
-# ARG_OPTIONAL_BOOLEAN([print],[],[A boolean option with long flag (and implicit default: off)],[])
-# ARG_VERSION([echo $0 v0.1])
+# Created by argbash-init v2.1.1
+# ARG_OPTIONAL_SINGLE([option],[o],[A option with short and long flags and default],[boo])
+# ARG_OPTIONAL_BOOLEAN([print],[],[A boolean option with long flag (and implicit default: off)])
+# ARG_POSITIONAL_SINGLE([positional-arg],[Positional arg description],[])
 # ARG_HELP([This is a minimal demo of Argbash potential])
+# ARG_VERSION([echo $0 v0.1])
 # ARGBASH_SET_INDENT([  ])
 # ARGBASH_GO()
 # needed because of Argbash --> m4_ignore([
@@ -20,22 +21,23 @@ die()
   echo "$1" >&2
   exit ${_ret}
 }
+# validators intpintnnintfloatdecimalstring
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 # THE DEFAULTS INITIALIZATION - OPTIONALS
-_arg_option="b"
+_arg_option="boo"
 _arg_print=off
 
 # THE PRINT HELP FUNCION
 print_help ()
 {
   echo "This is a minimal demo of Argbash potential"
-  printf 'Usage: %s [-o|--option <arg>] [--(no-)print] [-v|--version] [-h|--help] <positional-arg>\n' "$0"
+  printf 'Usage: %s [-o|--option <arg>] [--(no-)print] [-h|--help] [-v|--version] <positional-arg>\n' "$0"
   printf "\t<positional-arg>: Positional arg description\n"
-  printf "\t-o,--option: A option with short and long flags and default (default: '%s')\n" "b"
+  printf "\t-o,--option: A option with short and long flags and default (default: '%s')\n" "boo"
   printf "\t--print,--no-print: A boolean option with long flag (and implicit default: off) (%s by default)\n" "off"
-  printf "\t-v,--version: Prints version\n"
   printf "\t-h,--help: Prints help\n"
+  printf "\t-v,--version: Prints version\n"
 }
 
 # THE PARSING ITSELF
@@ -57,12 +59,12 @@ do
       _arg_print="on"
       test "${1:0:5}" = "--no-" && _arg_print="off"
       ;;
-    -v|--version)
-      echo $0 v0.1
-      exit 0
-      ;;
     -h|--help)
       print_help
+      exit 0
+      ;;
+    -v|--version)
+      echo $0 v0.1
       exit 0
       ;;
     *)

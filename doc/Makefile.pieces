@@ -1,8 +1,18 @@
 DOCDIR ?= .
 RESOURCES ?= ../resources
 
-MINIMAL_INIT = script.sh
-MINIMAL = $(RESOURCES)/examples/minimal.sh
+# TODO: minimal template,
+# minimal min. template after edit,
+# resulting script
+
+AB = ../bin/argbash
+AB_INIT = ../bin/argbash-init
+
+# example exclusively in index.rst
+INDEX_SCRIPT = script.sh
+MINIMAL_INIT_TPL = $(RESOURCES)/examples/minimal-raw.m4
+MINIMAL_INIT_POST = $(RESOURCES)/examples/minimal.m4
+MINIMAL_SCRIPT = $(RESOURCES)/examples/minimal.sh
 SIMPLE = $(RESOURCES)/examples/simple.sh
 WRAPPER = $(RESOURCES)/examples/simple-wrapper.sh
 
@@ -11,8 +21,11 @@ STATICDIR = _static
 NUL =
 
 PIECES = \
+	$(STATICDIR)/index_script-create.txt \
+	$(STATICDIR)/index_script-help.txt \
+	$(STATICDIR)/index_script-output.txt \
+	$(STATICDIR)/minimal_argbash-create.txt \
 	$(STATICDIR)/minimal_init-create.txt \
-	$(STATICDIR)/minimal_init-help.txt \
 	$(STATICDIR)/minimal_init-output.txt \
 	$(STATICDIR)/minimal-output-help.txt \
 	$(STATICDIR)/minimal-output-foobar.txt \
@@ -36,32 +49,55 @@ define CMD_OUT_LOCAL
 	./$< $(FLAGS) >> $@
 endef
 
-A_INIT_OPTS = --pos positional --opt option1 --opt option2 
-$(STATICDIR)/minimal_init-create.txt: ../bin/argbash-init
-	$(eval FLAGS := $(A_INIT_OPTS) template.m4)
+A_INIT_ARGS = --pos positional-arg --opt option --opt-bool print
+$(STATICDIR)/minimal_init-create.txt: $(AB_INIT)
+	$(eval FLAGS := $(A_INIT_ARGS) minimal.m4)
 	$(CMD_OUT)
-	$(RM) template.m4
+	$(RM) minimal.m4
 
-$(MINIMAL_INIT):
-	../bin/argbash-init $(A_INIT_OPTS) | ../bin/argbash - -o $@
+$(STATICDIR)/index_script-create.txt: $(AB_INIT)
+	$(eval FLAGS := $(A_INIT_ARGS) - | $(AB) -o $(INDEX_SCRIPT) -)
+	$(CMD_OUT)
+	$(RM) $(INDEX_SCRIPT)
 
-$(STATICDIR)/minimal_init-output.txt: $(MINIMAL_INIT)
-	$(eval FLAGS := --option1 one --option2 two zero)
-	$(CMD_OUT_LOCAL)
-
-$(STATICDIR)/minimal_init-help.txt: $(MINIMAL_INIT)
+$(STATICDIR)/index_script-help.txt: $(INDEX_SCRIPT)
 	$(eval FLAGS := -h)
 	$(CMD_OUT_LOCAL)
 
-$(STATICDIR)/minimal-output-help.txt: $(MINIMAL)
+$(STATICDIR)/index_script-output.txt: $(INDEX_SCRIPT)
+	$(eval FLAGS := --print --option opt-value pos-value)
+	$(CMD_OUT_LOCAL)
+
+$(INDEX_SCRIPT):
+	$(AB_INIT) $(A_INIT_ARGS) - | $(AB) -o $@ -
+
+$(MINIMAL_INIT_TPL): $(AB_INIT)
+	$(AB_INIT) $(A_INIT_ARGS) $@
+
+$(MINIMAL_INIT_POST): $(MINIMAL_INIT_TPL) $(PWD)/_static/minimal.patch
+	patch -d $(dir $<) -o $(notdir $@) $(notdir $<) $(PWD)/_static/minimal.patch
+
+$(MINIMAL_SCRIPT): $(MINIMAL_INIT_POST) $(AB)
+	$(AB) $< -o $@
+
+$(STATICDIR)/minimal_argbash-create.txt: $(AB) $(MINIMAL_INIT_POST)
+	$(eval FLAGS := -o $(MINIMAL_SCRIPT) $(MINIMAL_INIT_POST))
+	$(CMD_OUT_LOCAL)
+	rm $(MINIMAL_SCRIPT)
+
+$(STATICDIR)/minimal_init-output.txt: $(MINIMAL_SCRIPT)
+	$(eval FLAGS := --option value1 --print value0)
+	$(CMD_OUT_LOCAL)
+
+$(STATICDIR)/minimal-output-help.txt: $(MINIMAL_SCRIPT)
 	$(eval FLAGS := -h)
 	$(CMD_OUT)
 
-$(STATICDIR)/minimal-output-foobar.txt: $(MINIMAL)
+$(STATICDIR)/minimal-output-foobar.txt: $(MINIMAL_SCRIPT)
 	$(eval FLAGS := foo -o bar --print)
 	$(CMD_OUT)
 
-$(STATICDIR)/minimal-output-noverbose.txt: $(MINIMAL)
+$(STATICDIR)/minimal-output-noverbose.txt: $(MINIMAL_SCRIPT)
 	$(eval FLAGS := foo -o bar)
 	$(CMD_OUT)
 
@@ -79,4 +115,4 @@ $(STATICDIR)/wrapper-output-action.txt: $(WRAPPER)
 
 clean-pieces:
 	$(RM) $(PIECES)
-	$(RM) $(MINIMAL_INIT)
+	$(RM) $(MINIMAL_SCRIPT) $(INDEX_SCRIPT)

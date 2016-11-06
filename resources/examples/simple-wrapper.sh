@@ -20,6 +20,7 @@ die()
   echo "$1" >&2
   exit ${_ret}
 }
+# validators intpintnnintfloatdecimalstring
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _arg_directory=('' )

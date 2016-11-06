@@ -1,5 +1,4 @@
-./script.sh --option1 one --option2 two zero
+./../resources/examples/minimal.sh --option value1 --print value0
 
-Value of --option1: one
-Value of --option2: two
-Value of positional: zero
+Positional arg value: 'value0'
+Optional arg '--option' value: 'value1'

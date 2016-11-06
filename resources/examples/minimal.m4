@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# ARG_POSITIONAL_SINGLE([positional-arg], [Positional arg description])
-# ARG_OPTIONAL_SINGLE([option], o, [A option with short and long flags and default], b)
-# ARG_OPTIONAL_BOOLEAN([print], , [A boolean option with long flag (and implicit default: off)], )
-# ARG_VERSION([echo $0 v0.1])
+# m4_ignore(
+echo "This is just a script template, not the script (yet) - pass it to 'argbash' to fix this." >&2
+exit 11  #)Created by argbash-init v2.1.1
+# ARG_OPTIONAL_SINGLE([option], o, [A option with short and long flags and default], [boo])
+# ARG_OPTIONAL_BOOLEAN([print], , [A boolean option with long flag (and implicit default: off)])
+# ARG_POSITIONAL_SINGLE([positional-arg], [Positional arg description], )
 # ARG_HELP([This is a minimal demo of Argbash potential])
+# ARG_VERSION([echo $0 v0.1])
 # ARGBASH_SET_INDENT([  ])
 # ARGBASH_GO
 

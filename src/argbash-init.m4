@@ -19,6 +19,13 @@ version=_ARGBASH_VERSION
 _variables=()
 
 
+# This should be in sync with _translit_var in stuff.m4
+_translit_var()
+{
+	printf "\$_arg_%s" "$1" | tr '[:upper:]' '[:lower:]' | tr '-' '_'
+}
+
+
 do_hints_pos()
 {
 	_help="[<$1's help message goes here>]"
@@ -40,7 +47,7 @@ do_opt()
 {
 	do_hits_opt "$1"
 	echo "# ARG_OPTIONAL_SINGLE([$1], $_short_opt, $_help)"
-	_variables+=('echo "Value of --'$1': $_arg_'$1'"')
+	_variables+=('echo "Value of --'$1': '$(_translit_var "$1")'"')
 }
 
 
@@ -48,7 +55,7 @@ do_opt_bool()
 {
 	do_hits_opt "$1"
 	echo "# ARG_OPTIONAL_BOOLEAN([$1], $_short_opt, $_help)"
-	_variables+=('echo "'$1' is $_arg_'$1'"')
+	_variables+=('echo "'$1' is '$(_translit_var "$1")'"')
 }
 
 
@@ -56,7 +63,7 @@ do_pos()
 {
 	do_hints_pos "$1"
 	echo "# ARG_POSITIONAL_SINGLE([$1], $_help, $_default)"
-	_variables+=('echo "Value of '$1': $_arg_'$1'"')
+	_variables+=('echo "Value of '$1': '$(_translit_var "$1")'"')
 }
 
 
