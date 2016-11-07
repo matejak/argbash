@@ -11,13 +11,18 @@ Aren't you tired of that? `getopt` is discouraged, `getopts` doesn't support lon
 
 Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
-* Make your existing script powered by `Argbash` [in a couple of minutes]()!
+* Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template)!
 * Fast, minimalistic declaration of arguments your script expects (see below for supported argument types).
 * Generate script from definitions once and use it afterwards on all platforms that have `bash`!
 * Definitions will stay embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
 * Re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
+
+>Do you need an argument-parsing battleship full of features?
+>No problem, we will make one for you.
+>Or would you rather accept a parsing gunboat?
+>Be our guest!
 
 ## What it is
 
