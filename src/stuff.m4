@@ -6,7 +6,6 @@ dnl TODO: Produce code completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
-dnl TODO: Make argbash-init template builder
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl TODO: Add protection against misspelled macros (m4_pattern_forbid/allow)
@@ -754,11 +753,11 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 			[m4_pushdef([argname1], <m4_expand([argname0])[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 			[m4_pushdef([argname], m4_if(m4_quote(_arg_type), [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-			[_INDENT_()[printf "\t]argname[: ]_msg],
+			[_INDENT_()[printf "\t%s\n" "]argname[: ]_msg],
 			[_POS_ARG_HELP_DEFAULTS([argname], m4_expand([_arg_type]), m4_expand([_min_argn]), m4_expand([_defaults]))],
 			[m4_popdef([argname])],
 			[m4_popdef([argname1])],
-			[[\n"
+			[["
 ]],
 			)])])],
 	)],
@@ -771,7 +770,7 @@ m4_define([_MAKE_HELP], [m4_do(
 		[_argname,_arg_short,_arg_type,_default,_arg_help],
 		[m4_ifnblank(_arg_help, [m4_do(
 			[m4_pushdef([_VARNAME], [_varname(_argname)])],
-			[_INDENT_()printf "\t],
+			[_INDENT_()printf "\t%s\n" "],
 			[dnl Display a short one if it is not blank
 ],
 			[m4_ifnblank(_arg_short, -_arg_short[,])],
@@ -786,24 +785,25 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 			[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
 ],
-			[dnl Now the default is expanded since it is between double quotes
+			[dnl We save the default to a temp var whichwe expand later.
 ],
+			[m4_pushdef([_default_val],
+				[m4_quote(m4_case(_arg_type,
+					[action], [],
+					[incr], [],
+					[arg], [m4_ifnblank(m4_quote(_default), [_default])],
+					[repeated], [m4_ifnblank(m4_quote(_default), [m4_bpatsubst(m4_quote(_default), ", \\")])],
+					[m4_ifnblank(m4_quote(_default), [_default])]))])],
 			[m4_case(_arg_type,
 				[action], [],
 				[incr], [],
-				[bool], [ (%s by default)],
-				[repeated], [ m4_if(m4_quote(_default), [()], [(empty by default)], [(default array: %s )])],
-				[ @{:@m4_ifnblank(m4_quote(_default), [default: '%s'], [no default])@:}@])],
-			[\n"],
+				[bool], [ (_default_val by default)],
+				[repeated], [ m4_if(m4_quote(_default), [()], [(empty by default)], [(default array: _default_val )])],
+				[ @{:@m4_ifnblank(m4_quote(_default), [default: '_default_val'], [no default])@:}@])],
+			[m4_popdef([_default_val])],
+			["
+],
 			[dnl Single: We are already quoted
-],
-			[m4_case(_arg_type,
-				[action], [],
-				[incr], [],
-				[arg], [m4_ifnblank(m4_quote(_default), [ _default])],
-				[repeated], [m4_ifnblank(m4_quote(_default), [ "m4_bpatsubst(m4_quote(_default), ", \\")"])],
-				[m4_ifnblank(m4_quote(_default), [ "_default"])])],
-			[
 ],
 			[m4_popdef([_VARNAME])],
 	)])])])],
@@ -813,10 +813,10 @@ m4_define([_MAKE_HELP], [m4_do(
 	[m4_list_ifempty([LIST_ENV_HELP], ,[m4_do(
 		[printf '\nEnvironment variables that are supported:\n'
 ],
-		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t[]_msg\n"
+		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t%s\n" "[]_msg"
 ])],
 	)])],
-	[m4_ifnblank(m4_expand([_HELP_MSG_EX]), m4_expand([_INDENT_()[printf "\n]_HELP_MSG_EX[\n]"
+	[m4_ifnblank(m4_expand([_HELP_MSG_EX]), m4_expand([_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
 ]))],
 	[}
 ],
@@ -1446,7 +1446,7 @@ m4_define([_ENV_HELP], [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_n
 dnl
 dnl $1: name
 dnl $2: default
-dnl TODO: Try to use declare to see whether the variable is even defined
+dnl TODO: Try to use the 'declare' builtin to see whether the variable is even defined
 m4_define([__SETTLE_ENV], [m4_do(
 	[test -n "@S|@$1" || $1="$2"
 ],
@@ -1472,9 +1472,8 @@ m4_define([_define_validator], [m4_do(
 
 dnl
 dnl Put definitions of validating functions if they are needed
-dnl TODO: The fact that we are aware of VALUE_TYPES doesn't mean that we use them
 m4_define([_PUT_VALIDATORS], [m4_do(
-	[m4_set_empty([VALUE_TYPES], , [# validators
+	[m4_set_empty([VALUE_TYPES_USED], , [# validators
 ])],
 	[m4_set_foreach([VALUE_TYPES], [_val_type], [m4_do(
 		[m4_set_empty(m4_expand([[VALUE_GROUP_]_val_type]), ,

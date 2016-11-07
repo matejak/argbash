@@ -1,2 +1,2 @@
-bin/argbash-init --pos positional-arg --opt option --opt-bool print  - | ../bin/argbash -o script.sh -
+bin/argbash-init --pos positional-arg --opt option --opt-bool print - | ../bin/argbash -o script.sh -
 

@@ -39,6 +39,7 @@ TESTS += \
 	test-init_simple \
 	test-init_simple-s \
 	test-init_simple-ss \
+	test-init_simple-s-update \
 	test-env-base \
 	test-env-simple \
 	test-int \
@@ -79,6 +80,10 @@ SCRIPTS += \
 	$(TESTDIR)/test-init_simple-s-parsing.sh \
 	$(TESTDIR)/test-init_simple-s-parsing.m4 \
 	$(TESTDIR)/test-init_simple-s.m4 \
+	$(TESTDIR)/test-init_simple-s-update-parsing.sh \
+	$(TESTDIR)/test-init_simple-s-update-parsing.m4 \
+	$(TESTDIR)/test-init_simple-s-update.m4 \
+	$(TESTDIR)/test-init_simple-s-update.sh \
 	$(TESTDIR)/test-init_simple-ss-parsing.sh \
 	$(TESTDIR)/test-init_simple-ss-parsing.m4 \
 	$(TESTDIR)/gen-test-init_name_char.m4 \
@@ -143,6 +148,7 @@ stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 
 basic: $(TESTDIR)/basic.sh
 	$(generic_regression)
+	$< -h | grep -q 'percent: %'
 
 call-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
@@ -317,10 +323,25 @@ $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@
 
 $(TESTDIR)/test-init_simple-s.m4: $(ARGBASH_INIT)
-	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@ -s
+	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s $@
+
+$(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT)
+	$< --opt ordnung -s $@
+	sed -i 's/^echo .*//' $@
+	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
+
+test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
+	$< --ordnung yes
+	$(REVERSE) $<
+	ERROR="unexpected argument" $(REVERSE) $< -o yes
+	sed -i 's/\[ordnung\],\[\]/&[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
+	$(ARGBASH_BIN) $< > /dev/null
+	$< --ordnung yes
+	$(REVERSE) $<
+	$< -o yes
 
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
-	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@ -s -s
+	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
 
 $(TESTDIR)/test-init_simple-ss-parsing.m4: $(TESTDIR)/test-init_simple-ss.sh
 	@
