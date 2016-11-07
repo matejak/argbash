@@ -19,10 +19,10 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
->Do you need an argument-parsing battleship full of features?
->No problem, we will make one for you.
->Or would you rather accept a parsing gunboat?
->Be our guest!
+> Do you need an argument-parsing battleship full of features?  
+> No problem, we will make one for you.  
+> Or would you rather accept a parsing gunboat?  
+> Be our guest!
 
 ## What it is
 
