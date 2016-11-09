@@ -54,6 +54,6 @@ The utility has been inspired by Python's `argparse` and the `shflags` project.
 Requirements
 ------------
 
- - `bash` that can work with arrays (most likely `bash >= 3.0`) (the only requirement for *users* - i.e. people that only execute scripts and don't make them)
- - `autom4te` utility that can work with sets (part of `autoconf >= 2.63` suite)
- - basic utilities s.a. `sed`, `grep`, `cat`, `test`.
+- `bash` that can work with arrays (most likely `bash >= 3.0`) (the only requirement for *users* - i.e. people that only execute scripts and don't make them)
+- `autom4te` utility that can work with sets (part of `autoconf >= 2.63` suite)
+- basic utilities s.a. `sed`, `grep`, `cat`, `test`.

@@ -12,9 +12,10 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 
 ``Argbash`` is free software, you are free to use it, share it, modify it and share the modifications with the world, since it is published under the 3-clause BSD linense.
 
+:Version:
+  |version|
 :Authors:
   - `Matěj Týč <https://github.com/matejak>`_
-
 :Copyright:
   - 2014-2016, Matěj Týč
 

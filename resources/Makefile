@@ -8,8 +8,8 @@ M4_SRC = \
 	../src/version \
 	$(NUL)
 
-PREFIX = $(HOME)/.local
-ROOT = /
+PREFIX ?= $(HOME)/.local
+ROOT ?= /
 
 A_INIT = ../bin/argbash-init
 GENPARSE = ../bin/argbash
