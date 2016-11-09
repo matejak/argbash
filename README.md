@@ -49,7 +49,7 @@ Following argument types are supported:
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
-**[Read the docs](http://argbash.readthedocs.org/en/latest/) for more info**
+**[Read the docs (latest stable version)](http://argbash.readthedocs.org/en/stable/) for more info**
 
 Requirements
 ------------
