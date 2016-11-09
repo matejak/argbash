@@ -1,0 +1,34 @@
+Name:		argbash
+Version:	@VERSION@
+Release:	@PKGREL@%{?dist}
+Summary:	@DESC@
+Group:
+License:	BSD
+URL:		@URL@
+Source0:	https://github.com/matejak/%{name}/archive/%{version}.tar.gz
+
+BuildArch:	noarch
+
+BuildRequires:	make,bash
+Requires:	autoconf,bash,coreutils
+
+%description
+
+%prep
+%autosetup -n argbash-@VERSION@
+
+%build
+
+%install
+cd resources && ROOT=%{buildroot} PREFIX=/usr make install
+
+%check
+cd resources && make check
+
+%files
+%{_bindir}/*
+%{_libdir}/*
+
+%doc
+
+%changelog

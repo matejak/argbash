@@ -1,4 +1,4 @@
-VERSION = $(shell cat ../../src/version)
+VERSION ?= $(shell cat ../../src/version)
 
 SOURCE = build/argbash-$(VERSION).tar.gz
 
@@ -45,7 +45,7 @@ build/PKGBUILD: arch/PKGBUILD.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENS
 archlinux: build/PKGBUILD
 	cd build && makepkg -f && makepkg --printsrcinfo > .SRCINFO
 
-build/SPEC: rpm/SPEC $(SOURCE)
+build/SPEC: rpm/SPEC.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
 	$(substitute)
 
 clean:

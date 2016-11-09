@@ -24,7 +24,7 @@ backup=()
 options=()
 install=
 changelog=
-source=("https://github.com/matejak/argbash/archive/$pkgver.tar.gz" LICENSE)
+source=("https://github.com/matejak/$pkgname/archive/$pkgver.tar.gz" LICENSE)
 noextract=()
 sha256sums=('@SHA256SUM@' '@LIC_SHA256SUM@')
 validpgpkeys=()
@@ -35,7 +35,7 @@ build() {
 
 check() {
 	cd "$pkgname-$pkgver/resources"
-	make -k check
+	make check
 }
 
 package() {
