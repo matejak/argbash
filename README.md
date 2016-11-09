@@ -1,4 +1,5 @@
-# argbash
+argbash
+=======
 
 [![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
 [![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://readthedocs.org/projects/argbash/?badge=latest)
@@ -24,7 +25,8 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 > Or would you rather accept a parsing gunboat?  
 > Be our guest!
 
-## What it is
+What it is
+----------
 
 Argbash is not a parsing library, but it is rather a code generator that generates a library tailor-made for your script.
 It lets you to describe arguments your script should take and then, you can generate the `bash` code.
@@ -49,7 +51,8 @@ The utility has been inspired by Python's `argparse` and the `shflags` project.
 
 **[Read the docs](http://argbash.readthedocs.org/en/latest/) for more info**
 
-## Requirements
+Requirements
+------------
 
  - `bash` that can work with arrays (most likely `bash >= 3.0`) (the only requirement for *users* - i.e. people that only execute scripts and don't make them)
  - `autom4te` utility that can work with sets (part of `autoconf >= 2.63` suite)
