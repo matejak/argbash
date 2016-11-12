@@ -148,7 +148,8 @@ stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 
 basic: $(TESTDIR)/basic.sh
 	$(generic_regression)
-	$< -h | grep -q 'percent: %'
+	$< -h | grep -q 'P percent: %'
+	$< -h | grep -q 'O percent: %'
 
 call-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)

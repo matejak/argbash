@@ -5,7 +5,8 @@ ADD_TEST([stability], [[
 
 ADD_TEST([basic], [[
 	$(generic_regression)
-	$< -h | grep -q 'percent: %'
+	$< -h | grep -q 'P percent: %'
+	$< -h | grep -q 'O percent: %'
 ]])
 
 ADD_SCRIPT([test-salone])

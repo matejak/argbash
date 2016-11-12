@@ -9,6 +9,8 @@ dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl TODO: Add protection against misspelled macros (m4_pattern_forbid/allow)
+dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
+dnl TODO: Sort out quoting of defaults and inside help strings (proposal for help msgs: terminate the double quoting just before, but make sure that the help msg element is quoted at least in some way).
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -215,7 +217,7 @@ m4_define([_opt_suffix], [[_opt]])
 m4_define([_pos_suffix], [[_pos]])
 m4_define([_arg_prefix], [[_arg_]])
 m4_define([_args_prefix], [[_args_]])
-m4_define([_varname], [_arg_prefix[]_translit_var([$1])])
+m4_define([_varname], [m4_quote(_arg_prefix[]_translit_var([$1]))])
 
 
 dnl
@@ -270,7 +272,7 @@ dnl $5: Type
 m4_define([__some_opt], [m4_do(
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
-		[m4_define([_COLLECT_]m4_quote(_varname([$1])),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
+		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
 	)])],
 	[m4_list_append([_ARGS_LONG], [$1])],
 	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
@@ -331,6 +333,7 @@ m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
 
+dnl $1 is not quoted on purpose - it is already handled (i.e. quoted) by the caller
 m4_define([_POS_WRAPPED],[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
 		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit_var(WRAPPED)[]_pos_suffix]))],
@@ -351,7 +354,7 @@ m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
-	[_POS_WRAPPED("${m4_quote(_varname([$1]))}")],
+	[_POS_WRAPPED("${_varname([$1])}")],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
 	[m4_define([_POSITIONALS_MAX], m4_incr(_POSITIONALS_MAX))],
@@ -400,7 +403,7 @@ dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
-	[_POS_WRAPPED(${m4_quote(_varname([$1]))@<:@@@:>@})],
+	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
 ],
@@ -441,7 +444,7 @@ m4_define([ARG_POSITIONAL_MULTI], [m4_do(
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
-	[_POS_WRAPPED(${m4_quote(_varname([$1]))@<:@@@:>@})],
+	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
 	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
 	[m4_list_append([_POSITIONAL_CATHS], [more])],
@@ -841,8 +844,8 @@ m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 			[_val="@S|@2"],
 			[shift]),
 		[fi],]),
-	[$3],
-	[_ADD_OPTS_VALS($_ARGVAR)],
+	[[$3]],
+	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
 )])
 
 
@@ -854,8 +857,8 @@ m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
 	[test @S|@# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[_val="@S|@2"],
 	[shift],
-	[$3],
-	[_ADD_OPTS_VALS($_ARGVAR)],
+	[[$3]],
+	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
 )])
 
 
@@ -872,8 +875,8 @@ m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
 		[_val="@S|@2"],
 		[shift]),
 	[fi],
-	[$3],
-	[_ADD_OPTS_VALS($_ARGVAR)],
+	[[$3]],
+	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
 )])
 
 
@@ -966,18 +969,18 @@ _INDENT_(2,	)],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD([$1], [$2], _ARGVAR[="$_val"])],
-		[repeated], [_VAL_OPT_ADD([$1], [$2], _ARGVAR[+=("$_val")])],
+		[arg], [_VAL_OPT_ADD([$1], [$2], [_ARGVAR="$_val"])],
+		[repeated], [_VAL_OPT_ADD([$1], [$2], [_ARGVAR+=("$_val")])],
 		[bool],
 		[_JOIN_INDENTED(3,
-			_ARGVAR[="on"],
-			[_ADD_OPTS_VALS()],
-			[test "$[]{1:0:5}" = "--no-" && ]_ARGVAR[="off"],
+			[_ARGVAR="on"],
+			[_ADD_OPTS_VALS(_ARGVAR)],
+			[test "$[]{1:0:5}" = "--no-" && _ARGVAR="off"],
 		)],
 		[incr],
 		[_JOIN_INDENTED(3,
-			m4_quote(_ARGVAR=$((_ARGVAR + 1))),
-			[_ADD_OPTS_VALS()],
+			[_ARGVAR=$((_ARGVAR + 1))],
+			[_ADD_OPTS_VALS(_ARGVAR)],
 		)],
 		[action],
 		[_JOIN_INDENTED(3,
@@ -991,7 +994,8 @@ _INDENT_(2,	)],
 
 
 dnl
-dnl $1: The value of the option arg
+dnl $1: The name of the option arg
+dnl $2: The value of the option arg
 dnl Uses:
 dnl _ARGVAR - name of the variable
 dnl _key - the run-time shell variable
@@ -1000,7 +1004,7 @@ m4_define([_ADD_OPTS_VALS], [m4_do(
 ],
 	[dnl Strip everything after the first = sign (= the optionwithout value)
 ],
-	[m4_ifdef([_COLLECT_]_ARGVAR, [[_COLLECT_]_ARGVAR+=("${_key%%=*}"m4_ifnblank([$1], [ "$1"]))])],
+	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
 )])
 
 
@@ -1088,7 +1092,7 @@ done]],
 					[dnl And repeat each of them POSITIONALS_MAXES-times
 ],
 					['],
-					[_varname(_pos_name)],
+					[m4_expand(_varname(_pos_name))],
 					[dnl If we handle a multi-value arg, we assign to an array => we add '[ii - 1]' to LHS
 ],
 					[m4_if(_max_argn, 1, , [@<:@m4_eval(jj - 1)@:>@])],
@@ -1174,7 +1178,7 @@ dnl If the corresponding arg has a default, save it according to its type.
 dnl If it doesn't have one, do nothing (TODO: to be reconsidered)
 m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 	[m4_ifnblank([$4], [m4_do(
-		[_varname([$1])=],
+		[m4_expand(_varname([$1]))=],
 		[m4_case([$2],
 			[single], [$4],
 			[more], [_MAKE_DEFAULTS_MORE_VALS([$1], [$2], [$3], [$4])],
@@ -1199,11 +1203,11 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
 ],
 		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_type,_default], [m4_do(
-			[m4_pushdef([_ARGVAR], _varname(_argname))],
+			[m4_pushdef([_ARGVAR], [_varname(_argname)])],
 			[m4_case(_arg_type,
 				[action], [],
-				m4_expand([_ARGVAR=_default
-]))],
+				[_ARGVAR=_default
+])],
 			[m4_popdef([_ARGVAR])],
 		)])],
 	)])],

@@ -213,6 +213,11 @@ Optional arguments
 
   The default default is an empty array.
   The argument can be repeated multiple times, but instead of the later specifications overriding earlier ones (s.a. ``ARG_OPTIONAL_SINGLE`` does), arguments are gradually appended to an array.
+  The form of the default is what you normally put between the brackets when you create ``bash`` arrays, so put whitespace-separated values in there, for example:
+
+  ::
+
+     ARG_OPTIONAL_REPEATED([include], [I], [Directories where to look for include files], ['/usr/include' '/usr/local/include'])
 
 * Action optional arguments (i.e. the ``--version`` and ``--help`` type of comments):
   ::
