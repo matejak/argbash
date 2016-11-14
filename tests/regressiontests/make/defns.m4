@@ -41,27 +41,28 @@ TESTS_GEN += \
 	m4_join([ \
 	], m4_set_list([_TEST_GEN])) \
 	$(NUL)
-
+[
 define generic_regression
 	$< LOO | grep -q POS_S=LOO,
 	$< "LOO BAR" | grep -q 'POS_S=LOO BAR,'
 	$< LOO | grep -q BOOL=off,
 	$< LOO --boo_l | grep -q BOOL=on,
 	$< LOO --no-boo_l | grep -q BOOL=off,
-	$< LOO | grep -q OPT_S=x,
-	$< LOO --opt-arg PoS | grep -q OPT_S=PoS,
-	$< LOO --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
-	$< LOO --opt-arg="PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< LOO | grep -q OPT_S=opt_arg_default,
+	$< LOO --opt_arg PoS | grep -q OPT_S=PoS,
+	$< LOO --opt_arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< LOO --opt_arg="PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
-	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos-default,'
+	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default,'
 	$< LOO | grep -q 'OPT_INCR=2,'
 	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
 	$< LOO --opt-incr -i | grep -q 'OPT_INCR=4,'
-	$< -h | grep -- pos-arg | grep -q @pos-arg@
+	$< -h | grep -- pos_arg | grep -q pos_arg_help
 	$< -h | grep -- pos-opt | grep -q @pos-opt-arg@
-	$(REVERSE) $< LOO --opt-arg 2> /dev/null
+	$< -h | grep -q ' \[<pos-opt>\]'
+	$(REVERSE) $< LOO --opt_arg 2> /dev/null
 endef
-
+]
 define _test_onlypos
 	$(REVERSE) grep -q case $<
 	$< LOO | grep -q POS_S=LOO,POS_OPT=pos-default,

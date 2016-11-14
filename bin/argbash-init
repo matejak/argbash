@@ -29,7 +29,7 @@ die()
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _arg_output="-"
 # THE DEFAULTS INITIALIZATION - OPTIONALS
-_arg_separate=m4_default(, 0)
+_arg_separate=0
 _arg_hints=off
 _arg_pos=()
 _arg_opt=()
@@ -40,7 +40,7 @@ _arg_wrap=()
 print_help ()
 {
 	echo "Make a template for scripts."
-	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-v|--version] [-h|--help] [[<output>]]\n' "$0"
+	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-v|--version] [-h|--help] [<output>]\n' "$0"
 	printf "\t%s\n" "<output>: Name of the output template (default: '""-""')"
 	printf "\t%s\n" "-s,--separate: Separate the parsing logic (specify two times for complete separation)"
 	printf "\t%s\n" "--hints,--no-hints: Whether to write hints to the script template (off by default)"
