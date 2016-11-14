@@ -1,9 +1,10 @@
 #!/bin/bash
 
-m4_define([pos_arg], [m4_fatal([The option string '$0' got expanded :-(])])
-m4_define([pos_arg_help], [m4_fatal([The option 'pos_arg' help string got expanded :-(])])
-m4_define([opt_arg], [m4_fatal([The option string '$0' got expanded :-(])])
-m4_define([opt_arg_help], [m4_fatal([The option 'opt_arg' help string got expanded :-(])])
+m4_define([pos_arg], [m4_fatal([The option string '$0' got expanded])])
+m4_define([_arg_pos_arg], [m4_fatal([The variable name '$0' got expanded])])
+m4_define([pos_arg_help], [m4_fatal([The option 'pos_arg' help string got expanded])])
+m4_define([opt_arg], [m4_fatal([The option string '$0' got expanded])])
+m4_define([opt_arg_help], [m4_fatal([The option 'opt_arg' help string got expanded])])
 
 # ARG_POSITIONAL_SINGLE([pos_arg], [pos_arg_help P percent: %])
 # ARG_POSITIONAL_SINGLE([pos-opt], [@pos-opt-arg@], [pos-default])

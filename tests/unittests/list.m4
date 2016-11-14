@@ -51,6 +51,7 @@ dnl The list items should be single-quoted only, so passing them to m4_expand sh
 m4_expand(m4_list_nth([FOO], 2))
 ANTIBOMB([list])
 assert_equals(m4_quote(m4_argn(1, m4_list_foreach([FOO], [item], [-item-,]))), [-BOMB-])
+assert_equals(m4_quote(m4_argn(1, m4_lists_foreach([FOO,FOO], [item,item2], [-item-item2-,]))), [-BOMB-BOMB-])
 assert_equals(m4_list_len([FOO]), 7)
 assert_equals(m4_quote(m4_list_indices([FOO], [BOMB])), [0,2])
 assert_equals(m4_quote(m4_list_indices([FOO], [BAZ])), 3)

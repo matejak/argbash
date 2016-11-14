@@ -36,7 +36,7 @@ _arg_debug=
 print_help ()
 {
 	echo "Argbash is an argument parser generator for Bash."
-	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] [<input>]\n' "$0"
 	printf "\t%s\n" "<input>: The input template file (pass '-' for stdout)"
 	printf "\t%s\n" "-o,--output: Name of the output file (pass '-' for stdout) (default: '"-"')"
 	printf "\t%s\n" "--library,--no-library: Whether the input file if the pure parsing library. (off by default)"

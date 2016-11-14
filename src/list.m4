@@ -20,22 +20,30 @@ dnl $2: List of var names
 dnl $3: What
 m4_define([m4_lists_foreach], [_lists_same_len([$1], 
 	[m4_do(
-		[m4_pushdef([_varnames2], m4_quote(m4_dquote_elt($2)))],
+		[m4_pushdef([_varnames], m4_quote(m4_dquote_elt($2)))],
+		[dnl How long is the first list
+],
 		[m4_pushdef([l_len], [m4_list_len(m4_car($1))])],
+		[dnl How many of lists they are (on input)
+],
 		[m4_pushdef([l_count], [m4_count($1)])],
 		[m4_if(l_count, 0, ,
 			[m4_if(l_len, 0, , [m4_for([_idx_item], 1, l_len, 1, [m4_do(
+				[dnl Go through all varnames and push the corresponding list value into it
+],
 				[m4_for([_idx_list], 1, l_count, 1, [m4_do(
-					[m4_pushdef(m4_argn(_idx_list, _varnames2), m4_list_nth(m4_argn(_idx_list, $1), _idx_item))],
+					[m4_pushdef(m4_argn(_idx_list, _varnames), m4_dquote(m4_list_nth(m4_argn(_idx_list, $1), _idx_item)))],
 				)])],
 				[$3],
+				[dnl After we do the loop body, pop all of the definitions
+],
 				[m4_for([_idx_list], 1, l_count, 1, [m4_do(
-					[m4_popdef(m4_argn(_idx_list, _varnames2))],
+					[m4_popdef(m4_argn(_idx_list, _varnames))],
 				)])],
 		)])])])],
 		[m4_popdef([l_count])],
 		[m4_popdef([l_len])],
-		[m4_popdef([_varnames2])],
+		[m4_popdef([_varnames])],
 	)], [m4_fatal([Lists $1 don't have the same length.])])])
 
 dnl

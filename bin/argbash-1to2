@@ -30,7 +30,7 @@ _arg_output=""
 print_help ()
 {
 	echo "Convert a template for argbash>=1<2 to argbash>=2<3"
-	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] [<input-1>] [[<input-2>]] [...] [[<input-n>]] [...]\n' "$0"
 	printf "\t%s\n" "<input>: The input file to transform"
 	printf "\t%s\n" "-o,--output: Name of the output file (pass '-' for stdout and empty string for the same as input file) (default: '""')"
 	printf "\t%s\n" "-v,--version: Prints version"
