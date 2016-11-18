@@ -526,6 +526,16 @@ Plus, there are convenience macros:
 
   In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
 
+* Declare every variable related to every positional argument:
+
+  ::
+
+    ARG_DEFAULTS_POS
+
+  By default, only variables with defaults are declared.
+  Since values are assigned using ``eval``, static analysis tools s.a. `shellcheck <https://www.shellcheck.net>`_ may complain about referencing undeclared variables.
+  This macro helps to ensure that there are not these false positives.
+
 Action macro
 ++++++++++++
 

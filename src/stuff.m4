@@ -35,7 +35,11 @@ dnl Checks that the n-th argument is an integer.
 dnl Should be called upon the macro definition outside of quotes, e.g. m4_define([FOO], _CHECK_INTEGER_TYPE(1)[m4_eval(2 + $1)])
 dnl $1: The argument number
 dnl $2: The error message (optional)
-m4_define([_CHECK_INTEGER_TYPE], __CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
+m4_define([_CHECK_INTEGER_TYPE], 
+	__CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
+
+
+m4_define([_ARG_DEFAULTS_POS], [[no]])
 
 
 dnl
@@ -542,8 +546,8 @@ dnl
 dnl In your script, include just this directive (and DEFINE_SCRIPT_DIR before) to include the parsing stuff from a standalone file.
 dnl The argbash script generator will pick it up and (re)generate that one as well
 dnl
-dnl $1 = the filename (assuming that it is in the same directory as the script)
-dnl $2 = what has been passed to DEFINE_SCRIPT_DIR as the first param
+dnl $1: the filename (assuming that it is in the same directory as the script)
+dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
 m4_define([INCLUDE_PARSING_CODE], [m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
@@ -575,10 +579,10 @@ m4_define([_ARG_OPTIONAL_INCREMENTAL_BODY],
 m4_define([_ARG_OPTIONAL_INCREMENTAL], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCREMENTAL_BODY)
 
 
-dnl $1 = long name
-dnl $2 = short name (opt)
-dnl $3 = help
-dnl $4 = default (=0)
+dnl $1: long name
+dnl $2: short name (opt)
+dnl $3: help
+dnl $4: default (=0)
 m4_define([ARG_OPTIONAL_INCREMENTAL], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
@@ -587,10 +591,10 @@ m4_define([ARG_OPTIONAL_INCREMENTAL], [m4_do(
 
 m4_define([_ARG_OPTIONAL_REPEATED_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, ($[]4), [repeated])])
 
-dnl $1 = long name
-dnl $2 = short name (opt)
-dnl $3 = help
-dnl $4 = default (empty array)
+dnl $1: long name
+dnl $2: short name (opt)
+dnl $3: help
+dnl $4: default (empty array)
 m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
@@ -598,7 +602,7 @@ m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
 )])
 
 
-dnl $1 = short name (opt)
+dnl $1: short name (opt)
 m4_define([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
@@ -606,10 +610,10 @@ m4_define([ARG_VERBOSE], [m4_do(
 )])
 
 
-dnl $1 = long name, var suffix (translit of [-] -> _)
-dnl $2 = short name (opt)
-dnl $3 = help
-dnl $4 = default (=off)
+dnl $1: long name, var suffix (translit of [-] -> _)
+dnl $2: short name (opt)
+dnl $3: help
+dnl $4: default (=off)
 m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
@@ -1194,7 +1198,12 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 		)],
 		[
 ],
-	)])],
+	)], [m4_do(
+		[dnl Just initialize the variable with blank value
+],
+		[m4_if(_ARG_DEFAULTS_POS, [yes], [_varname([$1])=
+])],
+)])],
 )])
 
 
@@ -1391,11 +1400,12 @@ dnl  - if a var name is not empty, test the prog (find the file with rx permissi
 dnl  - else try: progname until RC == 0
 dnl  - if nothing is found, die with provided msg
 dnl  - if successful, save the form that works in a variable (i.e. don't try to make it an absolute path at all costs)
-dnl  $1 - env var (default: argbash translit of prog name)
-dnl  $2 - prog name
-dnl  $3 - msg if not OK
-dnl  $4 - help message (if you want to mention existence of this in the help)
-dnl  $5 - args (if you want to check args)
+dnl
+dnl $1 - env var (default: argbash translit of prog name)
+dnl $2 - prog name
+dnl $3 - msg if not OK
+dnl $4 - help message (if you want to mention existence of this in the help)
+dnl $5 - args (if you want to check args)
 dnl
 dnl  In case of path issues (i.e. script is in a crontab), update the PATH variable yourself above the argbash code.
 dnl
@@ -1669,6 +1679,13 @@ dnl $2: strict
 m4_define([_GET_VALUE_TYPE], [m4_do(
 	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])],
 		[m4_ifnblank([$2], [m4_fatal([There is no type defined for argument '$1'.])], [generic])])],
+)])
+
+
+dnl
+dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
+m4_define([ARG_DEFAULTS_POS], [m4_do(
+	[m4_define([_ARG_DEFAULTS_POS], [[yes]])],
 )])
 
 dnl Types:

@@ -81,6 +81,20 @@ Modes of operation
   If you specify twice, you get the case 3 from above --- parsing code is in a separate file, the script includes it without any magic involved.
   This also means that the :ref:`brackets matching limitation <limitations>` doesn't apply to you.
 
+There is also a ``--mode`` option you can use to tune the balance between parsing features and complexity of the generated code.
+
+
+* ``default``: Assume the standard ``Argbash`` behavior.
+  Check the documentation out to find out what that means.
+
+* ``full``: Maximize script features.
+  * The long option and the corresponding value may be separated by whitespace or by the equal sign.
+  * Variables corresponding to every positional argument is declared (.. seealso::`_declare_pos`).
+
+* ``minimal``: Make the code as simple as possible, which means:
+  * The long option and the corresponding value may be separated only by whitespace.
+
+
 Argbash
 -------
 

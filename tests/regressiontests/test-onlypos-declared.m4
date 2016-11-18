@@ -2,6 +2,7 @@
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [@pos-arg@])
 # ARG_POSITIONAL_SINGLE([pos-opt], [@pos-opt-arg@], [pos-default])
+# ARG_DEFAULTS_POS
 # ARGBASH_GO
 
 # opening escape square bracket: [

@@ -33,6 +33,13 @@ ADD_TEST([test-more], [[
 
 ADD_TEST([test-onlypos], [[
 	$(_test_onlypos)
+	! grep -q '^_arg_pos_arg=$$' $<
+]])
+
+
+ADD_TEST([test-onlypos-declared], [[
+	$(_test_onlypos)
+	grep -q '^_arg_pos_arg=$$' $<
 ]])
 
 

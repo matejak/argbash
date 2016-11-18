@@ -21,6 +21,7 @@ TESTS += \
 	test-most \
 	test-more \
 	test-onlypos \
+	test-onlypos-declared \
 	test-onlyopt \
 	stability-salone \
 	test-ddash \
@@ -56,6 +57,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-most.sh \
 	$(TESTDIR)/test-more.sh \
 	$(TESTDIR)/test-onlypos.sh \
+	$(TESTDIR)/test-onlypos-declared.sh \
 	$(TESTDIR)/test-onlyopt.sh \
 	$(TESTDIR)/test-standalone2.sh \
 	$(TESTDIR)/test-standalone.sh \
@@ -170,6 +172,11 @@ test-more: $(TESTDIR)/test-more.sh
 
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(_test_onlypos)
+	! grep -q '^_arg_pos_arg=$$' $<
+
+test-onlypos-declared: $(TESTDIR)/test-onlypos-declared.sh
+	$(_test_onlypos)
+	grep -q '^_arg_pos_arg=$$' $<
 
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	grep -q '^  esac$$' $<

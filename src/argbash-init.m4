@@ -8,6 +8,7 @@ version=_ARGBASH_VERSION
 # ARG_OPTIONAL_REPEATED([opt], , [Add an single-valued optional argument])
 # ARG_OPTIONAL_REPEATED([opt-bool], ,[Add an optional boolean argument])
 # ARG_OPTIONAL_REPEATED([wrap], ,[What script(s) to wrap])
+# ARG_OPTIONAL_SINGLE([mode], m, [The slider between feature-rich and simple script.], [default])
 # ARG_VERSION([echo "argbash-init v$version"])
 # ARG_HELP([Make a template for scripts.])
 
@@ -98,6 +99,14 @@ do_args()
 
 do_args_footer()
 {
+	if test "$_arg_mode" = "full"
+	then
+		echo '# ARGBASH_SET_DELIM([ =])'
+		echo '# ARG_DEFAULTS_POS'
+	elif test "$_arg_mode" = "minimal"
+	then
+		echo 'ARGBASH_SET_DELIM([ ])'
+	fi
 	echo "# ARG_HELP([<The general help message of my script>])"
 	echo "# ARGBASH_GO"
 }
@@ -165,17 +174,24 @@ if test "$outfname" = '-'
 then
 	do_stuff 'script'
 else
-	test "$_arg_separate" = 0 && do_stuff 'script' > "$outfname" || parse_fname_stem="$(echo "${outfname}" | sed -e 's/\.\(sh\|m4\)$//')-parsing"
-	# IMPORTANT NOTION:
-	# do_stuff has to be called FIRST, because it sets the _variables array content as its side-effect
-	test "$_arg_separate" = 1 && {
-		do_stuff 'lib' > "${parse_fname_stem}.m4"
-		do_script_assisted > "$outfname"
-	}
-	test "$_arg_separate" = 2 && {
-		do_stuff 'lib'  > "${parse_fname_stem}.m4"
-		do_script_bare > "$outfname"
-	}
+	if test "$_arg_separate" = 0 
+	then
+		do_stuff 'script' > "$outfname" 
+	else
+		parse_fname_stem="$(echo "${outfname}" | sed -e 's/\.\(sh\|m4\)$//')-parsing"
+
+		# IMPORTANT NOTION:
+		# do_stuff has to be called FIRST, because it sets the _variables array content as its side-effect
+		if test "$_arg_separate" = 1
+		then
+			do_stuff 'lib' > "${parse_fname_stem}.m4"
+			do_script_assisted > "$outfname"
+		else 
+			test "$_arg_separate" = 2 || echo "The greatest separation value is 2, got $_arg_separate" >&2
+			do_stuff 'lib'  > "${parse_fname_stem}.m4"
+			do_script_bare > "$outfname"
+		fi
+	fi
 	chmod a+x "$outfname"
 fi
 
