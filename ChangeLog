@@ -1,6 +1,14 @@
 2.2.1 (TBA)
 ------------------
 
+New features (arbash-init):
+
+* Added the `--mode` option.
+
+Bugfixes:
+
+* Fixed quoting-related issues of the underlying code
+
 2.2.0 (2016-11-07)
 ------------------
 
