@@ -35,7 +35,7 @@ dnl Checks that the n-th argument is an integer.
 dnl Should be called upon the macro definition outside of quotes, e.g. m4_define([FOO], _CHECK_INTEGER_TYPE(1)[m4_eval(2 + $1)])
 dnl $1: The argument number
 dnl $2: The error message (optional)
-m4_define([_CHECK_INTEGER_TYPE], 
+m4_define([_CHECK_INTEGER_TYPE],
 	__CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
 
 
@@ -801,18 +801,26 @@ m4_define([_MAKE_HELP], [m4_do(
 			[dnl We save the default to a temp var whichwe expand later.
 ],
 			[m4_pushdef([_default_val],
-				[m4_quote(m4_case(_arg_type,
+				[m4_expand([m4_case(_arg_type,
 					[action], [],
 					[incr], [],
-					[arg], [m4_ifnblank(_default, [_default])],
-					[repeated], [m4_ifnblank(_default, [m4_bpatsubst(_default, ", \\")])],
-					[m4_ifnblank(_default, [_default])]))])],
-			[m4_case(_arg_type,
-				[action], [],
-				[incr], [],
-				[bool], [ (_default_val by default)],
-				[repeated], [ m4_if(_default, [()], [(empty by default)], [(default array: _default_val )])],
-				[ @{:@m4_ifnblank(_default, [default: '_default_val'], [no default])@:}@])],
+					[bool], [_default[ by default]],
+					[repeated], [m4_if(_default, [()], [[empty by default]], [[default array: ]m4_bpatsubst(_default, ", \\") ])],
+					[m4_ifblank(_default, [[no default]], [[default: ]'_default'])])])])],
+			[m4_pushdef([_type_spec],
+				[m4_expand([m4_case(_GET_VALUE_TYPE(_argname),
+					[generic], [],
+					[string], [],
+					[_GET_VALUE_DESC(_argname)])])])],
+			[dnl TODO: Merge the case statementbelow with the one above
+],
+			[m4_ifnblank(m4_quote(_default_val _type_spec), [m4_do(
+				[[ @{:@]],
+				[m4_ifnblank(m4_quote(_type_spec), m4_expand([_type_spec])m4_ifnblank(m4_quote(_default_val), [; ]))],
+				[m4_expand([_default_val])],
+				[[@:}@]],
+			)])],
+			[m4_popdef([_type_spec])],
 			[m4_popdef([_default_val])],
 			["
 ],
@@ -1237,7 +1245,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 
 dnl
 dnl Make some utility stuff.
-dnl Those include the die function as well as optional nalidators
+dnl Those include the die function as well as optional validators
 m4_define([_MAKE_UTILS], [m4_do(
 	[[die()
 {
@@ -1485,14 +1493,26 @@ dnl TODO: In this case: Raise an error (with a good advice)
 
 
 dnl
+dnl A very private macro --- return name of the macro containing description for the given type ID
+dnl $1: Type ID
+m4_define([__type_str], [[_type_str_$1]])
+
+dnl
+dnl Return type description for the given argname
+dnl $1: Argument ID
+m4_define([_GET_VALUE_DESC], [m4_expand(__type_str(_GET_VALUE_TYPE([$1])))])
+
+dnl
 dnl Define a validator for a particular type. Instead of using m4_define, use this:
 dnl $1: The type ID
 dnl $2: The validator body (a shell function accepting $1 - the value, $2 - the argument name)
+dnl $3: The type description
 m4_define([_define_validator], [m4_do(
 	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([We already have the validator for '$1'.])])],
 	[m4_set_add([VALUE_TYPES], [$1])],
 	[m4_define([_validator_$1], [$2
 ])],
+	[m4_define(__type_str([$1]), [[$3]])],
 )])
 
 
@@ -1517,7 +1537,7 @@ _define_validator([int],
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
 }
-]])
+]], [integer])
 
 
 dnl Define a positive int validator
@@ -1527,7 +1547,7 @@ _define_validator([pint],
 	printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
 }
-]])
+]], [positive integer])
 
 
 dnl Define a non-negative int validator
@@ -1537,7 +1557,7 @@ _define_validator([nnint],
 	printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
 }
-]])
+]], [positive integer or zero])
 
 
 dnl Define a float number validator
@@ -1547,7 +1567,7 @@ _define_validator([float],
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
 }
-]])
+]], [floating-point number])
 
 
 dnl Define a decimal number validator
@@ -1557,7 +1577,7 @@ _define_validator([decimal],
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."
 	printf "%d" @S|@1  # it is a number, so we can relax the quoting
 }
-]])
+]], [decimal number])
 
 
 dnl The string validator is a null validator
@@ -1577,7 +1597,7 @@ m4_define([_VALIDATE_VALUES], [m4_do(
 ])],
 	[dnl Don't do anything if we are string
 ],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_if(_GET_VALUE_TYPE(m4_quote(_arg), 1), [string], , [m4_do(
+	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_if(_GET_VALUE_TYPE(_arg, 1), [string], , [m4_do(
 		[_varname(_arg)="@S|@@{:@],
 		[_GET_VALUE_TYPE(_arg, 1)],
 		[ "$_varname(_arg)" "_arg"@:}@"],
@@ -1586,7 +1606,7 @@ m4_define([_VALIDATE_VALUES], [m4_do(
 ],
 	)])])],
 	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
-		[_VALIDATE_VALUES_IDX(m4_quote(_arg), m4_expand([_]_arg[_SUFFIX]))],
+		[_VALIDATE_VALUES_IDX(_arg, m4_expand([_]_arg[_SUFFIX]))],
 	)])],
 )])
 
@@ -1605,6 +1625,7 @@ m4_define([_VALIDATE_VALUES_IDX], [m4_ifnblank([$2], [m4_do(
 
 dnl
 dnl The common stuff to perform when adding a typed group
+dnl Registers the argument-type pair to be retreived by _GET_VALUE_TYPE or _GET_VALUE_STR
 dnl $1: The value type
 dnl $2: The type group name (NOT optional)
 dnl $3: Concerned arguments (as a list)
@@ -1617,11 +1638,11 @@ m4_define([_TYPED_GROUP_STUFF], [m4_do(
 		[dnl TODO: Test that vvv this check vvv works
 ],
 		[m4_set_contains([TYPED_ARGS], _argname,
-			[m4_fatal([Argument ]_argname[ already has a type ](_GET_VALUE_TYPE(m4_quote(_argname), 1))!)])],
+			[m4_fatal([Argument ]_argname[ already has a type ](_GET_VALUE_TYPE(_argname, 1))!)])],
 		[m4_set_add([VALUE_GROUP_$1], _argname)],
 		[m4_set_add([TYPED_ARGS], _argname)],
-		[m4_define(_argname[_VAL_TYPE], [$1])],
-		[m4_define(_argname[_VAL_GROUP], [$2])],
+		[m4_define(_argname[_VAL_TYPE], [[$1]])],
+		[m4_define(_argname[_VAL_GROUP], [[$2]])],
 	)])],
 	[m4_define([$2_VALIDATOR], [[_validator_$1]])],
 )])
@@ -1653,7 +1674,8 @@ m4_define([ARG_TYPE_GROUP_SET], [m4_do(
 		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],
 		[m4_list_append([_LIST_$1], m4_quote(_val))],
 	)])],
-	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]))],
+	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),
+		m4_expand([[one of ]m4_list_join([_LIST_$1], [, ], ', ', [ and ])]))],
 	[m4_foreach([_argname], [$3], [m4_do(
 		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
 		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],

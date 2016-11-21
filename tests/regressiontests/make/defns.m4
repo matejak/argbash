@@ -1,5 +1,14 @@
 m4_include([make.m4])
 
+dnl TODO: include tests-*.m4, match it tests-<what>.m4
+dnl TODO: Inside, assume that all test templates are in the <what> subdir and the test definitions are in a .m4 file next to them
+
+m4_define([include_test], [m4_do(
+	[m4_pushdef([_testname], [[$1]])],
+	[m4_include(m4_expand([[../]_testname/[tests.m4]]))],
+	[m4_popdef([_testname])],
+)])
+
 m4_include([tests/tests-base.m4])
 m4_include([tests/tests-delimiters.m4])
 m4_include([tests/tests-init.m4])
