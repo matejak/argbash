@@ -6,9 +6,9 @@ argbash
 
 ![argbash logo](resources/logo/argbash.png)
 
-Do you write `Bash` scripts that are supposed to accept arguments?
-
-Aren't you tired of that? `getopt` is discouraged, `getopts` doesn't support long options, there is no widely-accepted `Bash` module to do the task and some solutions don't work on all platforms (Linux, OSX, MSW)...
+* Do you write `Bash` scripts that should accept arguments?
+* But they don't since arguments support is a daunting task, because ...
+* `getopt` is discouraged, `getopts` doesn't support long options, there is no widely-accepted `Bash` module to do the task and some solutions don't work on all platforms (Linux, OSX, MSW)...
 
 Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
@@ -20,9 +20,9 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
-> Do you need an argument-parsing battleship full of features?  
-> No problem, we will make one for you.  
-> Or would you rather accept a parsing gunboat?  
+> Do you need an argument-parsing battleship full of features?
+> No problem, we will make one for you.
+> Or would you rather accept a fast, sleek parsing gunboat?
 > Be our guest!
 
 What it is
