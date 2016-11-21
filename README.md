@@ -21,7 +21,7 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
 > Do you need an argument-parsing battleship full of features?
-> No problem, we will make one for you.
+> No problem, we will make one for you.  
 > Or would you rather accept a fast, sleek parsing gunboat?
 > Be our guest!
 
