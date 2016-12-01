@@ -20,10 +20,11 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
-> Do you need an argument-parsing battleship full of features?
-> No problem, we will make one for you.  
-> Or would you rather accept a fast, sleek parsing gunboat?
-> Be our guest!
+**This just in: Try argbash online!**
+
+[<img src="https://cdn.rawgit.com/matejak/argbash/master/resources/logo/web-legacy.svg" width="600px" align="middle" alt="argbash.io banner"/>](https://argbash.io/generate)
+
+Yes, visit our vintage site and start playing with templates like no tomorrow!
 
 What it is
 ----------
