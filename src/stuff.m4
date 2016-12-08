@@ -1,7 +1,6 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Add support for opt types via arg groups
 dnl TODO: Produce code completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
@@ -11,6 +10,9 @@ dnl TODO: Add app finder wrappers
 dnl TODO: Add protection against misspelled macros (m4_pattern_forbid/allow)
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
 dnl TODO: Sort out quoting of defaults and inside help strings (proposal for help msgs: terminate the double quoting just before, but make sure that the help msg element is quoted at least in some way).
+dnl TODO: Add a 'comment mode', where individual parts of the generated code are commented thoroughly.
+dnl TODO: Add support for non-standard targets (i.e. variable names)
+dnl TODO: Add support for web mode
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -29,6 +31,17 @@ dnl ARGS_TYPE_INTEGER([list of args], [flags])
 dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
+
+m4_ifndef([NO_CHECK], [m4_do(
+	[m4_pattern_forbid([ARG_*])],
+)])
+
+dnl
+dnl Define a macro that is part of the API and that replicate itself.
+dnl Ensure the replication and also add the macro name to a list of allowed macros
+m4_define([argbash_persistent], [_argbash_persistent([$1], [$2], $[]@)])
+m4_define([_argbash_persistent], [m4_define([$1], [[$1($3)]
+m4_pattern_allow([$1])$2])])
 
 dnl
 dnl Checks that the n-th argument is an integer.
@@ -812,8 +825,6 @@ m4_define([_MAKE_HELP], [m4_do(
 					[generic], [],
 					[string], [],
 					[_GET_VALUE_DESC(_argname)])])])],
-			[dnl TODO: Merge the case statementbelow with the one above
-],
 			[m4_ifnblank(m4_quote(_default_val _type_spec), [m4_do(
 				[[ @{:@]],
 				[m4_ifnblank(m4_quote(_type_spec), m4_expand([_type_spec])m4_ifnblank(m4_quote(_default_val), [; ]))],
