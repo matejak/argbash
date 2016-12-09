@@ -53,16 +53,17 @@ dnl No trailing newline because the test body already has it
 
 dnl 
 dnl $1: The test stem (gen-test-<stem>.m4)
-dnl $2: The test error
+dnl $2, $3, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1)
 m4_define([ADD_GENTEST], [m4_do(
 	[m4_pushdef([_tname], [gen-test-$1])],
 	[m4_divert_text([STDOUT3], [m4_do(
-		[_tname: $(TESTDIR)/gen-test-$1.m4 $(ARGBASH_BIN)],
-		[
-	],
-		[m4_ifnblank([$2], [ERROR="$2" $(REVERSE) ])$(ARGBASH_BIN) $< > /dev/null],
-		[
+		[_tname: $(TESTDIR)/gen-test-$1.m4 $(ARGBASH_BIN)
 ],
+		[m4_ifblank([$2], [	$(ARGBASH_BIN) $< > /dev/null
+],
+			[m4_foreach([_errmsg], [m4_shift($@)],
+				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+])])],
 	)])],
 	[m4_set_add([_TEST_GEN], m4_quote(_tname))],
 )])

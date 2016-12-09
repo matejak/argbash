@@ -1,5 +1,6 @@
 #!/bin/bash
 
+m4_pattern_allow([ARGBASH_SET_DELIM])
 version=_ARGBASH_VERSION
 # ARG_POSITIONAL_SINGLE([output], [Name of the output template], "-")
 # ARG_OPTIONAL_INCREMENTAL([separate], s, [Separate the parsing logic (specify two times for complete separation)])

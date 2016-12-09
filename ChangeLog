@@ -1,3 +1,10 @@
+2.2.3a (2016-12-09)
+------------------
+
+New minor features:
+
+* `argbash` tries to warn you when it looks like you have made a typo when attempting to use macros.
+
 2.2.2 (2016-11-21)
 ------------------
 

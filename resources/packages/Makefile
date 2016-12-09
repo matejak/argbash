@@ -28,7 +28,7 @@ cat $< \
 	| sed -e 's/@VERSION@/$(VERSION)/' \
 	| sed -e 's/@PKGREL@/$(PKGREL)/' \
 	| sed -e 's/@DESC@/Bash argument parsing code generator/' \
-	| sed -e 's|@URL@|https://github.com/matejak/argbash|' \
+	| sed -e 's|@URL@|https://argbash.io|' \
 	| sed -e 's/@MD5SUM@/$(shell cat $(word 3,$+))/' \
 	| sed -e 's/@LIC_MD5SUM@/$(shell cat $(word 4,$+))/' \
 	| sed -e 's/@SHA256SUM@/$(shell cat $(word 5,$+))/' \

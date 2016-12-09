@@ -13,6 +13,7 @@ dnl TODO: Sort out quoting of defaults and inside help strings (proposal for hel
 dnl TODO: Add a 'comment mode', where individual parts of the generated code are commented thoroughly.
 dnl TODO: Add support for non-standard targets (i.e. variable names)
 dnl TODO: Add support for web mode
+dnl TODO: Strange behavior when the help option is missing
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -32,16 +33,14 @@ dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
 
-m4_ifndef([NO_CHECK], [m4_do(
-	[m4_pattern_forbid([ARG_*])],
-)])
 
 dnl
 dnl Define a macro that is part of the API and that replicate itself.
 dnl Ensure the replication and also add the macro name to a list of allowed macros
-m4_define([argbash_persistent], [_argbash_persistent([$1], [$2], $[]@)])
-m4_define([_argbash_persistent], [m4_define([$1], [[$1($3)]
-m4_pattern_allow([$1])$2])])
+m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
+m4_define([_argbash_persistent], [m4_set_add([_USED_MACROS],[$1])m4_define([$1], [$2])])
+dnl IDEA: Assemble a whitelist of macros used in the script, then grep the source and report all suspicious strings that resemble misspelled argbash macros
+
 
 dnl
 dnl Checks that the n-th argument is an integer.
@@ -210,7 +209,7 @@ _SET_INDENT([	])
 dnl
 dnl Sets the indentation character(s) in the parsing code
 dnl $1: The indentation character(s)
-m4_define([ARGBASH_SET_INDENT],
+argbash_api([ARGBASH_SET_INDENT],
 	[m4_bmatch(m4_expand([_W_FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
 
 
@@ -365,7 +364,7 @@ dnl Declare one positional argument with default
 dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
-m4_define([ARG_POSITIONAL_SINGLE], [m4_do(
+argbash_api([ARG_POSITIONAL_SINGLE], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
 )])
@@ -405,7 +404,7 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: How many args at least (opt., default=0)
 dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
-m4_define([ARG_POSITIONAL_INF], [m4_do(
+argbash_api([ARG_POSITIONAL_INF], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
@@ -455,7 +454,7 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
-m4_define([ARG_POSITIONAL_MULTI], [m4_do(
+argbash_api([ARG_POSITIONAL_MULTI], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
@@ -486,14 +485,14 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 )])
 
 
-m4_define([ARG_OPTIONAL_SINGLE], [m4_do(
+argbash_api([ARG_OPTIONAL_SINGLE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
 
 
-m4_define([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
+argbash_api([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 	[m4_list_contains([BLACKLIST], [--], , [[$0($@)]_ARG_POSITIONAL_DOUBLEDASH($@)])],
 )])
 
@@ -505,7 +504,7 @@ m4_define([_ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 
 dnl
 dnl $1 The function to call to get the version
-m4_define([ARG_VERSION], [m4_do(
+argbash_api([ARG_VERSION], [m4_do(
 	[dnl Just record how have we called ourselves
 ],
 	[[$0($@)]],
@@ -528,10 +527,10 @@ m4_define([_ARG_VERSIONx], [m4_do(
 dnl
 dnl $1: The main help message
 dnl $2: The bottom help message
-m4_define([ARG_HELP], [m4_do(
-	[[$0($@)]],
+argbash_api([ARG_HELP], [m4_do(
 	[dnl Skip help if we declare we don't want it
 ],
+	[[$0($@)]],
 	[m4_bmatch(m4_expand([_W_FLAGS]), [H], ,[_ARG_HELPx([$1], [$2])])],
 )])
 
@@ -561,7 +560,7 @@ dnl The argbash script generator will pick it up and (re)generate that one as we
 dnl
 dnl $1: the filename (assuming that it is in the same directory as the script)
 dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
-m4_define([INCLUDE_PARSING_CODE], [m4_do(
+argbash_api([INCLUDE_PARSING_CODE], [m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
 	[m4_list_append([_OTHER],
@@ -573,7 +572,7 @@ m4_define([INCLUDE_PARSING_CODE], [m4_do(
 dnl
 dnl $1: Name of the holding variable
 dnl Taken from: http://stackoverflow.com/a/246128/592892
-m4_define([DEFINE_SCRIPT_DIR], [m4_do(
+argbash_api([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
@@ -596,7 +595,7 @@ dnl $1: long name
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (=0)
-m4_define([ARG_OPTIONAL_INCREMENTAL], [m4_do(
+argbash_api([ARG_OPTIONAL_INCREMENTAL], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_INCREMENTAL_BODY)[,
@@ -608,7 +607,7 @@ dnl $1: long name
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (empty array)
-m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
+argbash_api([ARG_OPTIONAL_REPEATED], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
@@ -616,7 +615,7 @@ m4_define([ARG_OPTIONAL_REPEATED], [m4_do(
 
 
 dnl $1: short name (opt)
-m4_define([ARG_VERBOSE], [m4_do(
+argbash_api([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_ARG_OPTIONAL_INCREMENTAL([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)], 0)],
@@ -627,7 +626,7 @@ dnl $1: long name, var suffix (translit of [-] -> _)
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (=off)
-m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
+argbash_api([ARG_OPTIONAL_BOOLEAN], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3],
@@ -638,7 +637,7 @@ m4_define([ARG_OPTIONAL_BOOLEAN], [m4_do(
 m4_define([_ARG_OPTIONAL_ACTION_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [action])])
 
 
-m4_define([ARG_OPTIONAL_ACTION], [m4_do(
+argbash_api([ARG_OPTIONAL_ACTION], [m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[dnl Just call _ARG_OPTIONAL_ACTION with same args
@@ -964,8 +963,9 @@ m4_define([_SET_OPTION_DELIMITER],
 dnl
 dnl Sets the option--value separator (i.e. --option=val or --option val
 dnl $1: The directive (' ', '=', or ' =' or '= ')
-m4_define([ARGBASH_SET_DELIM],
-	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_DELIMITER([$1])])])
+argbash_api([ARGBASH_SET_DELIM], [m4_do(
+	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_DELIMITER([$1])])],
+)])
 
 
 dnl The default is both ' ' and '='
@@ -1298,7 +1298,7 @@ m4_define([_NO_ARGS_WHATSOEVER],
 		m4_if(HAVE_OPTIONAL, 1, 0, 1))])
 
 
-m4_define([ARGBASH_GO], [m4_do(
+argbash_api([ARGBASH_GO], [m4_do(
 	[m4_ifndef([WRAPPED], [_ARGBASH_GO([$0()])])],
 )])
 
@@ -1349,7 +1349,7 @@ dnl You can wrap multiple scripts using multiple ARGBASH_WRAP statements.
 dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: Names of blacklisted args (list)
 dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
-m4_define([ARGBASH_WRAP], [m4_do(
+argbash_api([ARGBASH_WRAP], [m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],
 	[m4_list_append([BLACKLIST], $2)],
@@ -1365,7 +1365,7 @@ dnl Empty the FLAGS macro (so it isn't F,L,A,G,S)
 m4_define([_W_FLAGS], [])
 
 
-m4_define([ARG_LEFTOVERS],
+argbash_api([ARG_LEFTOVERS],
 	[m4_list_contains([BLACKLIST], [leftovers], , [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
 
 
@@ -1430,7 +1430,7 @@ dnl  In case of path issues (i.e. script is in a crontab), update the PATH varia
 dnl
 dnl  internally:
 dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS, PROG_ARGS, PROG_HAVE_ARGS
-m4_define([ARG_USE_PROG], [m4_ifndef([WRAPPED], [m4_do(
+argbash_api([ARG_USE_PROG], [m4_ifndef([WRAPPED], [m4_do(
 	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
 	[m4_list_append([PROG_NAMES], [$2])],
 	[m4_list_append([PROG_MSGS], [$3])],
@@ -1462,7 +1462,7 @@ dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
 dnl TODO: Hanlde the case of wrapping correctly
 dnl TODO: Find out a proper name for this
-m4_define([ARG_USE_ENV], [m4_ifndef([WRAPPED], [m4_do(
+argbash_api([ARG_USE_ENV], [m4_ifndef([WRAPPED], [m4_do(
 	[[$0($@)]],
 	[m4_list_append([ENV_NAMES], [$1])],
 	[m4_list_append([ENV_DEFAULTS], [$2])],
@@ -1665,7 +1665,7 @@ dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)
 dnl TODO: Integrate with help (and not only with the help synopsis)
 dnl TODO: Validate the type value (code) string
-m4_define([ARG_TYPE_GROUP], [m4_do(
+argbash_api([ARG_TYPE_GROUP], [m4_do(
 	[[$0($@)]],
 	[m4_ifblank([$2], [m4_fatal([Name inference not implemented yet])])],
 	[_TYPED_GROUP_STUFF([$1], m4_dquote(m4_default([$2], [???])), [$3])],
@@ -1679,7 +1679,7 @@ dnl $3: Concerned arguments (as a list)
 dnl $4: The set of possible values (as a list)
 dnl $5: The index variable suffix
 dnl TODO: Integrate with help (and not only with the help synopsis)
-m4_define([ARG_TYPE_GROUP_SET], [m4_do(
+argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 	[[$0($@)]],
 	[m4_foreach([_val], [$4], [m4_do(
 		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],
@@ -1717,7 +1717,7 @@ m4_define([_GET_VALUE_TYPE], [m4_do(
 
 dnl
 dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
-m4_define([ARG_DEFAULTS_POS], [m4_do(
+argbash_api([ARG_DEFAULTS_POS], [m4_do(
 	[m4_define([_ARG_DEFAULTS_POS], [[yes]])],
 )])
 

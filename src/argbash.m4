@@ -1,5 +1,6 @@
 #!/bin/bash
 
+m4_pattern_allow([ARGBASH_WRAP])
 version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdout)])
@@ -117,17 +118,16 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname
 
-if test "$outfname" = '-'
+output="$(do_stuff)" || die "" "$?"
+grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(]m4_set_contents([_USED_MACROS], [\|])[\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /')"
+if test -n "$grep_output"
 then
-	do_stuff
-else
-	# vvv This should catch most of the cases when we want to overwrite the source file
-	# vvv and we don't want to leave a file (not even an empty one) when something goes wrong.
-	temp_outfile=temp_out_$$
-	_trap="$_trap rm -f $temp_outfile;"
-	trap "$_trap" EXIT
-	do_stuff > "$temp_outfile"
-	mv "$temp_outfile" "$outfname"
+	printf "Your script contains possible misspelled Argbash macros: %s" "$grep_output" >&2
+	die "" 1
+fi
+if test "$outfname" != '-'
+then
+	printf "%s\n" "$output" > "$outfname"
 	chmod a+x "$outfname"
 fi
 
