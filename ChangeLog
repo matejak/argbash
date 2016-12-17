@@ -1,9 +1,14 @@
-2.2.3a (2016-12-09)
+2.2.3a (2016-12-17)
 ------------------
 
 New minor features:
 
 * `argbash` tries to warn you when it looks like you have made a typo when attempting to use macros.
+* `argbash` supports commented mode, when the parsing code is explained in detail
+
+Bugfixes:
+
+* Fixed handling of help messages in case of missing `ARG_HELP` macro
 
 2.2.2 (2016-11-21)
 ------------------

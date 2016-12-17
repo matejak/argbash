@@ -1,11 +1,12 @@
 #!/bin/bash
 
-m4_pattern_allow([ARGBASH_WRAP])
 version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdout)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
+# ARG_OPTIONAL_BOOLEAN([check-typos],, [Whether to check for possible argbash macro typos], [on])
+# ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
 # ARG_VERSION([echo "argbash v$version"])
@@ -20,7 +21,9 @@ _trap=
 # The main function that generates the parsing script body
 do_stuff ()
 {
-	echo "$_wrapped_defns" \
+	local _pass_also="$_wrapped_defns"
+	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
+	echo "$_pass_also" \
 		| cat - "$m4dir/stuff.m4" "$output_m4" "$infile" \
 		| autom4te "${DEBUG[@]}" -l m4sugar -I "$m4dir" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
@@ -102,7 +105,7 @@ test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 output_m4="$m4dir/output.m4"
 test "$_arg_library" = "on" && output_m4="$m4dir/output-standalone.m4"
 
-test -f "$infile" || { echo "'$infile' is supposed to be a file!" >&2; exit 1; }
+test -f "$infile" || _PRINT_HELP=yes die "argument '$infile' is supposed to be a file!" 1
 test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
 outfname="$_arg_output"
 autom4te --version > "$discard" 2>&1 || { echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1; exit 1; }
@@ -119,16 +122,20 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing
 settle_wrapped_fname
 
 output="$(do_stuff)" || die "" "$?"
-grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(]m4_set_contents([_USED_MACROS], [\|])[\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /')"
-if test -n "$grep_output"
+if test "$_arg_check_typos" = on
 then
-	printf "Your script contains possible misspelled Argbash macros: %s" "$grep_output" >&2
-	die "" 1
+	# match against suspicious, then inverse match against correct stuff:
+	# #<optional whitespace>\(allowed\|another allowed\|...\)<optional whitespace><opening bracket <or> end of line>
+	# Then, extract all matches (assumed to be alnum chars + '_') from grep and put them in the error msg.
+	grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(]m4_set_contents([_KNOWN_MACROS], [\|])[\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
+	test -n "$grep_output" && die "Your script contains possible misspelled Argbash macros: $grep_output" 1
 fi
 if test "$outfname" != '-'
 then
 	printf "%s\n" "$output" > "$outfname"
 	chmod a+x "$outfname"
+else
+	printf "%s\n" "$output"
 fi
 
 # ]dnl

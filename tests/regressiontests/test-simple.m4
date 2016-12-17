@@ -3,7 +3,7 @@
 # ARG_POSITIONAL_SINGLE([pos-arg],[@pos-arg@])
 # ARG_OPTIONAL_SINGLE([prefix],[o],[],[x])
 # ARG_VERSION([echo $0 FOO])
-# ARG_HELP([Testing program])
+# ARG_HELP([Testing program m4_fatal(BOOM!)], [m4_fatal([CRASH!])])
 # ARGBASH_GO()
 
 # [ <-- needed because of Argbash

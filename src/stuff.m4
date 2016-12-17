@@ -1,19 +1,15 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Produce code completition
+dnl TODO: Produce command-line completition
 dnl TODO (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl TODO Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
-dnl TODO: Add protection against misspelled macros (m4_pattern_forbid/allow)
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
 dnl TODO: Sort out quoting of defaults and inside help strings (proposal for help msgs: terminate the double quoting just before, but make sure that the help msg element is quoted at least in some way).
-dnl TODO: Add a 'comment mode', where individual parts of the generated code are commented thoroughly.
 dnl TODO: Add support for non-standard targets (i.e. variable names)
-dnl TODO: Add support for web mode
-dnl TODO: Strange behavior when the help option is missing
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -33,12 +29,13 @@ dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
 
+m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift($@))])])
 
 dnl
 dnl Define a macro that is part of the API and that replicate itself.
 dnl Ensure the replication and also add the macro name to a list of allowed macros
 m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
-m4_define([_argbash_persistent], [m4_set_add([_USED_MACROS],[$1])m4_define([$1], [$2])])
+m4_define([_argbash_persistent], [m4_set_add([_KNOWN_MACROS],[$1])m4_define([$1], [$2])])
 dnl IDEA: Assemble a whitelist of macros used in the script, then grep the source and report all suspicious strings that resemble misspelled argbash macros
 
 
@@ -193,9 +190,16 @@ m4_define([_INDENT_MORE], [m4_do(
 )])
 
 
+dnl Take precaution that if the indentation depth is 0, nothing happens
 m4_define([_SET_INDENT], [m4_define([_INDENT_],
 	[m4_for(_, 1, m4_default($][1, 1), 1,
 		[[$1]])])])
+
+m4_define([_SET_INDENT], [__SET_INDENT([$1], $[]1)])
+
+m4_define([__SET_INDENT], [m4_define([_INDENT_], [m4_if([$2], 0, ,
+	[m4_for(_, 1, m4_default([$2], 1), 1,
+		[[$1]])])])])
 
 dnl
 dnl defines _INDENT_
@@ -536,10 +540,11 @@ argbash_api([ARG_HELP], [m4_do(
 
 
 m4_define([_HELP_MSG])
+m4_define([_HELP_MSG_EX])
 dnl TODO: If the name is _ARG_HELP and not _ARG_HELPx, it doesn't work. WTF!?
 m4_define([_ARG_HELPx], [m4_do(
-	[m4_define([_HELP_MSG], m4_escape([$1]))],
-	[m4_define([_HELP_MSG_EX], m4_escape([$2]))],
+	[m4_define([_HELP_MSG], [m4_escape([$1])])],
+	[m4_define([_HELP_MSG_EX], [m4_escape([$2])])],
 	[_ARG_OPTIONAL_ACTION(
 		[help],
 		[h],
@@ -754,14 +759,16 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 dnl
 dnl $1: The command short description
 m4_define([_MAKE_HELP], [m4_do(
-	[# THE PRINT HELP FUNCION
-],
+	[_COMM_BLOCK(0,
+		[# Function that prints general usage of the script.],
+		[# This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)],
+		[# and it makes sense to remind the user how the script is supposed to be called.],
+	)],
 	[print_help ()
 {
 ],
-
-	m4_ifnblank(m4_expand([_HELP_MSG]), m4_expand([_INDENT_()[echo] "_HELP_MSG"
-])),
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[echo] "_HELP_MSG"
+))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
@@ -847,8 +854,8 @@ m4_define([_MAKE_HELP], [m4_do(
 		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t%s\n" "[]_msg"
 ])],
 	)])],
-	[m4_ifnblank(m4_expand([_HELP_MSG_EX]), m4_expand([_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
-]))],
+	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
+))],
 	[}
 ],
 )])
@@ -859,6 +866,7 @@ dnl
 dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
 dnl $3: Action
+dnl $4: The name of the option arg
 dnl
 dnl .. note::
 dnl    If the equal-delimited option has a short version, we allow space-delimited short option and value
@@ -873,7 +881,7 @@ m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 			[shift]),
 		[fi],]),
 	[$3],
-	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
+	[_ADD_OPTS_VALS([$4], $[$4])],
 )])
 
 
@@ -881,12 +889,13 @@ dnl
 dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
 dnl $3: Action
+dnl $4: The name of the option arg
 m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
 	[test @S|@# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[_val="@S|@2"],
 	[shift],
 	[$3],
-	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
+	[_ADD_OPTS_VALS([$4], $[$4])],
 )])
 
 
@@ -894,6 +903,7 @@ dnl
 dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
 dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
 m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
 	[_val="${_key##--[$1]=}"],
 	[if test "$_val" = "$_key"],
@@ -904,7 +914,7 @@ m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
 		[shift]),
 	[fi],
 	[$3],
-	[_ADD_OPTS_VALS(_ARGVAR, $_ARGVAR)],
+	[_ADD_OPTS_VALS([$4], $[$4])],
 )])
 
 
@@ -939,6 +949,7 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl BOTH
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
+			[m4_define([_DELIMITER], [[BOTH]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
 ],
@@ -947,6 +958,7 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl SPACE
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([])],
+			[m4_define([_DELIMITER], [[SPACE]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
@@ -954,6 +966,7 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl EQUALS
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
+			[m4_define([_DELIMITER], [[EQUALS]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
@@ -977,6 +990,7 @@ dnl $1: _argname
 dnl $2: short opt.
 dnl $3: _arg_type
 dnl $4: _default
+dnl $5: _varname(_argname)
 m4_define([_OPTS_VALS_LOOP_BODY], [m4_do(
 	[
 _INDENT_(2,	)],
@@ -992,24 +1006,23 @@ _INDENT_(2,	)],
 	[_MAYBE_EQUALS_MATCH([$3], [$1])],
 	[@:}@
 ],
-	[m4_pushdef([_ARGVAR], [_varname([$1])])],
 	[dnl Output the body of the case
 ],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD([$1], [$2], [_ARGVAR="$_val"])],
-		[repeated], [_VAL_OPT_ADD([$1], [$2], [_ARGVAR+=("$_val")])],
+		[arg], [_VAL_OPT_ADD([$1], [$2], [[$5="$_val"]], [$5])],
+		[repeated], [_VAL_OPT_ADD([$1], [$2], [[$5+=("$_val")]], [$5])],
 		[bool],
 		[_JOIN_INDENTED(3,
-			[_ARGVAR="on"],
-			[_ADD_OPTS_VALS(_ARGVAR)],
-			[test "$[]{1:0:5}" = "--no-" && _ARGVAR="off"],
+			[[$5="on"]],
+			[_ADD_OPTS_VALS([$5])],
+			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
 		[incr],
 		[_JOIN_INDENTED(3,
-			[_ARGVAR=$((_ARGVAR + 1))],
-			[_ADD_OPTS_VALS(_ARGVAR)],
+			[[$5=$(($5 + 1))]],
+			[_ADD_OPTS_VALS([$5])],
 		)],
 		[action],
 		[_JOIN_INDENTED(3,
@@ -1018,7 +1031,6 @@ _INDENT_(2,	)],
 		)],
 	)],
 	[_INDENT_(3);;],
-	[m4_popdef([_ARGVAR])],
 )])
 
 
@@ -1050,11 +1062,38 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 				[break]),
 			[fi])
 ])],
+	[_COMM_BLOCK(1,
+		[# We now iterate through all passed arguments.],
+		[# When dealing with optional arguments:],
+		m4_case(_DELIMITER, [EQUALS], [m4_ignore(
+		)[# We support only the = as a delimiter between option argument and its value.],
+		[# Therefore, we expect --opt=value or -o value],
+		[# so we watch for --opt=* and -o],
+		[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
+		[# if nothing got stripped, we know that we got the short option],
+		[# so we reach out for the next argument.],
+		[# At the end, either of what was successful is stored as the result.],
+		], [SPACE], [m4_ignore(
+		)[# We support only whitespace as a delimiter between option argument and its value.],
+		[# Therefore, we expect --opt value or -o value],
+		[# so we watch for --opt and -o],
+		[# Since we know that we got the long or short option],
+		[# we just reach out for the next argument.],
+		], [BOTH], [m4_ignore(
+		)[# We support both whitespace or = as a delimiter between option argument and its value.],
+		[# Therefore, we expect --opt=value, --opt value or -o value],
+		[# so we watch for --opt=*, --opt and -o],
+		[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
+		[# if nothing got stripped, we know that we got the long or short option],
+		[# so we reach out for the next argument.],
+		[# At the end, either of what was successful is stored as the result.],
+		], [m4_fatal([Unknown case when handling delimiters])]),
+	)],
 	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _NARGS == 0
 ],
 	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
-		[_OPTS_VALS_LOOP_BODY(_argname, _arg_short, _arg_type, _default)])],
+		[_OPTS_VALS_LOOP_BODY(_argname, _arg_short, _arg_type, _default, _varname(_argname))])],
 	[m4_if(HAVE_POSITIONAL, 1,
 		[m4_expand([_EVAL_POSITIONALS_CASE])],
 		[m4_expand([_EXCEPT_OPTIONALS_CASE])])],
@@ -1110,6 +1149,10 @@ done]],
 ],
 		[
 ],
+		[_COMM_BLOCK(0,
+			[# We have an array of variables to which we want to save positional args values.],
+			[# This array is able to hold array elements as targets.],
+		)],
 		[[_positional_names=@{:@]],
 		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 			[dnl Go through all positionals names ...
@@ -1129,6 +1172,9 @@ done]],
 				)])],
 			)])],
 		)])],
+		[_COMM_BLOCK(0,
+			[# Now check that we didn't receive more or less of positional arguments than we require.],
+		)],
 		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
 		[[@:}@
 test ${#_positionals[@]} -lt ]],
@@ -1161,6 +1207,10 @@ done
 ]],
 			)])],
 		[m4_popdef([_NARGS_SPEC])],
+		[_COMM_BLOCK(0,
+			[# Take arguments that we have received, and save them in variables of given names.],
+			[# The 'eval' command is needed as the name of target variable is saved into another variable.],
+		)],
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
 ]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
@@ -1258,6 +1308,15 @@ dnl
 dnl Make some utility stuff.
 dnl Those include the die function as well as optional validators
 m4_define([_MAKE_UTILS], [m4_do(
+	[_COMM_BLOCK(0,
+		[# When called, the process ends.],
+		[# Args:],
+		[# _INDENT_()@S|@1: The exit message (print to stderr)],
+		[# _INDENT_()@S|@2: The exit code (default is 1)],
+		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
+		[# Example:],
+		[# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
+	)],
 	[[die()
 {
 ]],
@@ -1322,7 +1381,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[_ARGBASH_ID
 ],
 	[[# Argbash is a bash code generator used to get arguments parsing right.
-# Argbash is FREE SOFTWARE, know your rights: https://github.com/matejak/argbash
+# Argbash is FREE SOFTWARE, see https://argbash.io for more info
 
 ]],
 	[_SETTLE_ENV],
