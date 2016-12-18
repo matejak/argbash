@@ -16,7 +16,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="online.svg">
+   sodipodi:docname="web-legacy.svg">
   <defs
      id="defs4">
     <linearGradient
@@ -50,8 +50,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="418.40067"
-     inkscape:cy="210.49385"
+     inkscape:cx="139.82924"
+     inkscape:cy="207.63671"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -60,10 +60,10 @@
      fit-margin-left="10"
      fit-margin-right="10"
      fit-margin-bottom="10"
-     inkscape:window-width="1280"
-     inkscape:window-height="953"
+     inkscape:window-width="1440"
+     inkscape:window-height="836"
      inkscape:window-x="0"
-     inkscape:window-y="34"
+     inkscape:window-y="27"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
@@ -73,7 +73,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -149,14 +149,14 @@
          style="fill:#000000;fill-opacity:1">.io</tspan></text>
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:57.32514191px;line-height:112.99999952%;font-family:Sans;-inkscape-font-specification:Sans;text-align:center;writing-mode:lr-tb;text-anchor:middle;opacity:1;fill:#001dde;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       x="465.98413"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:57.32514191px;line-height:112.99999952%;font-family:Sans;-inkscape-font-specification:Sans;text-align:end;writing-mode:lr-tb;text-anchor:end;opacity:1;fill:#001dde;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       x="675.49518"
        y="316.82101"
        id="text4218"
        sodipodi:linespacing="113%"><tspan
          sodipodi:role="line"
          id="tspan4220"
-         x="465.98413"
-         y="316.82101">Try me online!</tspan></text>
+         x="675.49518"
+         y="316.82101">Go online!</tspan></text>
   </g>
 </svg>

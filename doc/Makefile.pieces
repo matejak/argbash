@@ -73,8 +73,9 @@ $(MINIMAL_INIT_TPL): $(AB_INIT)
 $(MINIMAL_INIT_POST): $(MINIMAL_INIT_TPL) $(PWD)/_static/minimal.patch
 	cat $(word 2,$^) | sed -e 's/@VERSION@/$(shell cat ../src/version)/' | patch -d $(dir $<) -o $(notdir $@) $(notdir $<)
 
+# We enable the comments-in mode for the minimal script, so they are can be observed in the documentation
 $(MINIMAL_SCRIPT): $(MINIMAL_INIT_POST) $(AB)
-	$(AB) $< -o $@
+	$(AB) -c $< -o $@
 
 $(STATICDIR)/minimal_argbash-create.txt: $(AB) $(MINIMAL_INIT_POST)
 	$(eval FLAGS := -o $(MINIMAL_SCRIPT) $(MINIMAL_INIT_POST))

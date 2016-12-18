@@ -3,11 +3,11 @@ resources/examples/simple-wrapper.sh --glob '*.m4' ../src ../resources/examples 
 Contents of '../src' matching '*.m4':
 	argbash-1to2.m4: 1 kiB
 	argbash-init.m4: 4 kiB
-	argbash.m4: 4 kiB
+	argbash.m4: 5 kiB
 	list.m4: 5 kiB
 	output.m4: 0 kiB
 	output-standalone.m4: 0 kiB
-	stuff.m4: 53 kiB
+	stuff.m4: 57 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
 	minimal-raw.m4: 0 kiB
