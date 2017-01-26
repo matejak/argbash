@@ -50,8 +50,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.7"
-     inkscape:cx="139.82924"
-     inkscape:cy="207.63671"
+     inkscape:cx="169.11495"
+     inkscape:cy="33.350996"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -60,8 +60,8 @@
      fit-margin-left="10"
      fit-margin-right="10"
      fit-margin-bottom="10"
-     inkscape:window-width="1440"
-     inkscape:window-height="836"
+     inkscape:window-width="1366"
+     inkscape:window-height="704"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1" />
@@ -157,6 +157,6 @@
          sodipodi:role="line"
          id="tspan4220"
          x="675.49518"
-         y="316.82101">Go online!</tspan></text>
+         y="316.82101">Use me online!</tspan></text>
   </g>
 </svg>

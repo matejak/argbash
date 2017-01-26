@@ -22,7 +22,7 @@ There are two major types of arguments --- thake an example:
 
 Here, the argument ``-l`` is optional of a boolean type (it is either on or off), ``--sort`` is also optional, taking exactly one value (in this case ``time``).
 ``-l`` and ``--sort`` are called options, hence the name *optional* arguments.
-The common pattern is that optional arguments are not required, being there just for the case you need them.
+The common pattern is that optional arguments are not required, being there just in the case you need them.
 
 The ``/home`` argument is a positional one.
 In case of ``ls``, the positional argument has a default --- running ``ls`` without parameters is the same as running ``ls "."``.
@@ -38,8 +38,9 @@ Option, Value, and others
 
 We have positional and optional arguments sorted out, so let's define some other terms now keeping the example of ``ls -l --sort time /home``:
 
-* Option:
-  The string that identifies optional arguments on the command-line, can have a short (dash and a letter, e.g. ``-l``) or long (double dash and string, e.g. ``--sort``) form.
+* Option (also ``flag`` or ``switch``):
+  The string that identifies optional arguments on the command-line, can have a short (dash and a character, e.g. ``-l``, ``-?``) or long (double dash and string, e.g. ``--sort``) form.
+  `POSIX conventions <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html>`_ mention only short options, whereas the `GNU conventions <https://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html>`_ mention long options.
 
 * Value:
   In connection with optional arguments, value of an argument is the string that follows it (provided that the argument expects a value to be given).
@@ -562,14 +563,13 @@ Available shell stuff
 Using parsing results
 +++++++++++++++++++++
 
-The key is that parsing results are saved in environmental variables that relate to argument (long) names.
+The key is that parsing results are saved in shell variables that relate to argument (long) names.
 The argument name is transliterated like this:
 
 #. All letters are made lower-case
 #. Dashes are transliterated to underscores (``include-batteries`` becomes ``include_batteries``)
 #. ``_arg_`` is prepended to the string.
-
-   So given that you have an argument ``--include-batteries`` that expects a value, you can access it via environmental variable ``_arg_include_batteries``.
+   So given that you have an argument ``--include-batteries`` that expects a value, you can access it via shell variable ``_arg_include_batteries``.
 
 * Boolean arguments have values either ``on`` or ``off``.
   If (a boolean argument) ``--quiet`` is passed, value of ``_arg_quiet`` is set to ``on``.
