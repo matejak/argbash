@@ -152,3 +152,5 @@ ADD_GENTEST([more], [is unknown])
 ADD_GENTEST([illegal-pos], [contains forbidden characters])
 ADD_GENTEST([illegal-opt], [one character])
 ADD_GENTEST([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
+dnl We have to escape [,] for grep
+ADD_GENTEST([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])

@@ -1,3 +1,10 @@
+2.2.4 (TBA)
+------------------
+
+New minor features:
+
+* `argbash` provides more useful feedback in case of unmatched square brackets in the input
+
 2.2.3 (2016-12-18)
 ------------------
 
