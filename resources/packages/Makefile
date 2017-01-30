@@ -28,6 +28,7 @@ cat $< \
 	| sed -e 's/@VERSION@/$(VERSION)/' \
 	| sed -e 's/@PKGREL@/$(PKGREL)/' \
 	| sed -e 's/@DESC@/Bash argument parsing code generator/' \
+	| sed -e 's/@LONGDESC@/Argbash helps your shell scripts to accept arguments. You declare what arguments you want your script to accept and Argbash generates the shell code that parses them from the command-line and exposes passed values as shell variables.\nHelp message is also generated, and helpful error messages are dispatched if the script is called with arguments that conflict with the interface./' \
 	| sed -e 's|@URL@|https://argbash.io|' \
 	| sed -e 's/@MD5SUM@/$(shell cat $(word 3,$+))/' \
 	| sed -e 's/@LIC_MD5SUM@/$(shell cat $(word 4,$+))/' \
@@ -45,7 +46,9 @@ build/PKGBUILD: arch/PKGBUILD.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENS
 archlinux: build/PKGBUILD
 	cd build && makepkg -f && makepkg --printsrcinfo > .SRCINFO
 
-build/SPEC: rpm/SPEC.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
+fedora: build/argbash.spec
+
+build/argbash.spec: rpm/argbash.spec.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
 	$(substitute)
 
 clean:

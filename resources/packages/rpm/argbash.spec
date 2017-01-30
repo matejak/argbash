@@ -2,10 +2,9 @@ Name:		argbash
 Version:	@VERSION@
 Release:	@PKGREL@%{?dist}
 Summary:	@DESC@
-Group:
 License:	BSD
 URL:		@URL@
-Source0:	https://github.com/matejak/%{name}/archive/%{version}.tar.gz
+Source0:	https://github.com/matejak/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildArch:	noarch
 
@@ -13,6 +12,7 @@ BuildRequires:	make,bash
 Requires:	autoconf,bash,coreutils
 
 %description
+@LONGDESC@
 
 %prep
 %autosetup -n argbash-@VERSION@
