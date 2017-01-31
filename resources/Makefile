@@ -9,6 +9,7 @@ M4_SRC = \
 	$(NUL)
 
 PREFIX ?= $(HOME)/.local
+PREFIXED_LIBDIR ?= $(PREFIX)/lib
 ROOT ?= /
 
 A_INIT = ../bin/argbash-init
@@ -94,20 +95,20 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash"
-	mkdir -p "$(ROOT)/$(PREFIX)/lib/argbash"
-	touch "$(ROOT)/$(PREFIX)/lib/argbash/stuff.m4"
-	cp $(M4_SRC) "$(ROOT)/$(PREFIX)/lib/argbash/"
-	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIX)/lib/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
+	mkdir -p "$(ROOT)/$(PREFIXED_LIBDIR)/argbash"
+	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/stuff.m4"
+	cp $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/"
+	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIXED_LIBDIR)/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
 	cp $(A_INIT) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
-	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/"*.m4
-	$(RM) "$(ROOT)/$(PREFIX)/lib/argbash/version"
+	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/"*.m4
+	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/version"
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
-	rmdir "$(ROOT)/$(PREFIX)/lib/argbash"
+	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash"
 
 version:
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }

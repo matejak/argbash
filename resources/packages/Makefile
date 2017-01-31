@@ -28,7 +28,13 @@ cat $< \
 	| sed -e 's/@VERSION@/$(VERSION)/' \
 	| sed -e 's/@PKGREL@/$(PKGREL)/' \
 	| sed -e 's/@DESC@/Bash argument parsing code generator/' \
-	| sed -e 's/@LONGDESC@/Argbash helps your shell scripts to accept arguments. You declare what arguments you want your script to accept and Argbash generates the shell code that parses them from the command-line and exposes passed values as shell variables.\nHelp message is also generated, and helpful error messages are dispatched if the script is called with arguments that conflict with the interface./' \
+	| sed -e 's/@LONGDESC@/\
+Argbash helps your shell scripts to accept arguments. \n\
+You declare what arguments you want your script to accept and Argbash \n\
+generates the shell code that parses them from the command-line and exposes \n\
+passed values as shell variables.\n\n\
+Help message is also generated, and helpful error messages are dispatched \n\
+if the script is called with arguments that conflict with the interface./' \
 	| sed -e 's|@URL@|https://argbash.io|' \
 	| sed -e 's/@MD5SUM@/$(shell cat $(word 3,$+))/' \
 	| sed -e 's/@LIC_MD5SUM@/$(shell cat $(word 4,$+))/' \
@@ -47,6 +53,8 @@ archlinux: build/PKGBUILD
 	cd build && makepkg -f && makepkg --printsrcinfo > .SRCINFO
 
 fedora: build/argbash.spec
+	@test -n "$(FEDORA_RELEASE)" || { echo "Specify fedora release number like 'make ... FEDORA_RELEASE=f25'"; exit 1; }
+	cd build && fedpkg --release $(FEDORA_RELEASE) mockbuild && fedpkg --release $(FEDORA_RELEASE) srpm
 
 build/argbash.spec: rpm/argbash.spec.in $(SOURCE) build/md5-$(VERSION) build/md5-LICENSE build/sha256-$(VERSION) build/sha256-LICENSE
 	$(substitute)

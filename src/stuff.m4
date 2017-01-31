@@ -2,17 +2,19 @@ dnl We don't like the # comments
 m4_changecom()
 
 dnl TODO: Define parsing code as a function so one can call it on its hown
-dnl TODO: Add a strict mode, when non-numeric values preceded with one or two dashes produce an "invalid option" error.
 dnl TODO: Produce command-line completition
 dnl TODO: (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
 dnl TODO: Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
-dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
 dnl TODO: Sort out quoting of defaults and inside help strings (proposal for help msgs: terminate the double quoting just before, but make sure that the help msg element is quoted at least in some way).
 dnl TODO: Add support for non-standard targets (i.e. variable names)
-dnl TODO: Disable the m4_(e)syscmd
+dnl
+dnl vvvvvvvvvvvvvvv
+dnl TBD soon:
+dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
+dnl TODO: Add a strict mode, when non-numeric values preceded with one or two dashes produce an "invalid option" error. A function looping passed args through the known list of all opts will do the trick. Should be off by default, breaking the backward compatibility can wait.
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -1801,5 +1803,6 @@ dnl defauls handling:
 dnl - X -> _MAKE_DEFAULTS -> _MAKE_DEFAULTS_POSITIONALS_LOOP -> _MAKE_DEFAULTS_MORE_VALS
 dnl - X -> _MAKE_HELP -> _POS_ARG_HELP_DEFAULTS -> _MAKE_DEFAULTS_MORE_MSG
 
+dnl These macros are not needed and they present a security threat when exposed during Argbash run
 m4_undefine([m4_esyscmd])
 m4_undefine([m4_syscmd])

@@ -8,7 +8,7 @@ Source0:	https://github.com/matejak/%{name}/archive/%{version}.tar.gz#/%{name}-%
 
 BuildArch:	noarch
 
-BuildRequires:	make,bash
+BuildRequires:	autoconf,coreutils,make,bash
 Requires:	autoconf,bash,coreutils
 
 %description
@@ -20,7 +20,7 @@ Requires:	autoconf,bash,coreutils
 %build
 
 %install
-cd resources && ROOT=%{buildroot} PREFIX=/usr make install
+cd resources && ROOT=%{buildroot} PREFIX=/usr PREFIXED_LIBDIR=%{_libddir} make install
 
 %check
 cd resources && make check
@@ -28,7 +28,8 @@ cd resources && make check
 %files
 %{_bindir}/*
 %{_libdir}/*
+%license LICENSE
 
-%doc
+%doc README.md ChangeLog
 
 %changelog
