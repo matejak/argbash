@@ -46,6 +46,8 @@ TESTS += \
 	test-int \
 	test-group \
 	test-group-idx \
+	test-semi_strict \
+	test-very_strict \
 	$(NUL)
 TESTS += tests-gen
 
@@ -95,6 +97,8 @@ SCRIPTS += \
 	$(TESTDIR)/test-int.sh \
 	$(TESTDIR)/test-group.sh \
 	$(TESTDIR)/test-group-idx.sh \
+	$(TESTDIR)/test-semi_strict.sh \
+	$(TESTDIR)/test-very_strict.sh \
 	$(NUL)
 
 TESTS_GEN += \
@@ -425,6 +429,21 @@ test-group-idx: $(TESTDIR)/test-group-idx.sh
 	ERROR="allowed" $(REVERSE) $< fuuuu
 	ERROR="allowed" $(REVERSE) $< bar
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
+
+$(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-onlyopt.m4
+	printf "%s\n" "# ARG_STRICT_MODE([semi])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -
+$(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-onlyopt.m4
+	printf "%s\n" "# ARG_STRICT_MODE([very])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -
+test-semi_strict: $(TESTDIR)/test-semi_strict.sh
+	$< -o -x | grep -q 'OPT_S=-x,'
+	$< -o --opt-argx | grep -q 'OPT_S=--opt-argx,'
+	ERROR="omitted the actual value" $(REVERSE) $< -o -i
+	ERROR="omitted the actual value" $(REVERSE) $< -o -ilau
+	ERROR="omitted the actual value" $(REVERSE) $< -o --opt-arg
+
+test-very_strict: $(TESTDIR)/test-very_strict.sh
+	ERROR="omitted the actual value" $(REVERSE) $< -o -x
+	ERROR="omitted the actual value" $(REVERSE) $< -o -i
 
 tests-gen: $(TESTS_GEN)
 

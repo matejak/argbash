@@ -53,7 +53,7 @@ dnl No trailing newline because the test body already has it
 
 dnl 
 dnl $1: The test stem (gen-test-<stem>.m4)
-dnl $2, $3, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1)
+dnl $2, $3, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
 m4_define([ADD_GENTEST], [m4_do(
 	[m4_pushdef([_tname], [gen-test-$1])],
 	[m4_divert_text([STDOUT3], [m4_do(

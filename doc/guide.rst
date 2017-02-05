@@ -531,11 +531,32 @@ Plus, there are convenience macros:
 
   ::
 
-    ARG_DEFAULTS_POS
+    ARG_DEFAULTS_POS()
 
   By default, only variables with defaults are declared.
   Since values are assigned using ``eval``, static analysis tools s.a. `shellcheck <https://www.shellcheck.net>`_ may complain about referencing undeclared variables.
   This macro helps to ensure that there are not these false positives.
+
+* Activate Argbash strict mode:
+
+  ::
+
+    ARG_STRICT_MODE([mode code])
+
+  The mode code restricts values any argument may accept.
+
+  =======================       ====================================================================
+  Mode code                     What is restricted
+  =======================       ====================================================================
+  ``options-all``               anything that looks like as an option (long and short)
+  ``options-this_script``       option (long and short) of any optional argument this script accepts
+  =======================       ====================================================================
+
+  You may want to restrict argument values in order to prevent two types of possible confusions:
+ 
+  * The user forgets to supply value to an optional argument, so the next argument is mistaken for it.
+    For example, when we leave ``time`` from ``ls --sort time --long /home/me/*``, we get a syntactically valid command-line ``ls --sort --long /home/me/*``, where ``--long`` is identified as value of the argument ``--sort`` instead an argument on its own.
+  * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo (e.g. ``--srot``), and, consequently, it is understood as a positional argument.
 
 Action macro
 ++++++++++++

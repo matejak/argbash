@@ -10,10 +10,15 @@ dnl TODO: Add app finder wrappers
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
 dnl TODO: Sort out quoting of defaults and inside help strings (proposal for help msgs: terminate the double quoting just before, but make sure that the help msg element is quoted at least in some way).
 dnl TODO: Add support for non-standard targets (i.e. variable names)
+dnl TODO: Add a guide how to contribute to the documentation
+dnl TODO: Sort out the argbash_api macro
+dnl TODO: Fix the bug when re-running of tests fails
+dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
+dnl  - check out the INCLUDE_PARSING_CODE macro
+dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
 dnl TBD soon:
-dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl TODO: Add a strict mode, when non-numeric values preceded with one or two dashes produce an "invalid option" error. A function looping passed args through the known list of all opts will do the trick. Should be off by default, breaking the backward compatibility can wait.
 dnl
 dnl Arg groups:
@@ -37,7 +42,7 @@ dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
 m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift($@))])])
 
 dnl
-dnl Define a macro that is part of the API and that replicate itself.
+dnl Define a macro that is part of the public API
 dnl Ensure the replication and also add the macro name to a list of allowed macros
 m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
 m4_define([_argbash_persistent], [m4_set_add([_KNOWN_MACROS],[$1])m4_define([$1], [$2])])
@@ -1016,8 +1021,8 @@ _INDENT_(2,	)],
 	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD([$1], [$2], [[$5="$_val"]], [$5])],
-		[repeated], [_VAL_OPT_ADD([$1], [$2], [[$5+=("$_val")]], [$5])],
+		[arg], [_VAL_OPT_ADD([$1], [$2], [[$5="$_val"]], [$5])ADD_OPT_VALUE_VALIDATION([$_key], [$_val])],
+		[repeated], [_VAL_OPT_ADD([$1], [$2], [[$5+=("$_val")]], [$5])ADD_OPT_VALUE_VALIDATION([$_key], [$_val])],
 		[bool],
 		[_JOIN_INDENTED(3,
 			[[$5="on"]],
@@ -1043,7 +1048,6 @@ dnl
 dnl $1: The name of the option arg
 dnl $2: The value of the option arg
 dnl Uses:
-dnl _ARGVAR - name of the variable
 dnl _key - the run-time shell variable
 m4_define([_ADD_OPTS_VALS], [m4_do(
 	[dnl If the arg comes from wrapped script/template, save it in an array
@@ -1333,6 +1337,7 @@ m4_define([_MAKE_UTILS], [m4_do(
 		[exit ${_ret}])],
 	[}
 ],
+	[_IF_STRICT_MODE([_MAKE_STRICT_FUNCTION])],
 	[_PUT_VALIDATORS],
 )])
 
@@ -1779,11 +1784,72 @@ m4_define([_GET_VALUE_TYPE], [m4_do(
 )])
 
 
+m4_define([ARG_STRICT_MODE] [m4_do(
+)])
+
+
 dnl
 dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
 argbash_api([ARG_DEFAULTS_POS], [m4_do(
 	[m4_define([_ARG_DEFAULTS_POS], [[yes]])],
 )])
+
+
+m4_set_add([_S_STRICT_MODES], [liberal])
+m4_set_add([_S_STRICT_MODES], [semi])
+m4_set_add([_S_STRICT_MODES], [strict])
+dnl
+dnl Sets the strict mode global
+dnl When the strict mode is on, some argument values are blacklisted
+argbash_api([ARG_STRICT_MODE], [m4_do(
+	[m4_set_contains([_S_STRICT_MODES], [$1], , 
+		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_S_STRICT_MODES], [, ]).)])],
+	[m4_define([_STRICT_MODE], [[$1]])],
+)])
+
+
+dnl
+dnl Output some text depending on what strict mode we find ourselves in
+m4_define([_ASSIGN_STRICT_MODE], [m4_case(_STRICT_MODE,
+	[liberal], [$1],
+	[semi], [$2],
+	[strict], [$3])])
+
+dnl
+dnl Output some text depending on what strict mode we find ourselves in
+m4_define([_IF_STRICT_MODE], [_ASSIGN_STRICT_MODE([$2], [$1], [$1])])
+
+
+m4_define([_MAKE_STRICT_FUNCTION], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Function that evaluates whether a value passed to an argument],
+		[# does not violate the global rule imposed by the ARG_STRICT_MODE macro:],
+		[# _ASSIGN_STRICT_MODE([], 
+		[The value must not match any long or short option this script uses],
+		[The value must not match anything that looks like any long or short option.])],
+		[# _INDENT_()@S|@1: The name of the option],
+		[# _INDENT_()@S|@2: The passed value],
+	)],
+	[[evaluate_strictness()
+{
+]],
+	[_INDENT_()_ASSIGN_STRICT_MODE([], 
+		[@<:@@<:@ "@S|@2" =~ ^-(-(m4_list_join([_ARGS_LONG], [|]))$|m4_dquote(m4_list_join([_ARGS_SHORT], []))) @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1', which makes it look like that you have omitted the actual value, since '@S|@2' is an option accepted by this script. This is considered a fatal error."],
+		[@<:@@<:@ "@S|@2"=~ ^--?@<:@a-zA-Z@:>@ @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1'. It looks like that you are trying to pass an option instead of the actual value, which is considered a fatal error."])],
+	[
+}],
+)])
+
+
+dnl
+dnl Adds the code to ensure that the variable that contains the freshly passed value from the command-line is not blacklisted
+dnl $1: Name of the run-time variable that contains the value
+m4_define([ADD_OPT_VALUE_VALIDATION], [m4_do(
+	[_IF_STRICT_MODE(
+		[_INDENT_(3)evaluate_strictness "$1" "$2"])
+],
+)])
+
 
 dnl Types:
 dnl #. Register group name, assert uniquness
