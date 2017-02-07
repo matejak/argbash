@@ -14,7 +14,8 @@ build/sha256-LICENSE: build/LICENSE | build
 source: $(SOURCE)
 
 $(SOURCE): | build
-	wget -O $@ https://github.com/matejak/argbash/archive/$(VERSION).tar.gz
+	@# If wget wasn't successful, delete the empty "downloaded" file
+	wget -O $@ https://github.com/matejak/argbash/archive/$(VERSION).tar.gz || $(RM) $@
 
 build/md5-$(VERSION): $(SOURCE)
 	md5sum $< | cut -f 1 -d ' ' > $@
@@ -22,19 +23,15 @@ build/md5-$(VERSION): $(SOURCE)
 build/sha256-$(VERSION): $(SOURCE)
 	sha256sum $< | cut -f 1 -d ' ' > $@
 
+LONGDESC = Argbash helps your shell scripts to accept arguments.\nYou declare what arguments you want your script to accept and Argbash\ngenerates the shell code that parses them from the command-line and exposes\npassed values as shell variables.\n\nHelp message is also generated, and helpful error messages are dispatched\nif the script is called with arguments that conflict with the interface.
+
 define substitute =
 @test -n "$(PKGREL)" || { echo "Specify pkg release number like 'make ... PKGREL=1'"; exit 1; }
 cat $< \
 	| sed -e 's/@VERSION@/$(VERSION)/' \
 	| sed -e 's/@PKGREL@/$(PKGREL)/' \
 	| sed -e 's/@DESC@/Bash argument parsing code generator/' \
-	| sed -e 's/@LONGDESC@/\
-Argbash helps your shell scripts to accept arguments. \n\
-You declare what arguments you want your script to accept and Argbash \n\
-generates the shell code that parses them from the command-line and exposes \n\
-passed values as shell variables.\n\n\
-Help message is also generated, and helpful error messages are dispatched \n\
-if the script is called with arguments that conflict with the interface./' \
+	| sed -e 's/@LONGDESC@/$(LONGDESC)/' \
 	| sed -e 's|@URL@|https://argbash.io|' \
 	| sed -e 's/@MD5SUM@/$(shell cat $(word 3,$+))/' \
 	| sed -e 's/@LIC_MD5SUM@/$(shell cat $(word 4,$+))/' \
