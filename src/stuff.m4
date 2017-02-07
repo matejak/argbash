@@ -1337,7 +1337,7 @@ m4_define([_MAKE_UTILS], [m4_do(
 		[exit ${_ret}])],
 	[}
 ],
-	[_IF_STRICT_MODE([_MAKE_STRICT_FUNCTION])],
+	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION])],
 	[_PUT_VALIDATORS],
 )])
 
@@ -1784,9 +1784,6 @@ m4_define([_GET_VALUE_TYPE], [m4_do(
 )])
 
 
-m4_define([ARG_STRICT_MODE] [m4_do(
-)])
-
 
 dnl
 dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
@@ -1795,36 +1792,37 @@ argbash_api([ARG_DEFAULTS_POS], [m4_do(
 )])
 
 
-m4_set_add([_S_STRICT_MODES], [liberal])
-m4_set_add([_S_STRICT_MODES], [semi])
-m4_set_add([_S_STRICT_MODES], [strict])
+m4_set_add([_S_RESTRICT_VALUES_MODES], [none])
+m4_set_add([_S_RESTRICT_VALUES_MODES], [no-local-options])
+m4_set_add([_S_RESTRICT_VALUES_MODES], [no-any-options])
 dnl
 dnl Sets the strict mode global
 dnl When the strict mode is on, some argument values are blacklisted
-argbash_api([ARG_STRICT_MODE], [m4_do(
-	[m4_set_contains([_S_STRICT_MODES], [$1], , 
-		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_S_STRICT_MODES], [, ]).)])],
-	[m4_define([_STRICT_MODE], [[$1]])],
+argbash_api([ARG_RESTRICT_VALUES], [m4_do(
+	[[$0($@)]],
+	[m4_set_contains([_S_RESTRICT_VALUES_MODES], [$1], ,
+		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_S_RESTRICT_VALUES_MODES], [, ]).)])],
+	[m4_define([_RESTRICT_VALUES], [[$1]])],
 )])
 
 
 dnl
 dnl Output some text depending on what strict mode we find ourselves in
-m4_define([_ASSIGN_STRICT_MODE], [m4_case(_STRICT_MODE,
-	[liberal], [$1],
-	[semi], [$2],
-	[strict], [$3])])
+m4_define([_CASE_RESTRICT_VALUES], [m4_case(_RESTRICT_VALUES,
+	[none], [$1],
+	[no-local-options], [$2],
+	[no-any-options], [$3])])
 
 dnl
 dnl Output some text depending on what strict mode we find ourselves in
-m4_define([_IF_STRICT_MODE], [_ASSIGN_STRICT_MODE([$2], [$1], [$1])])
+m4_define([_IF_RESTRICT_VALUES], [_CASE_RESTRICT_VALUES([$2], [$1], [$1])])
 
 
-m4_define([_MAKE_STRICT_FUNCTION], [m4_do(
+m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that evaluates whether a value passed to an argument],
-		[# does not violate the global rule imposed by the ARG_STRICT_MODE macro:],
-		[# _ASSIGN_STRICT_MODE([], 
+		[# does not violate the global rule imposed by the ARG_RESTRICT_VALUES macro:],
+		[# _CASE_RESTRICT_VALUES([],
 		[The value must not match any long or short option this script uses],
 		[The value must not match anything that looks like any long or short option.])],
 		[# _INDENT_()@S|@1: The name of the option],
@@ -1833,9 +1831,9 @@ m4_define([_MAKE_STRICT_FUNCTION], [m4_do(
 	[[evaluate_strictness()
 {
 ]],
-	[_INDENT_()_ASSIGN_STRICT_MODE([], 
+	[_INDENT_()_CASE_RESTRICT_VALUES([],
 		[@<:@@<:@ "@S|@2" =~ ^-(-(m4_list_join([_ARGS_LONG], [|]))$|m4_dquote(m4_list_join([_ARGS_SHORT], []))) @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1', which makes it look like that you have omitted the actual value, since '@S|@2' is an option accepted by this script. This is considered a fatal error."],
-		[@<:@@<:@ "@S|@2"=~ ^--?@<:@a-zA-Z@:>@ @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1'. It looks like that you are trying to pass an option instead of the actual value, which is considered a fatal error."])],
+		[@<:@@<:@ "@S|@2" =~ ^--?@<:@a-zA-Z@:>@ @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1'. It looks like that you are trying to pass an option instead of the actual value, which is considered a fatal error."])],
 	[
 }],
 )])
@@ -1845,7 +1843,7 @@ dnl
 dnl Adds the code to ensure that the variable that contains the freshly passed value from the command-line is not blacklisted
 dnl $1: Name of the run-time variable that contains the value
 m4_define([ADD_OPT_VALUE_VALIDATION], [m4_do(
-	[_IF_STRICT_MODE(
+	[_IF_RESTRICT_VALUES(
 		[_INDENT_(3)evaluate_strictness "$1" "$2"])
 ],
 )])

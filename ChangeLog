@@ -1,5 +1,8 @@
-2.2.4 (TBA)
+2.3.0 (TBA)
 ------------------
+
+New features:
+* Behavior that raises an error when a script argument's value looks like option - enabled by the `ARG_RESTRICT_VALUES`.
 
 New minor features:
 

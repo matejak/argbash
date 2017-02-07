@@ -17,6 +17,7 @@ Then read throgh this list of influences and/or alternatives!
   * Cons:
 
     * It is Python, we are ``bash``.
+    * It has a strict value restriction turned on (analogous to having ``ARG_RESTRICT_VALUES([no-option-all])`` in every script) that `can't be switched off <...>`_.
 
   * Argbash says:
 

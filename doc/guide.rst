@@ -155,7 +155,7 @@ Positional arguments
 
   ``Argbash`` supports arguments with arbitrary number of values.
   However, you can require a minimal amount of values the caller has to provide and you can also assign defaults for the values that are not required.
-  Given that your argument accepts at least :math:`n` values, you can specify defaults for :math:`n + 1`:sup:`th` argument (and so on).
+  Given that your argument accepts at least :math:`n` values, you can specify defaults for :math:`(n + 1)`:sup:`th` argument (and so on).
 
   For example, consider that your script makes use of infinitely many-valued argument, which accepts at least 1 value and also has two defaults ``bar`` and ``baz``.
   Then, it is imperative that at least one value is specified on the command-line.
@@ -541,22 +541,24 @@ Plus, there are convenience macros:
 
   ::
 
-    ARG_STRICT_MODE([mode code])
+    ARG_RESTRICT_VALUES([mode code])
 
-  The mode code restricts values any argument may accept.
+  The mode code restricts allowed values for all arguments.
 
   =======================       ====================================================================
   Mode code                     What is restricted
   =======================       ====================================================================
-  ``options-all``               anything that looks like as an option (long and short)
-  ``options-this_script``       option (long and short) of any optional argument this script accepts
+  none                          nothing is restricted (default behavior)
+  no-any-options                anything that looks like as an option (be it long or short)
+  no-local-options              option (long or short) of any optional argument this script supports
   =======================       ====================================================================
 
-  You may want to restrict argument values in order to prevent two types of possible confusions:
+  You may want to restrict argument values in order to prevent these possible confusions:
  
   * The user forgets to supply value to an optional argument, so the next argument is mistaken for it.
     For example, when we leave ``time`` from ``ls --sort time --long /home/me/*``, we get a syntactically valid command-line ``ls --sort --long /home/me/*``, where ``--long`` is identified as value of the argument ``--sort`` instead an argument on its own.
-  * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo (e.g. ``--srot``), and, consequently, it is understood as a positional argument.
+  * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo, (e.g. ``--srot``), or the script actually doesn't support that argument.
+    As an unwanted consequence, it is interpreted as a positional argument.
 
 Action macro
 ++++++++++++

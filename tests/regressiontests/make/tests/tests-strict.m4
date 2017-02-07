@@ -1,8 +1,8 @@
 ADD_RULE([$(TESTDIR)/test-semi_strict.sh], [$(TESTDIR)/test-onlyopt.m4],
-	[[printf "%s\n" "# ARG_STRICT_MODE([semi])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -]])
+	[[printf "%s\n" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 ADD_RULE([$(TESTDIR)/test-very_strict.sh], [$(TESTDIR)/test-onlyopt.m4],
-	[[printf "%s\n" "# ARG_STRICT_MODE([very])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -]])
+	[[printf "%s\n" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 ADD_TEST([test-semi_strict], [[
 	$< -o -x | grep -q 'OPT_S=-x,'
@@ -13,6 +13,6 @@ ADD_TEST([test-semi_strict], [[
 ]])
 
 ADD_TEST([test-very_strict], [[
-	ERROR="omitted the actual value" $(REVERSE) $< -o -x
-	ERROR="omitted the actual value" $(REVERSE) $< -o -i
+	ERROR="are trying to pass an option" $(REVERSE) $< -o -x
+	ERROR="are trying to pass an option" $(REVERSE) $< -o -i
 ]])

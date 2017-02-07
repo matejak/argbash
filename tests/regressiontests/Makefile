@@ -431,9 +431,9 @@ test-group-idx: $(TESTDIR)/test-group-idx.sh
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-onlyopt.m4
-	printf "%s\n" "# ARG_STRICT_MODE([semi])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -
+	printf "%s\n" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-onlyopt.m4
-	printf "%s\n" "# ARG_STRICT_MODE([very])" | cat - $< | $(ARGBASH_BIN) --no-check-typos -o $(@) -
+	printf "%s\n" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	$< -o -x | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx | grep -q 'OPT_S=--opt-argx,'
@@ -442,8 +442,8 @@ test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	ERROR="omitted the actual value" $(REVERSE) $< -o --opt-arg
 
 test-very_strict: $(TESTDIR)/test-very_strict.sh
-	ERROR="omitted the actual value" $(REVERSE) $< -o -x
-	ERROR="omitted the actual value" $(REVERSE) $< -o -i
+	ERROR="are trying to pass an option" $(REVERSE) $< -o -x
+	ERROR="are trying to pass an option" $(REVERSE) $< -o -i
 
 tests-gen: $(TESTS_GEN)
 
