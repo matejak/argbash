@@ -84,8 +84,10 @@ SCRIPTS += \
 	$(TESTDIR)/test-init_simple-s-parsing.sh \
 	$(TESTDIR)/test-init_simple-s-parsing.m4 \
 	$(TESTDIR)/test-init_simple-s.m4 \
+	$(TESTDIR)/regenerate-test-init-simple-s-update.m4 \
 	$(TESTDIR)/test-init_simple-s-update-parsing.sh \
 	$(TESTDIR)/test-init_simple-s-update-parsing.m4 \
+	$(TESTDIR)/regenerate-test-init_simple-s-update.m4 \
 	$(TESTDIR)/test-init_simple-s-update.m4 \
 	$(TESTDIR)/test-init_simple-s-update.sh \
 	$(TESTDIR)/test-init_simple-ss-parsing.sh \
@@ -350,12 +352,17 @@ $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 $(TESTDIR)/test-init_simple-s.m4: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s $@
 
-$(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT)
+$(TESTDIR)/regenerate-test-init_simple-s-update.m4:
+	touch $@
+
+$(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --opt ordnung -s $@
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
 
 test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
+	@# Regenerate everyting during the next test run
+	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes
 	$(REVERSE) $<
 	ERROR="unexpected argument" $(REVERSE) $< -o yes

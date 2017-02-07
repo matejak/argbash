@@ -147,6 +147,7 @@ Finally, you just make sure that ``my-script.sh`` and ``my-parsing.m4`` are next
    argbash my-script.sh -o my-script.sh
 
 which finds ``my-parsing.m4`` (it would find ``my-parsing.sh`` too) and generates new ``my-parsing.sh`` and ``my-script.sh`` that you can use right away.
+If both ``my-parsing.m4`` and ``my-parsing.sh`` are found, the more recent one is used to generate the ``my-parsing.sh``.
 
 .. _usage_manual:
 

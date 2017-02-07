@@ -30,11 +30,17 @@ dnl
 dnl Add a test that checks that updates to the parsing functionality are applied
 dnl First, create a script that succeeds if --ordnung yes is passed
 dnl Then, add an abbrev in the parsing code and see it again
+ADD_SCRIPT([regenerate-test-init-simple-s-update], [m4])
 ADD_SCRIPT([test-init_simple-s-update-parsing])
 ADD_SCRIPT([test-init_simple-s-update-parsing], [m4])
 
 dnl Take out all echos (argbash-init puts them there) so that we don't have to discard stdout.
-ADD_RULE([$(TESTDIR)/test-init_simple-s-update.m4], [$(ARGBASH_INIT)],
+ADD_RULE([$(TESTDIR)/regenerate-test-init_simple-s-update.m4], [],
+	[touch $@
+])
+
+dnl Take out all echos (argbash-init puts them there) so that we don't have to discard stdout.
+ADD_RULE([$(TESTDIR)/test-init_simple-s-update.m4], [$(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4],
 	[$< --opt ordnung -s $@
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
@@ -45,6 +51,8 @@ dnl 1. The parsing part fails if --ordnung does not receive the "yes" value, but
 dnl 2. The support for -o is injected to the parsing shell script
 dnl 3. The script is regenerated and this time, we expect that the parsing stuff got also regenerated, so the -o alias is functional.
 ADD_TEST([test-init_simple-s-update], [[
+	@# Regenerate everyting during the next test run
+	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes
 	$(REVERSE) $<
 	ERROR="unexpected argument" $(REVERSE) $< -o yes

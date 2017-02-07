@@ -7,6 +7,7 @@ New features:
 New minor features:
 
 * `argbash` provides more useful feedback in case of unmatched square brackets in the input
+* `argbash` in standalone mode now uses the more fresh of the parsing code `.sh` or `.m4` templates (was undocumented, but the `.sh` one was always preferred over the `.m4`).
 
 2.2.3 (2016-12-18)
 ------------------

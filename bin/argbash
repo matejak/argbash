@@ -208,18 +208,28 @@ settle_wrapped_fname ()
 # 4. Something is wrong
 function get_parsing_code
 {
+	local _shfile _m4file _newerfile
 	# Get the argument of INCLUDE_PARSING_CODE
 	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(cat "$infile")" \
 			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' 2> "$discard" \
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$infile")/$_srcfile"
-	test -f "$_thatfile" && echo "$_thatfile" && return
+	test -f "$_thatfile" && _shfile="$_thatfile"
 	# Take out everything after last dot (http://stackoverflow.com/questions/125281/how-do-i-remove-the-file-suffix-and-path-portion-from-a-path-string-in-bash)
 	_thatfile="${_thatfile%.*}.m4"
-	test -f "$_thatfile" && echo "$_thatfile" && return
-	# if we are here, we are out of luck
-	test -n "$_srcfile" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1
+	test -f "$_thatfile" && _m4file="$_thatfile"
+
+	# if have neither of files
+	test -z "$_shfile" && test -z "$_m4file" && echo "Strange, we think that there was a source file '$_srcfile' that should be included, but we haven't found it in directory '$(dirname "$_thatfile")'" >&2 && return 1
+	# We have one file, but not the other one => decision of what to pick is easy.
+	test -z "$_shfile" && test -n "$_m4file" && echo "$_m4file" && return
+	test -n "$_shfile" && test -z "$_m4file" && echo "$_shfile" && return
+
+	# We have both, so we pick up the newer one
+	_newerfile="$_shfile"
+	test "$_m4file" -nt "$_shfile" && _newerfile="$_m4file"
+	echo "$_newerfile"
 }
 
 # MS Windows compatibility fix
