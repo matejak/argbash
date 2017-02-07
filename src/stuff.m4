@@ -1220,11 +1220,9 @@ done
 		)],
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
-]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]
-_CASE_RESTRICT_VALUES(
-	[], [],
-	[_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"
-]])
+]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]_CASE_RESTRICT_VALUES(
+	[], [], [
+_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]])
 [done]],
 		[
 ],
