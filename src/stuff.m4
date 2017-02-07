@@ -18,9 +18,6 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
-dnl TBD soon:
-dnl TODO: make argbash use the newer of .sh or .m4 files, not just the .sh
-dnl TODO: Add a strict mode, when non-numeric values preceded with one or two dashes produce an "invalid option" error. A function looping passed args through the known list of all opts will do the trick. Should be off by default, breaking the backward compatibility can wait.
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -1223,8 +1220,12 @@ done
 		)],
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
-]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
-done]],
+]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]
+_CASE_RESTRICT_VALUES(
+	[], [],
+	[_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"
+]])
+[done]],
 		[
 ],
 		[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_set_foreach([_POS_VARNAMES], [varname], [varname=()
@@ -1843,10 +1844,12 @@ m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 dnl
 dnl Adds the code to ensure that the variable that contains the freshly passed value from the command-line is not blacklisted
 dnl $1: Name of the run-time variable that contains the value
+dnl $2: Name of the run-time variable that contains the option or argument name
 m4_define([ADD_OPT_VALUE_VALIDATION], [m4_do(
 	[_IF_RESTRICT_VALUES(
-		[_INDENT_(3)evaluate_strictness "$1" "$2"])
+		[_INDENT_(3)evaluate_strictness "$1" "$2"
 ],
+		[])],
 )])
 
 
