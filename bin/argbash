@@ -56,13 +56,17 @@ while test $# -gt 0
 do
 	_key="$1"
 	case "$_key" in
-		-o|--output|--output=*)
+		-o*|--output|--output=*)
 			_val="${_key##--output=}"
+			_val2="${_key##-o}"
 			if test "$_val" = "$_key"
 			then
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
+			elif test "$_val2" != "$_key" -a -n "$_val2"
+			then
+				_val="$_val2"
 			fi
 			_arg_output="$_val"
 			;;
@@ -74,17 +78,23 @@ do
 			_arg_check_typos="on"
 			test "${1:0:5}" = "--no-" && _arg_check_typos="off"
 			;;
-		-c|--no-commented|--commented)
+		-c*|--no-commented|--commented)
 			_arg_commented="on"
+			_next="${_key##-c}"
+			test -n "$_next" && test "$_next" != "$_key" && shift && set -- "-c" "-${_next}" "$@"
 			test "${1:0:5}" = "--no-" && _arg_commented="off"
 			;;
-		-I|--search|--search=*)
+		-I*|--search|--search=*)
 			_val="${_key##--search=}"
+			_val2="${_key##-I}"
 			if test "$_val" = "$_key"
 			then
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
+			elif test "$_val2" != "$_key" -a -n "$_val2"
+			then
+				_val="$_val2"
 			fi
 			_arg_search+=("$_val")
 			;;
@@ -98,11 +108,11 @@ do
 			fi
 			_arg_debug="$_val"
 			;;
-		-v|--version)
+		-v*|--version)
 			echo "argbash v$version"
 			exit 0
 			;;
-		-h|--help)
+		-h*|--help)
 			print_help
 			exit 0
 			;;
@@ -275,7 +285,7 @@ then
 	# match against suspicious, then inverse match against correct stuff:
 	# #<optional whitespace>\(allowed\|another allowed\|...\)<optional whitespace><opening bracket <or> end of line>
 	# Then, extract all matches (assumed to be alnum chars + '_') from grep and put them in the error msg.
-	grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(ARGBASH_SET_INDENT\|ARG_POSITIONAL_SINGLE\|ARG_POSITIONAL_INF\|ARG_POSITIONAL_MULTI\|ARG_OPTIONAL_SINGLE\|ARG_POSITIONAL_DOUBLEDASH\|ARG_VERSION\|ARG_HELP\|INCLUDE_PARSING_CODE\|DEFINE_SCRIPT_DIR\|ARG_OPTIONAL_INCREMENTAL\|ARG_OPTIONAL_REPEATED\|ARG_VERBOSE\|ARG_OPTIONAL_BOOLEAN\|ARG_OPTIONAL_ACTION\|ARGBASH_SET_DELIM\|ARGBASH_GO\|ARGBASH_WRAP\|ARG_LEFTOVERS\|ARG_USE_PROG\|ARG_USE_ENV\|ARG_TYPE_GROUP\|ARG_TYPE_GROUP_SET\|ARG_DEFAULTS_POS\|ARG_RESTRICT_VALUES\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
+	grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(ARGBASH_SET_INDENT\|ARG_POSITIONAL_SINGLE\|ARG_POSITIONAL_INF\|ARG_POSITIONAL_MULTI\|ARG_OPTIONAL_SINGLE\|ARG_POSITIONAL_DOUBLEDASH\|ARG_VERSION\|ARG_HELP\|INCLUDE_PARSING_CODE\|DEFINE_SCRIPT_DIR\|ARG_OPTIONAL_INCREMENTAL\|ARG_OPTIONAL_REPEATED\|ARG_VERBOSE\|ARG_OPTIONAL_BOOLEAN\|ARG_OPTIONAL_ACTION\|ARGBASH_SET_DELIM\|ARGBASH_GO\|ARGBASH_WRAP\|ARG_LEFTOVERS\|ARG_USE_PROG\|ARG_USE_ENV\|ARG_TYPE_GROUP\|ARG_TYPE_GROUP_SET\|ARG_DEFAULTS_POS\|ARG_RESTRICT_VALUES\|ARG_CLUSTERING\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
 	test -n "$grep_output" && die "Your script contains possible misspelled Argbash macros: $grep_output" 1
 fi
 if test "$outfname" != '-'

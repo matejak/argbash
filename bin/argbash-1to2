@@ -41,21 +41,25 @@ while test $# -gt 0
 do
 	_key="$1"
 	case "$_key" in
-		-o|--output|--output=*)
+		-o*|--output|--output=*)
 			_val="${_key##--output=}"
+			_val2="${_key##-o}"
 			if test "$_val" = "$_key"
 			then
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
+			elif test "$_val2" != "$_key" -a -n "$_val2"
+			then
+				_val="$_val2"
 			fi
 			_arg_output="$_val"
 			;;
-		-v|--version)
+		-v*|--version)
 			echo "argbash-1to2 v$version"
 			exit 0
 			;;
-		-h|--help)
+		-h*|--help)
 			print_help
 			exit 0
 			;;

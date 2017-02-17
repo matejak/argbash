@@ -1,10 +1,7 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: Produce command-line completition
-dnl TODO: (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set "-$rest" $@`
-dnl TODO: Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
@@ -12,12 +9,14 @@ dnl TODO: Sort out quoting of defaults and inside help strings (proposal for hel
 dnl TODO: Add support for non-standard targets (i.e. variable names)
 dnl TODO: Add a guide how to contribute to the documentation
 dnl TODO: Sort out the argbash_api macro
-dnl TODO: Fix the bug when re-running of tests fails
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
+dnl TODO: Define parsing code as a function so one can call it on its hown
+dnl TODO: (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set -- "-$rest" "$@"`
+dnl TODO: Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -914,12 +913,17 @@ dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
 m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
 	[_val="${_key##--[$1]=}"],
+	m4_ifnblank([$2], [_IF_CLUSTERING_GETOPT([[[_val2="${_key##-$2}"]]])]),
 	[if test "$_val" = "$_key"],
 	[then],
 	_INDENT_MORE(
 		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 		[_val="@S|@2"],
 		[shift]),
+	m4_ifnblank([$2], [_IF_CLUSTERING_GETOPT(
+	[[[elif test "$_val2" != "$_key" -a -n "$_val2"]],
+	 [[then]],
+	 [_INDENT_()[_val="$_val2"]]])]),
 	[fi],
 	[$3],
 	[_ADD_OPTS_VALS([$4], $[$4])],
@@ -1004,7 +1008,7 @@ m4_define([_OPTS_VALS_LOOP_BODY], [m4_do(
 _INDENT_(2,	)],
 	[dnl Output short option (if we have it), then |
 ],
-	[m4_ifblank([$2], [], [[-$2|]])],
+	[m4_ifblank([$2], [], [[-$2]_IF_CLUSTERING_GETOPT([*])|])],
 	[dnl If we are dealing with bool, also look for --no-...
 ],
 	[m4_if([$3], [bool], [[--no-$1|]])],
@@ -1025,11 +1029,13 @@ _INDENT_(2,	)],
 		[_JOIN_INDENTED(3,
 			[[$5="on"]],
 			[_ADD_OPTS_VALS([$5])],
+			_PASS_WHEN_GETOPT([$2]),
 			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
 		[incr],
 		[_JOIN_INDENTED(3,
 			[[$5=$(($5 + 1))]],
+			_PASS_WHEN_GETOPT([$2]),
 			[_ADD_OPTS_VALS([$5])],
 		)],
 		[action],
@@ -1221,7 +1227,8 @@ done
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
 ]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]_CASE_RESTRICT_VALUES(
-	[], [], [
+	[], [], [_COMM_BLOCK([
+_INDENT_()# It has been requested that all positional arguments that look like options are rejected])
 _INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]])
 [done]],
 		[
@@ -1849,6 +1856,30 @@ m4_define([ADD_OPT_VALUE_VALIDATION], [m4_do(
 ],
 		[])],
 )])
+
+
+dnl
+dnl $1: The mode of argument clustering: One of 'none', 'getopts'
+argbash_api([ARG_CLUSTERING], [m4_do(
+	[[$0($@)]],
+	[m4_define([_CLUSTERING_MODE], [[$1]])],
+)])
+
+
+m4_define([_IF_CLUSTERING_GETOPT], [m4_if(_CLUSTERING_MODE, [getopt], [$1], [$2])])
+dnl Set the default value
+ARG_CLUSTERING([getopt])
+
+
+dnl
+dnl Normally, we would just wait for the shift.
+dnl However, we now transform '-xyz' to '-x' '-yz', so '-x' disappears during the shift
+dnl and the rest is processed the next time.
+dnl
+dnl $1: The short option
+m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
+	[_IF_CLUSTERING_GETOPT([[[_next="${_key##-$1}"]], [[test -n "$_next" && test "$_next" != "$_key" && shift && set -- "-$1" "-${_next}" "@S|@@"]]])],
+)])])
 
 
 dnl Types:

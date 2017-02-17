@@ -48,6 +48,9 @@ TESTS += \
 	test-group-idx \
 	test-semi_strict \
 	test-very_strict \
+	test-getopt-both \
+	test-getopt-space \
+	test-getopt-equals \
 	$(NUL)
 TESTS += tests-gen
 
@@ -101,6 +104,9 @@ SCRIPTS += \
 	$(TESTDIR)/test-group-idx.sh \
 	$(TESTDIR)/test-semi_strict.sh \
 	$(TESTDIR)/test-very_strict.sh \
+	$(TESTDIR)/test-getopt-equals.sh \
+	$(TESTDIR)/test-getopt-both.sh \
+	$(TESTDIR)/test-getopt-space.sh \
 	$(NUL)
 
 TESTS_GEN += \
@@ -453,6 +459,37 @@ test-very_strict: $(TESTDIR)/test-very_strict.sh
 	ERROR="are trying to pass an option" $(REVERSE) $< -o -o pos-arg
 	ERROR="are trying to pass an option" $(REVERSE) $< -x
 	ERROR="are trying to pass an option" $(REVERSE) $< --foobar
+
+$(TESTDIR)/test-getopt-equals.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_CLUSTERING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+$(TESTDIR)/test-getopt-both.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_CLUSTERING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+$(TESTDIR)/test-getopt-space.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_CLUSTERING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+test-getopt-both: $(TESTDIR)/test-getopt-both.sh
+	$< -ii | grep -q 'OPT_INCR=4,'
+	$< --incrx -ii | grep -q 'OPT_INCR=5,'
+	$< -Bi | grep 'OPT_INCR=3,' | grep -q 'BOOL=on,'
+	$< -Bio bu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
+	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
+
+test-getopt-space: $(TESTDIR)/test-getopt-space.sh
+	$< -ii | grep -q 'OPT_INCR=4,'
+	$< -Bi | grep 'OPT_INCR=1,' | grep -q 'BOOL=on,'
+	$< -Bio bu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Biobu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=0,' | grep -q 'OPT_S=ibu,'
+	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
+
+test-getopt-equals: $(TESTDIR)/test-getopt-equals.sh
+	$< -ii | grep -q 'OPT_INCR=4,'
+	$< -Bi | grep 'OPT_INCR=1,' | grep -q 'BOOL=on,'
+	$< -Bio bu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Biobu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=0,' | grep -q 'OPT_S=ibu,'
+	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
 
 tests-gen: $(TESTS_GEN)
 

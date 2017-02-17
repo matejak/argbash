@@ -43,7 +43,6 @@ ADD_TEST([test-onlypos-declared], [[
 ]])
 
 
-# Also check the 2-spaces indentation
 ADD_TEST([test-onlyopt], [[
 	grep -q '^  esac$$' $<
 	@# ! negates the return code
