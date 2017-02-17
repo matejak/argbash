@@ -1298,6 +1298,11 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[# THE DEFAULTS INITIALIZATION - POSITIONALS
 ],
+		[_COMM_BLOCK(0,
+			[# The positional args array has to be reset before the parsing, because it may already be defined],
+			[# - for example if this script is sourced by an argbash-powered script.])],
+		[[_positionals=()
+]],
 		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONAL_CATHS], [_argname,_min_argn,_defaults,_arg_type],
 			[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
 	)])],

@@ -28,6 +28,7 @@ die()
 }
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
+_positionals=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output="-"
 _arg_library=off
