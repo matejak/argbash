@@ -17,6 +17,8 @@ dnl vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set -- "-$rest" "$@"`
 dnl TODO: Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
+dnl TODO: Support custom error messages
+dnl TODO: Make positional args check optional
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -1198,9 +1200,9 @@ test ${#_positionals[@]} -lt ]],
 			[m4_do(
 				[dnl If we allow up to infinitely many args, we prepare the array for it.
 ],
-				[_OUR_ARGS=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
+				[_our_args=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
 ],
-				[for (( ii = 0; ii < _OUR_ARGS; ii++))
+				[for (( ii = 0; ii < _our_args; ii++))
 do
 _INDENT_()_positional_names+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
 done
