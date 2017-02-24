@@ -57,4 +57,4 @@ build/argbash.spec: rpm/argbash.spec.in $(SOURCE) build/md5-$(VERSION) build/md5
 	$(substitute)
 
 clean:
-	$(RM) build/*
+	$(RM) -r build/*

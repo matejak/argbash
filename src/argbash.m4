@@ -26,6 +26,19 @@ run_autom4te()
 	return $?
 }
 
+
+# TODO: Refactor to associative arrays as soon as the argbash online is sufficiently reliable
+# We don't use associative arrays due to old bash compatibility reasons
+autom4te_error_messages=(
+	'end of file in string'
+	'end of file in argument list'
+)
+# the %.s means "null format"
+argbash_error_response_stem=(
+	'You seem to have an unmatched square bracket on line %d:\n\t%s\n'
+	"You seem to have a '(' open parenthesis unmatched by a closing one somewhere above the line %d (%s)\n"
+)
+
 # $1: The error string
 # $2: The input (that caused the error)
 # $3: The number of the first line of the actual file input by the user
@@ -33,9 +46,17 @@ interpret_error()
 {
 	# print the error, smart stuff may follow
 	printf "%s\n" "$1"
-	local eof_lineno
-	eof_lineno="$(printf "%s" "$1" | grep 'end of file in string' | sed -e 's/.*:\([0-9]\+\).*/\1/')"
-	test -n "$eof_lineno" && printf "You seem to have an unmatched square bracket on line %d:\n\t%s\n" "$((eof_lineno - $3))" "$(printf '%s' "$2" | sed -n "$eof_lineno"p)"
+	local eof_lineno line_mentioned
+	for idx in "${!autom4te_error_messages[@]}"
+	do
+		eof_lineno="$(printf "%s" "$1" | grep -e "${autom4te_error_messages[$idx]}" | sed -e 's/.*:\([0-9]\+\).*/\1/')"
+		if test -n "$eof_lineno"
+		then
+			line_mentioned="$(printf '%s' "$2" | sed -n "$eof_lineno"p | tr -d '\n\r')"
+			printf "${argbash_error_response_stem[$idx]}" "$((eof_lineno - $3))" "$line_mentioned"
+		fi
+		eof_lineno=''
+	done
 }
 
 # The main function that generates the parsing script body

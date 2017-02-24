@@ -87,9 +87,9 @@ develop: $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
 	ln -s -r $(A_INIT) "$(ROOT)/$(PREFIX)/bin"
-	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 
 install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
