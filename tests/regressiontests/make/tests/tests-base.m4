@@ -28,6 +28,7 @@ ADD_TEST([test-more], [[
 	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x f\[o\]o ba,r,"
 	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa ba,r,"
 	$< LOO laa bus kus | grep -q "POS_S=LOO,POS_MORE=laa bus kus",
+	ERROR="namely: 'pos-arg' and 'pos-more'" $(REVERSE) $<
 ]])
 
 
@@ -125,6 +126,7 @@ ADD_TEST([test-infinity], [[
 
 ADD_TEST([test-infinity-nodefaults], [[
 	ERROR="require at least 2" $(REVERSE) $<
+	ERROR="namely: 'pos-arg' (2 times)" $(REVERSE) $<
 	$< 1 "2 3" | grep -q 'POS_S=1,2 3'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 ]])

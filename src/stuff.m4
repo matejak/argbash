@@ -179,7 +179,7 @@ m4_define([__CHECK_INTEGER_TYPE], [[m4_do(
 
 
 dnl
-dnl Blank args are totally ignored, use @&t@ to get over that --- @&t@ is a quadrigraph that expands to nothing in the later phase
+dnl Blank args to this macro are totally ignored, use @&t@ to get over that --- @&t@ is a quadrigraph that expands to nothing in the later phase
 dnl $1: How many indents
 dnl $2, $3, ...: What to put there
 m4_define([_JOIN_INDENTED], _CHECK_INTEGER_TYPE(1, [depth of indentation])[m4_do(
@@ -394,6 +394,7 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 ],
 	[m4_ifblank([$3], [m4_do(
 			[_A_POSITIONAL],
+			[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], 1)],
 			[m4_list_append([_POSITIONALS_MINS], 1)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], [])],
 		)], [m4_do(
@@ -447,6 +448,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[m4_pushdef([_min_argn], m4_default([$3], 0))],
 	[m4_define([_INF_ARGN], _min_argn)],
 	[m4_define([_INF_VARNAME], [_varname([$1])])],
+	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
 	[m4_list_append([_POSITIONALS_MINS], _min_argn)],
 	[m4_list_append([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
 	[dnl If there are more than 3 args to this macro, add more stuff to defaults
@@ -459,6 +461,14 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[m4_popdef([_min_argn])],
 	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
+
+
+dnl
+dnl $1: The name
+dnl $2: How many times has the argument be repeated
+m4_define([_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS], _CHECK_INTEGER_TYPE(2, [the repetition amount])[m4_case([$2],
+	0, [], 1, [m4_list_append([_POSITIONALS_REQUIRED], ['$1'])],
+	[m4_list_append([_POSITIONALS_REQUIRED], ['$1' ($2 times)])])])
 
 
 dnl
@@ -488,6 +498,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 ],
 	[m4_if(_min_argn, [$3], , [_A_POSITIONAL_VARNUM])],
 	[m4_list_append([_POSITIONALS_MINS], _min_argn)],
+	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
 	[m4_list_append([_POSITIONALS_MAXES], [$3])],
 	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
 ],
@@ -1191,10 +1202,18 @@ done]],
 			[# Now check that we didn't receive more or less of positional arguments than we require.],
 		)],
 		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
-		[[@:}@
-test ${#_positionals[@]} -lt ]],
+		[dnl TODO: Determine mandatory positional args since they are useful as error messages
+],
+		[@:}@
+],
+		[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
+],
+		[[test ${#_positionals[@]} -lt ]],
 		[_POSITIONALS_MIN],
-		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]_NARGS_SPEC[, but got only ${#_positionals[@]}." 1
+		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
+		[_NARGS_SPEC],
+		[ (namely: $_required_args_string)],
+		[[, but got only ${#_positionals[@]}." 1
 ]],
 		[IF_POSITIONALS_INF(
 			[m4_do(
@@ -1216,6 +1235,7 @@ done
 				[_POSITIONALS_MAX],
 				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 				[_NARGS_SPEC],
+				[ (namely: $_required_args_string)],
 				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
 				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
