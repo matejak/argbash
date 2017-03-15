@@ -72,7 +72,8 @@ do
 done
 
 _positional_names=('_arg_input' )
-test ${#_positionals[@]} -lt 1 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1, but got only ${#_positionals[@]}." 1
+_required_args_string="'input'"
+test ${#_positionals[@]} -lt 1 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: $_required_args_string), but got only ${#_positionals[@]}." 1
 _our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
 for (( ii = 0; ii < _our_args; ii++))
 do
