@@ -373,7 +373,7 @@ m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
 
-dnl 
+dnl
 dnl $1 - the variable where the argument value is collected
 m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED],
 	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
@@ -927,7 +927,7 @@ m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 			[shift]),
 		[fi],]),
 	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -941,7 +941,7 @@ m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
 	[_val="@S|@2"],
 	[shift],
 	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -965,7 +965,7 @@ m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
 	 [_INDENT_()[_val="$_val2"]]])]),
 	[fi],
 	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -990,6 +990,23 @@ dnl  - equals only: Add '=*',
 dnl  - both: Add '|--option=*'.
 
 
+dnl
+dnl $1: The name of the option arg
+dnl $2: The value of the option arg
+dnl Uses:
+dnl _key - the run-time shell variable
+dnl _key - the run-time shell variable
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH], [m4_do(
+	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
+)])
+
+
+dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
+	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key}"m4_ifnblank([$2], [ "$2"]))])],
+)])
+
+
 dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
@@ -1000,6 +1017,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl BOTH
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
@@ -1009,6 +1028,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl SPACE
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([])],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
@@ -1017,6 +1038,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl EQUALS
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
@@ -1084,23 +1107,6 @@ _INDENT_(2,	)],
 		)],
 	)],
 	[_INDENT_(3);;],
-)])
-
-
-dnl
-dnl $1: The name of the option arg
-dnl $2: The value of the option arg
-dnl Uses:
-dnl _key - the run-time shell variable
-dnl _key - the run-time shell variable
-m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH], [m4_do(
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
-)])
-
-
-dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
-m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key}"m4_ifnblank([$2], [ "$2"]))])],
 )])
 
 
@@ -1228,8 +1234,8 @@ done]],
 			)])],
 		)])],
 		[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
-			[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT, 
-			[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]], 
+			[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
+			[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
 			[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
 		[dnl TODO: Determine mandatory positional args since they are useful as error messages
 ],

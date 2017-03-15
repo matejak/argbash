@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 version=2.3.0
 # ARG_POSITIONAL_SINGLE([output],[Name of the output template],["-"])
 # ARG_OPTIONAL_INCREMENTAL([separate],[s],[Separate the parsing logic (specify two times for complete separation)])
