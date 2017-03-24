@@ -43,16 +43,18 @@ do
 	_key="$1"
 	case "$_key" in
 		-o*|--output|--output=*)
-			_val="${_key##--output=}"
-			_val2="${_key##-o}"
-			if test "$_val" = "$_key"
+			_val_from_long="${_key##--output=}"
+			_val_from_short="${_key##-o}"
+			if test "$_val_from_long" != "$_key"
 			then
+				_val="$_val_from_long"
+			elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"
+			then
+				_val="$_val_from_short"
+			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
-			elif test "$_val2" != "$_key" -a -n "$_val2"
-			then
-				_val="$_val2"
 			fi
 			_arg_output="$_val"
 			;;
@@ -72,7 +74,8 @@ do
 done
 
 _positional_names=('_arg_input' )
-test ${#_positionals[@]} -lt 1 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1, but got only ${#_positionals[@]}." 1
+_required_args_string="'input'"
+test ${#_positionals[@]} -lt 1 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: $_required_args_string), but got only ${#_positionals[@]}." 1
 _our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
 for (( ii = 0; ii < _our_args; ii++))
 do

@@ -40,7 +40,7 @@ _arg_debug=
 print_help ()
 {
 	echo "Argbash is an argument parser generator for Bash."
-	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [--(no-)check-typos] [--(no-)commented] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
+	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [--(no-)check-typos] [-c|--(no-)commented] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
 	printf "\t%s\n" "<input>: The input template file (pass '-' for stdout)"
 	printf "\t%s\n" "-o,--output: Name of the output file (pass '-' for stdout) (default: '"-"')"
 	printf "\t%s\n" "--library,--no-library: Whether the input file if the pure parsing library. (off by default)"
@@ -58,16 +58,18 @@ do
 	_key="$1"
 	case "$_key" in
 		-o*|--output|--output=*)
-			_val="${_key##--output=}"
-			_val2="${_key##-o}"
-			if test "$_val" = "$_key"
+			_val_from_long="${_key##--output=}"
+			_val_from_short="${_key##-o}"
+			if test "$_val_from_long" != "$_key"
 			then
+				_val="$_val_from_long"
+			elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"
+			then
+				_val="$_val_from_short"
+			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
-			elif test "$_val2" != "$_key" -a -n "$_val2"
-			then
-				_val="$_val2"
 			fi
 			_arg_output="$_val"
 			;;
@@ -86,16 +88,18 @@ do
 			test "${1:0:5}" = "--no-" && _arg_commented="off"
 			;;
 		-I*|--search|--search=*)
-			_val="${_key##--search=}"
-			_val2="${_key##-I}"
-			if test "$_val" = "$_key"
+			_val_from_long="${_key##--search=}"
+			_val_from_short="${_key##-I}"
+			if test "$_val_from_long" != "$_key"
 			then
+				_val="$_val_from_long"
+			elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"
+			then
+				_val="$_val_from_short"
+			else
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
-			elif test "$_val2" != "$_key" -a -n "$_val2"
-			then
-				_val="$_val2"
 			fi
 			_arg_search+=("$_val")
 			;;

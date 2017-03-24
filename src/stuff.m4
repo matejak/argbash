@@ -759,7 +759,7 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 		[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
 			[ @<:@],
 			[m4_case(_arg_type,
-				[bool], [--(no-)]_argname,
+				[bool], [_ARG_FORMAT([(no-)]_argname, _arg_short)],
 				[arg], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
 				[repeated], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
 				[_ARG_FORMAT(_argname, _arg_short)])],
@@ -924,19 +924,50 @@ dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
 dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_BOTH], [_JOIN_INDENTED(3,
+m4_define([_VAL_OPT_ADD_BOTH],
+	[m4_ifnblank([$2],
+		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_BOTH_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
+		[_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_BOTH_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
+	[_val_from_long="${_key##--[$1]=}"],
+	[_val_from_short="${_key##-$2}"],
+	[if test "$_val_from_long" != "$_key"],
+	[then],
+	[_INDENT_()[_val="$_val_from_long"]],
+	[elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
+	[then],
+	[_INDENT_()[_val="$_val_from_short"]],
+	[else],
+	_INDENT_MORE(
+		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+		[_val="@S|@2"],
+		[shift]),
+	[fi],
+	[$3],
+	[_ADD_OPTS_VALS([$4], $[$4])],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (not used here)
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
 	[_val="${_key##--[$1]=}"],
-	m4_ifnblank([$2], [_IF_CLUSTERING_GETOPT([[[_val2="${_key##-$2}"]]])]),
 	[if test "$_val" = "$_key"],
 	[then],
 	_INDENT_MORE(
 		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 		[_val="@S|@2"],
 		[shift]),
-	m4_ifnblank([$2], [_IF_CLUSTERING_GETOPT(
-	[[[elif test "$_val2" != "$_key" -a -n "$_val2"]],
-	 [[then]],
-	 [_INDENT_()[_val="$_val2"]]])]),
 	[fi],
 	[$3],
 	[_ADD_OPTS_VALS([$4], $[$4])],

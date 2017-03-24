@@ -204,6 +204,10 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
 	$(REVERSE) $< LOO 2> /dev/null
+	$< -h | grep -q -e '-o\>'
+	$< -h | grep -q -e '-r\>'
+	$< -h | grep -q -e '-i\>'
+	$< -h | grep -q -e '-B\>'
 
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)

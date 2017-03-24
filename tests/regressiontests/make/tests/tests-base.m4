@@ -55,6 +55,10 @@ ADD_TEST([test-onlyopt], [[
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
 	$(REVERSE) $< LOO 2> /dev/null
+	$< -h | grep -q -e '-o\>'
+	$< -h | grep -q -e '-r\>'
+	$< -h | grep -q -e '-i\>'
+	$< -h | grep -q -e '-B\>'
 ]])
 
 ADD_SCRIPT([test-standalone2])
