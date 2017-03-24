@@ -1,5 +1,9 @@
-2.3.1 (TBA)
+2.4.0a (2017-03-24)
 ------------------
+
+New features:
+
+* Implemented getopt-like behavior (so e.g. `-gIinclude` equals to `-g -I include`).
 
 Bugfixes:
 
@@ -9,6 +13,7 @@ Bugfixes:
 ------------------
 
 New features:
+
 * Behavior that raises an error when a script argument's value looks like option - enabled by the `ARG_RESTRICT_VALUES`.
 
 New minor features:

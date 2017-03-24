@@ -151,7 +151,6 @@ Limitations
 
   Please read this carefuly.
 
-#. Clustering of short arguments (e.g. using ``-xzf`` instead of ``-x -z -f``) is not supported.
 #. The square brackets in your script should match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``).
    More precisely, the number of closing square brackets ``]`` must not exceed the number of opening ``[``.
    This limitation does apply to files that are processed by ``argbash`` --- you are fine if you have the argument parsing code in a separate file and you :ref:`don't use <usage_manual>` the ``INCLUDE_PARSING_CODE`` macro.

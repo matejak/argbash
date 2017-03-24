@@ -479,23 +479,25 @@ test-getopt-both: $(TESTDIR)/test-getopt-both.sh
 	$< -Bio bu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
 	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
 	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
-	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
+	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
 
 test-getopt-space: $(TESTDIR)/test-getopt-space.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
-	$< -Bi | grep 'OPT_INCR=1,' | grep -q 'BOOL=on,'
-	$< -Bio bu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
-	$< -Biobu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
-	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=0,' | grep -q 'OPT_S=ibu,'
-	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
+	$< --incrx -ii | grep -q 'OPT_INCR=5,'
+	$< -Bi | grep 'OPT_INCR=3,' | grep -q 'BOOL=on,'
+	$< -Bio bu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
+	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
 
 test-getopt-equals: $(TESTDIR)/test-getopt-equals.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
-	$< -Bi | grep 'OPT_INCR=1,' | grep -q 'BOOL=on,'
-	$< -Bio bu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
-	$< -Biobu | grep 'OPT_INCR=1,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
-	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=0,' | grep -q 'OPT_S=ibu,'
-	ERROR="no option '-f' and '-B' doesn't accept value" $(REVERSE) $< -Bfoo
+	$< --incrx -ii | grep -q 'OPT_INCR=5,'
+	$< -Bi | grep 'OPT_INCR=3,' | grep -q 'BOOL=on,'
+	$< -Bio bu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
+	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
+	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
 
 tests-gen: $(TESTS_GEN)
 

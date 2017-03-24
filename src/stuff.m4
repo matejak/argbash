@@ -907,25 +907,47 @@ m4_define([_MAKE_HELP], [m4_do(
 )])
 
 
-
 dnl
 dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
-dnl $3: Action
+dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_SPACE],
+	[m4_ifnblank([$2],
+		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_SPACE_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
+		[_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
+
+
 dnl
-dnl .. note::
-dnl    If the equal-delimited option has a short version, we allow space-delimited short option and value
-m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
-	[_val="${_key##--[$1]=}"],
-	m4_ifnblank([$2],
-		[[if test "$_key" = "-$2"],
-		[then],
-		_INDENT_MORE(
-			[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-			[_val="@S|@2"],
-			[shift]),
-		[fi],]),
+dnl $1: Arg name
+dnl $2: Short arg name
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_SPACE_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
+	[_val_from_short="${_key##-$2}"],
+	[if test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
+	[then],
+	[_INDENT_()[_val="$_val_from_short"]],
+	[else],
+	_INDENT_MORE(
+		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+		[_val="@S|@2"],
+		[shift]),
+	[fi],
+	[$3],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (not used here)
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
+	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+	[_val="@S|@2"],
+	[shift],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
@@ -934,12 +956,53 @@ m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 dnl
 dnl $1: Arg name
 dnl $2: Short arg name (if applicable)
-dnl $3: Action
+dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
-	[test @S|@# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-	[_val="@S|@2"],
-	[shift],
+m4_define([_VAL_OPT_ADD_EQUALS],
+	[m4_ifnblank([$2],
+		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_EQUALS_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
+		[_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (not used here)
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
+	[_val="${_key##--[$1]=}"],
+	[if test "$_val" = "$_key"],
+	[then],
+	_INDENT_MORE(
+		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+		[_val="@S|@2"],
+		[shift]),
+	[fi],
+	[$3],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name
+dnl $3: Action - the variable containing the value to assign is '_val'
+dnl $4: The name of the option arg
+m4_define([_VAL_OPT_ADD_EQUALS_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
+	[_val_from_long="${_key##--[$1]=}"],
+	[_val_from_short="${_key##-$2}"],
+	[if test "$_val_from_long" != "$_key"],
+	[then],
+	[_INDENT_()[_val="$_val_from_long"]],
+	[elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
+	[then],
+	[_INDENT_()[_val="$_val_from_short"]],
+	[else],
+	_INDENT_MORE(
+		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+		[_val="@S|@2"],
+		[shift]),
+	[fi],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
@@ -977,7 +1040,7 @@ m4_define([_VAL_OPT_ADD_BOTH_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
 		[shift]),
 	[fi],
 	[$3],
-	[_ADD_OPTS_VALS([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -1113,7 +1176,7 @@ _INDENT_(2,	)],
 ],
 	[dnl Output the body of the case
 ],
-	[dnl _ADD_OPTS_VALS: If the arg comes from wrapped script/template, save it in an array
+	[dnl _APPEND_WRAPPED_ARGUMENT_TO_ARRAY: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD([$1], [$2], [[$5="$_val"]], [$5])ADD_OPT_VALUE_VALIDATION([$_key], [$_val])],
@@ -1419,27 +1482,15 @@ dnl
 dnl Make some utility stuff.
 dnl Those include the die function as well as optional validators
 m4_define([_MAKE_UTILS], [m4_do(
-	[_COMM_BLOCK(0,
-		[# When called, the process ends.],
-		[# Args:],
-		[# _INDENT_()@S|@1: The exit message (print to stderr)],
-		[# _INDENT_()@S|@2: The exit code (default is 1)],
-		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
-		[# Example:],
-		[# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
-	)],
-	[[die()
-{
-]],
-	[_JOIN_INDENTED(1,
-		[local _ret=$[]2],
-		[test -n "$_ret" || _ret=1],
-		[test "$_PRINT_HELP" = yes && print_help >&2],
-		[echo "$[]1" >&2],
-		[exit ${_ret}])],
-	[}
+	[_MAKE_DIE_FUNCTION
+
 ],
-	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION])],
+	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION]
+
+)],
+	[_IF_CLUSTERING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
+
+)],
 	[_PUT_VALIDATORS],
 )])
 
@@ -1480,14 +1531,18 @@ m4_define([_ARGBASH_ID],
 	[### START OF CODE GENERATED BY Argbash v]_ARGBASH_VERSION[ one line above ###])
 
 
+m4_define([DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
+	[m4_if(m4_cmp(0, m4_list_len([_POSITIONALS_MINS])), 1,
+		m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], [m4_list_sum(_POSITIONALS_MINS)]))])
+
+
 dnl $1: The macro call (the caller is supposed to pass [$0($@)])
 dnl What is also part of the API: The line
 dnl ### START OF CODE GENERATED BY Argbash vx.y.z one line above ###
 m4_define([ARGBASH_GO_BASE], [m4_do(
 	[[$1
 ]],
-	[m4_if(m4_cmp(0, m4_list_len([_POSITIONALS_MINS])), 1,
-		m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], [m4_list_sum(_POSITIONALS_MINS)]))],
+	[DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@
 ]],
 	[_ARGBASH_ID
@@ -1920,6 +1975,49 @@ dnl Output some text depending on what strict mode we find ourselves in
 m4_define([_IF_RESTRICT_VALUES], [_CASE_RESTRICT_VALUES([$2], [$1], [$1])])
 
 
+m4_define([_MAKE_DIE_FUNCTION], [m4_do(
+	[_COMM_BLOCK(0,
+		[# When called, the process ends.],
+		[# Args:],
+		[# _INDENT_()@S|@1: The exit message (print to stderr)],
+		[# _INDENT_()@S|@2: The exit code (default is 1)],
+		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
+		[# Example:],
+		[# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
+	)],
+	[[die()
+{
+]],
+	[_JOIN_INDENTED(1,
+		[local _ret=$[]2],
+		[test -n "$_ret" || _ret=1],
+		[test "$_PRINT_HELP" = yes && print_help >&2],
+		[echo "$[]1" >&2],
+		[exit ${_ret}])],
+	[}],
+)])
+
+
+m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Function that evaluates whether a value passed to it],
+		[# begins by a character that is a short option of an accepted argument],
+		[# ],
+	)],
+	[begins_with_short_option()
+{
+],
+	[_JOIN_INDENTED(1,
+		[local first_option all_short_options],
+		[all_short_options='m4_list_join([_ARGS_SHORT], [])'],
+		[first_option="${1:0:1}"],
+		[test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0],
+)],
+	[}
+],
+)])
+
+
 m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that evaluates whether a value passed to an argument],
@@ -1973,7 +2071,12 @@ dnl and the rest is processed the next time.
 dnl
 dnl $1: The short option
 m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
-	[_IF_CLUSTERING_GETOPT([[[_next="${_key##-$1}"]], [[test -n "$_next" && test "$_next" != "$_key" && shift && set -- "-$1" "-${_next}" "@S|@@"]]])],
+	[_IF_CLUSTERING_GETOPT(
+		[[[_next="${_key##-$1}"]],
+		[[if test -n "$_next" -a "$_next" != "$_key"]],
+		[[then]],
+		[_INDENT_()[begins_with_short_option "$_next" && shift && set -- "-$1" "-${_next}" "@S|@@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."]],
+		[[fi]]])],
 )])])
 
 
