@@ -269,22 +269,32 @@ m4_define([_sh_quote], [m4_do(
 
 dnl
 dnl $1: Argument name
-dnl $2: Argument type (OPT or POS)
+dnl $2: The variable name that would hold the argument value
 dnl Check whether an argument has not (long or short) options that conflict with already defined args.
 dnl Also writes the argname to the right set
 m4_define([_CHECK_ARGNAME_FREE], [m4_do(
-	[m4_pushdef([_TLIT], m4_dquote(_translit_var([$1])))],
-	[m4_set_contains([_ARGS_LONG], _TLIT,
+	[m4_set_contains([_ARGS_LONG], [$2],
 		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a long option used earlier.])])])],
-	[m4_set_contains([_POSITIONALS], _TLIT,
+	[m4_set_contains([_POSITIONALS], [$2],
 		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a positional argument name used earlier.])])])],
-	[m4_set_add(m4_case([$2],
-			[OPT], [[_ARGS_LONG]],
-			[POS], [_POSITIONALS],
-			[m4_fatal([Unknown argument type '$2'])]),
-		_TLIT)],
-	[m4_popdef([_TLIT])],
 )])
+
+
+m4_define([_CHECK_POSITIONAL_ARGNAME_IS_FREE], [m4_do(
+	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
+	[_CHECK_ARGNAME_FREE([$1], _ARG_VAR_NAME)],
+	[m4_set_add([_POSITIONALS], _ARG_VAR_NAME)],
+	[m4_popdef([_ARG_VAR_NAME])],
+)])
+
+
+m4_define([_CHECK_OPTIONAL_ARGNAME_IS_FREE], [m4_do(
+	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
+	[_CHECK_ARGNAME_FREE([$1], _ARG_VAR_NAME)],
+	[m4_set_add([_ARGS_LONG], _ARG_VAR_NAME)],
+	[m4_popdef([_ARG_VAR_NAME])],
+)])
+
 
 
 m4_define([_some_opt], [m4_do(
@@ -302,14 +312,13 @@ dnl $3: Help string
 dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
 m4_define([__some_opt], [m4_do(
+	[_CHECK_OPTIONAL_ARGNAME_IS_FREE([$1])],
+	[_OPT_WRAPPED(_varname([$1]))],
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
 		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
 	)])],
 	[m4_list_append([_ARGS_LONG], [$1])],
-	[dnl Check whether we didn't already use the arg, if not, add its tranliteration to the list of used ones
-],
-	[_CHECK_ARGNAME_FREE([$1], [OPT])],
 	[m4_list_append([_ARGS_SHORT], [$2])],
 	[m4_set_contains([_ARGS_SHORT], [$2],
 		[m4_ifnblank([$2], [m4_fatal([The short option '$2' is already used.])])],
@@ -317,16 +326,15 @@ m4_define([__some_opt], [m4_do(
 	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
 	[m4_list_append([_ARGS_CATH], [$5])],
-	[m4_define([_NARGS], m4_eval(_NARGS + 1))],
+	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
 )])
 
-dnl Number of distinct optional args the script can accept
-m4_define([_NARGS], 0)
-dnl Minimal number of positional args the script accepts
-m4_define([_POSITIONALS_MIN], 0)
+m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], 0)
+dnl How many values of positional arguments is the generated script required to receive when called.
+m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], 0)
 dnl Greatest number of positional args the script can accept (infinite number of args is handled in parallel)
-m4_define([_POSITIONALS_MAX], 0)
-dnl We expect infinitely many args (keep in mind that we still need _POSITIONALS_MAX)
+m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], 0)
+dnl We expect infinitely many args (keep in mind that we still need _HIGHEST_POSITIONAL_VALUES_COUNT)
 m4_define([_POSITIONALS_INF], 0)
 
 
@@ -365,12 +373,30 @@ m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
 
-dnl $1 is not quoted on purpose - it is already handled (i.e. quoted) by the caller
-m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED], [m4_do(
-		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
-		[m4_set_add([_POS_VARNAMES], m4_expand([_args_prefix[]_translit_var(WRAPPED)[]_pos_suffix]))],
-		[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([_args_prefix[]_translit_var(WRAPPED)[]_pos_suffix+=([$1])]))],
-)])])
+dnl
+dnl $1 - the variable where the argument value is collected
+m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED],
+	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+)])
+
+m4_define([__POS_WRAPPED], [m4_do(
+	[m4_set_add([_POS_VARNAMES], m4_expand([[$2]_pos_suffix]))],
+	[m4_list_append([_WRAPPED_ADD_SINGLE], m4_expand([[$2]_pos_suffix+=([$1])]))],
+	[__ANY_WRAPPED([$2])],
+)])
+
+m4_define([_OPT_WRAPPED], [m4_ifdef([WRAPPED],
+	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+)])
+
+m4_define([__OPT_WRAPPED], [m4_do(
+	[m4_define([_COLLECT_$1],  [$2]_opt_suffix)],
+	[__ANY_WRAPPED([$2])],
+)])
+
+m4_define([__ANY_WRAPPED], [m4_do(
+	[m4_set_add([_ARGS_GROUPS], [$1])],
+)])
 
 dnl
 dnl Declare one positional argument with default
@@ -386,10 +412,11 @@ argbash_api([ARG_POSITIONAL_SINGLE], [m4_do(
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED("${_varname([$1])}")],
 	[dnl Number of possibly supplied positional arguments just went up
 ],
-	[m4_define([_POSITIONALS_MAX], m4_incr(_POSITIONALS_MAX))],
+	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_incr(_HIGHEST_POSITIONAL_VALUES_COUNT))],
 	[dnl If we don't have default, also a number of positional args that are needed went up
 ],
 	[m4_ifblank([$3], [m4_do(
@@ -408,7 +435,6 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
 	[dnl Here, the _sh_quote actually does not ensure that the default is NOT BLANK!
 ],
-	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
 
@@ -436,6 +462,7 @@ dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
@@ -457,9 +484,8 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[dnl vvv This has to be like this, additional args that are not required are handled differently
 ],
 	[m4_list_append([_POSITIONALS_MAXES], _min_argn)],
-	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + _min_argn))],
+	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + _min_argn))],
 	[m4_popdef([_min_argn])],
-	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
 
@@ -486,8 +512,9 @@ argbash_api([ARG_POSITIONAL_MULTI], [m4_do(
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
 	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
-	[m4_define([_POSITIONALS_MAX], m4_eval(_POSITIONALS_MAX + [$3]))],
+	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + [$3]))],
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
 	[m4_list_append([_POSITIONAL_CATHS], [more])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
@@ -505,7 +532,6 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[m4_list_append([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
 	[m4_if(m4_cmp($#, 3), 1, [m4_list_append([_$1_DEFAULTS], m4_shiftn(3, $@))])],
 	[m4_popdef([_min_argn])],
-	[_CHECK_ARGNAME_FREE([$1], [POS])],
 )])
 
 
@@ -817,7 +843,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
-	[m4_if(_NARGS, 0, [], [m4_lists_foreach(
+	[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, [], [m4_lists_foreach(
 		[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
 		[_argname,_arg_short,_arg_type,_default,_arg_help],
 		[m4_ifnblank(_arg_help, [m4_do(
@@ -901,7 +927,7 @@ m4_define([_VAL_OPT_ADD_EQUALS], [_JOIN_INDENTED(3,
 			[shift]),
 		[fi],]),
 	[$3],
-	[_ADD_OPTS_VALS([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -915,7 +941,7 @@ m4_define([_VAL_OPT_ADD_SPACE], [_JOIN_INDENTED(3,
 	[_val="@S|@2"],
 	[shift],
 	[$3],
-	[_ADD_OPTS_VALS([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -970,7 +996,7 @@ m4_define([_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
 		[shift]),
 	[fi],
 	[$3],
-	[_ADD_OPTS_VALS([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -995,6 +1021,23 @@ dnl  - equals only: Add '=*',
 dnl  - both: Add '|--option=*'.
 
 
+dnl
+dnl $1: The name of the option arg
+dnl $2: The value of the option arg
+dnl Uses:
+dnl _key - the run-time shell variable
+dnl _key - the run-time shell variable
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH], [m4_do(
+	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
+)])
+
+
+dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
+	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key}"m4_ifnblank([$2], [ "$2"]))])],
+)])
+
+
 dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
@@ -1005,6 +1048,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl BOTH
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
@@ -1014,6 +1059,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl SPACE
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([])],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
@@ -1022,6 +1069,8 @@ m4_define([_SET_OPTION_DELIMITER],
 			[dnl EQUALS
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
+			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
+				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
@@ -1072,7 +1121,7 @@ _INDENT_(2,	)],
 		[bool],
 		[_JOIN_INDENTED(3,
 			[[$5="on"]],
-			[_ADD_OPTS_VALS([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 			_PASS_WHEN_GETOPT([$2]),
 			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
@@ -1080,7 +1129,7 @@ _INDENT_(2,	)],
 		[_JOIN_INDENTED(3,
 			[[$5=$(($5 + 1))]],
 			_PASS_WHEN_GETOPT([$2]),
-			[_ADD_OPTS_VALS([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 		)],
 		[action],
 		[_JOIN_INDENTED(3,
@@ -1089,20 +1138,6 @@ _INDENT_(2,	)],
 		)],
 	)],
 	[_INDENT_(3);;],
-)])
-
-
-dnl
-dnl $1: The name of the option arg
-dnl $2: The value of the option arg
-dnl Uses:
-dnl _key - the run-time shell variable
-m4_define([_ADD_OPTS_VALS], [m4_do(
-	[dnl If the arg comes from wrapped script/template, save it in an array
-],
-	[dnl Strip everything after the first = sign (= the optionwithout value)
-],
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
 )])
 
 
@@ -1147,7 +1182,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 		], [m4_fatal([Unknown case when handling delimiters])]),
 	)],
 	[_INDENT_()[case "$_key" in]],
-	[dnl We don't do this if _NARGS == 0
+	[dnl We don't do this if _DISTINCT_OPTIONAL_ARGS_COUNT == 0
 ],
 	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
 		[_OPTS_VALS_LOOP_BODY(_argname, _arg_short, _arg_type, _default, _varname(_argname))])],
@@ -1187,7 +1222,7 @@ m4_define([_EVAL_POSITIONALS_FOR],
 	[_INDENT_()[_positionals+=("$][1")]])
 
 
-m4_define([_MAKE_EVAL], [m4_do(
+m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
 	[# THE PARSING ITSELF
 ],
 	[while test $[]# -gt 0
@@ -1229,20 +1264,23 @@ done]],
 				)])],
 			)])],
 		)])],
-		[_COMM_BLOCK(0,
-			[# Now check that we didn't receive more or less of positional arguments than we require.],
-		)],
-		[m4_pushdef([_NARGS_SPEC], IF_POSITIONALS_INF([[at least ]_POSITIONALS_MIN], m4_if(_POSITIONALS_MIN, _POSITIONALS_MAX, [[exactly _POSITIONALS_MIN]], [[between _POSITIONALS_MIN and _POSITIONALS_MAX]])))],
+		[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
+			[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
+			[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
+			[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
 		[dnl TODO: Determine mandatory positional args since they are useful as error messages
 ],
 		[@:}@
 ],
+		[_COMM_BLOCK(0,
+			[# Now check that we didn't receive more or less of positional arguments than we require.],
+		)],
 		[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
 ],
 		[[test ${#_positionals[@]} -lt ]],
-		[_POSITIONALS_MIN],
+		[_MINIMAL_POSITIONAL_VALUES_COUNT],
 		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
-		[_NARGS_SPEC],
+		[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 		[ (namely: $_required_args_string)],
 		[[, but got only ${#_positionals[@]}." 1
 ]],
@@ -1262,17 +1300,16 @@ done
 			[m4_do(
 				[dnl If we allow up to infinitely many args, there is no point in warning about too many args.
 ],
-				[[test ${#_positionals[@]} -gt ]],
-				[_POSITIONALS_MAX],
+				[[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
-				[_NARGS_SPEC],
+				[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 				[ (namely: $_required_args_string)],
 				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
 				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 ]],
 			)])],
-		[m4_popdef([_NARGS_SPEC])],
+		[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
 		[_COMM_BLOCK(0,
 			[# Take arguments that we have received, and save them in variables of given names.],
 			[# The 'eval' command is needed as the name of target variable is saved into another variable.],
@@ -1450,7 +1487,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[[$1
 ]],
 	[m4_if(m4_cmp(0, m4_list_len([_POSITIONALS_MINS])), 1,
-		m4_define([_POSITIONALS_MIN], [m4_list_sum(_POSITIONALS_MINS)]))],
+		m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], [m4_list_sum(_POSITIONALS_MINS)]))],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@
 ]],
 	[_ARGBASH_ID
@@ -1467,7 +1504,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ],
 		[_MAKE_HELP
 ],
-		[_MAKE_EVAL
+		[_MAKE_VALUES_ASSIGNMENTS
 ],
 	)])],
 	[_MAKE_OTHER

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-m4_pattern_allow([ARGBASH_SET_DELIM])
 version=_ARGBASH_VERSION
 # ARG_POSITIONAL_SINGLE([output], [Name of the output template], "-")
 # ARG_OPTIONAL_INCREMENTAL([separate], s, [Separate the parsing logic (specify two times for complete separation)])
@@ -117,7 +116,7 @@ do_args_footer()
 do_script_assisted()
 {
 	do_header script
-	
+
 	echo "# DEFINE_SCRIPT_DIR()"
 	echo "# INCLUDE_PARSING_CODE([$(basename "${parse_fname_stem}.sh")])"
 	echo "# ARGBASH_GO"
@@ -130,11 +129,11 @@ do_script_bare()
 {
 	do_header script
 	parse_fname=${parse_fname_stem}.sh
-	
+
 	echo "# Run 'argbash --library \"$parse_fname\" -o \"$parse_fname\""
 	echo 'script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"'
 	echo '. "${script_dir}/'"$(basename "$parse_fname")\" || { echo \"Couldn't find '$(basename "$parse_fname")' parsing library in the '"'$script_dir'"' directory\"; exit 1; }"
-	echo 
+	echo
 
 	do_body
 }
@@ -176,9 +175,9 @@ if test "$outfname" = '-'
 then
 	do_stuff 'script'
 else
-	if test "$_arg_separate" = 0 
+	if test "$_arg_separate" = 0
 	then
-		do_stuff 'script' > "$outfname" 
+		do_stuff 'script' > "$outfname"
 	else
 		parse_fname_stem="$(echo "${outfname}" | sed -e 's/\.\(sh\|m4\)$//')-parsing"
 
@@ -188,7 +187,7 @@ else
 		then
 			do_stuff 'lib' > "${parse_fname_stem}.m4"
 			do_script_assisted > "$outfname"
-		else 
+		else
 			test "$_arg_separate" = 2 || echo "The greatest separation value is 2, got $_arg_separate" >&2
 			do_stuff 'lib'  > "${parse_fname_stem}.m4"
 			do_script_bare > "$outfname"
