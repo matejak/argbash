@@ -228,6 +228,13 @@ test-ddash: $(TESTDIR)/test-ddash.sh
 test-simple: $(TESTDIR)/test-simple.sh
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
 	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< -h | grep -q 'END-$$'
+	$< -h | grep -q '^\s*-BEGIN'
+	$< -h | grep -q '^		-BEGIN'
+	$< -h | grep -q -v '^\s*-BEGIN2'
+	$< -h | grep -q -v 'END2-$$'
+	$< -h | grep -q '^		-PBEGIN'
+	$< -h | grep -q 'PEND-$$'
 	ERROR=spurious 	$(REVERSE) $< -- one two
 	ERROR="last one was: 'two'" 	$(REVERSE) $< one two
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two

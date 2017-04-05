@@ -47,6 +47,11 @@ m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
 m4_define([_argbash_persistent], [m4_set_add([_KNOWN_MACROS],[$1])m4_define([$1], [$2])])
 dnl IDEA: Assemble a whitelist of macros used in the script, then grep the source and report all suspicious strings that resemble misspelled argbash macros
 
+dnl
+dnl $1: The text to substitute
+dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
+m4_define([_SUBSTITUTE_LF_FOR_NEWLINE], [m4_bpatsubst([[$1]], [\([^\\]\)\(\\\\\)*\\n],  [\1\2
+		])])
 
 dnl
 dnl Checks that the n-th argument is an integer.
@@ -831,7 +836,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 			[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 			[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-			[_INDENT_()[printf "\t%s\n" "]argname[: ]_msg],
+			[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE(_msg)],
 			[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
 			[m4_popdef([argname])],
 			[m4_popdef([argname1])],
@@ -858,7 +863,7 @@ m4_define([_MAKE_HELP], [m4_do(
 			[dnl Bool have a long beginning with --no-
 ],
 			[m4_case(_arg_type, [bool], [,--no-]_argname)],
-			[: _arg_help],
+			[: _SUBSTITUTE_LF_FOR_NEWLINE(_arg_help)],
 			[dnl Actions don't have defaults
 ],
 			[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
