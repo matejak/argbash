@@ -166,9 +166,7 @@ do
 done
 
 _positional_names=('_arg_output' )
-_required_args_string=""
-test ${#_positionals[@]} -lt 0 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require between 0 and 1 (namely: $_required_args_string), but got only ${#_positionals[@]}." 1
-test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect between 0 and 1 (namely: $_required_args_string), but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
+test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect between 0 and 1, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
 	eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1

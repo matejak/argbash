@@ -62,7 +62,7 @@ m4_define([_CHECK_INTEGER_TYPE],
 	__CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
 
 
-m4_define([_ARG_DEFAULTS_POS], [[no]])
+m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])
 
 
 dnl
@@ -301,11 +301,10 @@ m4_define([_CHECK_OPTIONAL_ARGNAME_IS_FREE], [m4_do(
 )])
 
 
-
 m4_define([_some_opt], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[_CHECK_SHORT_OPT_TYPE([$2], [$1])],
-	[m4_list_contains([BLACKLIST], [$1], , [__some_opt($@)])],
+	[m4_list_contains([BLACKLIST], [$1], , [__ADD_OPTIONAL_ARGUMENT($@)])],
 )])
 
 
@@ -316,7 +315,7 @@ dnl $2: Short option (opt)
 dnl $3: Help string
 dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
-m4_define([__some_opt], [m4_do(
+m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[_CHECK_OPTIONAL_ARGNAME_IS_FREE([$1])],
 	[_OPT_WRAPPED(_varname([$1]))],
 	[m4_ifdef([WRAPPED], [m4_do(
@@ -326,7 +325,7 @@ m4_define([__some_opt], [m4_do(
 	[m4_list_append([_ARGS_LONG], [$1])],
 	[m4_list_append([_ARGS_SHORT], [$2])],
 	[m4_set_contains([_ARGS_SHORT], [$2],
-		[m4_ifnblank([$2], [m4_fatal([The short option '$2' is already used.])])],
+		[m4_ifnblank([$2], [m4_fatal([The short option '$2' (in definition of '--$1') is already used.])])],
 		[m4_set_add([_ARGS_SHORT], [$2])])],
 	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
@@ -740,7 +739,7 @@ dnl $1: argname macro
 dnl $2: _arg_type
 dnl $3: _min_argn
 dnl $4: _defaults
-m4_define([_MAKE_DEFAULTS_MORE_MSG], [m4_do(
+m4_define([_FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS], [m4_do(
 	[m4_list_ifempty([$4], , [m4_do(
 		[[ @{:@defaults for ]$1(m4_incr([$3]))],
 		[m4_if(m4_list_len([$4]), 1, ,
@@ -761,15 +760,9 @@ m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 ],
 	[m4_case([$2],
 		[single],
-			[m4_if([$3], 0, [m4_do(
-				[ @{:@],
-				[default: '"],
-				[[$4]],
-				["'],
-				[@:}@],
-			)])],
-		[more], [_MAKE_DEFAULTS_MORE_MSG([$1], [$2], [$3], [$4])],
-		[inf], [_MAKE_DEFAULTS_MORE_MSG([$1], [$2], [$3], [$4])],
+			[m4_if([$3], 0, [[ @{:@default: '"$4"'@:}@]])],
+		[more], [_FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
+		[inf], [_FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 	[m4_fatal([$0: Unhandled arg type: '$2'])])],
 )])
 
@@ -777,8 +770,9 @@ m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 dnl
 dnl $1: _argname
 dnl $2: short arg
+dnl
 dnl Returns either --long or -l|--long if there is that -l
-m4_define([_ARG_FORMAT], [m4_do(
+m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE], [m4_do(
 	[m4_ifnblank([$2],
 		[-$2|])],
 	[[--$1]],
@@ -790,10 +784,10 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 		[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
 			[ @<:@],
 			[m4_case(_arg_type,
-				[bool], [_ARG_FORMAT([(no-)]_argname, _arg_short)],
-				[arg], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-				[repeated], [_ARG_FORMAT(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-				[_ARG_FORMAT(_argname, _arg_short)])],
+				[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
+				[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+				[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+				[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
 			[@:>@],
 		)])],
 	)],
@@ -1343,15 +1337,16 @@ done]],
 		[_COMM_BLOCK(0,
 			[# Now check that we didn't receive more or less of positional arguments than we require.],
 		)],
-		[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
+		[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [], [m4_do(
+			[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
 ],
-		[[test ${#_positionals[@]} -lt ]],
-		[_MINIMAL_POSITIONAL_VALUES_COUNT],
-		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
-		[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-		[ (namely: $_required_args_string)],
-		[[, but got only ${#_positionals[@]}." 1
-]],
+			[[test ${#_positionals[@]} -lt ]],
+			[_MINIMAL_POSITIONAL_VALUES_COUNT],
+			[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
+			[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
+			[ (namely: $_required_args_string)],
+			[[, but got only ${#_positionals[@]}." 1
+]])])],
 		[IF_POSITIONALS_INF(
 			[m4_do(
 				[dnl If we allow up to infinitely many args, we prepare the array for it.
@@ -1371,7 +1366,8 @@ done
 				[[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 				[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-				[ (namely: $_required_args_string)],
+				[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [], 
+					[ (namely: $_required_args_string)])],
 				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
 				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
@@ -1405,8 +1401,7 @@ dnl $2: _arg_type
 dnl $3: _min_argn
 dnl $4: _defaults
 dnl
-dnl Make defaults for arguments that possibly accept more than one value
-m4_define([_MAKE_DEFAULTS_MORE_VALS], [m4_do(
+m4_define([_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS], [m4_do(
 	[@{:@],
 	[dnl m4_for([foo], 1, 0) doesn't work
 ],
@@ -1436,15 +1431,15 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 ],
 		[m4_case([$2],
 			[single], [[$4]],
-			[more], [_MAKE_DEFAULTS_MORE_VALS([$1], [$2], [$3], [$4])],
-			[inf], [_MAKE_DEFAULTS_MORE_VALS([$1], [$2], [$3], [$4])],
+			[more], [_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
+			[inf], [_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 		)],
 		[
 ],
 	)], [m4_do(
 		[dnl Just initialize the variable with blank value
 ],
-		[m4_if(_ARG_DEFAULTS_POS, [yes], [_varname([$1])=
+		[m4_if(_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS, [yes], [_varname([$1])=
 ])],
 )])],
 )])
@@ -1950,7 +1945,7 @@ m4_define([_GET_VALUE_TYPE], [m4_do(
 dnl
 dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
 argbash_api([ARG_DEFAULTS_POS], [m4_do(
-	[m4_define([_ARG_DEFAULTS_POS], [[yes]])],
+	[m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[yes]])],
 )])
 
 
@@ -2100,8 +2095,8 @@ dnl * Help: optional args - value should take the name.
 dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
 dnl
 dnl defauls handling:
-dnl - X -> _MAKE_DEFAULTS -> _MAKE_DEFAULTS_POSITIONALS_LOOP -> _MAKE_DEFAULTS_MORE_VALS
-dnl - X -> _MAKE_HELP -> _POS_ARG_HELP_DEFAULTS -> _MAKE_DEFAULTS_MORE_MSG
+dnl - X -> _MAKE_DEFAULTS -> _MAKE_DEFAULTS_POSITIONALS_LOOP -> _MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS
+dnl - X -> _MAKE_HELP -> _POS_ARG_HELP_DEFAULTS -> _FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS
 
 dnl These macros are not needed and they present a security threat when exposed during Argbash run
 m4_undefine([m4_esyscmd])

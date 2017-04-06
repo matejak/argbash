@@ -3,11 +3,13 @@
 
 New features:
 
-* Implemented getopt-like behavior (so e.g. `-gIinclude` equals to `-g -I include`).
+* Implemented getopt-like behavior (so e.g. `-gIinclude` equals to `-g -I include` etc.).
+* Improved feedback in case of mismatch between expected / received arguments.
 
 Bugfixes:
 
 * Argbash-powered scripts with positional arguments can be sourced consecutively without having to manually perform variable reset.
+* Fixed issue #7 with newlines in help strings.
 
 2.3.0 (2017-02-07)
 ------------------
