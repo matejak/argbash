@@ -15,10 +15,8 @@ dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its hown
-dnl TODO: (maybe a bad idea altogether): Support for -czf foo (now only -c -z -f foo) --- use `set -- "-$rest" "$@"`
-dnl TODO: Support for -ffoo (alternative to -f foo, i.e. the null separator for short opts)
 dnl TODO: Support custom error messages
-dnl TODO: Make positional args check optional
+dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -344,7 +342,7 @@ m4_define([_POSITIONALS_INF], 0)
 
 dnl
 dnl Use using processing an argument that is positional
-m4_define([_A_POSITIONAL], [m4_do(
+m4_define([_DECLARE_THAT_SCRIPT_ACCEPTS_POSITIONAL_ARGUMENTS], [m4_do(
 	[m4_define([HAVE_POSITIONAL], 1)],
 )])
 
@@ -354,8 +352,8 @@ dnl Call in cases when it is not clear how many positional args to expect.
 dnl This is determined by:
 dnl  - the nature of the positional argument itself
 dnl  - the positional arg has a default (?)
-m4_define([_A_POSITIONAL_VARNUM], [m4_do(
-	[_A_POSITIONAL],
+m4_define([_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED], [m4_do(
+	[_DECLARE_THAT_SCRIPT_ACCEPTS_POSITIONAL_ARGUMENTS],
 	[m4_define([HAVE_POSITIONAL_VARNUM], 1)],
 )])
 
@@ -424,12 +422,12 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[dnl If we don't have default, also a number of positional args that are needed went up
 ],
 	[m4_ifblank([$3], [m4_do(
-			[_A_POSITIONAL],
+			[_DECLARE_THAT_SCRIPT_ACCEPTS_POSITIONAL_ARGUMENTS],
 			[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], 1)],
 			[m4_list_append([_POSITIONALS_MINS], 1)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], [])],
 		)], [m4_do(
-			[_A_POSITIONAL_VARNUM],
+			[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED],
 			[m4_list_append([_POSITIONALS_MINS], 0)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 		)])],
@@ -475,7 +473,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
 	[m4_list_append([_POSITIONAL_CATHS], [inf])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
-	[_A_POSITIONAL_VARNUM],
+	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED],
 	[m4_pushdef([_min_argn], m4_default([$3], 0))],
 	[m4_define([_INF_ARGN], _min_argn)],
 	[m4_define([_INF_VARNAME], [_varname([$1])])],
@@ -527,7 +525,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[m4_pushdef([_min_argn], m4_eval([$3] - ($# - 3) ))],
 	[dnl If we have defaults, we actually accept unknown number of arguments
 ],
-	[m4_if(_min_argn, [$3], , [_A_POSITIONAL_VARNUM])],
+	[m4_if(_min_argn, [$3], , [_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED])],
 	[m4_list_append([_POSITIONALS_MINS], _min_argn)],
 	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
 	[m4_list_append([_POSITIONALS_MAXES], [$3])],
@@ -801,8 +799,86 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 	)])],
 )])
 
-dnl
-dnl $1: The command short description
+
+
+m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
+	[_POSITIONALS_NAMES,_POSITIONAL_CATHS,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONALS_MSGS],
+	[argname0,_arg_type,_min_argn,_defaults,_msg], [m4_ifnblank(_msg, [m4_do(
+	[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
+],
+	[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
+	[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
+	[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE(_msg)],
+	[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
+	[m4_popdef([argname])],
+	[m4_popdef([argname1])],
+	["
+],
+)])])])
+
+
+m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach(
+	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
+	[_argname,_arg_short,_arg_type,_default,_arg_help],
+	[m4_ifnblank(_arg_help, [m4_do(
+		[m4_pushdef([_VARNAME], [_varname(_argname)])],
+		[_INDENT_()printf "\t%s\n" "],
+		[dnl Display a short one if it is not blank
+],
+		[m4_ifnblank(_arg_short, -_arg_short[,])],
+		[dnl Long one is never blank
+],
+		[--_argname],
+		[dnl Bool have a long beginning with --no-
+],
+		[m4_case(_arg_type, [bool], [,--no-]_argname)],
+		[: _SUBSTITUTE_LF_FOR_NEWLINE(_arg_help)],
+		[dnl Actions don't have defaults
+],
+		[dnl We save the default to a temp var whichwe expand later.
+],
+		[m4_pushdef([_default_val],
+			[m4_expand([m4_case(_arg_type,
+				[action], [],
+				[incr], [],
+				[bool], [_default[ by default]],
+				[repeated], [m4_if(_default, [()], [[empty by default]], [[default array: ]m4_bpatsubst(_default, ", \\") ])],
+				[m4_ifblank(_default, [[no default]], [[default: ]'_default'])])])])],
+		[m4_pushdef([_type_spec],
+			[m4_expand([m4_case(_GET_VALUE_TYPE(_argname),
+				[generic], [],
+				[string], [],
+				[_GET_VALUE_DESC(_argname)])])])],
+		[m4_ifnblank(m4_quote(_default_val _type_spec), [m4_do(
+			[[ @{:@]],
+			[m4_ifnblank(m4_quote(_type_spec), m4_expand([_type_spec])m4_ifnblank(m4_quote(_default_val), [; ]))],
+			[m4_expand([_default_val])],
+			[[@:}@]],
+		)])],
+		[m4_popdef([_type_spec])],
+		[m4_popdef([_default_val])],
+		["
+],
+		[dnl Single: We are already quoted
+],
+		[m4_popdef([_VARNAME])],
+)])])])
+
+
+m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
+	[m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], [m4_do(
+		[m4_ifnblank(_help, [m4_list_append([LIST_ENV_HELP], m4_expand([m4_do(
+			[m4_expand([_name: _help.])],
+			[m4_ifnblank(_default, [ (default: ']_default'))],
+		)]))])],
+	)])],
+	[printf '\nEnvironment variables that are supported:\n'
+],
+	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t%s\n" "[]_msg"
+])],
+)])
+
+
 m4_define([_MAKE_HELP], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that prints general usage of the script.],
@@ -820,85 +896,16 @@ m4_define([_MAKE_HELP], [m4_do(
 	[_MAKE_HELP_SYNOPSIS],
 	[\n' "@S|@0"
 ],
-	[dnl Don't display extended help for an arg if it doesn't have a description
-],
-	[m4_if(HAVE_POSITIONAL, 1,
-		[m4_lists_foreach(
-			[_POSITIONALS_NAMES,_POSITIONAL_CATHS,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONALS_MSGS],
-			[argname0,_arg_type,_min_argn,_defaults,_msg], [m4_ifnblank(_msg, [m4_do(
-			[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
-],
-			[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
-			[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-			[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE(_msg)],
-			[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
-			[m4_popdef([argname])],
-			[m4_popdef([argname1])],
-			[["
-]],
-			)])])],
-	)],
+	[m4_if(HAVE_POSITIONAL, 1, [_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
 	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
 ],
 	[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
-	[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, [], [m4_lists_foreach(
-		[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
-		[_argname,_arg_short,_arg_type,_default,_arg_help],
-		[m4_ifnblank(_arg_help, [m4_do(
-			[m4_pushdef([_VARNAME], [_varname(_argname)])],
-			[_INDENT_()printf "\t%s\n" "],
-			[dnl Display a short one if it is not blank
-],
-			[m4_ifnblank(_arg_short, -_arg_short[,])],
-			[dnl Long one is never blank
-],
-			[--_argname],
-			[dnl Bool have a long beginning with --no-
-],
-			[m4_case(_arg_type, [bool], [,--no-]_argname)],
-			[: _SUBSTITUTE_LF_FOR_NEWLINE(_arg_help)],
-			[dnl Actions don't have defaults
-],
-			[dnl WAS: We format defaults help by print-quoting them with ' and stopping the help echo quotes " before the store value is subsittuted, so the message should really match the real default.
-],
-			[dnl We save the default to a temp var whichwe expand later.
-],
-			[m4_pushdef([_default_val],
-				[m4_expand([m4_case(_arg_type,
-					[action], [],
-					[incr], [],
-					[bool], [_default[ by default]],
-					[repeated], [m4_if(_default, [()], [[empty by default]], [[default array: ]m4_bpatsubst(_default, ", \\") ])],
-					[m4_ifblank(_default, [[no default]], [[default: ]'_default'])])])])],
-			[m4_pushdef([_type_spec],
-				[m4_expand([m4_case(_GET_VALUE_TYPE(_argname),
-					[generic], [],
-					[string], [],
-					[_GET_VALUE_DESC(_argname)])])])],
-			[m4_ifnblank(m4_quote(_default_val _type_spec), [m4_do(
-				[[ @{:@]],
-				[m4_ifnblank(m4_quote(_type_spec), m4_expand([_type_spec])m4_ifnblank(m4_quote(_default_val), [; ]))],
-				[m4_expand([_default_val])],
-				[[@:}@]],
-			)])],
-			[m4_popdef([_type_spec])],
-			[m4_popdef([_default_val])],
-			["
-],
-			[dnl Single: We are already quoted
-],
-			[m4_popdef([_VARNAME])],
-	)])])])],
+	[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, , [_MAKE_HELP_FUNCTION_OPTIONAL_PART])],
 	[dnl Print a more verbose help message to the end of the help (if requested)
 ],
-	[_ENV_HELP()],
-	[m4_list_ifempty([LIST_ENV_HELP], ,[m4_do(
-		[printf '\nEnvironment variables that are supported:\n'
-],
-		[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t%s\n" "[]_msg"
+	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
 ])],
-	)])],
 	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
 ))],
 	[}
@@ -1366,7 +1373,7 @@ done
 				[[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 				[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-				[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [], 
+				[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [],
 					[ (namely: $_required_args_string)])],
 				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
@@ -1704,14 +1711,6 @@ m4_define([_SETTLE_ENV], [m4_list_ifempty([ENV_NAMES], , [m4_lists_foreach([ENV_
 		m4_expand([__SETTLE_ENV(m4_expand([_name]), m4_expand([_default]))]))])],
 )])]
 )])
-
-
-m4_define([_ENV_HELP], [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], [m4_do(
-	[m4_ifnblank(m4_quote(_help), [m4_list_append([LIST_ENV_HELP], m4_expand([m4_do(
-		[m4_expand([_name: _help.])],
-		[m4_ifnblank(m4_quote(_default), m4_expand([[ (default: ']_default')]))],
-	)]))])],
-)])])
 
 
 dnl

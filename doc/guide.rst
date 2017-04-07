@@ -242,6 +242,7 @@ Special arguments
   Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
 
   The long program desription is a string quoted in double quotation marks (so you may use environmental variables in it) and additionally, occurences of ``\n`` will be translated to a line break with indentation (use ``\\n`` to have the actual ``\n`` in the help description).
+  If you want to have environmental variables and newlines, you have to make sure that the env variable contains literal newlines/tabs --- you can either use the ``foo=$'broken\nline'`` `pattern <http://stackoverflow.com/a/3182519>`_, or you can use quotes to define the variable so it contains real literal newlines / tabs.
 
 * Version argument (a special case of an action argument):
   ::
