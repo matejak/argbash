@@ -16,6 +16,7 @@ dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: Support custom error messages
+dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
 dnl
 dnl Arg groups:
@@ -800,7 +801,6 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 )])
 
 
-
 m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
 	[_POSITIONALS_NAMES,_POSITIONAL_CATHS,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONALS_MSGS],
 	[argname0,_arg_type,_min_argn,_defaults,_msg], [m4_ifnblank(_msg, [m4_do(
@@ -1107,6 +1107,38 @@ m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
 )])
 
 
+
+m4_define([_COMMENT_OPT_SPACE], [m4_dquote_elt(
+	[# We support only whitespace as a delimiter between option argument and its value.],
+	[# Therefore, we expect --opt value or -o value],
+	[# so we watch for --opt and -o],
+	[# Since we know that we got the long or short option],
+	[# we just reach out for the next argument.],
+)])
+
+
+m4_define([_COMMENT_OPT_EQUALS], [m4_dquote_elt(
+	[# We support only the = as a delimiter between option argument and its value.],
+	[# Therefore, we expect --opt=value or -o value],
+	[# so we watch for --opt=* and -o],
+	[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
+	[# if nothing got stripped, we know that we got the short option],
+	[# so we reach out for the next argument.],
+	[# At the end, either of what was successful is stored as the result.],
+)])
+
+
+m4_define([_COMMENT_OPT_BOTH], [m4_dquote_elt(
+	[# We support both whitespace or = as a delimiter between option argument and its value.],
+	[# Therefore, we expect --opt=value, --opt value or -o value],
+	[# so we watch for --opt=*, --opt and -o],
+	[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
+	[# if nothing got stripped, we know that we got the long or short option],
+	[# so we reach out for the next argument.],
+	[# At the end, either of what was successful is stored as the result.],
+)])
+
+
 dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
@@ -1114,34 +1146,37 @@ dnl $1: The directive
 m4_define([_SET_OPTION_DELIMITER],
 	[m4_bmatch([$1], [ ],
 		[m4_bmatch([$1], [=], [m4_do(
-			[dnl BOTH
+			[dnl BOTH delimiters
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
+			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
 ],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)], [m4_do(
-			[dnl SPACE
+			[dnl SPACE only
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([])],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
+			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
 		[m4_bmatch([$1], [=], [m4_do(
-			[dnl EQUALS
+			[dnl EQUALS only
 ],
 			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
 			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
+			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
 
@@ -1223,32 +1258,10 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 				[break]),
 			[fi])
 ])],
-	[_COMM_BLOCK(1,
+	[_COMM_BLOCK(1, 
 		[# We now iterate through all passed arguments.],
 		[# When dealing with optional arguments:],
-		m4_case(_DELIMITER, [EQUALS], [m4_ignore(
-		)[# We support only the = as a delimiter between option argument and its value.],
-		[# Therefore, we expect --opt=value or -o value],
-		[# so we watch for --opt=* and -o],
-		[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
-		[# if nothing got stripped, we know that we got the short option],
-		[# so we reach out for the next argument.],
-		[# At the end, either of what was successful is stored as the result.],
-		], [SPACE], [m4_ignore(
-		)[# We support only whitespace as a delimiter between option argument and its value.],
-		[# Therefore, we expect --opt value or -o value],
-		[# so we watch for --opt and -o],
-		[# Since we know that we got the long or short option],
-		[# we just reach out for the next argument.],
-		], [BOTH], [m4_ignore(
-		)[# We support both whitespace or = as a delimiter between option argument and its value.],
-		[# Therefore, we expect --opt=value, --opt value or -o value],
-		[# so we watch for --opt=*, --opt and -o],
-		[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
-		[# if nothing got stripped, we know that we got the long or short option],
-		[# so we reach out for the next argument.],
-		[# At the end, either of what was successful is stored as the result.],
-		], [m4_fatal([Unknown case when handling delimiters])]),
+		_OPT_ARGS_COMMENT
 	)],
 	[_INDENT_()[case "$_key" in]],
 	[dnl We don't do this if _DISTINCT_OPTIONAL_ARGS_COUNT == 0
@@ -1289,6 +1302,77 @@ _INDENT_(2)],
 dnl Store positional args inside a 'for' statement
 m4_define([_EVAL_POSITIONALS_FOR],
 	[_INDENT_()[_positionals+=("$][1")]])
+
+
+m4_define([_ASSIGN_PASSED_POSITIONAL_ARGS], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Take arguments that we have received, and save them in variables of given names.],
+		[# The 'eval' command is needed as the name of target variable is saved into another variable.],
+	)],
+	[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
+do
+]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]_CASE_RESTRICT_VALUES(
+[], [], [_COMM_BLOCK([
+_INDENT_()# It has been requested that all positional arguments that look like options are rejected])
+_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]])
+[done]],
+	[
+],
+	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_set_foreach([_POS_VARNAMES], [varname], [varname=()
+])])],
+	[m4_join([
+], m4_unquote(m4_list_contents([_WRAPPED_ADD_SINGLE])))],
+)])
+
+
+m4_define([_CHECK_COUNT_OF_PASSED_POSITIONAL_ARGS], [m4_do(
+	[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
+		[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
+		[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
+		[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
+	[dnl TODO: Determine mandatory positional args since they are useful as error messages
+],
+	[_COMM_BLOCK(0,
+		[# Now check that we didn't receive more or less of positional arguments than we require.],
+	)],
+	[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [], [m4_do(
+		[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
+],
+		[[test ${#_positionals[@]} -lt ]],
+		[_MINIMAL_POSITIONAL_VALUES_COUNT],
+		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
+		[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
+		[ (namely: $_required_args_string)],
+		[[, but got only ${#_positionals[@]}." 1
+]])])],
+	[IF_POSITIONALS_INF(
+		[m4_do(
+			[dnl If we allow up to infinitely many args, we prepare the array for it.
+],
+			[_our_args=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
+],
+			[for (( ii = 0; ii < _our_args; ii++))
+do
+_INDENT_()_positional_names+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
+done
+
+],
+		)],
+		[m4_do(
+			[dnl If we allow up to infinitely many args, there is no point in warning about too many args.
+],
+			[[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
+			[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+			[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
+			[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [],
+				[ (namely: $_required_args_string)])],
+			[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+],
+			[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
+]],
+		)])],
+	[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
+)])
 
 
 m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
@@ -1333,71 +1417,10 @@ done]],
 				)])],
 			)])],
 		)])],
-		[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
-			[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
-			[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
-			[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
-		[dnl TODO: Determine mandatory positional args since they are useful as error messages
-],
 		[@:}@
 ],
-		[_COMM_BLOCK(0,
-			[# Now check that we didn't receive more or less of positional arguments than we require.],
-		)],
-		[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [], [m4_do(
-			[_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
-],
-			[[test ${#_positionals[@]} -lt ]],
-			[_MINIMAL_POSITIONAL_VALUES_COUNT],
-			[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
-			[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-			[ (namely: $_required_args_string)],
-			[[, but got only ${#_positionals[@]}." 1
-]])])],
-		[IF_POSITIONALS_INF(
-			[m4_do(
-				[dnl If we allow up to infinitely many args, we prepare the array for it.
-],
-				[_our_args=$((${#_positionals@<:@@@:>@} - ${#_positional_names@<:@@@:>@}))
-],
-				[for (( ii = 0; ii < _our_args; ii++))
-do
-_INDENT_()_positional_names+=("_INF_VARNAME@<:@(($ii + _INF_ARGN))@:>@")
-done
-
-],
-			)],
-			[m4_do(
-				[dnl If we allow up to infinitely many args, there is no point in warning about too many args.
-],
-				[[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
-				[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
-				[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-				[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [],
-					[ (namely: $_required_args_string)])],
-				[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
-],
-				[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
-]],
-			)])],
-		[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
-		[_COMM_BLOCK(0,
-			[# Take arguments that we have received, and save them in variables of given names.],
-			[# The 'eval' command is needed as the name of target variable is saved into another variable.],
-		)],
-		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
-do
-]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]_CASE_RESTRICT_VALUES(
-	[], [], [_COMM_BLOCK([
-_INDENT_()# It has been requested that all positional arguments that look like options are rejected])
-_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]])
-[done]],
-		[
-],
-		[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_set_foreach([_POS_VARNAMES], [varname], [varname=()
-])])],
-		[m4_join([
-], m4_unquote(m4_list_contents([_WRAPPED_ADD_SINGLE])))],
+		[_CHECK_COUNT_OF_PASSED_POSITIONAL_ARGS],
+		[_ASSIGN_PASSED_POSITIONAL_ARGS],
 	)])],
 )])
 
@@ -2000,8 +2023,8 @@ m4_define([_MAKE_DIE_FUNCTION], [m4_do(
 m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that evaluates whether a value passed to it],
-		[# begins by a character that is a short option of an accepted argument],
-		[# ],
+		[# begins by a character that is a short option of an argument],
+		[# the script knows about],
 	)],
 	[begins_with_short_option()
 {
