@@ -6,10 +6,15 @@ License:	BSD
 URL:		@URL@
 Source0:	https://github.com/matejak/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
-BuildArch:	noarch
+BuildArch: noarch
 
-BuildRequires:	autoconf,coreutils,make,bash
-Requires:	autoconf,bash,coreutils
+BuildRequires: autoconf
+BuildRequires: coreutils
+BuildRequires: make
+BuildRequires: bash
+Requires: autoconf
+Requires: bash
+Requires: coreutils
 
 %description
 @LONGDESC@
@@ -20,16 +25,22 @@ Requires:	autoconf,bash,coreutils
 %build
 
 %install
-cd resources && ROOT=%{buildroot} PREFIX=/usr PREFIXED_LIBDIR=%{_libddir} make install
+cd resources && ROOT=%{buildroot} PREFIX=%{_prefix} make install
 
 %check
 cd resources && make check
 
 %files
-%{_bindir}/*
-%{_libdir}/*
 %license LICENSE
-
 %doc README.md ChangeLog
 
+%{_bindir}/argbash
+%{_bindir}/argbash-1to2
+%{_bindir}/argbash-init
+
+
+%{_prefix}/lib/argbash/
+
 %changelog
+* Wed Mar 08 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.3.0-0.1
+- Initial package
