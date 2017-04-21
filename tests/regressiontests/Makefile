@@ -118,6 +118,7 @@ TESTS_GEN += \
 	gen-test-opt \
 	gen-test-pos2 \
 	gen-test-opt2 \
+	gen-test-infinity-illegal \
 	gen-test-pos-opt \
 	gen-test-pos-opt2 \
 	gen-test-more \
@@ -309,6 +310,9 @@ gen-test-pos2: $(TESTDIR)/gen-test-pos2.m4 $(ARGBASH_BIN)
 
 gen-test-opt2: $(TESTDIR)/gen-test-opt2.m4 $(ARGBASH_BIN)
 	ERROR="opt_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-infinity-illegal: $(TESTDIR)/gen-test-infinity-illegal.m4 $(ARGBASH_BIN)
+	ERROR="number of expected positional arguments before 'pos-arg' is unknown (because of argument 'pos-arg', which has a default)" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
 gen-test-pos-opt: $(TESTDIR)/gen-test-pos-opt.m4 $(ARGBASH_BIN)
 	ERROR="same-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null

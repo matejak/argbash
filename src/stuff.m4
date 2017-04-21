@@ -354,9 +354,12 @@ dnl Call in cases when it is not clear how many positional args to expect.
 dnl This is determined by:
 dnl  - the nature of the positional argument itself
 dnl  - the positional arg has a default (?)
+dnl
+dnl $1: The argument name of the argument that declares this
 m4_define([_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED], [m4_do(
 	[_DECLARE_THAT_SCRIPT_ACCEPTS_POSITIONAL_ARGUMENTS],
 	[m4_define([HAVE_POSITIONAL_VARNUM], 1)],
+	[m4_define([_LAST_POSITIONAL_ARGUMENT_WITH_DEFAULT], [[$1]])],
 )])
 
 
@@ -376,6 +379,13 @@ dnl Do something depending on whether there have been optional positional args d
 m4_define([IF_POSITIONALS_VARNUM],
 	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
 
+
+dnl
+dnl $1: The name of the current argument
+m4_define([_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN], [m4_do(
+	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
+	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown (because of argument ']_LAST_POSITIONAL_ARGUMENT_WITH_DEFAULT[', which has a default). This is not supported, define arguments that accept fixed number of values first.])], [])],
+)])
 
 dnl
 dnl $1 - the variable where the argument value is collected
@@ -414,8 +424,7 @@ argbash_api([ARG_POSITIONAL_SINGLE], [m4_do(
 
 
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
-	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
-	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED("${_varname([$1])}")],
 	[dnl Number of possibly supplied positional arguments just went up
@@ -429,7 +438,7 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 			[m4_list_append([_POSITIONALS_MINS], 1)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], [])],
 		)], [m4_do(
-			[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED],
+			[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])],
 			[m4_list_append([_POSITIONALS_MINS], 0)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 		)])],
@@ -464,8 +473,7 @@ dnl $1 ... $3: Same as ARG_POSITIONAL_INF
 dnl $4: Representation of arg on command-line
 dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
-	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
-	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
 	[m4_define([_POSITIONALS_INF], 1)],
@@ -475,7 +483,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[m4_list_append([_POSITIONALS_NAMES], [$1])],
 	[m4_list_append([_POSITIONAL_CATHS], [inf])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
-	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED],
+	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])],
 	[m4_pushdef([_min_argn], [[$3]])],
 	[m4_define([_INF_ARGN], _min_argn)],
 	[m4_define([_INF_VARNAME], [_varname([$1])])],
@@ -513,9 +521,8 @@ argbash_api([ARG_POSITIONAL_MULTI], [m4_do(
 )])
 
 
-m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
-	[IF_POSITIONALS_INF([m4_fatal([We already expect arbitrary number of arguments before '$1'. This is not supported])], [])],
-	[IF_POSITIONALS_VARNUM([m4_fatal([The number of expected positional arguments before '$1' is unknown. This is not supported, define arguments that accept fixed number of values first.])], [])],
+m4_define([_ARG_POSITIONAL_MULTI], _CHECK_INTEGER_TYPE(3, [number of arguments])[m4_do(
+	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
 	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + [$3]))],
@@ -527,7 +534,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[m4_pushdef([_min_argn], m4_eval([$3] - ($# - 3) ))],
 	[dnl If we have defaults, we actually accept unknown number of arguments
 ],
-	[m4_if(_min_argn, [$3], , [_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED])],
+	[m4_if(_min_argn, [$3], , [_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])])],
 	[m4_list_append([_POSITIONALS_MINS], _min_argn)],
 	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
 	[m4_list_append([_POSITIONALS_MAXES], [$3])],
@@ -1198,7 +1205,7 @@ _SET_OPTION_DELIMITER([ =])
 
 
 dnl Possible scenarios:
-dnl value-less (* -> getopts on)
+dnl value-less (* -> getopts on) (LS + S)
 dnl - longopt or shortopt
 dnl * clustered shortopt
 dnl with value (ditto, = -> only equals, -= -> space and equals, - -> only space)
