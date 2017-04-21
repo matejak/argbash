@@ -18,6 +18,7 @@ dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: Support custom error messages
 dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
+dnl TODO: When dealing with optional arguments, don't match -o|-o*|--opt|--opt=* in the case statement - instead, match first for -o, then for --opt etc. as needed. In that way, the case statement will be clearer and the m4 code too.
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -451,8 +452,8 @@ argbash_api([ARG_POSITIONAL_INF], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
-		[m4_if($#, 3,
-			[_ARG_POSITIONAL_INF($@)],
+		[m4_if(m4_eval($# > 3),
+			0, [_ARG_POSITIONAL_INF([$1], [$2], m4_default([$3], 0))],
 			[_ARG_POSITIONAL_INF([$1], [$2], [$3], [], m4_shiftn(3, $@))])],
 	)])],
 )])
@@ -475,7 +476,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[m4_list_append([_POSITIONAL_CATHS], [inf])],
 	[m4_list_append([_POSITIONALS_MSGS], [$2])],
 	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED],
-	[m4_pushdef([_min_argn], m4_default([$3], 0))],
+	[m4_pushdef([_min_argn], [[$3]])],
 	[m4_define([_INF_ARGN], _min_argn)],
 	[m4_define([_INF_VARNAME], [_varname([$1])])],
 	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
@@ -778,18 +779,20 @@ m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE], [m4_do(
 )])
 
 
+m4_define([_IF_HAVE_OPTIONAL],
+	[m4_if(HAVE_OPTIONAL, 1, [$1], [$2])])
+
+
 m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
-	[m4_if(HAVE_OPTIONAL, 1,
-		[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
-			[ @<:@],
-			[m4_case(_arg_type,
-				[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
-				[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-				[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-				[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
-			[@:>@],
-		)])],
-	)],
+	[_IF_HAVE_OPTIONAL([m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
+		[ @<:@],
+		[m4_case(_arg_type,
+			[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
+			[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+			[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+			[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
+		[@:>@],
+	)])])],
 	[m4_if(HAVE_DOUBLEDASH, 1, [[ @<:@--@:>@]])],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
@@ -1194,6 +1197,25 @@ dnl The default is both ' ' and '='
 _SET_OPTION_DELIMITER([ =])
 
 
+dnl Possible scenarios:
+dnl value-less (* -> getopts on)
+dnl - longopt or shortopt
+dnl * clustered shortopt
+dnl with value (ditto, = -> only equals, -= -> space and equals, - -> only space)
+dnl - longopt or shortopt
+dnl = longopt
+dnl = shortopt
+dnl -= longopt or shortopt
+dnl -= longopt
+dnl * shortopt + value
+dnl
+dnl Handlers:
+dnl
+dnl LS - longopt or shortopt, adaptive to availability of short opt or whether space is a delimiter
+dnl L  = longopt
+dnl S  * shortopt only
+
+
 dnl
 dnl $1: _argname
 dnl $2: short opt.
@@ -1258,7 +1280,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 				[break]),
 			[fi])
 ])],
-	[_COMM_BLOCK(1, 
+	[_COMM_BLOCK(1,
 		[# We now iterate through all passed arguments.],
 		[# When dealing with optional arguments:],
 		_OPT_ARGS_COMMENT
@@ -1381,7 +1403,7 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
 	[while test $[]# -gt 0
 do
 ],
-	[m4_if(HAVE_OPTIONAL, 1,
+	[_IF_HAVE_OPTIONAL(
 		[m4_expand([_EVAL_OPTIONALS])],
 		[m4_expand([_EVAL_POSITIONALS_FOR])])
 ],
@@ -1489,7 +1511,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONAL_CATHS], [_argname,_min_argn,_defaults,_arg_type],
 			[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
 	)])],
-	[m4_if(HAVE_OPTIONAL, 1, [m4_do(
+	[_IF_HAVE_OPTIONAL([m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
 ],
 		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_type,_default], [m4_do(
@@ -1518,9 +1540,9 @@ m4_define([_MAKE_UTILS], [m4_do(
 	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION]
 
 )],
-	[_IF_CLUSTERING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
+	[_IF_HAVE_OPTIONAL([_IF_CLUSTERING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
 
-)],
+)])],
 	[_PUT_VALIDATORS],
 )])
 
@@ -1545,9 +1567,9 @@ m4_define([_m4_divert(STDOUT)], 1)
 
 
 dnl Expand to 1 if we don't have positional nor optional args
-m4_define([_NO_ARGS_WHATSOEVER],
-	[m4_if(HAVE_POSITIONAL, 1, 0,
-		m4_if(HAVE_OPTIONAL, 1, 0, 1))])
+m4_define([_IF_SOME_ARGS_ARE_DEFINED],
+	[m4_if(m4_if(HAVE_POSITIONAL, 1, 1, [_IF_HAVE_OPTIONAL(1, 0)]),
+		1, [$1], [$2])])
 
 
 argbash_api([ARGBASH_GO], [m4_do(
@@ -1582,7 +1604,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 
 ]],
 	[_SETTLE_ENV],
-	[m4_if(_NO_ARGS_WHATSOEVER, 1, [], [m4_do(
+	[_IF_SOME_ARGS_ARE_DEFINED([m4_do(
 		[_MAKE_UTILS
 ],
 		[_MAKE_DEFAULTS

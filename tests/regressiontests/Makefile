@@ -17,6 +17,7 @@ REVERSE = $(TESTDIR)/reverse
 TESTS += \
 	stability \
 	basic \
+	test-void \
 	call-salone \
 	test-most \
 	test-more \
@@ -30,6 +31,7 @@ TESTS += \
 	test-wrapping-more \
 	test-wrapping-excl \
 	stability-wrapping \
+	test-infinity-minimal_call \
 	test-infinity \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
@@ -57,6 +59,7 @@ TESTS += tests-gen
 SCRIPTS += \
 	$(TESTDIR)/basic2.sh \
 	$(TESTDIR)/basic.sh \
+	$(TESTDIR)/test-void.sh \
 	$(TESTDIR)/test-salone.sh \
 	$(TESTDIR)/call-salone.sh \
 	$(TESTDIR)/test-most.sh \
@@ -73,6 +76,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
 	$(TESTDIR)/test-wrapping2.sh \
+	$(TESTDIR)/test-infinity-minimal_call.sh \
 	$(TESTDIR)/test-infinity.sh \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
@@ -167,6 +171,9 @@ basic: $(TESTDIR)/basic.sh
 	$(generic_regression)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
+
+test-void: $(TESTDIR)/test-void.sh
+	! grep -q 'die' $<
 
 call-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
@@ -264,6 +271,11 @@ test-wrapping-excl: $(TESTDIR)/test-wrapping-excl.sh $(TESTDIR)/test-onlypos.m4
 
 stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
 	diff -q $< $(word 2,$^)
+
+test-infinity-minimal_call: $(TESTDIR)/test-infinity-minimal_call.sh
+	$< | grep -q 'POS_S='
+	$< 1 | grep -q 'POS_S=1,'
+	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 
 test-infinity: $(TESTDIR)/test-infinity.sh
 	$< | grep -q 'POS_S=first,second,third,'

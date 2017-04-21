@@ -9,6 +9,10 @@ ADD_TEST([basic], [[
 	$< -h | grep -q 'O percent: %'
 ]])
 
+ADD_TEST([test-void], [[
+	! grep -q 'die' $<
+]])
+
 ADD_SCRIPT([test-salone])
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 ADD_TEST([call-salone], [[
@@ -128,6 +132,12 @@ ADD_TEST([stability-wrapping], [[
 	diff -q $< $(word 2,$^)
 ]],
 	[$(TESTDIR)/test-wrapping2.sh], [$(TESTDIR)/test-wrapping.sh])
+
+ADD_TEST([test-infinity-minimal_call], [[
+	$< | grep -q 'POS_S='
+	$< 1 | grep -q 'POS_S=1,'
+	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+]])
 
 ADD_TEST([test-infinity], [[
 	$< | grep -q 'POS_S=first,second,third,'
