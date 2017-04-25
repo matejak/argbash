@@ -82,7 +82,10 @@ while test $# -gt 0
 do
 	_key="$1"
 	case "$_key" in
-		-s*|--separate)
+		-s|--separate)
+			_arg_separate=$((_arg_separate + 1))
+			;;
+		-s*)
 			_arg_separate=$((_arg_separate + 1))
 			_next="${_key##-s}"
 			if test -n "$_next" -a "$_next" != "$_key"
@@ -90,71 +93,62 @@ do
 				begins_with_short_option "$_next" && shift && set -- "-s" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 			fi
 			;;
-		--no-hints|--hints)
+		--hints)
 			_arg_hints="on"
 			test "${1:0:5}" = "--no-" && _arg_hints="off"
 			;;
-		--pos|--pos=*)
-			_val="${_key##--pos=}"
-			if test "$_val" = "$_key"
-			then
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
-				shift
-			fi
+		--pos)
+			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			_val="$2"
+			shift
 			_arg_pos+=("$_val")
 			;;
-		--opt|--opt=*)
-			_val="${_key##--opt=}"
-			if test "$_val" = "$_key"
-			then
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
-				shift
-			fi
+		--opt)
+			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			_val="$2"
+			shift
 			_arg_opt+=("$_val")
 			;;
-		--opt-bool|--opt-bool=*)
-			_val="${_key##--opt-bool=}"
-			if test "$_val" = "$_key"
-			then
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
-				shift
-			fi
+		--opt-bool)
+			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			_val="$2"
+			shift
 			_arg_opt_bool+=("$_val")
 			;;
-		--wrap|--wrap=*)
-			_val="${_key##--wrap=}"
-			if test "$_val" = "$_key"
-			then
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
-				shift
-			fi
+		--wrap)
+			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			_val="$2"
+			shift
 			_arg_wrap+=("$_val")
 			;;
-		-m*|--mode|--mode=*)
-			_val_from_long="${_key##--mode=}"
-			_val_from_short="${_key##-m}"
-			if test "$_val_from_long" != "$_key"
-			then
-				_val="$_val_from_long"
-			elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"
-			then
-				_val="$_val_from_short"
-			else
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
-				shift
-			fi
+		-m|--mode)
+			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+			_val="$2"
+			shift
 			_arg_mode="$_val"
 			;;
-		-v*|--version)
+
+		--mode=*)
+			_val="${_key##--mode=}"
+			_arg_mode="$_val"
+			;;
+		-m*)
+			_val="${_key##-m}"
+			_arg_mode="$_val"
+			;;
+		-v|--version)
 			echo "argbash-init v$version"
 			exit 0
 			;;
-		-h*|--help)
+		-v*)
+			echo "argbash-init v$version"
+			exit 0
+			;;
+		-h|--help)
+			print_help
+			exit 0
+			;;
+		-h*)
 			print_help
 			exit 0
 			;;
