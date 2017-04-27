@@ -63,7 +63,7 @@ m4_define([_CHECK_INTEGER_TYPE],
 
 
 m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])
-m4_define([_IF_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [m4_if(_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS, 
+m4_define([_IF_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [m4_if(_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS,
 	[yes], [$1],
 	[$2])])
 
@@ -182,7 +182,7 @@ dnl $3: The arg value
 dnl $4: The error message (optional)
 m4_define([__CHECK_INTEGER_TYPE], [[m4_do(
 	[m4_bmatch([$2], [^[0-9]+$], ,
-		[m4_fatal([The ]m4_if([$3], 1, 1st, 2, 2nd, 3, 3rd, $3th)[ argument of '$1' has to be a number]m4_ifnblank([$4], [[ ($4)]])[, got '$2'])])],
+		[m4_fatal([The ]m4_case([$3], 1, 1st, 2, 2nd, 3, 3rd, $3th)[ argument of '$1' has to be a number]m4_ifnblank([$4], [[ ($4)]])[, got '$2'])])],
 )]])
 
 
@@ -464,7 +464,7 @@ argbash_api([ARG_POSITIONAL_INF], [m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
-		[m4_if(m4_eval($# > 3),
+		[m4_case(m4_eval($# > 3),
 			0, [_ARG_POSITIONAL_INF([$1], [$2], m4_default([$3], 0))],
 			[_ARG_POSITIONAL_INF([$1], [$2], [$3], [], m4_shiftn(3, $@))])],
 	)])],
@@ -928,38 +928,6 @@ m4_define([_MAKE_HELP], [m4_do(
 
 dnl
 dnl $1: Arg name
-dnl $2: Short arg name (if applicable)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_SPACE],
-	[m4_ifnblank([$2],
-		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_SPACE_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
-		[_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_SPACE_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
-	[_val_from_short="${_key##-$2}"],
-	[if test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
-	[then],
-	[_INDENT_()[_val="$_val_from_short"]],
-	[else],
-	_INDENT_MORE(
-		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-		[_val="@S|@2"],
-		[shift]),
-	[fi],
-	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
-)])
-
-
-dnl
-dnl $1: Arg name
 dnl $2: Short arg name (not used here)
 dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
@@ -967,36 +935,6 @@ m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[_val="@S|@2"],
 	[shift],
-	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
-)])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name (if applicable)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_EQUALS],
-	[m4_ifnblank([$2],
-		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_EQUALS_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
-		[_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name (not used here)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_EQUALS_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
-	[_val="${_key##--[$1]=}"],
-	[if test "$_val" = "$_key"],
-	[then],
-	_INDENT_MORE(
-		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-		[_val="@S|@2"],
-		[shift]),
-	[fi],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
@@ -1018,112 +956,11 @@ dnl $1: Arg name
 dnl $2: Short arg name
 dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_EQUALS_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
-	[_val_from_long="${_key##--[$1]=}"],
-	[_val_from_short="${_key##-$2}"],
-	[if test "$_val_from_long" != "$_key"],
-	[then],
-	[_INDENT_()[_val="$_val_from_long"]],
-	[elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
-	[then],
-	[_INDENT_()[_val="$_val_from_short"]],
-	[else],
-	_INDENT_MORE(
-		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-		[_val="@S|@2"],
-		[shift]),
-	[fi],
-	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
-)])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name (if applicable)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_BOTH],
-	[m4_ifnblank([$2],
-		[_IF_CLUSTERING_GETOPT([_VAL_OPT_ADD_BOTH_WITH_SHORT_OPT_GETOPT($@)], [_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT($@)])],
-		[_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT($@)])])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_BOTH_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
-	[_val_from_long="${_key##--[$1]=}"],
-	[_val_from_short="${_key##-$2}"],
-	[if test "$_val_from_long" != "$_key"],
-	[then],
-	[_INDENT_()[_val="$_val_from_long"]],
-	[elif test "$_val_from_short" != "$_key" -a -n "$_val_from_short"],
-	[then],
-	[_INDENT_()[_val="$_val_from_short"]],
-	[else],
-	_INDENT_MORE(
-		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-		[_val="@S|@2"],
-		[shift]),
-	[fi],
-	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
-)])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
 m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
 	[_val="${_key##-$2}"],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
-
-
-dnl
-dnl $1: Arg name
-dnl $2: Short arg name (not used here)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_BOTH_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
-	[_val="${_key##--[$1]=}"],
-	[if test "$_val" = "$_key"],
-	[then],
-	_INDENT_MORE(
-		[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-		[_val="@S|@2"],
-		[shift]),
-	[fi],
-	[$3],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
-)])
-
-
-dnl
-dnl Macro factory, define _MAYBE_EQUALS_MATCH depending on what delimiters are effective.
-dnl
-dnl $1: What to do. Typically one of [], =*, |--$[]2=*
-m4_define([_MAYBE_EQUALS_MATCH_FACTORY], [m4_define([_MAYBE_EQUALS_MATCH],
-	[m4_case(m4_quote($][1),
-		[arg], [$1],
-		[repeated], [$1], [])])])
-dnl
-dnl Defines macro _MAYBE_EQUALS_MATCH:
-dnl
-dnl $1: Option type (be effective only for 'arg' and 'repeated')
-dnl $2: Option name
-dnl
-dnl Before this macros is called, we output e.g. '--option' in the case match statement.
-dnl If delimiter is
-dnl  - space only: Do nothing,
-dnl  - equals only: Add '=*',
-dnl  - both: Add '|--option=*'.
 
 
 dnl
@@ -1184,13 +1021,11 @@ m4_define([_SET_OPTION_DELIMITER],
 		[m4_bmatch([$1], [=], [m4_do(
 			[dnl BOTH delimiters
 ],
-			[_MAYBE_EQUALS_MATCH_FACTORY(m4_dquote(|--$[]2=*))],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
-			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_BOTH]))],
 			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
 ],
@@ -1198,26 +1033,22 @@ m4_define([_SET_OPTION_DELIMITER],
 		)], [m4_do(
 			[dnl SPACE only
 ],
-			[_MAYBE_EQUALS_MATCH_FACTORY([])],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]2))],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
-			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_SPACE]))],
 			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
 		[m4_bmatch([$1], [=], [m4_do(
 			[dnl EQUALS only
 ],
-			[_MAYBE_EQUALS_MATCH_FACTORY([=*])],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]2))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
-			[m4_define([_VAL_OPT_ADD], m4_defn([_VAL_OPT_ADD_EQUALS]))],
 			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
@@ -1255,13 +1086,31 @@ dnl L  = longopt
 dnl S  * shortopt only
 
 
+m4_define([_COMPOSE_CASE_MATCH_STATEMENT], [m4_do(
+	[m4_foreach([_arg], [$@], [m4_ifnblank(m4_quote(_arg),
+		[m4_list_append([_CASE_MATCHES], m4_quote(_arg))])])],
+	[m4_list_join([_CASE_MATCHES], [|])],
+	[m4_list_destroy([_CASE_MATCHES])],
+)])
+
+
+dnl
+dnl Given multiple matches, join them with |
 m4_define([_INDENT_AND_END_CASE_MATCH], [m4_do(
 	[
 _INDENT_(2,	)],
-	$@,
+	[_COMPOSE_CASE_MATCH_STATEMENT($@)],
 	[@:}@
 ],
 )])
+
+
+m4_define([_IF_ARG_IS_BOOLEAN],
+	[m4_if([$1], [bool], [$2], [$3])])
+
+
+m4_define([_IF_ARG_ACCEPTS_VALUE],
+	[m4_case([$1], [arg], [$2], [repeated], [$2], [$3])])
 
 
 dnl
@@ -1279,8 +1128,9 @@ dnl And we also match for --no-that
 dnl And for -h*, since this is an action and argbash then ends (but maybe not, what if one has passed -hx, while -x is invalid?)
 m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
-		[m4_ifblank([$2], [], [[-$2]|])],
-		[_IF_SPACE_IS_A_DELIMITER([[--$1]])])],
+		[m4_ifblank([$2], [], [[-$2]])],
+		[_IF_ARG_IS_BOOLEAN([$3], [[--no-$1]])],
+		[_IF_ARG_ACCEPTS_VALUE([$3], [_IF_SPACE_IS_A_DELIMITER([[--$1]])], [[--$1]])])],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
@@ -1308,16 +1158,14 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 dnl
 dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have eqals as a delimiter
-m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE], 
-	[_IF_EQUALS_IS_A_DELIMITER([m4_if([$3], 
+m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
+	[_IF_EQUALS_IS_A_DELIMITER([m4_case([$3],
 		[arg], [_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
 		[repeated], [_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
 		[])])])
 
 
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
-	[
-_INDENT_(2,	)],
 	[_INDENT_AND_END_CASE_MATCH(
 		[[--$1=*]])],
 	[dnl Output the body of the case
@@ -1363,59 +1211,8 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 )])
 
 
-m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE], 
+m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE],
 	[_IF_CLUSTERING_GETOPT([m4_ifnblank([$2], [_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
-
-
-dnl
-dnl $1: _argname
-dnl $2: short opt.
-dnl $3: _arg_type
-dnl $4: _default
-dnl $5: _varname(_argname)
-m4_define([_MAKE_OPTARG_CASE_SECTION], [m4_do(
-	[
-_INDENT_(2,	)],
-	[dnl Output short option (if we have it), then |
-],
-	[m4_ifblank([$2], [], [[-$2]_IF_CLUSTERING_GETOPT([*])|])],
-	[dnl If we are dealing with bool, also look for --no-...
-],
-	[m4_if([$3], [bool], [[--no-$1|]])],
-	[dnl and then long option for the case.
-],
-	[[--$1]],
-	[_MAYBE_EQUALS_MATCH([$3], [$1])],
-	[@:}@
-],
-	[dnl Output the body of the case
-],
-	[dnl _APPEND_WRAPPED_ARGUMENT_TO_ARRAY: If the arg comes from wrapped script/template, save it in an array
-],
-	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
-		[repeated], [_VAL_OPT_ADD([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
-		[bool],
-		[_JOIN_INDENTED(3,
-			[[$5="on"]],
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
-			_PASS_WHEN_GETOPT([$2]),
-			[[test "${1:0:5}" = "--no-" && $5="off"]],
-		)],
-		[incr],
-		[_JOIN_INDENTED(3,
-			[[$5=$(($5 + 1))]],
-			_PASS_WHEN_GETOPT([$2]),
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
-		)],
-		[action],
-		[_JOIN_INDENTED(3,
-			[[$4]],
-			[exit 0],
-		)],
-	)],
-	[_INDENT_(3);;],
-)])
 
 
 m4_define([_MAKE_OPTARG_CASE_SECTIONS], [m4_do(

@@ -58,7 +58,6 @@ do
 			shift
 			_arg_output="$_val"
 			;;
-
 		--output=*)
 			_val="${_key##--output=}"
 			_arg_output="$_val"

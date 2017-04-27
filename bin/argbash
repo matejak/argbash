@@ -73,7 +73,6 @@ do
 			shift
 			_arg_output="$_val"
 			;;
-
 		--output=*)
 			_val="${_key##--output=}"
 			_arg_output="$_val"
@@ -82,15 +81,15 @@ do
 			_val="${_key##-o}"
 			_arg_output="$_val"
 			;;
-		--library)
+		--no-library|--library)
 			_arg_library="on"
 			test "${1:0:5}" = "--no-" && _arg_library="off"
 			;;
-		--check-typos)
+		--no-check-typos|--check-typos)
 			_arg_check_typos="on"
 			test "${1:0:5}" = "--no-" && _arg_check_typos="off"
 			;;
-		-c|--commented)
+		-c|--no-commented|--commented)
 			_arg_commented="on"
 			test "${1:0:5}" = "--no-" && _arg_commented="off"
 			;;
@@ -108,6 +107,10 @@ do
 			shift
 			_arg_search+=("$_val")
 			;;
+		--search=*)
+			_val="${_key##--search=}"
+			_arg_search+=("$_val")
+			;;
 		-I*)
 			_val="${_key##-I}"
 			_arg_search+=("$_val")
@@ -118,7 +121,6 @@ do
 			shift
 			_arg_debug="$_val"
 			;;
-
 		--debug=*)
 			_val="${_key##--debug=}"
 			_arg_debug="$_val"
