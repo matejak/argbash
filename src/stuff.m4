@@ -735,7 +735,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "_SUBSTITUTE_LF_FOR_NEWLINE(_HELP_MSG)"
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\n" "_SUBSTITUTE_LF_FOR_NEWLINE(_HELP_MSG)"
 ))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing

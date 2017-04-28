@@ -1,4 +1,4 @@
-m4_include([stuff.m4])
+m4_include([list.m4])
 
 m4_define([assert_equals],
 	[m4_if(

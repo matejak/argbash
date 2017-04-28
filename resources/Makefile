@@ -3,9 +3,23 @@ NUL =
 M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
-	../src/stuff.m4 \
-	../src/list.m4 \
+	../src/argbash-lib.m4 \
 	../src/version \
+	$(NUL)
+
+# generate using
+# grep '^m4_include' ../src/*.m4 | sed -e 's/.*m4_include(\[\(.*\)\])\s*/\t..\/src\/\1 \\/' | sort | uniq
+# which outputs all files that are included using m4_include in .m4 files
+M4_SRC += \
+	../src/argument_value_types.m4 \
+	../src/default_settings.m4 \
+	../src/env_vars.m4 \
+	../src/function_generators.m4 \
+	../src/list.m4 \
+	../src/progs.m4 \
+	../src/stuff.m4 \
+	../src/utilities.m4 \
+	../src/value_validators.m4 \
 	$(NUL)
 
 PREFIX ?= $(HOME)/.local
@@ -63,9 +77,9 @@ TESTDIR = ../tests/regressiontests
 include ../tests/regressiontests/Makefile
 
 
-# We include the source dir because there is m4_include in stuff.m4
+# We include the source dir because there is m4_include in argbash-lib.m4
 bootstrap:
-	cat ../src/stuff.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar -o $(GENPARSE)
+	cat ../src/argbash-lib.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar -o $(GENPARSE)
 	chmod a+x $(GENPARSE)
 	touch ../src/argbash.m4
 
@@ -96,7 +110,7 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash"
 	mkdir -p "$(ROOT)/$(PREFIXED_LIBDIR)/argbash"
-	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/stuff.m4"
+	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/argbash-lib.m4"
 	cp $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/"
 	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIXED_LIBDIR)/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }

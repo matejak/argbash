@@ -1,4 +1,4 @@
-m4_include([stuff.m4])
+m4_include([list.m4])
 
 m4_define([BOMB], [m4_fatal(m4_ifblank([$1], [[Bomb $2 has been expanded, which shouldn't happen]], [[$1]]))])
 m4_define([ANTIBOMB], [m4_ifndef([$1], [m4_fatal([We have expected '$1' to be defined])])])

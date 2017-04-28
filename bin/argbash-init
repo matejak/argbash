@@ -63,7 +63,7 @@ _arg_mode="default"
 
 print_help ()
 {
-	echo "Make a template for scripts."
+	printf "%s\n" "Make a template for scripts."
 	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\n' "$0"
 	printf "\t%s\n" "<output>: Name of the output template (default: '""-""')"
 	printf "\t%s\n" "-s,--separate: Separate the parsing logic (specify two times for complete separation)"
