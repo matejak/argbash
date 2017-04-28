@@ -14,11 +14,12 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
+dnl TODO: Split stuff.m4 into more files, while keeping the functionality
+dnl TODO: Introduce unit testing even of stuff.m4
 dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: Support custom error messages
 dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
-dnl TODO: When dealing with optional arguments, don't match -o|-o*|--opt|--opt=* in the case statement - instead, match first for -o, then for --opt etc. as needed. In that way, the case statement will be clearer and the m4 code too.
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -37,29 +38,6 @@ dnl ARGS_TYPE_INTEGER([list of args], [flags])
 dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
-
-m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift($@))])])
-
-dnl
-dnl Define a macro that is part of the public API
-dnl Ensure the replication and also add the macro name to a list of allowed macros
-m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
-m4_define([_argbash_persistent], [m4_set_add([_KNOWN_MACROS],[$1])m4_define([$1], [$2])])
-dnl IDEA: Assemble a whitelist of macros used in the script, then grep the source and report all suspicious strings that resemble misspelled argbash macros
-
-dnl
-dnl $1: The text to substitute
-dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
-m4_define([_SUBSTITUTE_LF_FOR_NEWLINE], [m4_bpatsubst([[$1]], [\([^\\]\)\(\\\\\)*\\n],  [\1\2
-		])])
-
-dnl
-dnl Checks that the n-th argument is an integer.
-dnl Should be called upon the macro definition outside of quotes, e.g. m4_define([FOO], _CHECK_INTEGER_TYPE(1)[m4_eval(2 + $1)])
-dnl $1: The argument number
-dnl $2: The error message (optional)
-m4_define([_CHECK_INTEGER_TYPE],
-	__CHECK_INTEGER_TYPE([[$][0]], m4_quote($[]$1), [$1], m4_quote($[]2)))
 
 
 m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])
@@ -93,153 +71,9 @@ m4_define([_CHECK_OPTION_NAME], [m4_do(
 )])
 
 
-dnl
-dnl Factory macro - makes _FLAGS_D_IF etc. macros
-m4_define([_FLAGS_WHATEVER_IF_FACTORY],
-	[m4_define([_FLAGS_$1_IF], [m4_bmatch(m4_quote($][1), [$1], m4_dquote($][2), m4_dquote($][3))])])
-_FLAGS_WHATEVER_IF_FACTORY(D)
-_FLAGS_WHATEVER_IF_FACTORY(R)
-_FLAGS_WHATEVER_IF_FACTORY(W)
-_FLAGS_WHATEVER_IF_FACTORY(X)
-
-
-dnl
-dnl $1: FLAGS: Any of RWXD, default is nothing (= an existing file)
-m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
-	[m4_pushdef([_fname], [[validate_file_$1]])],
-	[dnl Maybe we already have requested this function
-],
-	[m4_list_contains([_VALIDATE_FILE], _fname, , [m4_do(
-		[m4_list_append([_VALIDATE_FILE], _fname)],
-		[_fname[]()
-],
-		[{
-],
-		[_JOIN_INDENTED(1,
-			[_FLAGS_D_IF([$1], [m4_do(
-				[m4_pushdef([_what], [[directory]])],
-				[m4_pushdef([_xperm], [[browsable directory]])],
-				[[test -d "@S|@1" || die "Argument '@S|@2' has to be a directory, got '@S|@1'" 4]],
-				)], [m4_do(
-				[m4_pushdef([_what], [[file]])],
-				[m4_pushdef([_xperm], [[executable file]])],
-				[[test -f "@S|@1" || die "Argument '@S|@2' has to be a file, got '@S|@1'" 4]],
-			)])],
-			[_FLAGS_R_IF([$1], [[test -r "@S|@1" || { echo "Argument '@S|@2' has to be a readable ]_what[, '@S|@1' isn't."; return 4; }]])],
-			[_FLAGS_W_IF([$1], [[test -w "@S|@1" || { echo "Argument '@S|@2' has to be a writable ]_what[, '@S|@1' isn't."; return 4; }]])],
-			[_FLAGS_X_IF([$1], [[test -x "@S|@1" || { echo "Argument '@S|@2' has to be a ]_xperm[, '@S|@1' isn't."; return 4; }]])],
-		)],
-		[}
-],
-	)])],
-	[m4_popdef([_fname])],
-)])
-
-
-dnl
-dnl Given a arg type ID, it treats as a group type and creates a function to examine whether the value is in the list.
-dnl $1: The group stem
-dnl $2: If blank, don't bother with the index recording functionality
-dnl
-dnl The bash function accepts:
-dnl $1: The value to check
-dnl $2: What was the option that was associated with the value
-m4_define([_MK_VALIDATE_GROUP_FUNCTION], [m4_do(
-	[$1()
-],
-	[{
-],
-	[_JOIN_INDENTED(1,
-		[local _allowed=(m4_list_join([_LIST_$1_QUOTED], [ ]))],
-		[local _seeking="@S|@1"],
-		m4_ifnblank([$2], [[local _idx=0],],[[dnl nothing
-],])
-		[for element in "${_allowed@<:@@@:>@}"],
-		[do],
-		m4_ifnblank([$2],
-			[[_INDENT_()test "$element" = "$_seeking" && { test "@S|@3" = "idx" && echo "$_idx" || echo "$element"; } && return 0],
-			 [_INDENT_()_idx=$((_idx + 1))],],
-			[[_INDENT_()test "$element" = "$_seeking" && echo "$element" && return 0],])
-		[done],
-		[die "Value '$_seeking' (of argument '@S|@2') doesn't match the list of allowed values: m4_list_join([_LIST_$1], [, ], ', ', [ and ])" 4],
-	)],
-	[}],
-)])
-
-
-dnl
-dnl Given an optional argument name, it queries whether the value can be validated and emits a line if so.
-m4_define([_MAYBE_VALIDATE_VALUE_OPT], [m4_do(
-	[],
-)])
-
-
-dnl
-dnl The helper macro for _CHECK_INTEGER_TYPE
-dnl $1: The caller name
-dnl $2: The arg position
-dnl $3: The arg value
-dnl $4: The error message (optional)
-m4_define([__CHECK_INTEGER_TYPE], [[m4_do(
-	[m4_bmatch([$2], [^[0-9]+$], ,
-		[m4_fatal([The ]m4_case([$3], 1, 1st, 2, 2nd, 3, 3rd, $3th)[ argument of '$1' has to be a number]m4_ifnblank([$4], [[ ($4)]])[, got '$2'])])],
-)]])
-
-
-dnl
-dnl Blank args to this macro are totally ignored, use @&t@ to get over that --- @&t@ is a quadrigraph that expands to nothing in the later phase
-dnl $1: How many indents
-dnl $2, $3, ...: What to put there
-m4_define([_JOIN_INDENTED], _CHECK_INTEGER_TYPE(1, [depth of indentation])[m4_do(
-	[m4_foreach([line], [m4_shift($@)], [m4_ifnblank(m4_quote(line), _INDENT_([$1])[]m4_dquote(line)
-)])],
-)])
-
-dnl
-dnl $1, $2, ...: What to put there
-dnl
-dnl Takes arguments, returns them, but there is an extra _INDENT_() in the beginning of them
-m4_define([_INDENT_MORE], [m4_do(
-	[m4_list_ifempty([_TLIST], , [m4_fatal([Internal error: List '_TLIST' should be empty, contains ]m4_list_join([_TLIST])[ instead])])],
-	[m4_foreach([line], [$@], [m4_list_append([_TLIST], m4_expand([_INDENT_()line]))])],
-	[m4_unquote(m4_list_contents([_TLIST]))],
-	[m4_list_destroy([_TLIST])],
-)])
-
-
-dnl Take precaution that if the indentation depth is 0, nothing happens
-m4_define([_SET_INDENT], [m4_define([_INDENT_],
-	[m4_for(_, 1, m4_default($][1, 1), 1,
-		[[$1]])])])
-
-m4_define([_SET_INDENT], [__SET_INDENT([$1], $[]1)])
-
-m4_define([__SET_INDENT], [m4_define([_INDENT_], [m4_if([$2], 0, ,
-	[m4_for(_, 1, m4_default([$2], 1), 1,
-		[[$1]])])])])
-
-dnl
-dnl defines _INDENT_
-dnl $1: How many times to indent (default 1)
-dnl $2, ...: Ignored, but you can use those to make the code look somewhat better.
-
-dnl Sets the default (tab) indent
-_SET_INDENT([	])
-
-
-dnl
-dnl Sets the indentation character(s) in the parsing code
-dnl $1: The indentation character(s)
-argbash_api([ARGBASH_SET_INDENT],
-	[m4_bmatch(m4_expand([_W_FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
-
-
 dnl We include the version-defining macro
 m4_define([_ARGBASH_VERSION], m4_default_quoted(m4_normalize(m4_sinclude([version])), [unknown]))
 
-
-dnl Contains implementation of m4_list_...
-m4_include([list.m4])
 
 
 dnl
@@ -901,7 +735,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[echo] "_HELP_MSG"
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "_SUBSTITUTE_LF_FOR_NEWLINE(_HELP_MSG)"
 ))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
@@ -1016,7 +850,7 @@ dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to d
 dnl
 dnl Globally set the option-value delimiter according to a directive.
 dnl $1: The directive
-m4_define([_SET_OPTION_DELIMITER],
+m4_define([_SET_OPTION_VALUE_DELIMITER],
 	[m4_bmatch([$1], [ ],
 		[m4_bmatch([$1], [=], [m4_do(
 			[dnl BOTH delimiters
@@ -1059,31 +893,8 @@ dnl
 dnl Sets the option--value separator (i.e. --option=val or --option val
 dnl $1: The directive (' ', '=', or ' =' or '= ')
 argbash_api([ARGBASH_SET_DELIM], [m4_do(
-	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_DELIMITER([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_VALUE_DELIMITER([$1])])],
 )])
-
-
-dnl The default is both ' ' and '='
-_SET_OPTION_DELIMITER([ =])
-
-
-dnl Possible scenarios:
-dnl value-less (* -> getopts on) (LS + S)
-dnl - longopt or shortopt
-dnl * clustered shortopt
-dnl with value (ditto, = -> only equals, -= -> space and equals, - -> only space)
-dnl - longopt or shortopt
-dnl = longopt
-dnl = shortopt
-dnl -= longopt or shortopt
-dnl -= longopt
-dnl * shortopt + value
-dnl
-dnl Handlers:
-dnl
-dnl LS - longopt or shortopt, adaptive to availability of short opt or whether space is a delimiter
-dnl L  = longopt
-dnl S  * shortopt only
 
 
 m4_define([_COMPOSE_CASE_MATCH_STATEMENT], [m4_do(
@@ -1298,7 +1109,8 @@ _INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_
 	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_set_foreach([_POS_VARNAMES], [varname], [varname=()
 ])])],
 	[m4_join([
-], m4_unquote(m4_list_contents([_WRAPPED_ADD_SINGLE])))],
+],
+		m4_unquote(m4_list_contents([_WRAPPED_ADD_SINGLE])))],
 )])
 
 
@@ -1307,8 +1119,6 @@ m4_define([_CHECK_COUNT_OF_PASSED_POSITIONAL_ARGS], [m4_do(
 		[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
 		[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
 		[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
-	[dnl TODO: Determine mandatory positional args since they are useful as error messages
-],
 	[_COMM_BLOCK(0,
 		[# Now check that we didn't receive more or less of positional arguments than we require.],
 	)],
@@ -1517,10 +1327,6 @@ m4_define([_MAKE_OTHER], [m4_do(
 )])
 
 
-dnl And stop those annoying diversion warnings
-m4_define([_m4_divert(STDOUT)], 1)
-
-
 dnl Expand to 1 if we don't have positional nor optional args
 m4_define([_IF_SOME_ARGS_ARE_DEFINED],
 	[m4_if(m4_if(HAVE_POSITIONAL, 1, 1, [_IF_HAVE_OPTIONAL(1, 0)]),
@@ -1602,127 +1408,6 @@ argbash_api([ARG_LEFTOVERS],
 	[m4_list_contains([BLACKLIST], [leftovers], , [[$0($@)]_ARG_POSITIONAL_INF([leftovers], [$1], [0], [... ])])])
 
 
-dnl
-dnl Macro:
-dnl no args
-dnl Function:
-dnl $1: Name of the env var
-dnl $2: The program name
-dnl $3: The error message
-m4_define([_CHECK_PROG_FACTORY_INDIR], [m4_do(
-	[check_prog
-],
-	[{
-],
-	[_JOIN_INDENTED(1,
-		[local _msg="@S|@3"],
-		[test -n "$_msg" || _msg="Unable to find a reachable executable '@S|@2'"],
-		[eval "test -n \"@S|@@S|@1\" || @S|@1=\"@S|@2\""],
-		[eval "test -x \"$(which \"@S|@2\")\" && @S|@1=\"$(which \"@S|@2\")\" || die \"$_msg\" 1"],
-	)],
-	[}
-],
-)])
-
-
-dnl
-dnl Macro:
-dnl $1: The env var name
-dnl $2: The prog name
-dnl $3: The msg
-dnl Function:
-dnl no args
-m4_define([_CHECK_PROG_FACTORY_SINGLE], [m4_do(
-	[check_prog
-],
-	[{
-],
-	[_JOIN_INDENTED(1,
-		[test -n "@S|@$1" || $1="$2"],
-		[test -x "$(which "@S|@$1")" && $1="$(which "@S|@$1")" || die "m4_default([$3], [Unable to find a reachable executable '$2'])" 1],
-	)],
-	[}
-],
-)])
-
-
-dnl
-dnl Given a program name, error messages and variable name, do this:
-dnl  - if a var name is not empty, test the prog (find the file with rx permissions), if not OK, die with our msg
-dnl  - else try: progname until RC == 0
-dnl  - if nothing is found, die with provided msg
-dnl  - if successful, save the form that works in a variable (i.e. don't try to make it an absolute path at all costs)
-dnl
-dnl $1 - env var (default: argbash translit of prog name)
-dnl $2 - prog name
-dnl $3 - msg if not OK
-dnl $4 - help message (if you want to mention existence of this in the help)
-dnl $5 - args (if you want to check args)
-dnl
-dnl  In case of path issues (i.e. script is in a crontab), update the PATH variable yourself above the argbash code.
-dnl
-dnl  internally:
-dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS, PROG_ARGS, PROG_HAVE_ARGS
-argbash_api([ARG_USE_PROG], [m4_ifndef([WRAPPED], [m4_do(
-	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
-	[m4_list_append([PROG_NAMES], [$2])],
-	[m4_list_append([PROG_MSGS], [$3])],
-	[m4_list_append([PROG_HELPS], [$4])],
-	[m4_list_append([PROG_ARGS], [$5])],
-	[dnl Even if $# == 5, $5 can be blank, which we support.
-],
-	[m4_list_append([PROG_HAVE_ARGS], m4_if([$#], 5, 1, 0))],
-)])])
-
-
-dnl
-dnl $1: A prologue message
-m4_define([_HELP_PROGS], [m4_list_ifempty([PROG_VARS], ,
-	[$1
-m4_for([idx], 1, m4_list_len([PROG_VARS]), 1, [m4_do(
-		[],
-)])])])
-
-
-dnl
-dnl Given an env variable name, assign a default value to it (if it is empty)
-dnl  $1 - env var
-dnl  $2 - default value (optional, but maybe it shouldn't be blank unless we have $# >=4)
-dnl  $3 - help message (optional)
-dnl  $4 - (don't implement now) arg name the env var can default to (none by default, the env default's priority is higher than default's priority, but lower than actual argument value)
-dnl
-dnl  internally:
-dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
-dnl TODO: Hanlde the case of wrapping correctly
-dnl TODO: Find out a proper name for this
-argbash_api([ARG_USE_ENV], [m4_ifndef([WRAPPED], [m4_do(
-	[[$0($@)]],
-	[m4_list_append([ENV_NAMES], [$1])],
-	[m4_list_append([ENV_DEFAULTS], [$2])],
-	[m4_list_append([ENV_HELPS], [$3])],
-	[m4_list_append([ENV_ARGNAMES], [$4])],
-)])])
-
-
-m4_define([_SETTLE_ENV], [m4_list_ifempty([ENV_NAMES], , [m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS], [_name,_default], [m4_do(
-	[# Setting environmental variables
-],
-	[m4_ifnblank(m4_quote(_default), [m4_list_append([_OTHER],
-		m4_expand([__SETTLE_ENV(m4_expand([_name]), m4_expand([_default]))]))])],
-)])]
-)])
-
-
-dnl
-dnl $1: name
-dnl $2: default
-dnl TODO: Try to use the 'declare' builtin to see whether the variable is even defined
-m4_define([__SETTLE_ENV], [m4_do(
-	[test -n "@S|@$1" || $1="$2"
-],
-)])
-
-
 dnl If I am wrapped:
 dnl It may be that the wrapped script contains args that we already have.
 dnl TODO: In this case: Raise an error (with a good advice)
@@ -1739,194 +1424,13 @@ dnl $1: Argument ID
 m4_define([_GET_VALUE_DESC], [m4_expand(__type_str(_GET_VALUE_TYPE([$1])))])
 
 dnl
-dnl Define a validator for a particular type. Instead of using m4_define, use this:
-dnl $1: The type ID
-dnl $2: The validator body (a shell function accepting $1 - the value, $2 - the argument name)
-dnl $3: The type description
-m4_define([_define_validator], [m4_do(
-	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([We already have the validator for '$1'.])])],
-	[m4_set_add([VALUE_TYPES], [$1])],
-	[m4_define([_validator_$1], [$2
-])],
-	[m4_define(__type_str([$1]), [[$3]])],
-)])
-
-
-dnl
-dnl Put definitions of validating functions if they are needed
-m4_define([_PUT_VALIDATORS], [m4_do(
-	[m4_set_empty([VALUE_TYPES_USED], , [# validators
-])],
-	[m4_set_foreach([VALUE_TYPES], [_val_type], [m4_do(
-		[m4_set_empty(m4_expand([[VALUE_GROUP_]_val_type]), ,
-			m4_expand([[_validator_]_val_type]))],
-	)])],
-)])
-
-
-dnl
-dnl Define an int validator
-dnl double quoting is important because of the [] group inside
-_define_validator([int],
-[[function int
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}
-]], [integer])
-
-
-dnl Define a positive int validator
-_define_validator([pint],
-[[function pint
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}
-]], [positive integer])
-
-
-dnl Define a non-negative int validator
-_define_validator([nnint],
-[[function nnint
-{
-	printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}
-]], [positive integer or zero])
-
-
-dnl Define a float number validator
-_define_validator([float],
-[[function float
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}
-]], [floating-point number])
-
-
-dnl Define a decimal number validator
-_define_validator([decimal],
-[[function decimal
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
-}
-]], [decimal number])
-
-
-dnl The string validator is a null validator
-_define_validator([string])
-
-
-dnl
-dnl For all arguments we know that are typed, re-assign their values using the validator function, e.g.
-dnl arg_val=$(validate $arg_val argument-name) || exit 1
-dnl Remarks:
-dnl  - The argument name misses -- if it is an optional argument, because we don't know what type of arg this is
-dnl  - The subshell won't propagate the die call, so that's why we have to exit "manually"
-dnl  - Validator is not only a validator - it is a cannonizer.
-dnl  - The type 'string' does not undergo validation
-m4_define([_VALIDATE_VALUES], [m4_do(
-	[m4_set_empty([TYPED_ARGS], , [# Validation of values
-])],
-	[dnl Don't do anything if we are string
-],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_if(_GET_VALUE_TYPE(_arg, 1), [string], , [m4_do(
-		[_varname(_arg)="@S|@@{:@],
-		[_GET_VALUE_TYPE(_arg, 1)],
-		[ "$_varname(_arg)" "_arg"@:}@"],
-		[ || exit 1],
-		[
-],
-	)])])],
-	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
-		[_VALIDATE_VALUES_IDX(_arg, m4_expand([_]_arg[_SUFFIX]))],
-	)])],
-)])
-
-
-dnl
-dnl $1: argname
-dnl $2: suffix
-m4_define([_VALIDATE_VALUES_IDX], [m4_ifnblank([$2], [m4_do(
-	[_varname([$1])[_$2="@S|@@{:@]],
-	[_GET_VALUE_TYPE([$1], 1)],
-	[ "$_varname([$1])" "[$1]" idx@:}@"],
-	[
-],
-)])])
-
-
-dnl
-dnl The common stuff to perform when adding a typed group
-dnl Registers the argument-type pair to be retreived by _GET_VALUE_TYPE or _GET_VALUE_STR
-dnl $1: The value type
-dnl $2: The type group name (NOT optional)
-dnl $3: Concerned arguments (as a list)
-m4_define([_TYPED_GROUP_STUFF], [m4_do(
-	[m4_set_contains([VALUE_TYPES], [$1], , [m4_fatal([The type '$1' is unknown.])])],
-	[m4_set_add([VALUE_TYPES_USED], [$1])],
-	[m4_set_contains([VALUE_GROUPS], [$2], [m4_fatal([Value group $2 already exists!])])],
-	[m4_set_add([VALUE_GROUPS], [$2])],
-	[m4_foreach([_argname], m4_dquote($3), [m4_do(
-		[dnl TODO: Test that vvv this check vvv works
-],
-		[m4_set_contains([TYPED_ARGS], _argname,
-			[m4_fatal([Argument ]_argname[ already has a type ](_GET_VALUE_TYPE(_argname, 1))!)])],
-		[m4_set_add([VALUE_GROUP_$1], _argname)],
-		[m4_set_add([TYPED_ARGS], _argname)],
-		[m4_define(_argname[_VAL_TYPE], [[$1]])],
-		[m4_define(_argname[_VAL_GROUP], [[$2]])],
-	)])],
-	[m4_define([$2_VALIDATOR], [[_validator_$1]])],
-)])
-
-
-dnl
-dnl $1: The value type string (code)
-dnl $2: The type group name (optional, try to infer from value type)
-dnl $3: Concerned arguments (as a list)
-dnl TODO: Integrate with help (and not only with the help synopsis)
-dnl TODO: Validate the type value (code) string
-argbash_api([ARG_TYPE_GROUP], [m4_do(
-	[[$0($@)]],
-	[m4_ifblank([$2], [m4_fatal([Name inference not implemented yet])])],
-	[_TYPED_GROUP_STUFF([$1], m4_dquote(m4_default([$2], [???])), [$3])],
-)])
-
-
-dnl
-dnl $1: The value type string (code)
-dnl $2: The type group name
-dnl $3: Concerned arguments (as a list)
-dnl $4: The set of possible values (as a list)
-dnl $5: The index variable suffix
-dnl TODO: Integrate with help (and not only with the help synopsis)
-argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
-	[[$0($@)]],
-	[m4_foreach([_val], [$4], [m4_do(
-		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],
-		[m4_list_append([_LIST_$1], m4_quote(_val))],
-	)])],
-	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),
-		m4_expand([[one of ]m4_list_join([_LIST_$1], [, ], ', ', [ and ])]))],
-	[m4_foreach([_argname], [$3], [m4_do(
-		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
-		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],
-	)])],
-	[_TYPED_GROUP_STUFF([$1], [$2], [$3])],
-)])
-
-
-dnl
 dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
 dnl
 dnl $1: argname
 m4_define([_GET_VALUE_STR], [m4_do(
 	[m4_ifdef([$1_VAL_GROUP], [m4_indir([$1_VAL_GROUP])], [arg])],
 )])
+
 
 dnl
 dnl Given an argname, return the argument type code or 'generic'
@@ -1948,16 +1452,16 @@ argbash_api([ARG_DEFAULTS_POS], [m4_do(
 )])
 
 
-m4_set_add([_S_RESTRICT_VALUES_MODES], [none])
-m4_set_add([_S_RESTRICT_VALUES_MODES], [no-local-options])
-m4_set_add([_S_RESTRICT_VALUES_MODES], [no-any-options])
+m4_set_add([_SET_OF_RESTRICT_VALUES_MODES], [none])
+m4_set_add([_SET_OF_RESTRICT_VALUES_MODES], [no-local-options])
+m4_set_add([_SET_OF_RESTRICT_VALUES_MODES], [no-any-options])
 dnl
 dnl Sets the strict mode global
 dnl When the strict mode is on, some argument values are blacklisted
 argbash_api([ARG_RESTRICT_VALUES], [m4_do(
 	[[$0($@)]],
-	[m4_set_contains([_S_RESTRICT_VALUES_MODES], [$1], ,
-		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_S_RESTRICT_VALUES_MODES], [, ]).)])],
+	[m4_set_contains([_SET_OF_RESTRICT_VALUES_MODES], [$1], ,
+		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_SET_OF_RESTRICT_VALUES_MODES], [, ]).)])],
 	[m4_define([_RESTRICT_VALUES], [[$1]])],
 )])
 
@@ -1972,70 +1476,6 @@ m4_define([_CASE_RESTRICT_VALUES], [m4_case(_RESTRICT_VALUES,
 dnl
 dnl Output some text depending on what strict mode we find ourselves in
 m4_define([_IF_RESTRICT_VALUES], [_CASE_RESTRICT_VALUES([$2], [$1], [$1])])
-
-
-m4_define([_MAKE_DIE_FUNCTION], [m4_do(
-	[_COMM_BLOCK(0,
-		[# When called, the process ends.],
-		[# Args:],
-		[# _INDENT_()@S|@1: The exit message (print to stderr)],
-		[# _INDENT_()@S|@2: The exit code (default is 1)],
-		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
-		[# Example:],
-		[# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
-	)],
-	[[die()
-{
-]],
-	[_JOIN_INDENTED(1,
-		[local _ret=$[]2],
-		[test -n "$_ret" || _ret=1],
-		[test "$_PRINT_HELP" = yes && print_help >&2],
-		[echo "$[]1" >&2],
-		[exit ${_ret}])],
-	[}],
-)])
-
-
-m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [m4_do(
-	[_COMM_BLOCK(0,
-		[# Function that evaluates whether a value passed to it],
-		[# begins by a character that is a short option of an argument],
-		[# the script knows about],
-	)],
-	[begins_with_short_option()
-{
-],
-	[_JOIN_INDENTED(1,
-		[local first_option all_short_options],
-		[all_short_options='m4_list_join([_ARGS_SHORT], [])'],
-		[first_option="${1:0:1}"],
-		[test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0],
-)],
-	[}
-],
-)])
-
-
-m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
-	[_COMM_BLOCK(0,
-		[# Function that evaluates whether a value passed to an argument],
-		[# does not violate the global rule imposed by the ARG_RESTRICT_VALUES macro:],
-		[# _CASE_RESTRICT_VALUES([],
-		[The value must not match any long or short option this script uses],
-		[The value must not match anything that looks like any long or short option.])],
-		[# _INDENT_()@S|@1: The name of the option],
-		[# _INDENT_()@S|@2: The passed value],
-	)],
-	[[evaluate_strictness()
-{
-]],
-	[_INDENT_()_CASE_RESTRICT_VALUES([],
-		[@<:@@<:@ "@S|@2" =~ ^-(-(m4_list_join([_ARGS_LONG], [|]))$|m4_dquote(m4_list_join([_ARGS_SHORT], []))) @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1', which makes it look like that you have omitted the actual value, since '@S|@2' is an option accepted by this script. This is considered a fatal error."],
-		[@<:@@<:@ "@S|@2" =~ ^--?@<:@a-zA-Z@:>@ @:>@@:>@ && die "You have passed '@S|@2' as a value of argument '@S|@1'. It looks like that you are trying to pass an option instead of the actual value, which is considered a fatal error."])],
-	[
-}],
-)])
 
 
 dnl
@@ -2059,8 +1499,6 @@ argbash_api([ARG_CLUSTERING], [m4_do(
 
 
 m4_define([_IF_CLUSTERING_GETOPT], [m4_if(_CLUSTERING_MODE, [getopt], [$1], [$2])])
-dnl Set the default value
-ARG_CLUSTERING([getopt])
 
 
 dnl
@@ -2092,11 +1530,7 @@ dnl
 dnl * Upon arg encounter, validate the value. Die in case of no compliance.
 dnl * Help: optional args - value should take the name.
 dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
-dnl
-dnl defauls handling:
-dnl - X -> _MAKE_DEFAULTS -> _MAKE_DEFAULTS_POSITIONALS_LOOP -> _MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS
-dnl - X -> _MAKE_HELP -> _POS_ARG_HELP_DEFAULTS -> _FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS
 
-dnl These macros are not needed and they present a security threat when exposed during Argbash run
+dnl These macros that are being undefined are not needed and they present a security threat when exposed during Argbash run
 m4_undefine([m4_esyscmd])
 m4_undefine([m4_syscmd])

@@ -64,7 +64,7 @@ do_stuff ()
 {
 	local _pass_also="$_wrapped_defns" input prefix_len _ret
 	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
-	input="$(printf "%s\n" "$_pass_also" | cat - "$m4dir/stuff.m4" "$output_m4")"
+	input="$(printf "%s\n" "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
 	prefix_len=$(printf "%s\n" "$input" | wc -l)
 	input="$(printf "%s\n" "$input" | cat - "$infile")"
 	run_autom4te "$input" 2> "$discard" \
