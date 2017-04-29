@@ -14,6 +14,14 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
    * If so, run ``make install PREFIX=$HOME/.local``,
    * else, run ``sudo make install PREFIX=/usr``.
 
+   .. note::
+
+     If you want multiple ``Argbash`` versions installed in parallel, install them using ``make altinstall`` (and uninstall using ``make uninstall``) commands.
+     This will create ``argbash-X.Y.Z`` script under the ``bin`` directory, with ``argbash-X.Y``, ``argbash-X`` and ``argbash`` symlinks pointing transitively to it.
+     If you altinstall another version of ``Argbash``, the common symlinks will be overwritten (i.e. at least ``argbash``).
+
+     This way of installation won't install the ``argbash-xtoy`` :ref:`migration scripts <argbash_components>`.
+
 ``Argbash`` has this audience:
 
 * Users --- people that use scripts that make use of ``Argbash``.
@@ -24,6 +32,8 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
 * ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``. Developers and Tinkerers need this. ``autoconf`` is available on Linux, OSX, BSDs and can be installed on MS Windows.
 * ``grep``, ``sed``, ``coreutils`` --- The ``argbash`` script uses ``grep``, ``sed``, ``cat``, and ``test``. If you have ``autoconf``, you probably have those already.
 * ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to Tinkerers.
+
+.. _argbash_components:
 
 Argbash components
 ------------------

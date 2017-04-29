@@ -4,6 +4,7 @@
 New features:
 
 * The generated shell `case` statement is considerably nicer.
+* Support for having more Argbash versions simultainously (applies to Argbash version that implement the `make alt(un)install` targets)
 
 Bugfixes:
 

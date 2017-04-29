@@ -105,24 +105,44 @@ develop: $(ARGBASH_TO)
 	test -z "$(ARGBASH_TO)" || ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
 	ln -s -r $(A_INIT) "$(ROOT)/$(PREFIX)/bin"
 
+# Parse the version file and expose version numbers as variables
+# that are available in targets that have this target as prerequisite
+define-version:
+	$(eval VERSION_PATCH := $(shell cut -f 3 -d . ../src/version))
+	$(eval VERSION_MINOR := $(shell cut -f 2 -d . ../src/version))
+	$(eval VERSION_MAJOR := $(shell cut -f 1 -d . ../src/version))
+	$(eval VERSION_SUFFIX := -$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH))
+
 install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
-	touch "$(ROOT)/$(PREFIX)/bin/argbash"
-	mkdir -p "$(ROOT)/$(PREFIXED_LIBDIR)/argbash"
-	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/argbash-lib.m4"
-	cp $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/"
-	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIXED_LIBDIR)/argbash|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash"
-	test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
-	cp $(A_INIT) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init
-	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
+	touch "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
+	mkdir -p "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
+	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/argbash-lib.m4"
+	cp $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/"
+	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
+	test -n "$(VERSION_SUFFIX)" || test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
+	cp $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
+	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
+
+altpreclean: define-version
+	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
+	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR)"
+	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
+
+altinstall: altpreclean install
+	ln -s "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)" "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
+	ln -s "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)" "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR)"
+	ln -s "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR)" "$(ROOT)/$(PREFIX)/bin/argbash"
 
 uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash"
-	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/"*.m4
-	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash/version"
+	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/"*.m4
+	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/version"
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
-	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash"
+	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
+
+altuninstall: define-version uninstall
 
 version:
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
@@ -137,3 +157,7 @@ release: version $(GENPARSE) $(ARGBASH_TO) examples check
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master
 	git push --follow-tags
+
+# Update using
+# grep '^[-a-z]*:' Makefile | cut -f 1 -d ':' | sort | tr '\n' ' '
+.PHONY: altinstall altpreclean bootstrap check define-version develop examples install release tag uninstall unittests version

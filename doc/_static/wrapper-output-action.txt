@@ -3,11 +3,19 @@ resources/examples/simple-wrapper.sh --glob '*.m4' ../src ../resources/examples 
 Contents of '../src' matching '*.m4':
 	argbash-1to2.m4: 1 kiB
 	argbash-init.m4: 4 kiB
+	argbash-lib.m4: 0 kiB
 	argbash.m4: 7 kiB
+	argument_value_types.m4: 3 kiB
+	default_settings.m4: 0 kiB
+	env_vars.m4: 1 kiB
+	function_generators.m4: 2 kiB
 	list.m4: 5 kiB
 	output.m4: 0 kiB
 	output-standalone.m4: 0 kiB
-	stuff.m4: 69 kiB
+	progs.m4: 2 kiB
+	stuff.m4: 50 kiB
+	utilities.m4: 3 kiB
+	value_validators.m4: 5 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
 	minimal-raw.m4: 0 kiB
