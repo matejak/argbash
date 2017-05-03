@@ -60,3 +60,8 @@ m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 	[
 }],
 )])
+
+
+m4_define([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION], [m4_do(
+	[],
+)])

@@ -10,7 +10,7 @@ dnl $1: List names
 dnl $2: If yes
 dnl $3: If not
 m4_define([_lists_same_len], [m4_if(m4_count($1), 1, [$2],
-	[m4_if(m4_list_len(m4_car($1)), m4_list_len(m4_argn(2, $1)), 
+	[m4_if(m4_list_len(m4_car($1)), m4_list_len(m4_argn(2, $1)),
 		[_lists_same_len(m4_expand([m4_shift($1)]), [$2], [$3])], [$3])])])
 
 
@@ -18,7 +18,7 @@ dnl
 dnl $1: List of list names
 dnl $2: List of var names
 dnl $3: What
-m4_define([m4_lists_foreach], [_lists_same_len([$1], 
+m4_define([m4_lists_foreach], [_lists_same_len([$1],
 	[m4_do(
 		[m4_pushdef([_varnames], m4_quote(m4_dquote_elt($2)))],
 		[dnl How long is the first list
@@ -110,7 +110,7 @@ dnl $1: List name
 dnl $2: What
 dnl $3: If it is there
 dnl $4: If it is not there
-m4_define([m4_list_contains], 
+m4_define([m4_list_contains],
 	[m4_ifnblank(m4_list_indices([$1], [$2]), [$3], [$4])])
 
 m4_define([m4_list_sum], [m4_do(

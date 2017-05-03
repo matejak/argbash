@@ -77,7 +77,6 @@ print_help ()
 	printf "\t%s\n" "-h,--help: Prints help"
 }
 
-# THE PARSING ITSELF
 while test $# -gt 0
 do
 	_key="$1"
@@ -174,8 +173,8 @@ do
 	shift
 done
 
-_positional_names=('_arg_output' )
 test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect between 0 and 1, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
+_positional_names=('_arg_output' )
 for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 do
 	eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1

@@ -17,7 +17,7 @@ m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1], [m4_do(
 	[m4_pushdef([_COMMENT_$1], [$2])],
 )])])
 
-m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift($@))])])
+m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
 
 
 dnl
