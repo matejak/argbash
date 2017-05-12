@@ -1,3 +1,6 @@
+m4_include([list.m4])
+
+
 dnl
 dnl Define a macro that is part of the public API
 dnl Ensure the replication and also add the macro name to a list of allowed macros
@@ -13,8 +16,11 @@ dnl $4, ....: comment lines
 dnl
 dnl If the comment ID has been defined earlier, don't display the comment, but point to the definition.
 dnl Otherwise, act like _COMM_BLOCK
-m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1], [m4_do(
-	[m4_pushdef([_COMMENT_$1], [$2])],
+m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION], [m4_do(
+	[m4_define([_COMMENT_$1_LOCATION], [$2])],
+	[_COMM_BLOCK($3, m4_shiftn(3, $@))],
+)], [m4_do(
+	[[See the comment at ]m4_indir([_COMMENT_$1_LOCATION])],
 )])])
 
 m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
@@ -23,7 +29,7 @@ m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_sh
 dnl
 dnl $1: The text to substitute
 dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
-m4_define([_SUBSTITUTE_LF_FOR_NEWLINE], [m4_bpatsubst([[$1]], [\([^\\]\)\(\\\\\)*\\n],  [\1\2
+m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT], [m4_bpatsubst([[$1]], [\([^\\]\)\(\\\\\)*\\n],  [\1\2
 		])])
 
 
@@ -63,7 +69,7 @@ dnl $1, $2, ...: What to put there
 dnl
 dnl Takes arguments, returns them, but there is an extra _INDENT_() in the beginning of them
 m4_define([_INDENT_MORE], [m4_do(
-	[m4_list_ifempty([_TLIST], , [m4_fatal([Internal error: List '_TLIST' should be empty, contains ]m4_list_join([_TLIST])[ instead])])],
+	[m4_list_ifempty([_TLIST], , [m4_fatal([Internal error: List '_TLIST' should be empty, contains ]m4_list_contents([_TLIST])[ instead])])],
 	[m4_foreach([line], [$@], [m4_list_append([_TLIST], m4_expand([_INDENT_()line]))])],
 	[m4_unquote(m4_list_contents([_TLIST]))],
 	[m4_list_destroy([_TLIST])],

@@ -1,15 +1,5 @@
 m4_include([list.m4])
-
-m4_define([BOMB], [m4_fatal(m4_ifblank([$1], [[Bomb $2 has been expanded, which shouldn't happen]], [[$1]]))])
-m4_define([ANTIBOMB], [m4_ifndef([$1], [m4_fatal([We have expected '$1' to be defined])])])
-m4_define([ANTIFUSE], [m4_define([$1])])
-
-m4_define([assert_equals],
-	[m4_if(
-		[$1],
-		[$2],
-		[],
-		[m4_fatal([Item '$1' doesn't match '$2'.])])])
+m4_include([test-support.m4])
 
 dnl If BOMB gets expanded, we will be noticed.
 assert_equals(m4_quote(m4_list_contents([lol])), [])

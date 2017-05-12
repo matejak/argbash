@@ -14,11 +14,13 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
-dnl TODO: Introduce unit testing even of stuff.m4
 dnl TODO: Define parsing code as a function so one can call it on its hown
 dnl TODO: Support custom error messages
 dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
+dnl
+dnl WIP vvvvvvvvvvvvvvv
+dnl TODO: Introduce unit testing even of stuff.m4
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -659,7 +661,7 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
 ],
 	[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 	[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-	[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE(_msg)],
+	[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
 	[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
 	[m4_popdef([argname])],
 	[m4_popdef([argname1])],
@@ -683,7 +685,7 @@ m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach(
 		[dnl Bool have a long beginning with --no-
 ],
 		[m4_case(_arg_type, [bool], [,--no-]_argname)],
-		[: _SUBSTITUTE_LF_FOR_NEWLINE(_arg_help)],
+		[: _SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_arg_help)],
 		[dnl Actions don't have defaults
 ],
 		[dnl We save the default to a temp var whichwe expand later.
@@ -739,7 +741,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\n" "_SUBSTITUTE_LF_FOR_NEWLINE(_HELP_MSG)"
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\n" "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
 ))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing

@@ -1,12 +1,5 @@
 m4_include([list.m4])
-
-m4_define([assert_equals],
-	[m4_if(
-		[$1],
-		[$2],
-		[],
-		[m4_fatal([Item '$1' doesn't match '$2'.])])])
-
+m4_include([test-support.m4])
 
 m4_list_append([FOO], [one])
 m4_list_append([FOO], [two])

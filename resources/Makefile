@@ -91,9 +91,9 @@ check: $(TESTDIR)/Makefile $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	$(MAKE) tests-clean
 	@echo "*** All is OK ***"
 
+# TODO: Think out how to make a multiline foreach
 unittests:
-	autom4te -l m4sugar -I ../src/ ../tests/unittests/list.m4
-	autom4te -l m4sugar -I ../src/ ../tests/unittests/utils.m4
+	$(foreach testfile,$(wildcard ../tests/unittests/check-*.m4),autom4te -l m4sugar -I ../src/ -I ../tests/unittests $(testfile) &&) true
 
 develop: $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
