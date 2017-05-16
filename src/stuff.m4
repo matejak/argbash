@@ -1128,44 +1128,6 @@ _INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_
 )])
 
 
-m4_define([_CHECK_COUNT_OF_PASSED_POSITIONAL_ARGS], [m4_do(
-	[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
-		[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
-		[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
-		[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
-	[_COMM_BLOCK(0,
-		[# Now check that we didn't receive more or less of positional arguments than we require.],
-	)],
-	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([m4_do(
-		[_INDENT_(0)_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
-],
-		[_INDENT_(0)[test ${#_positionals[@]} -lt ]],
-		[_MINIMAL_POSITIONAL_VALUES_COUNT],
-		[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
-		[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-		[ (namely: $_required_args_string)],
-		[[, but got only ${#_positionals[@]}." 1
-]])])],
-	[IF_POSITIONALS_INF([m4_do(
-		[_COMM_BLOCK(0,
-			[We accept up to inifinitely many positional values, so],
-			[there is no need to check for spurious positional arguments.],
-		)],
-		[
-])], [m4_do(
-		[_INDENT_(0)[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
-		[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
-		[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-		[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
-		[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
-],
-		[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
-]],
-	)])],
-	[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
-)])
-
-
 m4_define([_MAKE_ARGV_WHILE_LOOP], [m4_do(
 	[_COMM_BLOCK(0, [# The parsing itself])],
 	[while test $[]# -gt 0
@@ -1224,9 +1186,18 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[
 ],
-		[_CHECK_COUNT_OF_PASSED_POSITIONAL_ARGS],
+		[_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION],
 		[_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS],
-		[_ASSIGN_PASSED_POSITIONAL_ARGS_TO_TARGETS],
+		[_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION],
+		[m4_if([DIY_MODE], 1, [_COMM_BLOCK(
+			[# Call the functions that assign passed arguments to variables],
+			[# and that check that the amount of passed arguments is correct],
+			)], [m4_do(
+				[handle_passed_args_count
+],
+				[assign_positional_args
+],
+		)])],
 	)])],
 )])
 

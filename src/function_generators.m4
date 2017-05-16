@@ -62,6 +62,82 @@ m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 )])
 
 
+m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
+	[_INDENT_(1)_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
+],
+	[_INDENT_(1)[test ${#_positionals[@]} -lt ]],
+	[_MINIMAL_POSITIONAL_VALUES_COUNT],
+	[[ && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
+	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
+	[ (namely: $_required_args_string)],
+	[[, but got only ${#_positionals[@]}." 1
+]],
+)])
+
+
+m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_do(
+	[_INDENT_(1)[test ${#_positionals[@]} -gt ]_HIGHEST_POSITIONAL_VALUES_COUNT],
+	[[ && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
+	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
+	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
+	[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
+],
+	[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
+]],
+)])
+
+
+dnl TODO: Make sure that if the function is not needed (inf arguments, zero required), it is not generated nor called
 m4_define([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION], [m4_do(
-	[],
+	[m4_pushdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT], IF_POSITIONALS_INF(
+		[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
+		[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
+		[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
+	[_COMM_BLOCK(0,
+		[# Check that we receive expected amount positional arguments.],
+		[# Return 0 if everything is OK, 1 if we have too little arguments],
+		[# and 2 if we have too much arguments],
+	)],
+	[handle_passed_args_count ()
+{
+],
+	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([_CHECK_FOR_TOO_LITTLE_ARGS])],
+	[IF_POSITIONALS_INF([m4_do(
+		[_COMM_BLOCK(0,
+			[# We accept up to inifinitely many positional values, so],
+			[# there is no need to check for spurious positional arguments.],
+		)],
+	)], [_CHECK_FOR_TOO_MANY_ARGS])],
+	[}
+],
+	[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
+)])
+
+m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Take arguments that we have received, and save them in variables of given names.],
+		[# The 'eval' command is needed as the name of target variable is saved into another variable.],
+	)],
+	[assign_positional_args ()
+{
+],
+	[_JOIN_INDENTED(1,
+		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))]],
+		[[do]],
+		[_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
+		[_CASE_RESTRICT_VALUES([], [], [_INDENT_MORE(
+			[_COMM_BLOCK([# It has been requested that all positional arguments that look like options are rejected])],
+			[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"])])],
+		[[done]],
+	)],
+	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_do(
+		[m4_set_foreach([_POS_VARNAMES], [varname], [_INDENT_()varname=()
+])],
+		[_INDENT_()m4_list_join([_WRAPPED_ADD_SINGLE], [
+_INDENT_()])],
+		[
+],
+	)])],
+	[}
+],
 )])
