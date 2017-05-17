@@ -93,6 +93,7 @@ handle_passed_args_count ()
 	_required_args_string="'input'"
 	test ${#_positionals[@]} -lt 1 && _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: $_required_args_string), but got only ${#_positionals[@]}." 1
 }
+
 _positional_names=('_arg_input' )
 _our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
 for ((ii = 0; ii < _our_args; ii++))
@@ -106,6 +107,7 @@ assign_positional_args ()
 		eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
 	done
 }
+
 handle_passed_args_count
 assign_positional_args
 

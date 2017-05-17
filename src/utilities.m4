@@ -71,7 +71,7 @@ dnl Takes arguments, returns them, but there is an extra _INDENT_() in the begin
 m4_define([_INDENT_MORE], [m4_do(
 	[m4_list_ifempty([_TLIST], , [m4_fatal([Internal error: List '_TLIST' should be empty, contains ]m4_list_contents([_TLIST])[ instead])])],
 	[m4_foreach([line], [$@], [m4_list_append([_TLIST], m4_expand([_INDENT_()line]))])],
-	[m4_unquote(m4_list_contents([_TLIST]))],
+	[m4_list_contents([_TLIST])],
 	[m4_list_destroy([_TLIST])],
 )])
 

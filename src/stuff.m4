@@ -1106,28 +1106,6 @@ m4_define([_STORE_PASSED_ARGS_AS_POSITIONALS],
 	[_INDENT_()[_positionals+=("$][1")]])
 
 
-m4_define([_ASSIGN_PASSED_POSITIONAL_ARGS_TO_TARGETS], [m4_do(
-	[_COMM_BLOCK(0,
-		[# Take arguments that we have received, and save them in variables of given names.],
-		[# The 'eval' command is needed as the name of target variable is saved into another variable.],
-	)],
-	[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))
-do
-]_INDENT_()[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]_CASE_RESTRICT_VALUES(
-[], [], [_COMM_BLOCK([
-_INDENT_()# It has been requested that all positional arguments that look like options are rejected])
-_INDENT_()[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]])
-[done]],
-	[
-],
-	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_set_foreach([_POS_VARNAMES], [varname], [varname=()
-])])],
-	[m4_join([
-],
-		m4_unquote(m4_list_contents([_WRAPPED_ADD_SINGLE])))],
-)])
-
-
 m4_define([_MAKE_ARGV_WHILE_LOOP], [m4_do(
 	[_COMM_BLOCK(0, [# The parsing itself])],
 	[while test $[]# -gt 0
@@ -1180,21 +1158,28 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 )])
 
 
+m4_define([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED], [IF_POSITIONALS_INF(
+	[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [$2], [$1])],
+	[$1])])
+
+
 m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
 	[_MAKE_ARGV_WHILE_LOOP
 ],
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[
 ],
-		[_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION],
+		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION
+])],
 		[_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS],
-		[_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION],
+		[_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION
+],
 		[m4_if([DIY_MODE], 1, [_COMM_BLOCK(
 			[# Call the functions that assign passed arguments to variables],
 			[# and that check that the amount of passed arguments is correct],
 			)], [m4_do(
-				[handle_passed_args_count
-],
+				[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([handle_passed_args_count
+])],
 				[assign_positional_args
 ],
 		)])],
