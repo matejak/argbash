@@ -77,9 +77,11 @@ print_help ()
 	printf "\t%s\n" "-h,--help: Prints help"
 }
 
-while test $# -gt 0
-do
-	_key="$1"
+parse_commandline ()
+{
+	while test $# -gt 0
+	do
+		_key="$1"
 	case "$_key" in
 		-s|--separate)
 			_arg_separate=$((_arg_separate + 1))
@@ -170,8 +172,11 @@ do
 			_positionals+=("$1")
 			;;
 	esac
-	shift
-done
+		shift
+	done
+}
+
+parse_commandline "$@"
 
 handle_passed_args_count ()
 {

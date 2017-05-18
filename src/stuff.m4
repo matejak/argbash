@@ -1106,20 +1106,6 @@ m4_define([_STORE_PASSED_ARGS_AS_POSITIONALS],
 	[_INDENT_()[_positionals+=("$][1")]])
 
 
-m4_define([_MAKE_ARGV_WHILE_LOOP], [m4_do(
-	[_COMM_BLOCK(0, [# The parsing itself])],
-	[while test $[]# -gt 0
-do
-],
-	[_IF_HAVE_OPTIONAL(
-		[_EVAL_OPTIONALS],
-		[_STORE_PASSED_ARGS_AS_POSITIONALS])
-],
-	[_INDENT_()[shift
-done]],
-)])
-
-
 m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 	[_COMM_BLOCK(0,
 		[# We have an array of variables to which we want to save positional args values.],
@@ -1164,8 +1150,15 @@ m4_define([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED], [IF_POSITIONALS_INF(
 
 
 m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
-	[_MAKE_ARGV_WHILE_LOOP
+	[_MAKE_ARGV_PARSING_FUNCTION
 ],
+	[m4_if([DIY_MODE], 1, [_COMM_BLOCK(
+		[# Call the functions that assign passed arguments to variables],
+		[# and that check that the amount of passed arguments is correct],
+		)], [m4_do(
+		[parse_commandline "@S|@@"
+],
+	)])],
 	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
 		[
 ],

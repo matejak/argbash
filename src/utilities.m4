@@ -24,6 +24,7 @@ m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION],
 )])])
 
 m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
+m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])
 
 
 dnl
@@ -59,8 +60,10 @@ dnl Blank args to this macro are totally ignored, use @&t@ to get over that --- 
 dnl $1: How many indents
 dnl $2, $3, ...: What to put there
 m4_define([_JOIN_INDENTED], _CHECK_INTEGER_TYPE(1, [depth of indentation])[m4_do(
+	[m4_pushdef([_current_indentation_level], [$1])],
 	[m4_foreach([line], [m4_shift($@)], [m4_ifnblank(m4_quote(line), _INDENT_([$1])[]m4_dquote(line)
 )])],
+	[m4_popdef([_current_indentation_level])],
 )])
 
 

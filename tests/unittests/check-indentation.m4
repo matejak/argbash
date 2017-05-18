@@ -11,16 +11,16 @@ _SET_INDENT([[x-]])
 assert_equals(_INDENT_(1)y, [[x-]y])
 
 _SET_INDENT([  ])
-assert_equals(_JOIN_INDENTED(0, a, b), 
+assert_equals(_JOIN_INDENTED(0, a, b),
 [a
 b
 ])
-assert_equals(_JOIN_INDENTED(1, a, b), 
+assert_equals(_JOIN_INDENTED(1, a, b),
 [  a
   b
 ])
 
-assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE(b, c), d, e), 
+assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE(b, c), d, e),
 [  a
     b
     c
@@ -31,6 +31,15 @@ assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE(b, c), d, e),
 assert_equals(_COMM_BLOCK(1, x, [BOMB]), [])
 
 m4_define([COMMENT_OUTPUT])
+
+assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE(b, _COMMENT([x]), _COMMENT([y]), c), e),
+[  a
+    b
+    x
+    y
+    c
+  e
+])
 
 assert_equals(_COMM_BLOCK(1, x, [BOMB]),
 [  x

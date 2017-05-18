@@ -144,3 +144,21 @@ _INDENT_()])],
 	[}
 ],
 )])
+
+
+m4_define([_MAKE_ARGV_PARSING_FUNCTION], [m4_do(
+	[_COMM_BLOCK(0, [# The parsing of the command-line])],
+	[parse_commandline ()
+{
+],
+	[_JOIN_INDENTED(1,
+	[while test $[]# -gt 0],
+	[do],
+	[_IF_HAVE_OPTIONAL(
+		[_EVAL_OPTIONALS],
+		[_STORE_PASSED_ARGS_AS_POSITIONALS])],
+	[_INDENT_()[shift]],
+	[done])],
+	[}
+],
+)])
