@@ -1,5 +1,5 @@
-argbash
-=======
+[argbash](https://argbash.io)
+=============================
 
 [![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
 [![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://readthedocs.org/projects/argbash/?badge=latest)
