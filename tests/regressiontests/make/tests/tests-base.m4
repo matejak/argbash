@@ -180,3 +180,4 @@ ADD_GENTEST([illegal-opt], [one character])
 ADD_GENTEST([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
 ADD_GENTEST([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
+ADD_GENTEST([badcall-multi], [3rd argument], [num of args], [actual number of])

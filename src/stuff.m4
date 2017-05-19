@@ -14,13 +14,14 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
-dnl TODO: Define parsing code as a function so one can call it on its hown
+dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
 dnl TODO: Support custom error messages
 dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
+dnl TODO: Shorten the case statement bodies
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Introduce unit testing even of stuff.m4
+dnl TODO: Add arg type checks for all public API functions
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -354,13 +355,13 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
-argbash_api([ARG_POSITIONAL_MULTI], [m4_do(
+argbash_api([ARG_POSITIONAL_MULTI], _CHECK_INTEGER_TYPE(3, [actual number of arguments])[m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
 
 
-m4_define([_ARG_POSITIONAL_MULTI], _CHECK_INTEGER_TYPE(3, [number of arguments])[m4_do(
+m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],

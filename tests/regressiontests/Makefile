@@ -126,6 +126,7 @@ TESTS_GEN += \
 	gen-test-illegal-opt \
 	gen-test-misspelled \
 	gen-test-unmatched_bracket \
+	gen-test-badcall-multi \
 	gen-test-init_name_dash \
 	gen-test-init_name_char \
 	$(NUL)
@@ -339,6 +340,11 @@ gen-test-misspelled: $(TESTDIR)/gen-test-misspelled.m4 $(ARGBASH_BIN)
 gen-test-unmatched_bracket: $(TESTDIR)/gen-test-unmatched_bracket.m4 $(ARGBASH_BIN)
 	ERROR="unmatched square bracket on line 3" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 	ERROR="# ARG_OPTIONAL_BOOLEAN(\[long\], l, \[)" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+
+gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
+	ERROR="3rd argument" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="num of args" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="actual number of" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
 test-delim-space: $(TESTDIR)/test-delim-space.sh
 	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something

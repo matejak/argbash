@@ -1,10 +1,11 @@
-2.4.1 (TBA)
+2.5.0 (TBA)
 ------------------
 
 New features:
 
 * The generated shell `case` statement is considerably nicer.
 * Support for having more Argbash versions simultainously (applies to Argbash version that implement the `make alt(un)install` targets)
+* Argbash functionality is now encapsulated in shell functions.
 
 Bugfixes:
 
