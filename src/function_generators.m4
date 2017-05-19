@@ -152,13 +152,15 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [m4_do(
 {
 ],
 	[_JOIN_INDENTED(1,
-	[while test $[]# -gt 0],
-	[do],
+		[while test $[]# -gt 0],
+		[do],
+	)],
 	[_IF_HAVE_OPTIONAL(
 		[_EVAL_OPTIONALS],
-		[_STORE_PASSED_ARGS_AS_POSITIONALS])],
-	[_INDENT_()[shift]],
-	[done])],
+		[_STORE_CURRENT_ARG_AS_POSITIONAL])],
+	[_JOIN_INDENTED(1,
+		[_INDENT_()[shift]],
+		[done])],
 	[}
 ],
 )])

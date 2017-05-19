@@ -12,6 +12,7 @@ M4_SRC = \
 # which outputs all files that are included using m4_include in .m4 files
 M4_SRC += \
 	../src/argument_value_types.m4 \
+	../src/constants.m4 \
 	../src/default_settings.m4 \
 	../src/env_vars.m4 \
 	../src/function_generators.m4 \

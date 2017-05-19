@@ -33,6 +33,7 @@ ADD_TEST([test-more], [[
 	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa ba,r,"
 	$< LOO laa bus kus | grep -q "POS_S=LOO,POS_MORE=laa bus kus",
 	ERROR="namely: 'pos-arg' and 'pos-more'" $(REVERSE) $<
+	grep -q '^		_positionals' $<
 ]])
 
 
@@ -49,7 +50,7 @@ ADD_TEST([test-onlypos-declared], [[
 
 
 ADD_TEST([test-onlyopt], [[
-	grep -q '^  esac$$' $<
+	grep -q '^    esac$$' $<
 	@# ! negates the return code
 	! grep -q '^	' $<
 	$(REVERSE) grep -q POSITION $<
@@ -96,6 +97,8 @@ ADD_TEST([test-simple], [[
 	$< -h | grep -q -v 'END2-$$'
 	$< -h | grep -q '^		-PBEGIN'
 	$< -h | grep -q 'PEND-$$'
+	grep -q '^		esac' $<
+	grep -q '^			\*@:}@' $<
 	ERROR=spurious 	$(REVERSE) $< -- one two
 	ERROR="last one was: 'two'" 	$(REVERSE) $< one two
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
@@ -110,7 +113,7 @@ ADD_TEST([test-wrapping], [[
 	! $< -h | grep -q boo_l
 	@# no spaces as indentation (that test-onlyopt uses)
 	! grep -q '^  ' $<
-	grep -q '^	esac' $<
+	grep -q '^		esac' $<
 	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,

@@ -1,4 +1,5 @@
 m4_include([list.m4])
+m4_include([constants.m4])
 m4_include([utilities.m4])
 m4_include([stuff.m4])
 m4_include([function_generators.m4])

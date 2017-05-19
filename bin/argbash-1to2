@@ -52,41 +52,41 @@ parse_commandline ()
 	while test $# -gt 0
 	do
 		_key="$1"
-	case "$_key" in
-		-o|--output)
-			test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-			_val="$2"
-			shift
-			_arg_output="$_val"
-			;;
-		--output=*)
-			_val="${_key##--output=}"
-			_arg_output="$_val"
-			;;
-		-o*)
-			_val="${_key##-o}"
-			_arg_output="$_val"
-			;;
-		-v|--version)
-			echo "argbash-1to2 v$version"
-			exit 0
-			;;
-		-v*)
-			echo "argbash-1to2 v$version"
-			exit 0
-			;;
-		-h|--help)
-			print_help
-			exit 0
-			;;
-		-h*)
-			print_help
-			exit 0
-			;;
-		*)
-			_positionals+=("$1")
-			;;
-	esac
+		case "$_key" in
+			-o|--output)
+				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+				_val="$2"
+				shift
+				_arg_output="$_val"
+				;;
+			--output=*)
+				_val="${_key##--output=}"
+				_arg_output="$_val"
+				;;
+			-o*)
+				_val="${_key##-o}"
+				_arg_output="$_val"
+				;;
+			-v|--version)
+				echo "argbash-1to2 v$version"
+				exit 0
+				;;
+			-v*)
+				echo "argbash-1to2 v$version"
+				exit 0
+				;;
+			-h|--help)
+				print_help
+				exit 0
+				;;
+			-h*)
+				print_help
+				exit 0
+				;;
+			*)
+				_positionals+=("$1")
+				;;
+		esac
 		shift
 	done
 }

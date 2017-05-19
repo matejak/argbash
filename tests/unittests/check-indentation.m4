@@ -20,15 +20,17 @@ assert_equals(_JOIN_INDENTED(1, a, b),
   b
 ])
 
-assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE(b, c), d, e),
+assert_equals(_JOIN_INDENTED(1, a, _INDENT_MORE([[BOMB]], [ANTIFUSE([_X_])c]), d, e),
 [  a
-    b
+    BOMB
     c
   d
   e
 ])
+ANTIBOMB([_X_])
 
 assert_equals(_COMM_BLOCK(1, x, [BOMB]), [])
+assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [])
 
 m4_define([COMMENT_OUTPUT])
 
@@ -57,3 +59,5 @@ assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\nsecond]), [first
 		second])
 
 assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\\nsecond]), [first\\nsecond])
+
+assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [BOMB,two])

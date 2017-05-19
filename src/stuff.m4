@@ -771,7 +771,7 @@ dnl $1: Arg name
 dnl $2: Short arg name (not used here)
 dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(3,
+m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[_val="@S|@2"],
 	[shift],
@@ -784,7 +784,7 @@ dnl
 dnl $1: Arg name
 dnl $2: Action - the variable containing the value to assign is '_val'
 dnl $3: The name of the option arg
-m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(3,
+m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[_val="${_key##--[$1]=}"],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
@@ -796,7 +796,7 @@ dnl $1: Arg name
 dnl $2: Short arg name
 dnl $3: Action - the variable containing the value to assign is '_val'
 dnl $4: The name of the option arg
-m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(3,
+m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[_val="${_key##-$2}"],
 	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
@@ -914,7 +914,7 @@ dnl
 dnl Given multiple matches, join them with |
 m4_define([_INDENT_AND_END_CASE_MATCH], [m4_do(
 	[
-_INDENT_(2,	)],
+_INDENT_(3,	)],
 	[_COMPOSE_CASE_MATCH_STATEMENT($@)],
 	[@:}@
 ],
@@ -951,23 +951,23 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[bool],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
 		[incr],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 		)],
 		[action],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$4]],
 			[exit 0],
 		)],
 	)],
-	[_INDENT_(3);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
 )])
 
 
@@ -993,7 +993,7 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[m4_fatal([Internal error: Argument of type '$3' is other than 'arg' or 'repeated' and shouldn't make it to the '$0' macro.])]
 	)],
-	[_INDENT_(3);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
 )])
 
 
@@ -1006,24 +1006,24 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[bool],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
 			_PASS_WHEN_GETOPT([$2]),
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 		)],
 		[incr],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
 			_PASS_WHEN_GETOPT([$2]),
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
 		)],
 		[action],
-		[_JOIN_INDENTED(3,
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$4]],
 			[exit 0],
 		)],
 	)],
-	[_INDENT_(3);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
 )])
 
 
@@ -1055,7 +1055,7 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
 
 
 m4_define([_EVAL_OPTIONALS], [m4_do(
-	[_INDENT_()_key="$[]1"
+	[_INDENT_(2)_key="$[]1"
 ],
 	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
 	[_COMM_BLOCK(1,
@@ -1068,42 +1068,31 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 
 
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
-	[_INDENT_()[case "$_key" in]],
+	[_INDENT_(2)[case "$_key" in]],
 	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _varname(_argname))])],
-	[m4_if(HAVE_POSITIONAL, 1,
-		[_EVAL_POSITIONALS_CASE],
-		[_HANDLE_UNEXPECTED_POSITIONAL_ARG])],
-	[_INDENT_()[esac]],
+	[_HANDLE_POSITIONAL_ARG],
+	[_INDENT_(2)[esac
+]],
 )])
 
 
-dnl Store positional args inside a 'case' statement (that is inside a 'for' statement)
-m4_define([_EVAL_POSITIONALS_CASE], [m4_do(
+m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
 	[
-_INDENT_(2)],
+_INDENT_(3)],
 	[*@:}@
 ],
-	[_JOIN_INDENTED(3,
-		[_positionals+=("$[]1")],
+	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+		[m4_if(HAVE_POSITIONAL, 1,
+			[_positionals+=("$[]1")],
+			[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1])],
 		[;;])],
 )])
 
 
-dnl If we expect only optional arguments and we get an intruder, fail noisily.
-m4_define([_HANDLE_UNEXPECTED_POSITIONAL_ARG], [m4_do(
-	[
-_INDENT_(2)],
-	[*@:}@
-],
-	[_JOIN_INDENTED(3,
-		[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1],
-		[;;])],
-)])
-
-
-m4_define([_STORE_PASSED_ARGS_AS_POSITIONALS],
-	[_INDENT_()[_positionals+=("$][1")]])
+m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL],
+	[_INDENT_(2)[_positionals+=("$][1")]
+])
 
 
 m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(

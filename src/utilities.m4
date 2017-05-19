@@ -24,6 +24,7 @@ m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION],
 )])])
 
 m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
+m4_define([_COMMENT_CHAIN], [m4_ifdef([COMMENT_OUTPUT], [$@])])
 m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])
 
 
