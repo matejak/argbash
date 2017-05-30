@@ -16,12 +16,11 @@ dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
 dnl TODO: Support custom error messages
-dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
 dnl TODO: Shorten the case statement bodies
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Add arg type checks for all public API functions
+dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -54,7 +53,7 @@ dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPT_TYPE], [m4_do(
 	[m4_ifnblank([$1], [m4_bmatch([$1], [^[a-zA-z]$], ,
-		[m4_fatal([Short option '$1' for argument '--$2' is not valid - it has to be exactly one character.])])])],
+		[m4_fatal([The value of short option '$1' for argument '--$2' is not valid - it has to be either left blank, or exactly one character.])])])],
 )])
 
 
@@ -257,7 +256,7 @@ dnl Declare one positional argument with default
 dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: Default (opt.)
-argbash_api([ARG_POSITIONAL_SINGLE], [m4_do(
+argbash_api([ARG_POSITIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_SINGLE($@)])],
 )])
@@ -297,7 +296,7 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: How many args at least (opt., default=0)
 dnl $4, $5, ...: Defaults (opt., defaults for the 1st, 2nd, ... value past the required minimum)
-argbash_api([ARG_POSITIONAL_INF], [m4_do(
+argbash_api([ARG_POSITIONAL_INF], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
@@ -355,7 +354,7 @@ dnl $1: Name of the arg
 dnl $2: Help for the arg
 dnl $3: How many args
 dnl $4, $5, ...: Defaults (opt.)
-argbash_api([ARG_POSITIONAL_MULTI], _CHECK_INTEGER_TYPE(3, [actual number of arguments])[m4_do(
+argbash_api([ARG_POSITIONAL_MULTI], _CHECK_PASSED_ARGS_COUNT(3)_CHECK_INTEGER_TYPE(3, [actual number of arguments])[m4_do(
 	[_CHECK_OPTION_NAME([$1])],
 	[m4_list_contains([BLACKLIST], [$1], , [[$0($@)]_ARG_POSITIONAL_MULTI($@)])],
 )])
@@ -386,7 +385,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 )])
 
 
-argbash_api([ARG_OPTIONAL_SINGLE], [m4_do(
+argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(2, 4)[m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
@@ -405,7 +404,7 @@ m4_define([_ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 
 dnl
 dnl $1 The function to call to get the version
-argbash_api([ARG_VERSION], [m4_do(
+argbash_api([ARG_VERSION], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[dnl Just record how have we called ourselves
 ],
 	[[$0($@)]],
@@ -428,7 +427,7 @@ m4_define([_ARG_VERSIONx], [m4_do(
 dnl
 dnl $1: The main help message
 dnl $2: The bottom help message
-argbash_api([ARG_HELP], [m4_do(
+argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[dnl Skip help if we declare we don't want it
 ],
 	[[$0($@)]],
@@ -462,7 +461,7 @@ dnl The argbash script generator will pick it up and (re)generate that one as we
 dnl
 dnl $1: the filename (assuming that it is in the same directory as the script)
 dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
-argbash_api([INCLUDE_PARSING_CODE], [m4_do(
+argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
 	[m4_list_append([_OTHER],
@@ -497,7 +496,7 @@ dnl $1: long name
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (=0)
-argbash_api([ARG_OPTIONAL_INCREMENTAL], [m4_do(
+argbash_api([ARG_OPTIONAL_INCREMENTAL], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_INCREMENTAL_BODY)[,
@@ -509,7 +508,7 @@ dnl $1: long name
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (empty array)
-argbash_api([ARG_OPTIONAL_REPEATED], [m4_do(
+argbash_api([ARG_OPTIONAL_REPEATED], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
@@ -528,7 +527,7 @@ dnl $1: long name, var suffix (translit of [-] -> _)
 dnl $2: short name (opt)
 dnl $3: help
 dnl $4: default (=off)
-argbash_api([ARG_OPTIONAL_BOOLEAN], [m4_do(
+argbash_api([ARG_OPTIONAL_BOOLEAN], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3],
@@ -898,7 +897,7 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 dnl
 dnl Sets the option--value separator (i.e. --option=val or --option val
 dnl $1: The directive (' ', '=', or ' =' or '= ')
-argbash_api([ARGBASH_SET_DELIM], [m4_do(
+argbash_api([ARGBASH_SET_DELIM], _CHECK_PASSED_ARGS_COUNT(1, 1)[m4_do(
 	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_VALUE_DELIMITER([$1])])],
 )])
 
@@ -1346,7 +1345,7 @@ dnl You can wrap multiple scripts using multiple ARGBASH_WRAP statements.
 dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: Names of blacklisted args (list)
 dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
-argbash_api([ARGBASH_WRAP], [m4_do(
+argbash_api([ARGBASH_WRAP], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED], [[$1]])],
 	[m4_list_append([BLACKLIST], $2)],
@@ -1416,7 +1415,7 @@ m4_set_add([_SET_OF_RESTRICT_VALUES_MODES], [no-any-options])
 dnl
 dnl Sets the strict mode global
 dnl When the strict mode is on, some argument values are blacklisted
-argbash_api([ARG_RESTRICT_VALUES], [m4_do(
+argbash_api([ARG_RESTRICT_VALUES], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[[$0($@)]],
 	[m4_set_contains([_SET_OF_RESTRICT_VALUES_MODES], [$1], ,
 		[m4_fatal([Invalid strict mode - used '$1', but you have to use one of: ]m4_set_contents([_SET_OF_RESTRICT_VALUES_MODES], [, ]).)])],
@@ -1450,7 +1449,7 @@ m4_define([_CHECK_PASSED_VALUE_AGAINST_BLACKLIST], [m4_do(
 
 dnl
 dnl $1: The mode of argument clustering: One of 'none', 'getopts'
-argbash_api([ARG_CLUSTERING], [m4_do(
+argbash_api([ARG_CLUSTERING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[[$0($@)]],
 	[m4_define([_CLUSTERING_MODE], [[$1]])],
 )])

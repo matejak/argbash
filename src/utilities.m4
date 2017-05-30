@@ -56,6 +56,37 @@ m4_define([__CHECK_INTEGER_TYPE], [[m4_do(
 )]])
 
 
+
+m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_FEW],
+	[])
+
+m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_MANY],
+	[])
+
+dnl
+dnl $1: Name of the macro
+dnl $2: The actual argc
+dnl $3: argc lower bound
+dnl $4: argc upper bound
+dnl $5: The calling signature
+m4_define([__CHECK_PASSED_ARGS_COUNT], [[m4_do(
+	[m4_pushdef([_maybe_signature_$1], [m4_ifnblank([$5], [[$1($5)]])])],
+	[m4_if(
+		m4_eval($2 < $3), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_FEW([$2], [$3], [m4_indir([_maybe_signature_$1])])],
+		m4_eval($2 > $4), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_MANY([$2], [$4], [m4_indir([_maybe_signature_$1])])],
+	)],
+	[m4_popdef([_maybe_signature_$1])],
+)]])
+
+
+dnl Check thath the correct number of arguments has been passed, and display the calling signature if it is not the case
+dnl $1: The minimal amount of args > 0 (due to m4's $# behaior)
+dnl $2: The highest possible arguments count (optional, defaults to no upper bound behavior)
+dnl $3: The arguments part of the calling signature (optional)
+m4_define([_CHECK_PASSED_ARGS_COUNT], m4_if([$1], 0, [m4_fatal([The minimal amount of args must be non-negative.])])[__CHECK_PASSED_ARGS_COUNT([$]0, $[#], [$1], m4_default([$2], [$[#]]), [$3])])
+
+
+dnl
 dnl
 dnl Blank args to this macro are totally ignored, use @&t@ to get over that --- @&t@ is a quadrigraph that expands to nothing in the later phase
 dnl $1: How many indents
