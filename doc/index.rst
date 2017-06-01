@@ -4,13 +4,13 @@ Argbash documentation
 Argbash
 -------
 
-``Argbash`` (`<https://github.com/matejak/argbash>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
+``Argbash`` (`<https://argbash.io>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
 You declare arguments that your script should use in few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, OSX, MS Windows, ...).
 
 You :ref:`can have <file_layout>` your parsing code in the script, you can have ``Argbash`` to help you to use it as a ``bash`` library, or you can generate the library yourself and include it yourself too, it's up to you.
 A basic template generator ``argbash-init`` is part of the package, and you can :ref:`get started with it <quickstart_init>` in a couple of seconds.
 
-``Argbash`` is free software, you are free to use it, share it, modify it and share the modifications with the world, since it is published under the 3-clause BSD linense.
+``Argbash`` is free and `open source <https://github.com/matejak/argbash>`_ software, you are free to use it, share it, modify it and share the modifications with the world, since it is published under the 3-clause BSD linense.
 
 .. image:: ../resources/logo/web-legacy.svg
    :alt: Link to argbash online generator
@@ -22,7 +22,7 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 :Authors:
   `Matěj Týč <https://github.com/matejak>`_
 :Copyright:
-  2014-2016, Matěj Týč
+  2014--2016, Matěj Týč
 :Website:
   https://argbash.io
 

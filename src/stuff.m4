@@ -385,7 +385,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 )])
 
 
-argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(2, 4)[m4_do(
+argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[_A_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],

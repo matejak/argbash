@@ -6,3 +6,4 @@ tests/regressiontests/test-standalone.sh
 tests/regressiontests/test.sh
 
 doc/_build
+resources/packages/build

@@ -58,10 +58,10 @@ m4_define([__CHECK_INTEGER_TYPE], [[m4_do(
 
 
 m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_FEW],
-	[])
+	[m4_fatal([You have passed $2 arguments to macro $1, while it requires at least $3.]m4_ifnblank([$4], [ Call it like: $4]))])
 
 m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_MANY],
-	[])
+	[m4_fatal([You have passed $2 arguments to macro $1, while it accepts at most $3.]m4_ifnblank([$4], [ Call it like: $4]))])
 
 dnl
 dnl $1: Name of the macro
@@ -72,8 +72,8 @@ dnl $5: The calling signature
 m4_define([__CHECK_PASSED_ARGS_COUNT], [[m4_do(
 	[m4_pushdef([_maybe_signature_$1], [m4_ifnblank([$5], [[$1($5)]])])],
 	[m4_if(
-		m4_eval($2 < $3), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_FEW([$2], [$3], [m4_indir([_maybe_signature_$1])])],
-		m4_eval($2 > $4), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_MANY([$2], [$4], [m4_indir([_maybe_signature_$1])])],
+		m4_eval($2 < $3), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_FEW([$1], [$2], [$3], m4_quote(m4_indir([_maybe_signature_$1])))],
+		m4_eval($2 > $4), 1, [_CHECK_PASSED_ARGS_COUNT_TOO_MANY([$1], [$2], [$4], m4_quote(m4_indir([_maybe_signature_$1])))],
 	)],
 	[m4_popdef([_maybe_signature_$1])],
 )]])
