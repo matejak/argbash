@@ -8,6 +8,7 @@ ADD_TEST([test-delim-space], [[
 ADD_TEST([test-delim-equals], [[
 	ERROR="unexpected argument '--opt'" $(REVERSE) $< --opt something
 	$< --opt=something | grep -q 'OPT_S=something,'
+	$< --xxx | grep -q 'XXX=on,'
 	ERROR="unexpected argument '--add'" $(REVERSE) $< -a one --add two --add=three
 	$< -a one --add=two | grep -q 'OPT_REP=one two,'
 ]])

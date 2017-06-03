@@ -14,10 +14,10 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
+dnl TODO: Shorten the case statement bodies
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
-dnl TODO: Shorten the case statement bodies
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
@@ -829,6 +829,22 @@ m4_define([_COMMENT_OPT_SPACE], [,
 ])
 
 
+m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW], [,
+	[# If an argurment doesn't accept a value,],
+	[# we expect the [--$1]m4_ifnblank([$2], [ or -$2]) value.],
+	[# so we watch for --$1m4_ifnblank([$2], [ and -$2 value])],
+])
+
+
+m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [,
+	[# We support whitespace as a delimiter between option argument and its value.],
+	[# Therefore, we expect the [--$1]m4_ifnblank([$2], [ or -$2]) value.],
+	[# so we watch for --$1m4_ifnblank([$2], [ and -$2 value])],
+	[# Since we know that we got the long[]m4_ifnblank([$2], [ or short]) option,],
+	[# we just reach out for the next argument to get the value.],
+])
+
+
 m4_define([_COMMENT_OPT_EQUALS], [,
 	[# We support only the = as a delimiter between option argument and its value.],
 	[# Therefore, we expect --opt=value or -o value],
@@ -837,6 +853,30 @@ m4_define([_COMMENT_OPT_EQUALS], [,
 	[# if nothing got stripped, we know that we got the short option],
 	[# so we reach out for the next argument.],
 	[# At the end, either of what was successful is stored as the result.],
+])
+
+
+m4_define([_COMMENT_OPT_EQUALS_NEW], [,
+	[# We support the = as a delimiter between option argument and its value.],
+	[# Therefore, we expect --$1=value, so we watch for --$1=*],
+	[# For whatever we get, we strip '--$1=' using the ${var##--$1} notation],
+	[# to get the argument value],
+])
+
+
+m4_define([_COMMENT_OPT_EQUALS_SHORT_NEW], [,
+	[# We don't support whitespace as a delimiter between option argument and its value.],
+	[# Therefore, we expect only for the -$2 value, so we watch for -$2],
+	[# Since we know that we got the short option],
+	[# we just reach out for the next argument to get the value.],
+])
+
+
+m4_define([_COMMENT_OPT_GETOPT], [,
+	[# We don't support whitespace as a delimiter between option argument and its value.],
+	[# Therefore, we expect only for the -$2 value, so we watch for -$2],
+	[# Since we know that we got the short option],
+	[# we just reach out for the next argument to get the value.],
 ])
 
 
@@ -933,9 +973,10 @@ dnl
 dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have space as a delimiter, OR
 dnl - argument has a short option.
-m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE], [_IF_SPACE_IS_A_DELIMITER(
-	[_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
-	[m4_ifnblank([$2], [_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)])])])
+m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE],
+	[_IF_SPACE_IS_A_DELIMITER([_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
+		[m4_ifnblank([$2], [_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
+			[_IF_ARG_ACCEPTS_VALUE([$3], , [_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)])])])])
 
 
 dnl TODO: We have to restrict case match for long options only if those long opts accept value.

@@ -167,4 +167,4 @@ m4_define([m4_list_pop_back], [m4_do(
 	[m4_popdef([_LIST_NAME])],
 )])
 
-m4_define([m4_list_destroy], [m4_undefine([_LIST_$1])])
+m4_define([m4_list_destroy], [m4_ifdef([_LIST_$1], [m4_undefine([_LIST_$1])])])
