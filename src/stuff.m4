@@ -820,6 +820,22 @@ m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
 )])
 
 
+m4_define([_PICK_SIMPLE_CASE_STATEMENT_COMMENT], [m4_do(
+	[_IF_ARG_ACCEPTS_VALUE([$3], 
+		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_VALUE_NEW($@))],
+		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_NOVALUE_NEW($@))],
+	)],
+)])
+
+
+m4_define([_PICK_GETOPT_CASE_STATEMENT_COMMENT], [m4_do(
+	[_IF_ARG_ACCEPTS_VALUE([$3], 
+		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITH_VALUE($@))],
+		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITHOUT_VALUE($@))],
+	)],
+)])
+
+
 m4_define([_COMMENT_OPT_SPACE], [,
 	[# We support only whitespace as a delimiter between option argument and its value.],
 	[# Therefore, we expect --opt value or -o value],
@@ -830,17 +846,16 @@ m4_define([_COMMENT_OPT_SPACE], [,
 
 
 m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW], [,
-	[# If an argurment doesn't accept a value,],
-	[# we expect the [--$1]m4_ifnblank([$2], [ or -$2]) value.],
-	[# so we watch for --$1m4_ifnblank([$2], [ and -$2 value])],
+	[# The $1 argurment doesn't accept a value,],
+	[# we expect the --$1]m4_ifnblank([$2], [ or -$2])[,so we watch for ]m4_ifnblank([$2], [them], [it])[.],
 ])
 
 
 m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [,
 	[# We support whitespace as a delimiter between option argument and its value.],
-	[# Therefore, we expect the [--$1]m4_ifnblank([$2], [ or -$2]) value.],
-	[# so we watch for --$1m4_ifnblank([$2], [ and -$2 value])],
-	[# Since we know that we got the long[]m4_ifnblank([$2], [ or short]) option,],
+	[# Therefore, we expect the --$1]m4_ifnblank([$2], [ or -$2])[ value.],
+	[# so we watch for --$1]m4_ifnblank([$2], [ and -$2])[.],
+	[# Since we know that we got the long]m4_ifnblank([$2], [ or short])[ option,],
 	[# we just reach out for the next argument to get the value.],
 ])
 
@@ -877,6 +892,21 @@ m4_define([_COMMENT_OPT_GETOPT], [,
 	[# Therefore, we expect only for the -$2 value, so we watch for -$2],
 	[# Since we know that we got the short option],
 	[# we just reach out for the next argument to get the value.],
+])
+
+
+m4_define([_COMMENT_OPT_GETOPT_WITH_VALUE], [,
+	[# We support getopts-style short arguments clustering,],
+	[# so as -$2 accepts value, we allow it to be appended to it, so we watch for -$2*],
+	[# and we strip the leading -$2 from the argument string using the ${var##-$2} notation.],
+])
+
+
+m4_define([_COMMENT_OPT_GETOPT_WITHOUT_VALUE], [,
+	[# We support getopts-style short arguments clustering,],
+	[# so as -$2 doesn't accepts value, other short options may appended to it, so we watch for -$2*.],
+	[# After strip the leading -$2 from the argument,],
+	[# we have to make sure that the first character coresponds to a short option.],
 ])
 
 
@@ -953,8 +983,7 @@ m4_define([_COMPOSE_CASE_MATCH_STATEMENT], [m4_do(
 dnl
 dnl Given multiple matches, join them with |
 m4_define([_INDENT_AND_END_CASE_MATCH], [m4_do(
-	[
-_INDENT_(3,	)],
+	[_INDENT_(3,	)],
 	[_COMPOSE_CASE_MATCH_STATEMENT($@)],
 	[@:}@
 ],
@@ -974,9 +1003,9 @@ dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have space as a delimiter, OR
 dnl - argument has a short option.
 m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE],
-	[_IF_SPACE_IS_A_DELIMITER([_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
-		[m4_ifnblank([$2], [_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
-			[_IF_ARG_ACCEPTS_VALUE([$3], , [_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)])])])])
+	[_IF_SPACE_IS_A_DELIMITER([_PICK_SIMPLE_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
+		[m4_ifnblank([$2], [_PICK_SIMPLE_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)],
+			[_IF_ARG_ACCEPTS_VALUE([$3], , [_PICK_SIMPLE_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)])])])])
 
 
 dnl TODO: We have to restrict case match for long options only if those long opts accept value.
@@ -1008,7 +1037,8 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 			[exit 0],
 		)],
 	)],
-	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
+],
 )])
 
 
@@ -1017,8 +1047,8 @@ dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have eqals as a delimiter
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
 	[_IF_EQUALS_IS_A_DELIMITER([m4_case([$3],
-		[arg], [_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
-		[repeated], [_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
+		[arg], [_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
+		[repeated], [_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
 		[])])])
 
 
@@ -1034,7 +1064,8 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
 		[m4_fatal([Internal error: Argument of type '$3' is other than 'arg' or 'repeated' and shouldn't make it to the '$0' macro.])]
 	)],
-	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
+],
 )])
 
 
@@ -1064,12 +1095,13 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 			[exit 0],
 		)],
 	)],
-	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
+],
 )])
 
 
 m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE],
-	[_IF_CLUSTERING_GETOPT([m4_ifnblank([$2], [_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
+	[_IF_CLUSTERING_GETOPT([m4_ifnblank([$2], [_PICK_GETOPT_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
 
 
 m4_define([_MAKE_OPTARG_CASE_SECTIONS], [m4_do(
@@ -1099,17 +1131,13 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 	[_INDENT_(2)_key="$[]1"
 ],
 	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
-	[_COMM_BLOCK(1,
-		[# We now iterate through all passed arguments.],
-		[# When dealing with optional arguments:],
-		_OPT_ARGS_COMMENT
-	)],
 	[_MAKE_CASE_STATEMENT],
 )])
 
 
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
-	[_INDENT_(2)[case "$_key" in]],
+	[_INDENT_(2)[case "$_key" in
+]],
 	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _varname(_argname))])],
 	[_HANDLE_POSITIONAL_ARG],
@@ -1119,15 +1147,15 @@ m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 
 
 m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
-	[
-_INDENT_(3)],
+	[_INDENT_(3)],
 	[*@:}@
 ],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 		[m4_if(HAVE_POSITIONAL, 1,
 			[_positionals+=("$[]1")],
 			[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1])],
-		[;;])],
+		[;;],
+	)],
 )])
 
 
