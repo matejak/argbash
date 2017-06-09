@@ -111,19 +111,19 @@ parse_commandline ()
 				_arg_output="$_val"
 				;;
 			# The library argurment doesn't accept a value,
-			# we expect the --library,so we watch for it.
+			# we expect the --library, so we watch for it.
 			--no-library|--library)
 				_arg_library="on"
 				test "${1:0:5}" = "--no-" && _arg_library="off"
 				;;
 			# The check-typos argurment doesn't accept a value,
-			# we expect the --check-typos,so we watch for it.
+			# we expect the --check-typos, so we watch for it.
 			--no-check-typos|--check-typos)
 				_arg_check_typos="on"
 				test "${1:0:5}" = "--no-" && _arg_check_typos="off"
 				;;
 			# The commented argurment doesn't accept a value,
-			# we expect the --commented or -c,so we watch for them.
+			# we expect the --commented or -c, so we watch for them.
 			-c|--no-commented|--commented)
 				_arg_commented="on"
 				test "${1:0:5}" = "--no-" && _arg_commented="off"
@@ -167,8 +167,7 @@ parse_commandline ()
 				_arg_search+=("$_val")
 				;;
 			# We support whitespace as a delimiter between option argument and its value.
-			# Therefore, we expect the --debug value.
-			# so we watch for --debug.
+			# Therefore, we expect the --debug value, so we watch for --debug.
 			# Since we know that we got the long option,
 			# we just reach out for the next argument to get the value.
 			--debug)
@@ -186,7 +185,7 @@ parse_commandline ()
 				_arg_debug="$_val"
 				;;
 			# The version argurment doesn't accept a value,
-			# we expect the --version or -v,so we watch for them.
+			# we expect the --version or -v, so we watch for them.
 			-v|--version)
 				echo "argbash v$version"
 				exit 0
@@ -200,7 +199,7 @@ parse_commandline ()
 				exit 0
 				;;
 			# The help argurment doesn't accept a value,
-			# we expect the --help or -h,so we watch for them.
+			# we expect the --help or -h, so we watch for them.
 			-h|--help)
 				print_help
 				exit 0

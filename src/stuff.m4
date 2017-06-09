@@ -845,19 +845,43 @@ m4_define([_COMMENT_OPT_SPACE], [,
 ])
 
 
-m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW], [,
+m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW_NOSHORT], [,
 	[# The $1 argurment doesn't accept a value,],
-	[# we expect the --$1]m4_ifnblank([$2], [ or -$2])[,so we watch for ]m4_ifnblank([$2], [them], [it])[.],
+	[# we expect the --$1, so we watch for it.],
 ])
 
 
-m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [,
+m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW_WITH_SHORT], [,
+	[# The $1 argurment doesn't accept a value,],
+	[# we expect the --$1 or -$2, so we watch for them.],
+])
+
+
+m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW], [m4_ifblank([$2],
+	m4_dquote(_COMMENT_OPT_SPACE_NOVALUE_NEW_NOSHORT($@)),
+	m4_dquote(_COMMENT_OPT_SPACE_NOVALUE_NEW_WITH_SHORT($@)))])
+
+
+m4_define([_COMMENT_OPT_SPACE_VALUE_NEW_NOSHORT], [,
 	[# We support whitespace as a delimiter between option argument and its value.],
-	[# Therefore, we expect the --$1]m4_ifnblank([$2], [ or -$2])[ value.],
-	[# so we watch for --$1]m4_ifnblank([$2], [ and -$2])[.],
-	[# Since we know that we got the long]m4_ifnblank([$2], [ or short])[ option,],
+	[# Therefore, we expect the --$1 value, so we watch for --$1.],
+	[# Since we know that we got the long option,],
 	[# we just reach out for the next argument to get the value.],
 ])
+
+
+m4_define([_COMMENT_OPT_SPACE_VALUE_NEW_WITH_SHORT], [,
+	[# We support whitespace as a delimiter between option argument and its value.],
+	[# Therefore, we expect the --$1 or -$2 value.],
+	[# so we watch for --$1 and -$2.],
+	[# Since we know that we got the long or short option,],
+	[# we just reach out for the next argument to get the value.],
+])
+
+
+m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [m4_ifblank([$2],
+	m4_dquote(_COMMENT_OPT_SPACE_VALUE_NEW_NOSHORT($@)),
+	m4_dquote(_COMMENT_OPT_SPACE_VALUE_NEW_WITH_SHORT($@)))])
 
 
 m4_define([_COMMENT_OPT_EQUALS], [,
