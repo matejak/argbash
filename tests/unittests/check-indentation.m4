@@ -48,12 +48,13 @@ assert_equals(_COMM_BLOCK(1, x, [BOMB]),
   BOMB
 ])
 
-assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [there], 1, x, [BOMB]),
+assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [comment at there BOMB], 1, x, [BOMB]),
 [  x
   BOMB
 ])
 
-assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [here], 1, x, [BOMB]), [See the comment at there])
+assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [here], 1, x, [BOMB]), [  # comment at there BOMB
+])
 
 assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\nsecond]), [first
 		second])

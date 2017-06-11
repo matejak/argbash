@@ -821,17 +821,21 @@ m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
 
 
 m4_define([_PICK_SIMPLE_CASE_STATEMENT_COMMENT], [m4_do(
-	[_IF_ARG_ACCEPTS_VALUE([$3], 
-		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_VALUE_NEW($@))],
-		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_NOVALUE_NEW($@))],
+	[_IF_ARG_ACCEPTS_VALUE([$3],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_value], [See the comment of option --$1 to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_VALUE_NEW($@))],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_novalue], [See the comment of option --$1 to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_NOVALUE_NEW($@))],
 	)],
 )])
 
 
 m4_define([_PICK_GETOPT_CASE_STATEMENT_COMMENT], [m4_do(
-	[_IF_ARG_ACCEPTS_VALUE([$3], 
-		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITH_VALUE($@))],
-		[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITHOUT_VALUE($@))],
+	[_IF_ARG_ACCEPTS_VALUE([$3],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_value], [See the comment of option -$2 to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITH_VALUE($@))],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_novalue], [See the comment of option -$2 to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITHOUT_VALUE($@))],
 	)],
 )])
 
@@ -1071,8 +1075,10 @@ dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have eqals as a delimiter
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
 	[_IF_EQUALS_IS_A_DELIMITER([m4_case([$3],
-		[arg], [_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
-		[repeated], [_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
+		[arg], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], [See the comment of option --$1= to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
+		[repeated], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], [See the comment of option --$1= to see what's going on here],
+			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
 		[])])])
 
 

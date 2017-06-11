@@ -17,10 +17,10 @@ dnl
 dnl If the comment ID has been defined earlier, don't display the comment, but point to the definition.
 dnl Otherwise, act like _COMM_BLOCK
 m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION], [m4_do(
-	[m4_define([_COMMENT_$1_LOCATION], [$2])],
+	[m4_define([_COMMENT_$1_LOCATION], [[$2]])],
 	[_COMM_BLOCK($3, m4_shiftn(3, $@))],
 )], [m4_do(
-	[[See the comment at ]m4_indir([_COMMENT_$1_LOCATION])],
+	[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))],
 )])])
 
 m4_define([_COMM_BLOCK], [m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
