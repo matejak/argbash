@@ -133,3 +133,7 @@ dnl Sets the indentation character(s) in the parsing code
 dnl $1: The indentation character(s)
 argbash_api([ARGBASH_SET_INDENT],
 	[m4_bmatch(m4_expand([_W_FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
+
+
+m4_define([_ASSIGN_VALUE_TO_VAR], [[$2="$1"]])
+m4_define([_APPEND_VALUE_TO_ARRAY], [[$2+=("$1")]])

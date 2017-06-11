@@ -55,17 +55,14 @@ parse_commandline ()
 		case "$_key" in
 			-o|--output)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_output="$2"
 				shift
-				_arg_output="$_val"
 				;;
 			--output=*)
-				_val="${_key##--output=}"
-				_arg_output="$_val"
+				_arg_output="${_key##--output=}"
 				;;
 			-o*)
-				_val="${_key##-o}"
-				_arg_output="$_val"
+				_arg_output="${_key##-o}"
 				;;
 			-v|--version)
 				echo "argbash-1to2 v$version"

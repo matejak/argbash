@@ -62,3 +62,6 @@ assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\nsecond]), [first
 assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\\nsecond]), [first\\nsecond])
 
 assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [BOMB,two])
+
+assert_equals(_ASSIGN_VALUE_TO_VAR([some, thing BOMB], [somewhere]), [somewhere="some, thing BOMB"])
+assert_equals(_APPEND_VALUE_TO_ARRAY([some, thing BOMB], [somewhere]), [somewhere+=("some, thing BOMB")])

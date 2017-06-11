@@ -100,57 +100,46 @@ parse_commandline ()
 				;;
 			--pos)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_pos+=("$2")
 				shift
-				_arg_pos+=("$_val")
 				;;
 			--pos=*)
-				_val="${_key##--pos=}"
-				_arg_pos+=("$_val")
+				_arg_pos+=("${_key##--pos=}")
 				;;
 			--opt)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_opt+=("$2")
 				shift
-				_arg_opt+=("$_val")
 				;;
 			--opt=*)
-				_val="${_key##--opt=}"
-				_arg_opt+=("$_val")
+				_arg_opt+=("${_key##--opt=}")
 				;;
 			--opt-bool)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_opt_bool+=("$2")
 				shift
-				_arg_opt_bool+=("$_val")
 				;;
 			--opt-bool=*)
-				_val="${_key##--opt-bool=}"
-				_arg_opt_bool+=("$_val")
+				_arg_opt_bool+=("${_key##--opt-bool=}")
 				;;
 			--wrap)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_wrap+=("$2")
 				shift
-				_arg_wrap+=("$_val")
 				;;
 			--wrap=*)
-				_val="${_key##--wrap=}"
-				_arg_wrap+=("$_val")
+				_arg_wrap+=("${_key##--wrap=}")
 				;;
 			-m|--mode)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_val="$2"
+				_arg_mode="$2"
 				shift
-				_arg_mode="$_val"
 				;;
 			--mode=*)
-				_val="${_key##--mode=}"
-				_arg_mode="$_val"
+				_arg_mode="${_key##--mode=}"
 				;;
 			-m*)
-				_val="${_key##-m}"
-				_arg_mode="$_val"
+				_arg_mode="${_key##-m}"
 				;;
 			-v|--version)
 				echo "argbash-init v$version"

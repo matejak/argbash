@@ -14,12 +14,13 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
-dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
+dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
+dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Shorten the case statement bodies
+dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -768,13 +769,12 @@ m4_define([_MAKE_HELP], [m4_do(
 dnl
 dnl $1: Arg name
 dnl $2: Short arg name (not used here)
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
+dnl $3: Name of the value-to-variable macro
+dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-	[_val="@S|@2"],
+	[$3([@S|@2], [$4])],
 	[shift],
-	[$3],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
@@ -782,10 +782,10 @@ m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_IND
 dnl
 dnl $1: Arg name
 dnl $2: Action - the variable containing the value to assign is '_val'
-dnl $3: The name of the option arg
+dnl $3: Name of the value-to-variable macro
+dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[_val="${_key##--[$1]=}"],
-	[$3],
+	[$3([${_key##--$1=}], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
@@ -793,11 +793,10 @@ m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_
 dnl
 dnl $1: Arg name
 dnl $2: Short arg name
-dnl $3: Action - the variable containing the value to assign is '_val'
-dnl $4: The name of the option arg
+dnl $3: Name of the value-to-variable macro
+dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[_val="${_key##-$2}"],
-	[$3],
+	[$3([${_key##-$2}], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
@@ -1010,8 +1009,8 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 		[_IF_ARG_IS_BOOLEAN([$3], [[--no-$1]])],
 		[_IF_ARG_ACCEPTS_VALUE([$3], [_IF_SPACE_IS_A_DELIMITER([[--$1]])], [[--$1]])])],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
-		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
+		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
+		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
@@ -1054,8 +1053,8 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 	[dnl _APPEND_WRAPPED_ARGUMENT_TO_ARRAY: If the arg comes from wrapped script/template, save it in an array
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
-		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
+		[arg], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
+		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[m4_fatal([Internal error: Argument of type '$3' is other than 'arg' or 'repeated' and shouldn't make it to the '$0' macro.])]
 	)],
 	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
@@ -1069,8 +1068,8 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 	[dnl Search for occurences of e.g. -ujohn and make sure that either -u accepts a value, or -j is a short option
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [[$5="$_val"]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
-		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [[$5+=("$_val")]], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$_val])],
+		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
+		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
@@ -1504,7 +1503,7 @@ dnl $1: Name of the run-time variable that contains the value
 dnl $2: Name of the run-time variable that contains the option or argument name
 m4_define([_CHECK_PASSED_VALUE_AGAINST_BLACKLIST], [m4_do(
 	[_IF_RESTRICT_VALUES(
-		[_INDENT_(3)evaluate_strictness "$1" "$2"
+		[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY)[evaluate_strictness "$1" "$2"]
 ],
 		[])],
 )])
