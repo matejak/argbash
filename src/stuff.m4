@@ -14,13 +14,12 @@ dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl
 dnl vvvvvvvvvvvvvvv
-dnl TODO: Shorten the case statement bodies
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Fix comments in the opt parsing code (clean + add comments for getopt functionality)
+dnl TODO: Shorten the case statement bodies
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -840,15 +839,6 @@ m4_define([_PICK_GETOPT_CASE_STATEMENT_COMMENT], [m4_do(
 )])
 
 
-m4_define([_COMMENT_OPT_SPACE], [,
-	[# We support only whitespace as a delimiter between option argument and its value.],
-	[# Therefore, we expect --opt value or -o value],
-	[# so we watch for --opt and -o],
-	[# Since we know that we got the long or short option],
-	[# we just reach out for the next argument.],
-])
-
-
 m4_define([_COMMENT_OPT_SPACE_NOVALUE_NEW_NOSHORT], [,
 	[# The $1 argurment doesn't accept a value,],
 	[# we expect the --$1, so we watch for it.],
@@ -886,17 +876,6 @@ m4_define([_COMMENT_OPT_SPACE_VALUE_NEW_WITH_SHORT], [,
 m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [m4_ifblank([$2],
 	m4_dquote(_COMMENT_OPT_SPACE_VALUE_NEW_NOSHORT($@)),
 	m4_dquote(_COMMENT_OPT_SPACE_VALUE_NEW_WITH_SHORT($@)))])
-
-
-m4_define([_COMMENT_OPT_EQUALS], [,
-	[# We support only the = as a delimiter between option argument and its value.],
-	[# Therefore, we expect --opt=value or -o value],
-	[# so we watch for --opt=* and -o],
-	[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
-	[# if nothing got stripped, we know that we got the short option],
-	[# so we reach out for the next argument.],
-	[# At the end, either of what was successful is stored as the result.],
-])
 
 
 m4_define([_COMMENT_OPT_EQUALS_NEW], [,
@@ -938,17 +917,6 @@ m4_define([_COMMENT_OPT_GETOPT_WITHOUT_VALUE], [,
 ])
 
 
-m4_define([_COMMENT_OPT_BOTH], [,
-	[# We support both whitespace or = as a delimiter between option argument and its value.],
-	[# Therefore, we expect --opt=value, --opt value or -o value],
-	[# so we watch for --opt=*, --opt and -o],
-	[# For whatever we get, we strip '--opt=' using the ${var##...} notation.],
-	[# if nothing got stripped, we know that we got the long or short option],
-	[# so we reach out for the next argument.],
-	[# At the end, either of what was successful is stored as the result.],
-])
-
-
 dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
@@ -963,7 +931,6 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
-			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_BOTH]))],
 			[dnl We won't try to show that = and ' ' are possible in the help message
 ],
 			[m4_define([_DELIM_IN_HELP], [ ])],
@@ -975,7 +942,6 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
-			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_SPACE]))],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
 		[m4_bmatch([$1], [=], [m4_do(
@@ -986,10 +952,8 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
 				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
-			[m4_define([_OPT_ARGS_COMMENT], m4_defn([_COMMENT_OPT_EQUALS]))],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
-
 
 
 dnl

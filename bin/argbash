@@ -18,13 +18,6 @@ version=2.4.1a
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 
-# When called, the process ends.
-# Args:
-# _INDENT_()$1: The exit message (print to stderr)
-# _INDENT_()$2: The exit code (default is 1)
-# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to )
-# Example:
-# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4
 die()
 {
 	local _ret=$2
@@ -34,9 +27,6 @@ die()
 	exit ${_ret}
 }
 
-# Function that evaluates whether a value passed to it
-# begins by a character that is a short option of an argument
-# the script knows about
 begins_with_short_option()
 {
 	local first_option all_short_options
@@ -48,8 +38,6 @@ begins_with_short_option()
 
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
-# The positional args array has to be reset before the parsing, because it may already be defined
-# - for example if this script is sourced by an argbash-powered script.
 _positionals=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output="-"
@@ -59,9 +47,6 @@ _arg_commented=off
 _arg_search=(".")
 _arg_debug=
 
-# Function that prints general usage of the script.
-# This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)
-# and it makes sense to remind the user how the script is supposed to be called.
 print_help ()
 {
 	printf "%s\n" "Argbash is an argument parser generator for Bash."
@@ -77,59 +62,38 @@ print_help ()
 	printf "\t%s\n" "-h,--help: Prints help"
 }
 
-# The parsing of the command-line
 parse_commandline ()
 {
 	while test $# -gt 0
 	do
 		_key="$1"
 		case "$_key" in
-			# We support whitespace as a delimiter between option argument and its value.
-			# Therefore, we expect the --output or -o value.
-			# so we watch for --output and -o.
-			# Since we know that we got the long or short option,
-			# we just reach out for the next argument to get the value.
 			-o|--output)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
 				_arg_output="$_val"
 				;;
-			# We support the = as a delimiter between option argument and its value.
-			# Therefore, we expect --output=value, so we watch for --output=*
-			# For whatever we get, we strip '--output=' using the ${var##--output} notation
-			# to get the argument value
 			--output=*)
 				_val="${_key##--output=}"
 				_arg_output="$_val"
 				;;
-			# We support getopts-style short arguments clustering,
-			# so as -o accepts value, we allow it to be appended to it, so we watch for -o*
-			# and we strip the leading -o from the argument string using the ${var##-o} notation.
 			-o*)
 				_val="${_key##-o}"
 				_arg_output="$_val"
 				;;
-			# The library argurment doesn't accept a value,
-			# we expect the --library, so we watch for it.
 			--no-library|--library)
 				_arg_library="on"
 				test "${1:0:5}" = "--no-" && _arg_library="off"
 				;;
-			# See the comment of option --library to see what's going on here
 			--no-check-typos|--check-typos)
 				_arg_check_typos="on"
 				test "${1:0:5}" = "--no-" && _arg_check_typos="off"
 				;;
-			# See the comment of option --library to see what's going on here
 			-c|--no-commented|--commented)
 				_arg_commented="on"
 				test "${1:0:5}" = "--no-" && _arg_commented="off"
 				;;
-			# We support getopts-style short arguments clustering,
-			# so as -c doesn't accepts value, other short options may appended to it, so we watch for -c*.
-			# After strip the leading -c from the argument,
-			# we have to make sure that the first character coresponds to a short option.
 			-c*)
 				_arg_commented="on"
 				_next="${_key##-c}"
@@ -138,51 +102,42 @@ parse_commandline ()
 					begins_with_short_option "$_next" && shift && set -- "-c" "-${_next}" "$@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."
 				fi
 				;;
-			# See the comment of option --output to see what's going on here
 			-I|--search)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
 				_arg_search+=("$_val")
 				;;
-			# See the comment of option --output= to see what's going on here
 			--search=*)
 				_val="${_key##--search=}"
 				_arg_search+=("$_val")
 				;;
-			# See the comment of option -o to see what's going on here
 			-I*)
 				_val="${_key##-I}"
 				_arg_search+=("$_val")
 				;;
-			# See the comment of option --output to see what's going on here
 			--debug)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
 				_val="$2"
 				shift
 				_arg_debug="$_val"
 				;;
-			# See the comment of option --output= to see what's going on here
 			--debug=*)
 				_val="${_key##--debug=}"
 				_arg_debug="$_val"
 				;;
-			# See the comment of option --library to see what's going on here
 			-v|--version)
 				echo "argbash v$version"
 				exit 0
 				;;
-			# See the comment of option -c to see what's going on here
 			-v*)
 				echo "argbash v$version"
 				exit 0
 				;;
-			# See the comment of option --library to see what's going on here
 			-h|--help)
 				print_help
 				exit 0
 				;;
-			# See the comment of option -c to see what's going on here
 			-h*)
 				print_help
 				exit 0
@@ -197,9 +152,6 @@ parse_commandline ()
 
 parse_commandline "$@"
 
-# Check that we receive expected amount positional arguments.
-# Return 0 if everything is OK, 1 if we have too little arguments
-# and 2 if we have too much arguments
 handle_passed_args_count ()
 {
 	_required_args_string="'input'"
@@ -207,11 +159,7 @@ handle_passed_args_count ()
 	test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect exactly 1 (namely: $_required_args_string), but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 }
 
-# We have an array of variables to which we want to save positional args values.
-# This array is able to hold array elements as targets.
 _positional_names=('_arg_input' )
-# Take arguments that we have received, and save them in variables of given names.
-# The 'eval' command is needed as the name of target variable is saved into another variable.
 assign_positional_args ()
 {
 	for (( ii = 0; ii < ${#_positionals[@]}; ii++))
