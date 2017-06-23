@@ -220,6 +220,8 @@ Optional arguments
 
      ARG_OPTIONAL_REPEATED([include], [I], [Directories where to look for include files], ['/usr/include' '/usr/local/include'])
 
+  The specified values are appended to defaults, so if you consider a script that accepts the ``--include`` argument due to the directive above, if you pass it ``-I src/include``, the argument-holding array will have three elements --- ``/usr/include``, ``/usr/local/include`` and ``src/include``.
+
 * Action optional arguments (i.e. the ``--version`` and ``--help`` type of comments):
   ::
 
