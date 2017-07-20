@@ -21,6 +21,9 @@ dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and 
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
+dnl TODO: Make argbash-init modes up-to-date
+dnl TODO: Update docs with clustering stuff
+dnl TODO: Rename clustering -> grouping?
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID

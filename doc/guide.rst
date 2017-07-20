@@ -540,7 +540,7 @@ Plus, there are convenience macros:
   Since values are assigned using ``eval``, static analysis tools s.a. `shellcheck <https://www.shellcheck.net>`_ may complain about referencing undeclared variables.
   This macro helps to ensure that there are not these false positives.
 
-* Activate Argbash strict mode:
+* Activate Argbash-powered scripts strict mode:
 
   ::
 
@@ -562,6 +562,21 @@ Plus, there are convenience macros:
     For example, when we leave ``time`` from ``ls --sort time --long /home/me/*``, we get a syntactically valid command-line ``ls --sort --long /home/me/*``, where ``--long`` is identified as value of the argument ``--sort`` instead an argument on its own.
   * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo, (e.g. ``--srot``), or the script actually doesn't support that argument.
     As an unwanted consequence, it is interpreted as a positional argument.
+
+* Make Argbash-powered scripts getopts-compatible:
+
+  ::
+
+    ARG_CLUSTERING([mode code])
+
+  The mode code either enables getopt-like `clustering of short arguments according to Guideline 5 <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>`_, or disables it.
+
+  =======================       ==========================================================
+  Mode code                     What is restricted
+  =======================       ==========================================================
+  none                          no clustering support
+  getopts                       support full getopts-like functionality (default behavior)
+  =======================       ==========================================================
 
 Action macro
 ++++++++++++
