@@ -205,7 +205,7 @@ Optional arguments
 
   The default default is 0.
   The argument accepts no values on command-line, but it tracks a numerical value internally.
-  That one increases with every argument occurence.
+  That one increases with every argument occurrence.
 
 * Repeated optional arguments:
   ::
@@ -243,7 +243,7 @@ Special arguments
   This will generate the ``--help`` and ``-h`` action arguments that will print the usage information.
   Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
 
-  The long program desription is a string quoted in double quotation marks (so you may use environmental variables in it) and additionally, occurences of ``\n`` will be translated to a line break with indentation (use ``\\n`` to have the actual ``\n`` in the help description).
+  The long program description is a string quoted in double quotation marks (so you may use environmental variables in it) and additionally, occurrences of ``\n`` will be translated to a line break with indentation (use ``\\n`` to have the actual ``\n`` in the help description).
   If you want to have environmental variables and newlines, you have to make sure that the env variable contains literal newlines/tabs --- you can either use the ``foo=$'broken\nline'`` `pattern <http://stackoverflow.com/a/3182519>`_, or you can use quotes to define the variable so it contains real literal newlines / tabs.
 
 * Version argument (a special case of an action argument):
@@ -282,7 +282,7 @@ Typing macros
 
 ``Argbash`` supports typed argument values.
 For example, you can declare that a certain argument requires an integer value, and if its value by the time of conclusion of the parsing part of the script is not of an integer type, an error is raised.
-The validator sometimes retutrns the value in a cannonical form (e.g. it may trim leading and trailing whitespaces).
+The validator sometimes returns the value in a canonical form (e.g. it may trim leading and trailing whitespaces).
 
 .. note::
 
@@ -386,7 +386,7 @@ Plus, there are convenience macros:
 * Set the delimiter between option and value:
   ::
 
-     ARGBASH_SET_DELIM([option-value delimiter caracter(s)])
+     ARGBASH_SET_DELIM([option-value delimiter character(s)])
 
   The default delimiter is either space or equal sign.
   You can either restrict delimiter to only space or only equal sign, or you can keep both.
@@ -528,7 +528,7 @@ Plus, there are convenience macros:
     
     Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the interactive Python interpreter) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
 
-  In either case, the vaule of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
+  In either case, the value of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
 
 * Declare every variable related to every positional argument:
 
