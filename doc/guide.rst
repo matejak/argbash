@@ -11,7 +11,7 @@ Definitions
 Positional and optional arguments
 +++++++++++++++++++++++++++++++++
 
-There are two major types of arguments --- thake an example:
+There are two major types of arguments --- take an example:
 
 ::
 
