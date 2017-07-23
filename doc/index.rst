@@ -5,7 +5,7 @@ Argbash
 -------
 
 ``Argbash`` (`<https://argbash.io>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
-You declare arguments that your script should use in few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, OSX, MS Windows, ...).
+You declare arguments that your script should use in a few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, macOS, MS Windows, ...).
 
 You :ref:`can have <file_layout>` your parsing code in the script, you can have ``Argbash`` to help you to use it as a ``bash`` library, or you can generate the library yourself and include it yourself too, it's up to you.
 A basic template generator ``argbash-init`` is part of the package, and you can :ref:`get started with it <quickstart_init>` in a couple of seconds.
@@ -96,7 +96,7 @@ So, let's say that we would like a script that produces the following help messa
 Then, it means that we need following arguments:
 
 * One mandatory positional argument.
-  (In other words, an argument that must be passed and that is not preceeded by options)
+  (In other words, an argument that must be passed and that is not preceded by options)
 * Four optional arguments:
 
   * ``--option`` that accepts one value,
@@ -149,7 +149,7 @@ Limitations
 
 .. warning::
 
-  Please read this carefuly.
+  Please read this carefully.
 
 #. The square brackets in your script have to match (i.e. every opening square bracket ``[`` has to be followed at some point by a closing square bracket ``]``).
 

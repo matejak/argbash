@@ -49,14 +49,14 @@ The most efficient way of using ``Argbash`` is probably this one (also covered i
 #. Get an idea of what arguments your script should accept.
 #. Execute ``argbash-init`` with the right arguments to get a basic template.
 #. Replace placeholders in the template with meaningful values.
-#. Expand the template with another directives (if neccessary) based on :ref:`argbash API <argbash_API>`.
+#. Expand the template with another directives (if necessary) based on :ref:`argbash API <argbash_API>`.
 #. Run ``argbash`` over the template.
 
 ``argbash-init`` supports generating templates with these types of arguments:
 
 * Single-valued positional arguments (``--pos`` argument).
-* Single-valued opttional arguments (``--opt`` argument).
-* Boolean opttional arguments (``--opt-bool`` argument).
+* Single-valued optional arguments (``--opt`` argument).
+* Boolean optional arguments (``--opt-bool`` argument).
 
 Generally, you specify argument name and you add help etc. by editing the template file.
 
@@ -142,7 +142,7 @@ Then, you add a very small template code to ``my-script.sh`` at the beginning:
 
     # ] <-- needed because of Argbash
 
-i.e. you add thos three lines with definitions and you enclose the script in square brackets.
+i.e. you add those three lines with definitions and you enclose the script in square brackets.
 
 Finally, you just make sure that ``my-script.sh`` and ``my-parsing.m4`` are next to each other and run
 
