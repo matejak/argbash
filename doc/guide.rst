@@ -567,14 +567,14 @@ Plus, there are convenience macros:
 
   ::
 
-    ARG_CLUSTERING([mode code])
+    ARG_OPTION_GROUPING([mode code])
 
-  The mode code either enables getopt-like `clustering of short arguments according to Guideline 5 <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>`_, or disables it.
+  The mode code either enables getopt-like `grouping of short arguments according to Guideline 5 <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html#tag_12_02>`_, or disables it.
 
   =======================       ==========================================================
   Mode code                     What is restricted
   =======================       ==========================================================
-  none                          no clustering support
+  none                          no grouping support
   getopts                       support full getopts-like functionality (default behavior)
   =======================       ==========================================================
 

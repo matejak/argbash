@@ -1097,7 +1097,7 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 
 
 m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE],
-	[_IF_CLUSTERING_GETOPT([m4_ifnblank([$2], [_PICK_GETOPT_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
+	[_IF_OPT_GROUPING_GETOPT([m4_ifnblank([$2], [_PICK_GETOPT_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
 
 
 m4_define([_MAKE_OPTARG_CASE_SECTIONS], [m4_do(
@@ -1327,7 +1327,7 @@ m4_define([_MAKE_UTILS], [m4_do(
 	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION]
 
 )],
-	[_IF_HAVE_OPTIONAL([_IF_CLUSTERING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
+	[_IF_HAVE_OPTIONAL([_IF_OPT_GROUPING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
 
 )])],
 	[_PUT_VALIDATORS],
@@ -1514,13 +1514,13 @@ m4_define([_CHECK_PASSED_VALUE_AGAINST_BLACKLIST], [m4_do(
 
 dnl
 dnl $1: The mode of argument clustering: One of 'none', 'getopts'
-argbash_api([ARG_CLUSTERING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
+argbash_api([ARG_OPTION_GROUPING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[[$0($@)]],
-	[m4_define([_CLUSTERING_MODE], [[$1]])],
+	[m4_define([_OPT_GROUPING_MODE], [[$1]])],
 )])
 
 
-m4_define([_IF_CLUSTERING_GETOPT], [m4_if(_CLUSTERING_MODE, [getopt], [$1], [$2])])
+m4_define([_IF_OPT_GROUPING_GETOPT], [m4_if(_OPT_GROUPING_MODE, [getopt], [$1], [$2])])
 
 
 dnl
@@ -1530,7 +1530,7 @@ dnl and the rest is processed the next time.
 dnl
 dnl $1: The short option
 m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
-	[_IF_CLUSTERING_GETOPT(
+	[_IF_OPT_GROUPING_GETOPT(
 		[[[_next="${_key##-$1}"]],
 		[[if test -n "$_next" -a "$_next" != "$_key"]],
 		[[then]],
