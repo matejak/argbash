@@ -29,7 +29,7 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
 * Tinkerers --- people that come in contact with ``Argbash`` internals, typically curious Developers.
 
 * ``bash >= 3.0`` --- this is obvious, everybody needs ``bash``. There is only one exception --- in cases of simple scripts, a ``POSIX`` shell s.a. ``dash`` will be enough for Users.
-* ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``. Developers and Tinkerers need this. ``autoconf`` is available on Linux, OSX, BSDs and can be installed on MS Windows.
+* ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``. Developers and Tinkerers need this. ``autoconf`` is available on Linux, macOS, BSDs and can be installed on MS Windows.
 * ``grep``, ``sed``, ``coreutils`` --- The ``argbash`` script uses ``grep``, ``sed``, ``cat``, and ``test``. If you have ``autoconf``, you probably have those already.
 * ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to Tinkerers.
 
@@ -65,7 +65,7 @@ Installation
 
 * ``make install [PREFIX=foo]`` runs the installation into the prefix you can specify (default is ``$(HOME)/.local``).
   This will install the ``argbash`` script (notice the missing ``.sh`` extension) into ``$PREFIX/bin`` (and some support files into ``$PREFIX/lib/argbash``).
-* ``make develop [PREFIX=foo]`` is similar to ``make install``, but it installs a wrapper around the local ``bin/argbash``, so any change to the file will be immediatelly reflected for everybody who uses the system-wide one.
+* ``make develop [PREFIX=foo]`` is similar to ``make install``, but it installs a wrapper around the local ``bin/argbash``, so any change to the file will be immediately reflected for everybody who uses the system-wide one.
   This is inspired by Python's ``python setup.py develop`` pattern.
 * ``make uninstall [PREFIX=foo]`` inverse of the above.
 
@@ -82,6 +82,6 @@ Releasing
 +++++++++
 
 * ``make check`` runs the tests.
-* ``make version VERSION=1.0.0`` sets the projct's version to all corners of the project where it should go.
+* ``make version VERSION=1.0.0`` sets the project's version to all corners of the project where it should go.
 * ``make release [VERSION=1.0.0]`` refreshes date in the ``ChangeLog`` and regenerates all of the stuff (and runs tests).
 * ``make tag`` tags the version.
