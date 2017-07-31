@@ -80,7 +80,6 @@ Let's see what the auto-generated script can do!
    :language: text
 
 We didn't have to do much, yet the script is pretty capable.
-We can easily
 
 
 Writing a template
