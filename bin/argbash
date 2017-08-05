@@ -142,7 +142,6 @@ parse_commandline ()
 	done
 }
 
-parse_commandline "$@"
 
 handle_passed_args_count ()
 {
@@ -151,15 +150,17 @@ handle_passed_args_count ()
 	test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect exactly 1 (namely: $_required_args_string), but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 }
 
-_positional_names=('_arg_input' )
 assign_positional_args ()
 {
+	_positional_names=('_arg_input' )
+
 	for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 	do
 		eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
 	done
 }
 
+parse_commandline "$@"
 handle_passed_args_count
 assign_positional_args
 
@@ -338,7 +339,7 @@ then
 	# match against suspicious, then inverse match against correct stuff:
 	# #<optional whitespace>\(allowed\|another allowed\|...\)<optional whitespace><opening bracket <or> end of line>
 	# Then, extract all matches (assumed to be alnum chars + '_') from grep and put them in the error msg.
-	grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(ARGBASH_SET_INDENT\|ARG_POSITIONAL_SINGLE\|ARG_POSITIONAL_INF\|ARG_POSITIONAL_MULTI\|ARG_OPTIONAL_SINGLE\|ARG_POSITIONAL_DOUBLEDASH\|ARG_VERSION\|ARG_HELP\|INCLUDE_PARSING_CODE\|DEFINE_SCRIPT_DIR\|ARG_OPTIONAL_INCREMENTAL\|ARG_OPTIONAL_REPEATED\|ARG_VERBOSE\|ARG_OPTIONAL_BOOLEAN\|ARG_OPTIONAL_ACTION\|ARGBASH_SET_DELIM\|ARGBASH_GO\|ARGBASH_WRAP\|ARG_LEFTOVERS\|ARG_DEFAULTS_POS\|ARG_RESTRICT_VALUES\|ARG_OPTION_GROUPING\|ARG_TYPE_GROUP\|ARG_TYPE_GROUP_SET\|ARG_USE_ENV\|ARG_USE_PROG\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
+	grep_output="$(printf "%s" "$output" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(ARGBASH_SET_INDENT\|ARG_POSITIONAL_SINGLE\|ARG_POSITIONAL_INF\|ARG_POSITIONAL_MULTI\|ARG_OPTIONAL_SINGLE\|ARG_POSITIONAL_DOUBLEDASH\|ARG_VERSION\|ARG_HELP\|INCLUDE_PARSING_CODE\|DEFINE_SCRIPT_DIR\|ARG_OPTIONAL_INCREMENTAL\|ARG_OPTIONAL_REPEATED\|ARG_VERBOSE\|ARG_OPTIONAL_BOOLEAN\|ARG_OPTIONAL_ACTION\|ARGBASH_SET_DELIM\|ARGBASH_GO\|ARGBASH_PREPARE\|ARGBASH_WRAP\|ARG_LEFTOVERS\|ARG_DEFAULTS_POS\|ARG_RESTRICT_VALUES\|ARG_OPTION_GROUPING\|ARG_TYPE_GROUP\|ARG_TYPE_GROUP_SET\|ARG_USE_ENV\|ARG_USE_PROG\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
 	test -n "$grep_output" && die "Your script contains possible misspelled Argbash macros: $grep_output" 1
 fi
 if test "$outfname" != '-'

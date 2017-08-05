@@ -121,6 +121,8 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [m4_do(
 	[assign_positional_args ()
 {
 ],
+	[_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS
+],
 	[_JOIN_INDENTED(1,
 		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))]],
 		[[do]],

@@ -106,6 +106,28 @@ ADD_TEST([test-simple], [[
 	ERROR="require exactly 1" 	$(REVERSE) $<
 ]])
 
+dnl The invocation like this is supposed to trigger complaints
+ADD_TEST([test-diy-noop], [[
+	$< LOO --opt_arg > /dev/null
+	$< LOO 1 2 3 3 > /dev/null
+	$< > /dev/null
+]])
+
+ADD_RULE([$(TESTDIR)/test-diy-noop.m4], [$(TESTDIR)/basic.m4],
+	[[sed -e 's/ARGBASH_GO/ARGBASH_PREPARE/' $< > $@
+]])
+ADD_SCRIPT([test-diy-noop], [m4])
+
+dnl This is the body of test-simple
+ADD_TEST([test-diy], [[
+	$(generic_regression)
+]])
+
+ADD_RULE([$(TESTDIR)/test-diy.m4], [$(TESTDIR)/test-diy-noop.m4],
+	[[sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
+]])
+ADD_SCRIPT([test-diy], [m4])
+
 ADD_TEST([test-wrapping], [[
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg

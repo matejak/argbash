@@ -27,6 +27,8 @@ TESTS += \
 	stability-salone \
 	test-ddash \
 	test-simple \
+	test-diy-noop \
+	test-diy \
 	test-wrapping \
 	test-wrapping-more \
 	test-wrapping-excl \
@@ -72,6 +74,10 @@ SCRIPTS += \
 	$(TESTDIR)/test-ddash.m4 \
 	$(TESTDIR)/test-ddash.sh \
 	$(TESTDIR)/test-simple.sh \
+	$(TESTDIR)/test-diy-noop.sh \
+	$(TESTDIR)/test-diy-noop.m4 \
+	$(TESTDIR)/test-diy.sh \
+	$(TESTDIR)/test-diy.m4 \
 	$(TESTDIR)/test-wrapping.sh \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
@@ -252,6 +258,20 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
+
+test-diy-noop: $(TESTDIR)/test-diy-noop.sh
+	$< LOO --opt_arg > /dev/null
+	$< LOO 1 2 3 3 > /dev/null
+	$< > /dev/null
+
+$(TESTDIR)/test-diy-noop.m4: $(TESTDIR)/basic.m4
+	sed -e 's/ARGBASH_GO/ARGBASH_PREPARE/' $< > $@
+
+test-diy: $(TESTDIR)/test-diy.sh
+	$(generic_regression)
+
+$(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4
+	sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
 
 test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4
 	$< -h | grep -q opt-arg

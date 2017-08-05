@@ -21,9 +21,6 @@ dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and 
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
-dnl TODO: Make argbash-init modes up-to-date
-dnl TODO: Update docs with clustering stuff
-dnl TODO: Rename clustering -> grouping?
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -632,6 +629,19 @@ m4_define([_IF_HAVE_OPTIONAL],
 	[m4_if(HAVE_OPTIONAL, 1, [$1], [$2])])
 
 
+m4_define([_IF_DIY_MODE],
+	[m4_if(_DIY_MODE, 1, [$1], [$2])])
+
+m4_define([_SET_DIY_MODE],
+	[m4_define([_DIY_MODE], 1)])
+
+m4_define([_UNSET_DIY_MODE],
+	[m4_define([_DIY_MODE], 0)])
+
+m4_define([_IF_HAVE_POSITIONAL],
+	[m4_if(HAVE_POSITIONAL, 1, [$1], [$2])])
+
+
 m4_define([_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED],
 	[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [$2], [$1])])
 
@@ -1161,11 +1171,12 @@ m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL],
 
 
 m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
-	[_COMM_BLOCK(0,
+	[m4_pushdef([_indentation_level], 1)],
+	[_COMM_BLOCK(_indentation_level,
 		[# We have an array of variables to which we want to save positional args values.],
 		[# This array is able to hold array elements as targets.],
 	)],
-	[_INDENT_(0)[_positional_names=@{:@]],
+	[_INDENT_(_indentation_level)[_positional_names=@{:@]],
 	[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 		[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL, so we really need the check.
 ],
@@ -1183,11 +1194,11 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 	[@:}@
 ],
 	[IF_POSITIONALS_INF([m4_do(
-		[_COMM_BLOCK(0,
+		[_COMM_BLOCK(_indentation_level,
 			[If we allow up to infinitely many args, we calculate how many of values],
 			[were actually passed, and we extend the target array accordingly.],
 		)],
-		[_JOIN_INDENTED(0,
+		[_JOIN_INDENTED(_indentation_level,
 			[[_our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))]],
 			[[for ((ii = 0; ii < _our_args; ii++))]],
 			[do],
@@ -1195,6 +1206,7 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 			[done],
 		)],
 	)])],
+	[m4_popdef([_indentation_level])],
 )])
 
 
@@ -1203,34 +1215,60 @@ m4_define([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED], [IF_POSITIONALS_INF(
 	[$1])])
 
 
-m4_define([_MAKE_VALUES_ASSIGNMENTS], [m4_do(
+dnl
+dnl Generates functions and outputs either hints or function calls
+dnl
+dnl $1: Callback --- how to deal with actual function calls
+m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE], [m4_do(
 	[_MAKE_ARGV_PARSING_FUNCTION
 ],
-	[m4_if([DIY_MODE], 1, [_COMM_BLOCK(
-		[# Call the functions that assign passed arguments to variables],
-		[# and that check that the amount of passed arguments is correct],
-		)], [m4_do(
-		[parse_commandline "@S|@@"
-],
-	)])],
-	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
+	[_IF_HAVE_POSITIONAL([m4_do(
 		[
 ],
 		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION
 ])],
-		[_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS],
 		[_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION
 ],
-		[m4_if([DIY_MODE], 1, [_COMM_BLOCK(
-			[# Call the functions that assign passed arguments to variables],
-			[# and that check that the amount of passed arguments is correct],
-			)], [m4_do(
-				[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([handle_passed_args_count
-])],
-				[assign_positional_args
-],
-		)])],
 	)])],
+	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args])],
+)])
+
+
+m4_define([_ASSIGN_GO], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Now call all the functions defined above that are needed to get the job done],
+	)],
+	[$1
+],
+	[_IF_HAVE_POSITIONAL([m4_do(
+		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([$2
+])],
+		[$3
+],
+	)])],
+)])
+
+
+dnl
+dnl Convention:
+dnl The commented-out calls are supposed to be preceded by regexp '^# '
+m4_define([_ASSIGN_PREPARE], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Call the function that assigns passed optional arguments to variables:],
+		[#  $1],)
+	],
+	[_IF_HAVE_POSITIONAL([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED(
+		[_COMM_BLOCK(0,
+			[# Then, call the function that checks that the amount of passed arguments is correct],
+			[# followed by the function that assigns passed positional arguments to variables:],
+			[#  $2],
+			[#  $3],
+		)])],
+		[_COMM_BLOCK(0,
+			[# Then, call the function that assigns passed positional arguments to variables:],
+			[# $3],
+		)],
+	)],
 )])
 
 
@@ -1360,6 +1398,14 @@ argbash_api([ARGBASH_GO], [m4_do(
 )])
 
 
+argbash_api([ARGBASH_PREPARE], [m4_do(
+	[m4_ifndef([WRAPPED], [m4_do(
+		[_SET_DIY_MODE()],
+		[_ARGBASH_GO([$0()])],
+	)])],
+)])
+
+
 dnl
 dnl Identify the Argbash version (this is part of the API)
 m4_define([_ARGBASH_ID],
@@ -1394,7 +1440,8 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ],
 		[_MAKE_HELP
 ],
-		[_MAKE_VALUES_ASSIGNMENTS
+		[_MAKE_VALUES_ASSIGNMENTS_BASE(
+			[_IF_DIY_MODE([_ASSIGN_PREPARE], [_ASSIGN_GO])])
 ],
 	)])],
 	[_MAKE_OTHER

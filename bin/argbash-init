@@ -165,22 +165,23 @@ parse_commandline ()
 	done
 }
 
-parse_commandline "$@"
 
 handle_passed_args_count ()
 {
 	test ${#_positionals[@]} -gt 1 && _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect between 0 and 1, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
 }
 
-_positional_names=('_arg_output' )
 assign_positional_args ()
 {
+	_positional_names=('_arg_output' )
+
 	for (( ii = 0; ii < ${#_positionals[@]}; ii++))
 	do
 		eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1
 	done
 }
 
+parse_commandline "$@"
 handle_passed_args_count
 assign_positional_args
 
