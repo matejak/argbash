@@ -101,13 +101,13 @@ do_args_footer()
 	if test "$_arg_mode" = "full"
 	then
 		echo '# ARGBASH_SET_DELIM([ =])'
-		echo '# ARG_OPTION_GROUPING([getopt])'
+		echo '# ARG_OPTION_STACKING([getopt])'
 		echo '# ARG_RESTRICT_VALUES([no-local-options])'
 		echo '# ARG_DEFAULTS_POS'
 	elif test "$_arg_mode" = "minimal"
 	then
 		echo 'ARGBASH_SET_DELIM([ ])'
-		echo '# ARG_OPTION_GROUPING([none])'
+		echo '# ARG_OPTION_STACKING([none])'
 		echo '# ARG_RESTRICT_VALUES([none])'
 	fi
 	echo "# ARG_HELP([<The general help message of my script>])"

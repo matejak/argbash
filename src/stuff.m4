@@ -1561,7 +1561,7 @@ m4_define([_CHECK_PASSED_VALUE_AGAINST_BLACKLIST], [m4_do(
 
 dnl
 dnl $1: The mode of argument clustering: One of 'none', 'getopts'
-argbash_api([ARG_OPTION_GROUPING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
+argbash_api([ARG_OPTION_STACKING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[[$0($@)]],
 	[m4_define([_OPT_GROUPING_MODE], [[$1]])],
 )])

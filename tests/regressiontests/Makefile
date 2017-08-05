@@ -520,11 +520,11 @@ test-very_strict: $(TESTDIR)/test-very_strict.sh
 	ERROR="are trying to pass an option" $(REVERSE) $< --foobar
 
 $(TESTDIR)/test-getopt-equals.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_GROUPING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-both.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_GROUPING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-space.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_GROUPING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-getopt-both: $(TESTDIR)/test-getopt-both.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
 	$< --incrx -ii | grep -q 'OPT_INCR=5,'
