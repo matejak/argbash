@@ -29,6 +29,7 @@ You have three options here, they are sorted by the estimated preference:
    We assume that you have installed (see :ref:`install`) the ``argbash`` script, so it is available in your terminal as a command ``argbash``.
    If it is not the case, you just have to substitute ``argbash`` by direct invocation of ``bin/argbash``.
 
+
 .. _argbash_init:
 
 Template generator
@@ -36,6 +37,7 @@ Template generator
 
 It is not advisable to write a template from scratch, since ``Argbash`` contains a tool for that.
 The ``argbash-init`` :ref:`can generate <minimal_example>` a good starting template for you, so you can get started within minutes.
+
 
 .. _argbash_init_general:
 
@@ -61,6 +63,7 @@ Generally, you specify argument name and you add help etc. by editing the templa
 Next, ``argbash-init`` supports :ref:`wrapping <argbash_wrap>` of another argbash-aware scripts.
 The help macro is always included.
 
+
 .. _argbash_init_modes:
 
 Modes of operation
@@ -83,7 +86,6 @@ Modes of operation
 
 There is also a ``--mode`` option you can use to tune the balance between parsing features and complexity of the generated code.
 
-
 * ``default``: Assume the standard ``Argbash`` behavior.
   Check the documentation out to find out what that means.
 
@@ -99,6 +101,7 @@ Argbash
 -------
 
 So, you have a template and now it is time to (re)generate a shell script from it!
+
 
 Parsing code and script body together
 +++++++++++++++++++++++++++++++++++++
@@ -118,6 +121,7 @@ If you want to regenerate a new version of ``my-script.sh`` after you have modif
 as the script can deal with input and output being the same file.
 
 .. [*] ``m4`` is the file extension used for the ``M4`` language, but we use the ``m4sugar`` language extension built on top of it.
+
 
 Separate file for parsing with assistance
 +++++++++++++++++++++++++++++++++++++++++
@@ -149,6 +153,7 @@ Finally, you just make sure that ``my-script.sh`` and ``my-parsing.m4`` are next
 which finds ``my-parsing.m4`` (it would find ``my-parsing.sh`` too) and generates new ``my-parsing.sh`` and ``my-script.sh`` that you can use right away.
 If both ``my-parsing.m4`` and ``my-parsing.sh`` are found, the more recent one is used to generate the ``my-parsing.sh``.
 
+
 .. _usage_manual:
 
 Separate file for parsing
@@ -167,6 +172,21 @@ Then, you just generate ``my-parsing.sh`` using ``--library`` option:
 .. code-block:: bash
 
    argbash my-parsing.m4 -o my-parsing.sh --library
+
+
+.. _commented:
+
+Commented output
+++++++++++++++++
+
+You can call ``argbash`` in commented mode, when the generated code is commented, so you can run through the generated code and understand the big picture fast.
+
+To generate code with those comments, just call ``argbash`` with the according switch:
+
+.. code-block:: bash
+
+   argbash my-parsing.m4 -c -o my-parsing.sh
+
 
 .. _api_change:
 

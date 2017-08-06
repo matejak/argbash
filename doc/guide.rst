@@ -582,12 +582,30 @@ Action macro
 ++++++++++++
 
 Finally, you have to express your desire to generate the parsing code, help message etc.
-You do that by specifying a macro ``ARGBASH_GO``.
-The macro doesn't take any parameters.
+You do it by specifying an "action macro" past all arguments definitions.
 
-::
+You can either let the parsing code to be executed (carefree mode), or you can just generate parsing functions and call them yourself (DIY mode).
 
-   ARGBASH_GO
+* Carefree mode: Use action macro ``ARGBASH_GO``.
+  The macro doesn't take any parameters.
+
+  ::
+
+     ARGBASH_GO
+
+* DIY mode: Use action macro ``ARGBASH_PREPARE``.
+  The macro doesn't take any parameters.
+
+  If you are not familiar with the DIY mode, generate the script with :ref:`embedded helpful comments <commented>` that tell you what functions you have to call in your code to fully use the Argbash potential.
+
+  ::
+
+     ARGBASH_PREPARE
+  
+  .. warning::
+
+    This feature is under development and not part of the stable API.
+
 
 Available shell stuff
 +++++++++++++++++++++
