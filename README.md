@@ -12,26 +12,30 @@
 
 Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
-* Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template)!
 * Fast, minimalistic declaration of arguments your script expects (see below for supported argument types).
-* Generate script from definitions once and use it afterwards on all platforms that have `bash`!
-* Definitions will stay embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
-* Re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
-* Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr/bin` for a system-wide installation).
+* Scripts generated from definitions once that can be used on all platforms that have `bash`.
+* Definitions embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
+* Ability to re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
+* Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
-**This just in: Try argbash online!**
+Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template), or ...
+
+**Try argbash online!**
 
 [<img src="https://cdn.rawgit.com/matejak/argbash/master/resources/logo/web-legacy.svg" width="600px" align="middle" alt="argbash.io banner"/>](https://argbash.io/generate)
 
-Yes, visit our vintage site and start playing with templates like no tomorrow!
+Yes, click the banner above to get started in a couple of seconds!
+
 
 What it is
 ----------
 
-Argbash is not a parsing library, but it is rather a code generator that generates a library tailor-made for your script.
-It lets you to describe arguments your script should take and then, you can generate the `bash` code.
-You can either include in your script or let `Argbash` do it for you (in any case, from then on, you can forget about `Argbash` altogether).
+Argbash is not a parsing library, but it is rather a code generator that generates a bash library tailor-made for your script.
+It lets you to describe arguments your script should take and then, you can generate the `bash` parsing code.
+It stays in your script by default, but you can have it generated to a separate file and let `Argbash` to include it in your script for you.
+In any case, you won't need `Argbash` to run the script.
+
 `Argbash` is very simple to use and the generated code is relatively nice to read.
 Moreover, argument definitions stay embedded in the script, so when you need to update the parsing logic, you just re-run the `argbash` script on the already generated script.
 
@@ -51,6 +55,7 @@ Following argument types are supported:
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
 **[Read the docs (latest stable version)](http://argbash.readthedocs.org/en/stable/) for more info**
+
 
 Requirements
 ------------
