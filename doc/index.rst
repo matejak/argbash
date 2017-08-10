@@ -151,10 +151,13 @@ Limitations
 
   Please read this carefuly.
 
-#. The square brackets in your script should match (i.e. every opening square bracket ``[`` should be followed at some point by a closing square bracket ``]``).
-   More precisely, the number of closing square brackets ``]`` must not exceed the number of opening ``[``.
-   This limitation does apply to files that are processed by ``argbash`` --- you are fine if you have the argument parsing code in a separate file and you :ref:`don't use <usage_manual>` the ``INCLUDE_PARSING_CODE`` macro.
-   (You are also OK if you use :ref:`argbash-init <argbash_init>` in the *decoupled mode*.)
+#. The square brackets in your script have to match (i.e. every opening square bracket ``[`` has to be followed at some point by a closing square bracket ``]``).
+
+   There is a workaround --- if you need constructs s.a. ``red=$'\e[0;91m'``, you can put the matching square bracket behind a comment, i.e. ``red=$'\e[0;91m'  # match square bracket: ]``.
+
+   This limitation does apply only to files that are processed by ``argbash`` --- you are fine if you have the argument parsing code in a separate file and you :ref:`don't use <usage_manual>` the ``INCLUDE_PARSING_CODE`` macro.
+   You are also OK if you use :ref:`argbash-init <argbash_init>` in the *decoupled mode*.
+
 #. The generated code generally contains bashisms as it relies heavily on ``bash`` arrays to process any kind of positional arguments and multi-valued optional arguments.
    That said, if you stick with optional arguments only, a POSIX shell s.a. ``dash`` should be able to process the ``Argbash``-generated parsing code.
 
