@@ -1,19 +1,18 @@
 FROM library/alpine:latest
 
-ENTRYPOINT [ '/usr/bin/argbash' ]
+ENTRYPOINT [ '/usr/local/bin/argbash' ]
 
 RUN apk add --no-cache \
-	autoconf \
-	make
+	bash
 
-# Install argbash
-COPY    . /usr/share/argbash/
-WORKDIR /usr/share/argbash/resources/
-RUN     make install PREFIX=/usr/lib
-
-# Make the cli executable and available on the path
-RUN chmod +x /usr/share/argbash/bin/argbash \
- && ln -s /usr/share/argbash/bin/argbash /usr/bin/
+# Install argbash from sources
+COPY    . /usr/src/argbash/
+WORKDIR /usr/src/argbash/resources/
+RUN     apk add --no-cache --virtual .build-dependencies \
+            autoconf \
+            make \
+     && make install PREFIX=/usr/local \
+     && apk del .build-dependencies
 
 # This is the workspace for exec commands
 WORKDIR /usr/src
