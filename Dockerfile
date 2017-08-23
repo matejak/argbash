@@ -1,7 +1,6 @@
 FROM library/alpine:latest
 
-ENTRYPOINT [ '/usr/local/bin/argbash' ]
-
+# The application requires bash to run.
 RUN apk add --no-cache \
 	bash
 
@@ -15,5 +14,9 @@ RUN     apk add --no-cache --virtual .build-dependencies \
      && apk del .build-dependencies
 
 # This is the workspace for exec commands
-WORKDIR /usr/src
-VOLUME  /usr/src
+WORKDIR /work
+VOLUME  /work
+
+# Run argbash with any default invocation.
+ENTRYPOINT [ '/usr/local/bin/argbash' ]
+CMD [ "" ]
