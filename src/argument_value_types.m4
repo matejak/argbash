@@ -81,7 +81,7 @@ m4_define([_VALIDATE_VALUES], [m4_do(
 ],
 	)])])],
 	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
-		[_VALIDATE_VALUES_IDX(_arg, m4_expand([_]_arg[_SUFFIX]))],
+		[_VALIDATE_VALUES_IDX(_arg, m4_indir([_]_arg[_SUFFIX]))],
 	)])],
 )])
 
