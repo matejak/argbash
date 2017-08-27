@@ -12,15 +12,18 @@ dnl TODO: Sort out the argbash_api macro
 dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute path(?)
 dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
+dnl TODO: Add normalize-args utility --- given described script's command-line, simplify it.
 dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
 dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
+dnl TODO: Make ARG_TYPE_GROUP_SET fool-proof (check the validity of elements of the 3rd argument)
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
+dnl TODO: DIsplay the options stacking mode in the help message.
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -97,13 +100,24 @@ m4_define([_varname], [m4_do(
 
 dnl
 dnl Encloses string into "" if its first char is not ' or "
-dnl The string si also []-quoted
+dnl The string is also []-quoted
 dnl Property: Quoting a blank input results in blank result
 dnl to AVOID it, pass string like ""ls -l or "ls" -l
 dnl $1: String to quote
 m4_define([_sh_quote], [m4_do(
 	[m4_if(
 		[$1], , ,
+		m4_index([$1], [']), 0, [[$1]],
+		m4_index([$1], ["]), 0, [[$1]],
+		[["$1"]])],
+)])
+
+
+dnl
+dnl Same as _sh_quote, except Quoting a blank input results in pair of quotes
+dnl $1: String to quote
+m4_define([_sh_quote_also_blanks], [m4_do(
+	[m4_if(
 		m4_index([$1], [']), 0, [[$1]],
 		m4_index([$1], ["]), 0, [[$1]],
 		[["$1"]])],

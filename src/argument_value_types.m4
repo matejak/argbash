@@ -21,7 +21,7 @@ dnl TODO: Integrate with help (and not only with the help synopsis)
 argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 	[[$0($@)]],
 	[m4_foreach([_val], [$4], [m4_do(
-		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote(m4_quote(_val))))],
+		[m4_list_append([_LIST_$1_QUOTED], m4_quote(_sh_quote_also_blanks(m4_quote(_val))))],
 		[m4_list_append([_LIST_$1], m4_quote(_val))],
 	)])],
 	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),

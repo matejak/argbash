@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ARG_POSITIONAL_SINGLE([act-ion], [], [foo])
-# ARG_TYPE_GROUP_SET([act], [ACTION], [act-ion], [foo,baz,bar bar,[foo,baz]])
+# ARG_TYPE_GROUP_SET([act], [ACTION], [act-ion], [foo,baz,bar bar,[foo,baz],])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 #[

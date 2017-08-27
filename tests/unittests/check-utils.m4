@@ -1,4 +1,5 @@
 m4_include([list.m4])
+m4_include([stuff.m4])
 m4_include([test-support.m4])
 
 m4_list_append([FOO], [one])
@@ -33,3 +34,13 @@ assert_equals(m4_lists_foreach([FOO],[fu],[fu:]),
 
 assert_equals(m4_lists_foreach([FOO,BAR,BAZ],[fu,ba,za],[fu: ba-za@]), 
 	[one: 1-foo@two: 2-bar@])
+
+assert_equals(_sh_quote(), [])
+assert_equals(_sh_quote(x), ["x"])
+assert_equals(_sh_quote("x"), ["x"])
+assert_equals(_sh_quote('x'), ['x'])
+
+assert_equals(_sh_quote_also_blanks(), [""])
+assert_equals(_sh_quote_also_blanks(x), ["x"])
+assert_equals(_sh_quote_also_blanks("x"), ["x"])
+assert_equals(_sh_quote_also_blanks('x'), ['x'])

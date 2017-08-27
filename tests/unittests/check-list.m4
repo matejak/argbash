@@ -58,7 +58,8 @@ assert_equals(m4_list_nth([FOO], 2), [BOMB])
 
 m4_list_append([EMPTY], [])
 m4_list_append([EMPTY], [second])
-dnl The first element is the empty string
+
+assert_equals(m4_list_nth([EMPTY], 1), [])
 assert_equals(m4_list_nth([EMPTY], 2), [second])
 assert_equals(m4_list_len([EMPTY]), 2)
 m4_ignore([
