@@ -56,7 +56,7 @@ dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPT_TYPE], [m4_do(
 	[m4_ifnblank([$1], [m4_bmatch([$1], [^[0-9a-zA-z]$], ,
-		[m4_fatal([The value of short option '$1' for argument '--$2' is not valid - it has to be either left blank, or exactly one character.])])])],
+		[m4_fatal([The value of short option '$1' for argument '--$2' is not valid - it has to be either left blank, or exactly one character.]m4_ifnblank([$1], [[ (Yours has ]m4_len([$1])[ characters).]]))])])],
 )])
 
 
