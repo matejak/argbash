@@ -486,6 +486,7 @@ test-int: $(TESTDIR)/test-int.sh
 
 test-group: $(TESTDIR)/test-group.sh
 	$< foo | grep -q "ACT=foo"
+	$< '' | grep -q "ACT="
 	$< foo,baz | grep -q "ACT=foo,baz,"
 	$< "bar bar" | grep -q "ACT=bar bar,"
 	ERROR="allowed" $(REVERSE) $< fuuuu

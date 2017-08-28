@@ -19,6 +19,7 @@ ADD_TEST([test-int], [[
 
 ADD_TEST([test-group], [[
 	$< foo | grep -q "ACT=foo"
+	$< '' | grep -q "ACT="
 	$< foo,baz | grep -q "ACT=foo,baz,"
 	$< "bar bar" | grep -q "ACT=bar bar,"
 	ERROR="allowed" $(REVERSE) $< fuuuu
