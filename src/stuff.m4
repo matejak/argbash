@@ -17,7 +17,7 @@ dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
 dnl TODO: Support custom error messages
-dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args]
+dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args])
 dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
 dnl TODO: Make ARG_TYPE_GROUP_SET fool-proof (check the validity of elements of the 3rd argument)
 dnl
@@ -800,7 +800,7 @@ dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
-	[$3([@S|@2], [$4])],
+	[$3([$1], ["@S|@2"], [$4])],
 	[shift],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
@@ -812,7 +812,7 @@ dnl $2: Action - the variable containing the value to assign is '_val'
 dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[$3([${_key##--$1=}], [$4])],
+	[$3([$1], ["${_key##--$1=}"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
@@ -823,7 +823,7 @@ dnl $2: Short arg name
 dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[$3([${_key##-$2}], [$4])],
+	[$3([$1], ["${_key##-$2}"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
@@ -983,7 +983,7 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 
 
 dnl
-dnl Sets the option--value separator (i.e. --option=val or --option val
+dnl Sets the option--value separator (i.e. --option=val or --option val)
 dnl $1: The directive (' ', '=', or ' =' or '= ')
 argbash_api([ARGBASH_SET_DELIM], _CHECK_PASSED_ARGS_COUNT(1, 1)[m4_do(
 	[m4_bmatch(m4_expand([_W_FLAGS]), [S], ,[[$0($@)]_SET_OPTION_VALUE_DELIMITER([$1])])],
@@ -1397,7 +1397,8 @@ m4_define([_MAKE_OTHER], [m4_do(
 ])],
 	[m4_list_foreach([_OTHER], [item], [item
 ])],
-	[_VALIDATE_VALUES],
+	[_VALIDATE_POSITIONAL_ARGUMENTS],
+	[_MAYBE_ASSIGN_INDICES_TO_TYPED_SINGLE_VALUED_ARGS],
 )])
 
 
@@ -1513,19 +1514,6 @@ dnl $1: argname
 m4_define([_GET_VALUE_STR], [m4_do(
 	[m4_ifdef([$1_VAL_GROUP], [m4_indir([$1_VAL_GROUP])], [arg])],
 )])
-
-
-dnl
-dnl Given an argname, return the argument type code or 'generic'
-dnl If strict is not blank, raise an error if there is not a type code stored
-dnl
-dnl $1: argname
-dnl $2: strict
-m4_define([_GET_VALUE_TYPE], [m4_do(
-	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])],
-		[m4_ifnblank([$2], [m4_fatal([There is no type defined for argument '$1'.])], [generic])])],
-)])
-
 
 
 dnl

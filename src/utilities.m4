@@ -135,5 +135,7 @@ argbash_api([ARGBASH_SET_INDENT],
 	[m4_bmatch(m4_expand([_W_FLAGS]), [I], ,[[$0($@)]_SET_INDENT([$1])])])
 
 
-m4_define([_ASSIGN_VALUE_TO_VAR], [[$2="$1"]])
-m4_define([_APPEND_VALUE_TO_ARRAY], [[$2+=("$1")]])
+m4_define([_ASSIGN_VALUE_TO_VAR], [[$3=]_MAYBE_VALIDATE_VALUE([$1], [$2])_IF_ARG_IS_TYPED([$1], [ || exit 1])])
+m4_define([_APPEND_VALUE_TO_ARRAY], [[$3+=](_MAYBE_VALIDATE_VALUE([$1], [$2]))_IF_ARG_IS_TYPED([$1], [ || exit 1])])
+dnl m4_define([_ASSIGN_VALUE_TO_VAR], [[$2="$1"]])
+dnl m4_define([_APPEND_VALUE_TO_ARRAY], [[$2+=("$1")]])

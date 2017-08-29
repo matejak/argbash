@@ -1,4 +1,16 @@
 dnl
+dnl Given an argname, return the argument type code or 'generic'
+dnl If strict is not blank, raise an error if there is not a type code stored
+dnl
+dnl $1: argname
+dnl $2: strict
+m4_define([_GET_VALUE_TYPE], [m4_do(
+	[m4_ifdef([$1_VAL_TYPE], [m4_indir([$1_VAL_TYPE])],
+		[m4_ifnblank([$2], [m4_fatal([There is no type defined for argument '$1'.])], [generic])])],
+)])
+
+
+dnl
 dnl $1: The value type string (code)
 dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)
@@ -67,23 +79,47 @@ dnl  - The argument name misses -- if it is an optional argument, because we don
 dnl  - The subshell won't propagate the die call, so that's why we have to exit "manually"
 dnl  - Validator is not only a validator - it is a cannonizer.
 dnl  - The type 'string' does not undergo validation
-m4_define([_VALIDATE_VALUES], [m4_do(
+m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 	[m4_set_empty([TYPED_ARGS], , [# Validation of values
 ])],
 	[dnl Don't do anything if we are string
 ],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_if(_GET_VALUE_TYPE(_arg, 1), [string], , [m4_do(
-		[_varname(_arg)="@S|@@{:@],
-		[_GET_VALUE_TYPE(_arg, 1)],
-		[ "$_varname(_arg)" "_arg"@:}@"],
-		[ || exit 1],
-		[
-],
-	)])])],
+	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_list_contains([_POSITIONALS_NAMES], _arg,
+		[_varname(_arg)=_MAYBE_VALIDATE_VALUE(_arg, "$_varname(_arg)") || exit 1
+])])],
+)])
+
+
+m4_define([_IF_ARG_IS_TYPED], [m4_set_contains([TYPED_ARGS], [$1], [$2], [$3])])
+
+
+m4_define([_MAYBE_ASSIGN_INDICES_TO_TYPED_SINGLE_VALUED_ARGS], [m4_do(
 	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
-		[_VALIDATE_VALUES_IDX(_arg, m4_indir([_]_arg[_SUFFIX]))],
+		[m4_if(
+			m4_if(
+				m4_list_nth([_ARGS_CATH], m4_list_indices([_ARGS_LONG], _arg), 123), [arg], 1, 
+				m4_list_contains([_POSITIONALS_NAMES], _arg, 1, 0)),
+			1,
+			[_VALIDATE_VALUES_IDX(_arg, m4_indir([_]_arg[_SUFFIX]))
+])],
 	)])],
 )])
+
+
+dnl
+dnl Assign a validation of a value of a certain type to a variable.
+dnl Does nothing if the type is string or the value doesn't have a type
+dnl
+dnl $1: The associated argument name
+dnl $2: The variable holding the value to be validated (with quoting, e.g. "$value")
+m4_define([_MAYBE_VALIDATE_VALUE], [m4_case(_GET_VALUE_TYPE([$1]),
+		[string], [[$2]],
+		[generic], [[$2]], 
+		[m4_do(
+			["@S|@@{:@],
+			[_GET_VALUE_TYPE([$1], 1)],
+			[ [$2] "[$1]"@:}@"],
+)])])
 
 
 dnl
@@ -93,8 +129,4 @@ m4_define([_VALIDATE_VALUES_IDX], [m4_ifnblank([$2], [m4_do(
 	[_varname([$1])[_$2="@S|@@{:@]],
 	[_GET_VALUE_TYPE([$1], 1)],
 	[ "$_varname([$1])" "[$1]" idx@:}@"],
-	[
-],
 )])])
-
-

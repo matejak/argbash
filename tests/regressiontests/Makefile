@@ -499,6 +499,9 @@ test-group-idx: $(TESTDIR)/test-group-idx.sh
 	$< foo | grep -q "ACT=foo,IDX=0,"
 	$< foo,baz | grep -q "ACT=foo,baz,IDX=3,"
 	$< "bar bar" | grep -q "ACT=bar bar,IDX=2,"
+	ERROR="allowed" $(REVERSE) $< "bar bar" --repeated bar
+	! $< "bar bar" --repeated "bar bar" | grep -q "IDX3=2," > /dev/null
+	$< "bar bar" --opt-tion "bar bar" | grep -q "IDX2=2," > /dev/null
 	ERROR="allowed" $(REVERSE) $< fuuuu
 	ERROR="allowed" $(REVERSE) $< bar
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'

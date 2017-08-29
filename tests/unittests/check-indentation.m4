@@ -1,5 +1,6 @@
 m4_include([list.m4])
 m4_include([utilities.m4])
+m4_include([argument_value_types.m4])
 m4_include([test-support.m4])
 
 _SET_INDENT([x-])
@@ -63,5 +64,5 @@ assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\\nsecond]), [first\\n
 
 assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [BOMB,two])
 
-assert_equals(_ASSIGN_VALUE_TO_VAR([some, thing BOMB], [somewhere]), [somewhere="some, thing BOMB"])
-assert_equals(_APPEND_VALUE_TO_ARRAY([some, thing BOMB], [somewhere]), [somewhere+=("some, thing BOMB")])
+assert_equals(_ASSIGN_VALUE_TO_VAR(x, ["some, thing BOMB"], [somewhere]), [somewhere="some, thing BOMB"])
+assert_equals(_APPEND_VALUE_TO_ARRAY(x, ["some, thing BOMB"], [somewhere]), [somewhere+=("some, thing BOMB")])
