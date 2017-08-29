@@ -92,7 +92,7 @@ dnl
 dnl Given a list name and an element, it returns list of indices of the element in the list
 dnl or nothing if it has not been found
 m4_define([m4_list_indices], [m4_do(
-	[m4_define([_FOUND_IDX], 0)],
+	[m4_define([_FOUND_IDX], 1)],
 	[m4_define([_FOUND_RESULT], [])],
 	[m4_foreach([elem], [m4_list_contents([$1])], [m4_do(
 		[m4_if(elem, [$2], [m4_define([_FOUND_RESULT], m4_expand([_FOUND_RESULT,_FOUND_IDX]))])],
@@ -140,12 +140,14 @@ m4_define([m4_list_join], [m4_do(
 
 dnl
 dnl Returns its n-th element
+dnl If the element index is wrong, return $3
 m4_define([m4_list_nth], [m4_do(
-	[m4_if(m4_cmp([$2], 0), 1, ,[m4_fatal([Requesting element $2 from list '$1': Only positive indices are available])])],
-	[m4_pushdef([_listlen], m4_list_len([$1]))],
-	[m4_if(m4_cmp([$2], _listlen), 1, [m4_fatal([The list '$1' has length of ]_listlen[, so element No. $2 is not available])])],
-	[m4_popdef([_listlen])],
-	[m4_expand(m4_argn([$2], m4_list_contents([$1])))],
+	[m4_bmatch([$2], [[1-9][0-9]*], [m4_do(
+		[m4_pushdef([_listlen], m4_list_len([$1]))],
+		[m4_if(m4_cmp([$2], _listlen), 1, [m4_ifnblank([$3], [$3], [m4_fatal([The list '$1' has length of ]_listlen[, so element No. $2 is not available])])])],
+		[m4_popdef([_listlen])],
+		[m4_expand(m4_argn([$2], m4_list_contents([$1])))],
+	)], [m4_ifnblank([$3], [$3], [m4_fatal([Requesting element $2 from list '$1': Only positive indices are available])])])],
 )])
 
 dnl
