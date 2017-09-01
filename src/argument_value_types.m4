@@ -97,7 +97,7 @@ m4_define([_MAYBE_ASSIGN_INDICES_TO_TYPED_SINGLE_VALUED_ARGS], [m4_do(
 	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
 		[m4_if(
 			m4_if(
-				m4_list_nth([_ARGS_CATH], m4_list_indices([_ARGS_LONG], _arg), 123), [arg], 1, 
+				m4_list_nth([_ARGS_CATH], m4_list_indices([_ARGS_LONG], _arg), 123), [arg], 1,
 				m4_list_contains([_POSITIONALS_NAMES], _arg, 1, 0)),
 			1,
 			[_VALIDATE_VALUES_IDX(_arg, m4_indir([_]_arg[_SUFFIX]))
@@ -114,7 +114,7 @@ dnl $1: The associated argument name
 dnl $2: The variable holding the value to be validated (with quoting, e.g. "$value")
 m4_define([_MAYBE_VALIDATE_VALUE], [m4_case(_GET_VALUE_TYPE([$1]),
 		[string], [[$2]],
-		[generic], [[$2]], 
+		[generic], [[$2]],
 		[m4_do(
 			["@S|@@{:@],
 			[_GET_VALUE_TYPE([$1], 1)],

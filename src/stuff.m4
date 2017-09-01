@@ -19,11 +19,9 @@ dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args])
 dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
-dnl TODO: Make ARG_TYPE_GROUP_SET fool-proof (check the validity of elements of the 3rd argument)
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Define parsing code as a function so one can call it on its own. Implement DIY mode
-dnl TODO: DIsplay the options stacking mode in the help message.
+dnl TODO: Make ARG_TYPE_GROUP_SET fool-proof (check the validity of elements of the 3rd argument)
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -759,6 +757,24 @@ m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
 )])
 
 
+m4_define([_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED], [m4_do(
+	[m4_pushdef([message], m4_dquote(_MAKE_ARGS_STACKING_HELP_MESSAGE))],
+	[m4_ifnblank(message, [_JOIN_INDENTED(1,
+		[echo],
+		[echo 'message'],
+	)])],
+	[m4_popdef([message])],
+)])
+
+
+m4_define([_MAKE_ARGS_STACKING_HELP_MESSAGE], [m4_do(
+	[m4_case(_OPT_GROUPING_MODE,
+		[none], [[Short options stacking mode is not supported.]],
+		[getopt], [[]],
+	)],
+)])
+
+
 m4_define([_MAKE_HELP], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that prints general usage of the script.],
@@ -786,6 +802,8 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
 ])],
+	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED
+],
 	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
 ))],
 	[}
