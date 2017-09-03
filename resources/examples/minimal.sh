@@ -15,11 +15,11 @@
 
 # When called, the process ends.
 # Args:
-# _INDENT_()$1: The exit message (print to stderr)
-# _INDENT_()$2: The exit code (default is 1)
+#   $1: The exit message (print to stderr)
+#   $2: The exit code (default is 1)
 # if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to )
 # Example:
-# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4
+#   test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4
 die()
 {
   local _ret=$2

@@ -2,11 +2,11 @@ m4_define([_MAKE_DIE_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
 		[# When called, the process ends.],
 		[# Args:],
-		[# _INDENT_()@S|@1: The exit message (print to stderr)],
-		[# _INDENT_()@S|@2: The exit code (default is 1)],
+		[# ]_INDENT_()[@S|@1: The exit message (print to stderr)],
+		[# ]_INDENT_()[@S|@2: The exit code (default is 1)],
 		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
 		[# Example:],
-		[# _INDENT_()test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
+		[# ]_INDENT_()[test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
 	)],
 	[[die()
 {

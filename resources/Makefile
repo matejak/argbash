@@ -72,6 +72,9 @@ CHANGELOG = ../ChangeLog
 %3.sh: %2.sh $(GENPARSE)
 	$(GENPARSE) $< -o $@
 
+examples/minimal.sh: examples/minimal.m4
+	$(GENPARSE) $< -c -o $@
+
 # Must be included AFTER we have rules for .sh stuff
 TESTDIR = ../tests/regressiontests
 
