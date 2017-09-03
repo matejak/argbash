@@ -22,7 +22,7 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 :Authors:
   `Matěj Týč <https://github.com/matejak>`_
 :Copyright:
-  2014--2016, Matěj Týč
+  2014--2017, Matěj Týč
 :Website:
   https://argbash.io
 
@@ -51,6 +51,14 @@ In a nutshell, using ``Argbash`` consists of these simple steps:
 Eventually, you may want to add/remove/rename arguments your script accepts.
 In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
 Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash`` on top of the script to get it updated.
+
+How to use ``Argbash``?
+You can either
+
+* :ref:`download and install it <user_install>` locally,
+* use the `online generator <https://argbash.io/generate>`_, or
+* use the `Docker container <https://hub.docker.com/r/matejak/argbash/>`_.
+
 
 .. _quickstart_init:
 

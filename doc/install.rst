@@ -1,13 +1,21 @@
 Installation
 ============
 
-Installation is simple, but as it is described in the :ref:`quickstart`, you don't need it to use ``Argbash``.
+
+.. _user_install:
+
+User installation
+-----------------
+
+If you want to use Argbash locally, you have to download the software package and run the installation script.
+
+1. Go to the `release section of the GitHub project <https://github.com/matejak/argbash/releases>`_, choose the version to download, and download the source code package.
+
+#. Unpack the contents of the archive.
+   You can use the ``bin/argbash`` script without any installation (as it is described in the :ref:`quickstart`), but you can proceed to the installation in order to be able to use ``argbash`` system-wide.
 
 #. Go to the ``resources`` folder.
    There is a ``Makefile``.
-
-#. Run some checks: ``make check``.
-   You should get no errors.
 
 #. According to whether you have your ``$HOME/.local/bin`` folder in the ``PATH``:
 
@@ -22,6 +30,10 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
 
      This way of installation won't install the ``argbash-xtoy`` :ref:`migration scripts <argbash_components>`.
 
+#. Optional: Run some checks by executing: ``make check`` (still in the ``resources`` folder).
+   You should get a message ``All is OK`` at the bottom.
+
+
 ``Argbash`` has this audience:
 
 * Users --- people that use scripts that make use of ``Argbash``.
@@ -32,6 +44,25 @@ Installation is simple, but as it is described in the :ref:`quickstart`, you don
 * ``autoconf >= 2.63`` --- ``Argbash`` is written in a ``m4`` language extension called ``m4sugar``, which is contained in ``autoconf``. Developers and Tinkerers need this. ``autoconf`` is available on Linux, macOS, BSDs and can be installed on MS Windows.
 * ``grep``, ``sed``, ``coreutils`` --- The ``argbash`` script uses ``grep``, ``sed``, ``cat``, and ``test``. If you have ``autoconf``, you probably have those already.
 * ``GNU Make >= 4.0`` --- the project uses Makefiles to perform a wide variety of tasks, although it is more of interest to Tinkerers.
+
+
+Building Argbash
+----------------
+
+If you identify yourself as a tinkerer (i.e. you want to play with internals of ``Argbash``), you may use a different set of steps:
+
+#. Clone the Git repository: ``git clone https://github.com/matejak/argbash.git``
+
+#. Go to the ``resources`` directory consider running a develop install there, e.g. ``make develop PREFIX=$HOME/.local``,
+
+   This type of installation ensures that whenever you make a change to the ``bin/argbash`` script in the repository, the ``argbash`` command always calls that ``bin/argbash`` script.
+
+#. After you make modifications the source files (``.m4`` files in the ``src`` directory), you regenerate ``bin/argbash`` by running ``make ../bin/argbash`` in the ``resources`` directory.
+
+   If you let a bug through that prevents the ``argbash`` script to regenerate itself, run ``make bootstrap`` to regenerate it in a more robust way.
+
+#. Remember to run ``make check`` in the ``resources`` directory often to catch bugs as soon as possible.
+
 
 .. _argbash_components:
 
@@ -53,10 +84,12 @@ The ``Argbash`` package consists of these scripts:
 * ``argbash-init`` is a quickstart script --- it enables you to create a basic :ref:`template <templates>` for your script.
   Then, you just have to make some slight modifications, :ref:`feed it to argbash <invocation>` and you are done.
 
+
 The main Makefile
 -----------------
 
 The ``Makefile`` in the ``resources`` folder can do many things:
+
 
 .. _install:
 
@@ -69,6 +102,7 @@ Installation
   This is inspired by Python's ``python setup.py develop`` pattern.
 * ``make uninstall [PREFIX=foo]`` inverse of the above.
 
+
 Running argbash
 +++++++++++++++
 
@@ -77,6 +111,7 @@ Running argbash
 * ``make examples`` compiles examples from ``.m4`` files to ``.sh`` files in the ``examples`` folder.
 * ``make foo/bar.sh`` generates a script provided that there is a ``foo/bar.m4`` file.
 * ``make foo/bar2.sh`` generates a script provided that there is a ``foo/bar.sh`` file.
+
 
 Releasing
 +++++++++
