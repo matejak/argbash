@@ -39,6 +39,9 @@ argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),
 		m4_expand([[one of ]m4_list_join([_LIST_$1], [, ], ', ', [ and ])]))],
 	[m4_foreach([_argname], [$3], [m4_do(
+		[m4_list_contains([_ARGS_LONG], _argname, ,
+			[m4_list_contains([_POSITIONALS_NAMES], _argname, ,
+				[m4_fatal('_argname' [is not a script argument.])])])],
 		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
 		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],
 	)])],

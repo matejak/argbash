@@ -21,7 +21,6 @@ dnl TODO: Make positional args check optional - make it a function(n_positionals
 dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
 dnl
 dnl WIP vvvvvvvvvvvvvvv
-dnl TODO: Make ARG_TYPE_GROUP_SET fool-proof (check the validity of elements of the 3rd argument)
 dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
@@ -62,14 +61,14 @@ dnl
 dnl Checks that the first argument (long option) doesn't contain illegal characters
 dnl $1: The long option string
 m4_define([_CHECK_OPTION_NAME], [m4_do(
-	[m4_pushdef([_forbidden], [= /])],
+	[m4_pushdef([_allowed], [-a-zA-Z0-9_])],
 	[dnl Should produce the [= etc.] regexp
 ],
 	[m4_bmatch([$1], [^-],
 		[m4_fatal([The option name '$1' is illegal, because it begins with a dash ('-'). Names can contain dashes, but not at the beginning.])])],
-	[m4_bmatch([$1], m4_dquote(_forbidden),
-		[m4_fatal([The option name '$1' is illegal, because it contains forbidden characters (one of: ']_forbidden[').])])],
-	[m4_popdef([_forbidden])],
+	[m4_bmatch([$1], m4_dquote(^_allowed),
+		[m4_fatal([The option name '$1' is illegal, because it contains forbidden characters (i.e. other than: ']m4_dquote(_allowed)[').])])],
+	[m4_popdef([_allowed])],
 )])
 
 
@@ -802,8 +801,7 @@ m4_define([_MAKE_HELP], [m4_do(
 ],
 	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
 ])],
-	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED
-],
+	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
 	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
 ))],
 	[}

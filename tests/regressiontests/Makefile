@@ -112,6 +112,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-int.sh \
 	$(TESTDIR)/test-group.sh \
 	$(TESTDIR)/test-group-idx.sh \
+	$(TESTDIR)/gen-test-group-wrong.m4 \
 	$(TESTDIR)/test-semi_strict.sh \
 	$(TESTDIR)/test-very_strict.sh \
 	$(TESTDIR)/test-getopt-equals.sh \
@@ -135,6 +136,7 @@ TESTS_GEN += \
 	gen-test-badcall-multi \
 	gen-test-init_name_dash \
 	gen-test-init_name_char \
+	gen-test-group-wrong \
 	$(NUL)
 
 define generic_regression
@@ -505,6 +507,12 @@ test-group-idx: $(TESTDIR)/test-group-idx.sh
 	ERROR="allowed" $(REVERSE) $< fuuuu
 	ERROR="allowed" $(REVERSE) $< bar
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
+
+$(TESTDIR)/gen-test-group-wrong.m4: $(TESTDIR)/test-group.m4
+	sed -e 's/repeated],/foo,&/' $< > $@
+
+gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
+	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
 	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -

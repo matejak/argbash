@@ -60,7 +60,6 @@ print_help ()
 	printf "\t%s\n" "--debug: (developer option) Tell autom4te to trace a macro (no default)"
 	printf "\t%s\n" "-v,--version: Prints version"
 	printf "\t%s\n" "-h,--help: Prints help"
-
 }
 
 parse_commandline ()
