@@ -40,3 +40,9 @@ ADD_TEST([test-group-idx], [[
 	ERROR="allowed" $(REVERSE) $< bar
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
 ]])
+
+ADD_RULE([$(TESTDIR)/gen-test-group-wrong.m4], [$(TESTDIR)/test-group.m4],
+	[[sed -e 's/repeated@:>@,/foo,&/' $< > $@
+]])
+ADD_SCRIPT([gen-test-group-wrong], [m4])
+ADD_GENTEST([group-wrong], ['foo' is not a script argument])

@@ -124,6 +124,7 @@ m4_define([_MK_VALIDATE_FNAME_FUNCTION], [m4_do(
 
 
 dnl
+dnl TODO: What about defaults? We want defaults to be valid values, but maybe the blank argument is an exception --- if an optional argument has blank default, its propagated value should be OK even if it is still blank, but maybe we don't want users to be told to supply blank values...
 dnl Given a arg type ID, it treats as a group type and creates a function to examine whether the value is in the list.
 dnl $1: The group stem
 dnl $2: If blank, don't bother with the index recording functionality
