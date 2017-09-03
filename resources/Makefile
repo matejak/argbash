@@ -156,7 +156,7 @@ version:
 
 release: version $(GENPARSE) $(ARGBASH_TO) examples check
 	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
-	cd ../doc && make clean && make html && make clean-tmp
+	cd ../doc && $(MAKE) clean && $(MAKE) html && $(MAKE) clean-tmp
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

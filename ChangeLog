@@ -1,4 +1,4 @@
-2.5.0 (TBA)
+2.5.0 (2017-09-03)
 ------------------
 
 New features:
@@ -16,7 +16,7 @@ Bugfixes:
 * Improved feedback when users provide invalid input (fixed #8, #9).
 * The underlying code has been cleaned and distributed into multiple files.
 * Fixed `m4_list_indices` to be consistent with `m4_list_nth`.
-* Improved handling of typed arguments.
+* Much-improved handling of typed arguments (fixed #25, #26).
 * Improved documentation. Thanks to [Bianca Tamayo](https://github.com/btamayo)!
 
 2.4.0 (2017-04-08)

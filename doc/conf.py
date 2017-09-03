@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Argbash'
-copyright = u'2015, Matěj Týč'
+copyright = u'2015--2017, Matěj Týč'
 author = u'Matěj Týč'
 
 # The version info for the project you're documenting, acts as replacement for
