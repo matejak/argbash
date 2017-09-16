@@ -47,7 +47,7 @@ Example
 Imagine that you want to download an example, edit it, and make it a full-fledged script with `argbash`.
 You obviously have to fire up `docker`, but then, you just create the one-liner, download the example, and proceed.
 
-`
+```
 printf '%s\n' '#!/bin/bash' 'docker run -it --rm -v "$(pwd):/work" matejak/argbash "$@"' > argbash-docker
 chmod a+x argbash-docker
 
@@ -56,7 +56,7 @@ vim minimal.m4
 
 ./argbash-docker minimal.m4 -o my-script.sh
 ./my-script.sh -h
-`
+```
 
 Attribution
 ===========
