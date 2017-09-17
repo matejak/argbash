@@ -19,13 +19,13 @@ Give a `Argbash` a try and stop being terrorized by those pesky arguments! With 
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr` for a system-wide installation).
 * [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
-Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template), or ...
+Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template). Explore various Argbash flavours:
 
-**Try argbash online!**
-
-[<img src="https://cdn.rawgit.com/matejak/argbash/master/resources/logo/web-legacy.svg" width="600px" align="middle" alt="argbash.io banner"/>](https://argbash.io/generate)
-
-Yes, click the banner above to get started in a couple of seconds!
+Flavour               | Target group
+-------               | ------------
+[Argbash online](https://argbash.io/generate) | Use it if you want to try Argbash without installing it and you have permanent access to the Internet.
+[Argbash CLI](https://github.com/matejak/argbash/releases/tag/2.5.0) | Install the package to have `argbash` ready locally all the time.
+[Argbash Docker](https://hub.docker.com/r/matejak/argbash/) | Pretty much like Argbash CLI, but you don't have to install it, you just download the image.
 
 
 What it is
