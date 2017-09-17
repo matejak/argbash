@@ -20,7 +20,15 @@
    inkscape:export-xdpi="77.378578"
    inkscape:export-ydpi="77.378578">
   <defs
-     id="defs4" />
+     id="defs4">
+    <clipPath
+       id="clip1">
+      <path
+         inkscape:connector-curvature="0"
+         d="M 0,0 H 152.46875 V 105.91016 H 0 Z m 0,0"
+         id="path2" />
+    </clipPath>
+  </defs>
   <sodipodi:namedview
      id="base"
      pagecolor="#ffffff"
@@ -28,14 +36,14 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1475"
-     inkscape:cx="-108.61516"
-     inkscape:cy="-6.7895705"
+     inkscape:zoom="1.2953747"
+     inkscape:cx="125.99233"
+     inkscape:cy="-28.494114"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1016"
+     inkscape:window-width="1440"
+     inkscape:window-height="836"
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
@@ -53,7 +61,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -389,5 +397,241 @@
          x="118.85841"
          y="910.1521"
          style="fill:#000000;stroke-width:2.60095334">#</tspan></text>
+    <rect
+       ry="0"
+       y="955.44574"
+       x="42.93541"
+       height="171.55922"
+       width="171.55922"
+       id="rect194"
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.53677559;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png" />
+    <text
+       id="text198"
+       y="1050.1824"
+       x="40.950443"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:155.31469727px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.88286757"
+       xml:space="preserve"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png"><tspan
+         style="fill:#000000;stroke-width:3.88286757"
+         y="1050.1824"
+         x="40.950443"
+         id="tspan196"
+         sodipodi:role="line">a</tspan></text>
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.60114288;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect200"
+       width="169.86574"
+       height="169.86574"
+       x="43.782146"
+       y="956.29254"
+       ry="0"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png" />
+    <text
+       transform="skewX(-14.127864)"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       x="432.15402"
+       y="1119.3024"
+       id="text204"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png"><tspan
+         sodipodi:role="line"
+         id="tspan202"
+         x="432.15402"
+         y="1119.3024"
+         style="fill:#000000;stroke-width:2.60095334">!</tspan></text>
+    <text
+       id="text208"
+       y="1119.3024"
+       x="118.85841"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       xml:space="preserve"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png"><tspan
+         style="fill:#000000;stroke-width:2.60095334"
+         y="1119.3024"
+         x="118.85841"
+         id="tspan206"
+         sodipodi:role="line">#</tspan></text>
+    <g
+       transform="matrix(0.42736081,0,0,0.42736081,137.19519,973.9783)"
+       id="surface923"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"
+       inkscape:export-filename="./argbash-docker.png">
+      <g
+         style="clip-rule:nonzero"
+         clip-path="url(#clip1)"
+         id="g9">
+        <path
+           inkscape:connector-curvature="0"
+           style="fill:#056ba3;fill-opacity:1;fill-rule:evenodd;stroke:none"
+           d="m 86.234375,48.664062 h 15.742185 v -14.3125 H 86.234375 Z m -18.605469,0 h 15.742188 v -14.3125 H 67.628906 Z m -18.605468,0 h 15.742187 v -14.3125 H 49.023438 Z m -18.605469,0 h 15.742187 v -14.3125 H 30.417969 Z m -18.605469,0 h 15.742188 v -14.3125 H 11.8125 Z M 30.417969,31.488281 H 46.160156 V 17.179688 H 30.417969 Z m 18.605469,0 H 64.765625 V 17.179688 H 49.023438 Z m 18.605468,0 H 83.371094 V 17.179688 H 67.628906 Z m 0,-17.171875 H 83.371094 V 0.00390625 H 67.628906 Z m 81.656254,26.003906 c -3.4375,-2.300781 -11.33594,-3.144531 -17.41407,-1.996093 -0.78515,-5.726563 -3.97656,-10.691407 -9.78125,-15.179688 l -3.33593,-2.226562 -2.22657,3.339843 c -2.85156,4.300782 -4.27343,10.257813 -3.80859,15.96875 0.21094,2.007813 0.87109,5.601563 2.9375,8.761719 -2.06641,1.109375 -6.14844,2.640625 -11.53516,2.539063 H 0.589844 L 0.386719,52.71875 c -0.976563,5.738281 -0.953125,23.652344 10.675781,37.421875 8.839844,10.460935 22.09375,15.769535 39.394531,15.769535 37.5,0 65.242189,-17.261722 78.234379,-48.640629 5.10937,0.101563 16.10937,0.03125 21.76171,-10.765625 0.14454,-0.25 0.48438,-0.898437 1.47266,-2.941406 l 0.53906,-1.121094 -3.17968,-2.121094"
+           id="path7" />
+      </g>
+    </g>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.53677559;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect224"
+       width="171.55922"
+       height="171.55922"
+       x="245.05396"
+       y="955.44574"
+       ry="0"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:155.31469727px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.88286757"
+       x="243.06898"
+       y="1050.1824"
+       id="text228"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         sodipodi:role="line"
+         id="tspan226"
+         x="243.06898"
+         y="1050.1824"
+         style="fill:#000000;stroke-width:3.88286757">a</tspan></text>
+    <rect
+       ry="0"
+       y="956.29254"
+       x="245.90068"
+       height="169.86574"
+       width="169.86574"
+       id="rect230"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.60114288;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664" />
+    <text
+       id="text234"
+       y="1119.3024"
+       x="634.27258"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       xml:space="preserve"
+       transform="skewX(-14.127864)"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         style="fill:#000000;stroke-width:2.60095334"
+         y="1119.3024"
+         x="634.27258"
+         id="tspan232"
+         sodipodi:role="line">!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       x="320.97696"
+       y="1119.3024"
+       id="text238"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         sodipodi:role="line"
+         id="tspan236"
+         x="320.97696"
+         y="1119.3024"
+         style="fill:#000000;stroke-width:2.60095334">#</tspan></text>
+    <text
+       id="text261"
+       y="1011.1716"
+       x="339.9248"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:47.75866699px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.19396806;"
+       xml:space="preserve"
+       inkscape:export-filename="./argbash-cli.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         style="fill:#000000;stroke-width:1.19396806;-inkscape-font-specification:'monospace, Bold';font-family:monospace;font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal;font-size:47.75866699px;text-anchor:start;text-align:start;writing-mode:lr;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;"
+         y="1011.1716"
+         x="339.9248"
+         id="tspan259"
+         sodipodi:role="line">$<tspan
+   style="fill:#008000"
+   id="tspan263">_</tspan></tspan></text>
+    <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.53677559;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect265"
+       width="171.55922"
+       height="171.55922"
+       x="-159.18314"
+       y="955.44574"
+       ry="0"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:155.31469727px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:3.88286757"
+       x="-161.16809"
+       y="1050.1824"
+       id="text269"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         sodipodi:role="line"
+         id="tspan267"
+         x="-161.16809"
+         y="1050.1824"
+         style="fill:#000000;stroke-width:3.88286757">a</tspan></text>
+    <rect
+       ry="0"
+       y="956.29254"
+       x="-158.3364"
+       height="169.86574"
+       width="169.86574"
+       id="rect271"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:4.60114288;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664" />
+    <text
+       id="text275"
+       y="1119.3024"
+       x="230.03548"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       xml:space="preserve"
+       transform="skewX(-14.127864)"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         style="fill:#000000;stroke-width:2.60095334"
+         y="1119.3024"
+         x="230.03548"
+         id="tspan273"
+         sodipodi:role="line">!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:104.03812408px;line-height:1.25;font-family:monospace;-inkscape-font-specification:'monospace, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:2.60095334"
+       x="-83.260124"
+       y="1119.3024"
+       id="text279"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664"><tspan
+         sodipodi:role="line"
+         id="tspan277"
+         x="-83.260124"
+         y="1119.3024"
+         style="fill:#000000;stroke-width:2.60095334">#</tspan></text>
+    <path
+       id="path445"
+       d="m -32.446263,972.81919 a 25.633888,25.633888 0 1 0 0.2629,0 z m 0.13145,0 v 51.26781 m 25.63389,-25.63395 h -51.26778 m 5.78406,-15.77473 a 34.178518,34.178518 0 0 0 39.69966,0 m 0,31.54948 a 34.178518,34.178518 0 0 0 -39.69966,0 m 17.87799,-40.75134 a 32.863959,32.863959 0 0 0 0,50.21614 m 3.94368,0 a 32.863959,32.863959 0 0 0 0,-50.21614"
+       inkscape:connector-curvature="0"
+       style="fill:none;stroke:#660066;stroke-width:2.62911677;stroke-opacity:1"
+       inkscape:export-filename="./argbash-web.png"
+       inkscape:export-xdpi="79.235664"
+       inkscape:export-ydpi="79.235664" />
   </g>
 </svg>
