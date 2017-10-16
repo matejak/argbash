@@ -123,10 +123,10 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	touch "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
 	mkdir -p "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
 	touch "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/argbash-lib.m4"
-	cp $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/"
+	cp -p $(M4_SRC) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/"
 	grep -q 'm4dir=' $(GENPARSE) && sed -e 's|m4dir=.*|m4dir=/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)|' $(GENPARSE) > "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
-	test -n "$(VERSION_SUFFIX)" || test -z "$(ARGBASH_TO)" || { cp $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
-	cp $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
+	test -n "$(VERSION_SUFFIX)" || test -z "$(ARGBASH_TO)" || { cp -p $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
+	cp -p $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
 
 altpreclean: define-version
