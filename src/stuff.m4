@@ -861,11 +861,16 @@ m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
 )])
 
 
+m4_define([_MAKE_SEE_ALSO_OPTION_PHRASE], [m4_do(
+	[[See the comment of option '$1' to see what's going on here - principle is the same.]],
+)])
+
+
 m4_define([_PICK_SIMPLE_CASE_STATEMENT_COMMENT], [m4_do(
 	[_IF_ARG_ACCEPTS_VALUE([$3],
-		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_value], [See the comment of option --$1 to see what's going on here],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_value], _MAKE_SEE_ALSO_OPTION_PHRASE([--$1]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_VALUE_NEW($@))],
-		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_novalue], [See the comment of option --$1 to see what's going on here],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([simple_case_novalue], _MAKE_SEE_ALSO_OPTION_PHRASE([--$1]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_SPACE_NOVALUE_NEW($@))],
 	)],
 )])
@@ -873,9 +878,9 @@ m4_define([_PICK_SIMPLE_CASE_STATEMENT_COMMENT], [m4_do(
 
 m4_define([_PICK_GETOPT_CASE_STATEMENT_COMMENT], [m4_do(
 	[_IF_ARG_ACCEPTS_VALUE([$3],
-		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_value], [See the comment of option -$2 to see what's going on here],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_value], _MAKE_SEE_ALSO_OPTION_PHRASE([-$2]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITH_VALUE($@))],
-		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_novalue], [See the comment of option -$2 to see what's going on here],
+		[_POSSIBLY_REPEATED_COMMENT_BLOCK([getopt_case_novalue], _MAKE_SEE_ALSO_OPTION_PHRASE([-$2]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_GETOPT_WITHOUT_VALUE($@))],
 	)],
 )])
@@ -923,7 +928,7 @@ m4_define([_COMMENT_OPT_SPACE_VALUE_NEW], [m4_ifblank([$2],
 m4_define([_COMMENT_OPT_EQUALS_NEW], [,
 	[# We support the = as a delimiter between option argument and its value.],
 	[# Therefore, we expect --$1=value, so we watch for --$1=*],
-	[# For whatever we get, we strip '--$1=' using the ${var##--$1} notation],
+	[# For whatever we get, we strip '--$1=' using the ${var##--$1=} notation],
 	[# to get the argument value],
 ])
 
@@ -945,7 +950,7 @@ m4_define([_COMMENT_OPT_GETOPT], [,
 
 
 m4_define([_COMMENT_OPT_GETOPT_WITH_VALUE], [,
-	[# We support getopts-style short arguments clustering,],
+	[# We support getopts-style short arguments grouping,],
 	[# so as -$2 accepts value, we allow it to be appended to it, so we watch for -$2*],
 	[# and we strip the leading -$2 from the argument string using the ${var##-$2} notation.],
 ])
@@ -953,9 +958,9 @@ m4_define([_COMMENT_OPT_GETOPT_WITH_VALUE], [,
 
 m4_define([_COMMENT_OPT_GETOPT_WITHOUT_VALUE], [,
 	[# We support getopts-style short arguments clustering,],
-	[# so as -$2 doesn't accepts value, other short options may appended to it, so we watch for -$2*.],
-	[# After strip the leading -$2 from the argument,],
-	[# we have to make sure that the first character coresponds to a short option.],
+	[# so as -$2 doesn't accept value, other short options may be appended to it, so we watch for -$2*.],
+	[# After stripping the leading -$2 from the argument, we have to make sure],
+	[# that the first character that follows coresponds to a short option.],
 ])
 
 
@@ -1081,9 +1086,9 @@ dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have eqals as a delimiter
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
 	[_IF_EQUALS_IS_A_DELIMITER([m4_case([$3],
-		[arg], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], [See the comment of option --$1= to see what's going on here],
+		[arg], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], _MAKE_SEE_ALSO_OPTION_PHRASE([--$1=]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
-		[repeated], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], [See the comment of option --$1= to see what's going on here],
+		[repeated], [_POSSIBLY_REPEATED_COMMENT_BLOCK([equals_case], _MAKE_SEE_ALSO_OPTION_PHRASE([--$1=]),
 			_INDENT_LEVEL_IN_ARGV_CASE, _COMMENT_OPT_EQUALS_NEW($@))_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION($@)],
 		[])])])
 

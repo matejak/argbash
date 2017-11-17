@@ -23,9 +23,9 @@ m4_define([_MAKE_DIE_FUNCTION], [m4_do(
 
 m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
-		[# Function that evaluates whether a value passed to it],
-		[# begins by a character that is a short option of an argument],
-		[# the script knows about],
+		[# Function that evaluates whether a value passed to it begins by a character],
+		[# that is a short option of an argument the script knows about.],
+		[# This is required in order to support getopts-like short options grouping.],
 	)],
 	[begins_with_short_option()
 {
