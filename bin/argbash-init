@@ -283,7 +283,7 @@ do_args_footer()
 		echo '# ARG_DEFAULTS_POS'
 	elif test "$_arg_mode" = "minimal"
 	then
-		echo 'ARGBASH_SET_DELIM([ ])'
+		echo '# ARGBASH_SET_DELIM([ ])'
 		echo '# ARG_OPTION_STACKING([none])'
 		echo '# ARG_RESTRICT_VALUES([none])'
 	fi
