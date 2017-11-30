@@ -98,7 +98,7 @@ settle_wrapped_fname ()
 		do
 			test -f "$searchdir/$srcstem.m4" && { _found=yes; ext='.m4'; break; }
 			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext='.sh'; break; }
-			test -f "$searchdir/$srcstem.sh" && { _found=yes; ext=''; break; }
+			test -f "$searchdir/$srcstem" && { _found=yes; ext=''; break; }
 		done
 		# The last searchdir is a correct one
 		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_arg_search[*]}" >&2; exit 2; }

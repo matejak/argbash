@@ -195,7 +195,7 @@ else
 			do_script_bare > "$outfname"
 		fi
 	fi
-	chmod a+x "$outfname"
+	chmod a+x -- "$outfname"
 fi
 
 # ]dnl
