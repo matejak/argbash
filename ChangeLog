@@ -1,3 +1,12 @@
+2.5.1 (TBA)
+------------------
+
+Bugfixes:
+
+* Fixed argbash-init corner cases (wrong output filename, ).
+* Allowed argbash to wrap scripts in files with no extension.
+* Fixed compatibility with the `-e` (i.e. "strict") mode (fixed #30).
+
 2.5.0 (2017-09-03)
 ------------------
 

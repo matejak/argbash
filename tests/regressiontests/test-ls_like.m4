@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 # ARG_POSITIONAL_SINGLE([arg], [], [foo])
 # ARG_OPTIONAL_SINGLE([width], w, [])
