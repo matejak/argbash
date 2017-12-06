@@ -126,7 +126,7 @@ Positional arguments
 * Single-value positional argument (with optional default):
   ::
 
-     ARG_POSITIONAL_SINGLE([argument-name], [help message], [default (optional)])
+     ARG_POSITIONAL_SINGLE([argument-name], [help message (optional)], [default (optional)])
 
   The argument is mandatory, unless you specify a default.
 
@@ -136,7 +136,7 @@ Positional arguments
 * Multi-value positional argument (with optional defaults):
   ::
 
-     ARG_POSITIONAL_MULTI([argument-name], [help message], [number of arguments], ..., [default for the second-to-last (i.e. penultimate) argument (optional)], [default for the last argument (optional)])
+     ARG_POSITIONAL_MULTI([argument-name], [help message (optional)], [number of arguments], ..., [default for the second-to-last (i.e. penultimate) argument (optional)], [default for the last argument (optional)])
 
   Given that your argument accepts :math:`n` values, you can specify :math:`m` defaults, :math:`(m \leq n)` for last :math:`m` values.
 
@@ -151,7 +151,7 @@ Positional arguments
 * Infinitely many-valued positional argument (with optional defaults):
   ::
 
-     ARG_POSITIONAL_INF([argument-name], [help message], [minimal number of arguments (optional, default=0)], [default for the first non-required argument (optional)], ...)
+     ARG_POSITIONAL_INF([argument-name], [help message (optional)], [minimal number of arguments (optional, default=0)], [default for the first non-required argument (optional)], ...)
 
   ``Argbash`` supports arguments with arbitrary number of values.
   However, you can require a minimal amount of values the caller has to provide and you can also assign defaults for the values that are not required.
@@ -187,21 +187,21 @@ Optional arguments
 * Single-value optional arguments:
   ::
 
-     ARG_OPTIONAL_SINGLE([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+     ARG_OPTIONAL_SINGLE([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
   The default default is an empty string.
 
 * Boolean optional arguments:
   ::
 
-     ARG_OPTIONAL_BOOLEAN([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+     ARG_OPTIONAL_BOOLEAN([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
   The default default is ``off`` (the only alternative is ``on``).
 
 * Incremental optional arguments:
   ::
 
-     ARG_OPTIONAL_INCREMENTAL([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+     ARG_OPTIONAL_INCREMENTAL([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
   The default default is 0.
   The argument accepts no values on command-line, but it tracks a numerical value internally.
@@ -210,7 +210,7 @@ Optional arguments
 * Repeated optional arguments:
   ::
 
-     ARG_OPTIONAL_REPEATED([argument-name-long], [argument-name-short (optional)], [help message], [default (optional)])
+     ARG_OPTIONAL_REPEATED([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
   The default default is an empty array.
   The argument can be repeated multiple times, but instead of the later specifications overriding earlier ones (s.a. ``ARG_OPTIONAL_SINGLE`` does), arguments are gradually appended to an array.
@@ -225,7 +225,7 @@ Optional arguments
 * Action optional arguments (i.e. the ``--version`` and ``--help`` type of comments):
   ::
 
-     ARG_OPTIONAL_ACTION([argument-name-long], [argument-name-short (optional)], [help message], [code to execute when specified])
+     ARG_OPTIONAL_ACTION([argument-name-long], [argument-name-short (optional)], [help message (optional)], [code to execute when specified])
 
   The scripts exits after the argument is encountered.
   You can specify a name of a function, ``echo "my-script: v0.5"`` and whatever else.
