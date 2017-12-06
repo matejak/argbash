@@ -2,7 +2,4 @@
 
 <The general help message of my script>
 Usage: ./script.sh [--option <arg>] [--(no-)print] [-h|--help] <positional-arg>
-	<positional-arg>: <positional-arg's help message goes here>
-	--option: <option's help message goes here> (no default)
-	--print,--no-print: <print's help message goes here> (off by default)
 	-h,--help: Prints help
