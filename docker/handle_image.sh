@@ -1,7 +1,18 @@
 #!/bin/bash
 
-another_tag=(${1+-t "$1"})
+set -e
 
-docker login
-docker build -f docker/Dockerfile -t matejak/argbash:latest "${another_tag[@]}"
-docker push matejak/argbash:latest
+version="$(cat ../src/version)"
+another_tag=(-t "matejak/argbash:$version")
+dest="$version.tar.gz"
+
+rm -f "$dest"
+wget "https://github.com/matejak/argbash/archive/$version.tar.gz"
+tar -xf "$dest"
+mv "argbash-$version" argbash
+docker build -f Dockerfile -t matejak/argbash:latest "${another_tag[@]}" .
+rm -rf "argbash"
+echo Now run:
+echo docker login
+echo docker push matejak/argbash:$version
+echo docker push matejak/argbash:latest

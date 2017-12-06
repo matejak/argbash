@@ -6,7 +6,7 @@ RUN apk add --no-cache \
 	bash
 
 # Install argbash from sources
-COPY    . /usr/src/argbash/
+COPY    argbash/ /usr/src/argbash/
 WORKDIR /usr/src/argbash/resources/
 RUN     apk add --no-cache --virtual .build-dependencies \
             make \
