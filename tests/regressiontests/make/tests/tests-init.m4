@@ -1,11 +1,11 @@
 m4_pushdef([tbody], [[[
 	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "pos: foo"
+	$< foo | grep -q "'pos': foo"
 	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar | grep -q "'boo' is off"
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 ]]])
 
 
@@ -41,7 +41,7 @@ ADD_RULE([$(TESTDIR)/regenerate-test-init_simple-s-update.m4], [],
 
 dnl Take out all echos (argbash-init puts them there) so that we don't have to discard stdout.
 ADD_RULE([$(TESTDIR)/test-init_simple-s-update.m4], [$(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4],
-	[$< --opt ordnung -s $@
+	[$< --opt ordnung -s $@ > /dev/null
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
 ])
@@ -53,14 +53,14 @@ dnl 3. The script is regenerated and this time, we expect that the parsing stuff
 ADD_TEST([test-init_simple-s-update], [[
 	@# Regenerate everyting during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
-	$< --ordnung yes
+	$< --ordnung yes > /dev/null
 	$(REVERSE) $<
 	ERROR="unexpected argument" $(REVERSE) $< -o yes
-	sed -i 's/\[ordnung\],\[\]/&[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
+	sed -i 's/\[ordnung\]/&,[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
 	$(ARGBASH_BIN) $< > /dev/null
-	$< --ordnung yes
+	$< --ordnung yes > /dev/null
 	$(REVERSE) $<
-	$< -o yes
+	$< -o yes > /dev/null
 ]])
 
 ADD_SCRIPT([test-init_simple-ss-parsing])

@@ -26,44 +26,60 @@ _translit_var()
 }
 
 
-do_hints_pos()
+optional_argument_without_hints()
 {
-	_help="[<$1's help message goes here>]"
-	test "$_arg_hints" = on && _default="[<$1's default goes here (optional)>]"
+	echo "# ARG_OPTIONAL_SINGLE([$1])"
 }
 
 
-do_hits_opt()
+optional_argument_with_hints()
 {
-	do_hints_pos "$1"
-	if test "$_arg_hints" = on
-	then
-		_short_opt="[<short option character goes here (optional)>]"
-	fi
+	echo "# ARG_OPTIONAL_SINGLE([$1], [<short option character (optional)>], [<help message (optional)>], [<default (optional)>])"
 }
 
 
-do_opt()
+optional_argument()
 {
-	do_hits_opt "$1"
-	echo "# ARG_OPTIONAL_SINGLE([$1], $_short_opt, $_help)"
-	_variables+=('echo "Value of --'$1': '$(_translit_var "$1")'"')
+	"${FUNCNAME}_$2" "$1"
+	_variables+=("printf 'Value of --%s: %s\n' '$1' \"$(_translit_var "$1")\"")
 }
 
 
-do_opt_bool()
+boolean_argument_with_hints()
 {
-	do_hits_opt "$1"
-	echo "# ARG_OPTIONAL_BOOLEAN([$1], $_short_opt, $_help)"
-	_variables+=('echo "'$1' is '$(_translit_var "$1")'"')
+	echo "# ARG_OPTIONAL_BOOLEAN([$1], [<short option character (optional)>], [<help message (optional)>], [<default (optional), off by default>])"
 }
 
 
-do_pos()
+boolean_argument_without_hints()
 {
-	do_hints_pos "$1"
-	echo "# ARG_POSITIONAL_SINGLE([$1], $_help, $_default)"
-	_variables+=('echo "Value of '$1': '$(_translit_var "$1")'"')
+	echo "# ARG_OPTIONAL_BOOLEAN([$1])"
+}
+
+
+boolean_argument()
+{
+	"${FUNCNAME}_$2" "$1"
+	_variables+=("printf \"'%s' is %s\n\" '$1' \"$(_translit_var "$1")\"")
+}
+
+
+positional_argument_with_hints()
+{
+	echo "# ARG_POSITIONAL_SINGLE([$1], [<help message (optional)>], [<default (optional)])"
+}
+
+
+positional_argument_without_hints()
+{
+	echo "# ARG_POSITIONAL_SINGLE([$1])"
+}
+
+
+positional_argument()
+{
+	"${FUNCNAME}_$2" "$1"
+	_variables+=("printf \"Value of '%s': %s\n\" '$1' \"$(_translit_var "$1")\"")
 }
 
 
@@ -86,13 +102,18 @@ do_header()
 
 do_args()
 {
-	test "$_arg_hints" = on && echo "# Rearrange the order of options below according to what you would like to see in the help message."
+	local _mode="without_hints"
+	if test "$_arg_hints" = on
+	then
+		echo "# Rearrange the order of options below according to what you would like to see in the help message."
+		_mode="with_hints"
+	fi
 	for name in "${_arg_opt[@]}"
-	do do_opt "$name"; done
+	do optional_argument "$name" "$_mode"; done
 	for name in "${_arg_opt_bool[@]}"
-	do do_opt_bool "$name"; done
+	do boolean_argument "$name" "$_mode"; done
 	for name in "${_arg_pos[@]}"
-	do do_pos "$name"; done
+	do positional_argument "$name" "$_mode"; done
 }
 
 

@@ -3,7 +3,8 @@
 
 Bugfixes:
 
-* Fixed argbash-init corner cases (wrong output filename, ).
+* Fixed argbash-init corner cases (wrong output filename).
+* Corrected argbash-init hint mode.
 * Allowed argbash to wrap scripts in files with no extension.
 * Fixed compatibility with the `-e` (i.e. "strict") mode (fixed #30).
 

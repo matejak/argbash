@@ -388,30 +388,30 @@ test-delim-both: $(TESTDIR)/test-delim-both.sh
 
 test-init_simple: $(TESTDIR)/test-init_simple.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "pos: foo"
+	$< foo | grep -q "'pos': foo"
 	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar | grep -q "'boo' is off"
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 
 test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "pos: foo"
+	$< foo | grep -q "'pos': foo"
 	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar | grep -q "'boo' is off"
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 
 test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simple-ss-parsing.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "pos: foo"
+	$< foo | grep -q "'pos': foo"
 	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "boo is off"
+	$< foo --opt bar | grep -q "'boo' is off"
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "boo is on"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 
 $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@
@@ -423,21 +423,21 @@ $(TESTDIR)/regenerate-test-init_simple-s-update.m4:
 	touch $@
 
 $(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4
-	$< --opt ordnung -s $@
+	$< --opt ordnung -s $@ > /dev/null
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
 
 test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	@# Regenerate everyting during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
-	$< --ordnung yes
+	$< --ordnung yes > /dev/null
 	$(REVERSE) $<
 	ERROR="unexpected argument" $(REVERSE) $< -o yes
-	sed -i 's/\[ordnung\],\[\]/&[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
+	sed -i 's/\[ordnung\]/&,[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
 	$(ARGBASH_BIN) $< > /dev/null
-	$< --ordnung yes
+	$< --ordnung yes > /dev/null
 	$(REVERSE) $<
-	$< -o yes
+	$< -o yes > /dev/null
 
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
