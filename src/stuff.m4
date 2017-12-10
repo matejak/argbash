@@ -22,6 +22,8 @@ dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and 
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl
+dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
+dnl
 dnl Arg groups:
 dnl name is used both in help and internally as an ID
 dnl two arguments of different types may not have same type (e.g. choices and file).
@@ -164,9 +166,11 @@ dnl $2: Short option (opt)
 dnl $3: Help string
 dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
 dnl $5: Type
+dnl $6: Bash variable name
 m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[_CHECK_OPTIONAL_ARGNAME_IS_FREE([$1])],
-	[_OPT_WRAPPED(_varname([$1]))],
+	[m4_pushdef([_arg_varname], [m4_default([$6], [_varname([$1]]))])],
+	[_OPT_WRAPPED(_arg_varname)],
 	[m4_ifdef([WRAPPED], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
 		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
@@ -179,6 +183,8 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
 	[m4_list_append([_ARGS_CATH], [$5])],
+	[m4_list_append([_ARGS_VARNAME], [_arg_varname])],
+	[m4_popdef([_arg_varname])],
 	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
 )])
 
@@ -215,7 +221,7 @@ m4_define([_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED], [m4_do(
 
 dnl
 dnl Use using processing an argument that is optional
-m4_define([_A_OPTIONAL], [m4_do(
+m4_define([THIS_ARGUMENT_IS_OPTIONAL], [m4_do(
 	[m4_define([HAVE_OPTIONAL], 1)],
 )])
 
@@ -398,7 +404,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 
 argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
 )])
 
@@ -500,7 +506,7 @@ m4_define([_CALL_SOME_OPT], [[_some_opt([$1], [$2], [$3], [$4], [$5])]])
 
 m4_define([_ARG_OPTIONAL_INCREMENTAL_BODY],
 	[_CALL_SOME_OPT($[]1, $[]2, $[]3, [m4_default($][4, 0)], [incr])])
-m4_define([_ARG_OPTIONAL_INCREMENTAL], [_A_OPTIONAL[]]_ARG_OPTIONAL_INCREMENTAL_BODY)
+m4_define([_ARG_OPTIONAL_INCREMENTAL], [THIS_ARGUMENT_IS_OPTIONAL[]]_ARG_OPTIONAL_INCREMENTAL_BODY)
 
 
 dnl $1: long name
@@ -509,7 +515,7 @@ dnl $3: help
 dnl $4: default (=0)
 argbash_api([ARG_OPTIONAL_INCREMENTAL], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_INCREMENTAL_BODY)[,
 )])
 
@@ -521,7 +527,7 @@ dnl $3: help
 dnl $4: default (empty array)
 argbash_api([ARG_OPTIONAL_REPEATED], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	]m4_dquote(_ARG_OPTIONAL_REPEATED_BODY)[,
 )])
 
@@ -529,7 +535,7 @@ argbash_api([ARG_OPTIONAL_REPEATED], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 dnl $1: short name (opt)
 argbash_api([ARG_VERBOSE], [m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	[_ARG_OPTIONAL_INCREMENTAL([verbose], [$1], [Set verbose output (can be specified multiple times to increase the effect)], 0)],
 )])
 
@@ -540,7 +546,7 @@ dnl $3: help
 dnl $4: default (=off)
 argbash_api([ARG_OPTIONAL_BOOLEAN], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	[_some_opt([$1], [$2], [$3],
 		m4_default([$4], [off]), [bool])],
 )])
@@ -551,14 +557,14 @@ m4_define([_ARG_OPTIONAL_ACTION_BODY], [_CALL_SOME_OPT($[]1, $[]2, $[]3, $[]4, [
 
 argbash_api([ARG_OPTIONAL_ACTION], [m4_do(
 	[[$0($@)]],
-	[_A_OPTIONAL],
+	[THIS_ARGUMENT_IS_OPTIONAL],
 	[dnl Just call _ARG_OPTIONAL_ACTION with same args
 ],
 	]m4_dquote(_ARG_OPTIONAL_ACTION_BODY)[,
 )])
 
 
-m4_define([_ARG_OPTIONAL_ACTION], [_A_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
+m4_define([_ARG_OPTIONAL_ACTION], [THIS_ARGUMENT_IS_OPTIONAL[]]_ARG_OPTIONAL_ACTION_BODY)
 
 
 dnl
@@ -695,10 +701,9 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
 
 
 m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach(
-	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
-	[_argname,_arg_short,_arg_type,_default,_arg_help],
+	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME,_ARGS_HELP],
+	[_argname,_arg_short,_arg_type,_default,_arg_varname,_arg_help],
 	[m4_ifnblank(_arg_help, [m4_do(
-		[m4_pushdef([_VARNAME], [_varname(_argname)])],
 		[_INDENT_()printf "\t%s\n" "],
 		[dnl Display a short one if it is not blank
 ],
@@ -738,7 +743,6 @@ m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach(
 ],
 		[dnl Single: We are already quoted
 ],
-		[m4_popdef([_VARNAME])],
 )])])])
 
 
@@ -964,7 +968,14 @@ m4_define([_COMMENT_OPT_GETOPT_WITHOUT_VALUE], [,
 ])
 
 
-dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_ARGVAR="$_val"')])])
+m4_define([LONG_ARG_TO_INDEX], [m4_do(
+	[m4_list_indices([_ARGS_LONG], [$1])],
+)])
+
+m4_define([LONG_ARG_TO_ARGS_SOMETHING],
+	[m4_list_nth([_ARGS_$2], LONG_ARG_TO_INDEX([$1]))])
+
+dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_arg_varname="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
 dnl $1: The directive
@@ -1179,8 +1190,8 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 	[_INDENT_(2)[case "$_key" in
 ]],
-	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_short,_arg_type,_default],
-		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _varname(_argname))])],
+	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
+		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
 	[_HANDLE_POSITIONAL_ARG],
 	[_INDENT_(2)[esac
 ]],
@@ -1374,17 +1385,15 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 	[_IF_HAVE_OPTIONAL([m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
 ],
-		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT], [_argname,_arg_type,_default], [m4_do(
-			[m4_pushdef([_ARGVAR], [_varname(_argname)])],
+		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
 			[dnl We have to handle 'incr' as a special case, there is a m4_default(..., 0)
 ],
 			[m4_case(_arg_type,
 				[action], [],
-				[incr], [_ARGVAR=m4_expand(_default)
+				[incr], [_arg_varname=m4_expand(_default)
 ],
-				[_ARGVAR=_default
+				[_arg_varname=_default
 ])],
-			[m4_popdef([_ARGVAR])],
 		)])],
 	)])],
 )])

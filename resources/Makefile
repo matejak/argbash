@@ -1,5 +1,7 @@
 NUL =
 
+SHELLCHECK=$(shell shellcheck -V > /dev/null && echo shellcheck)
+
 M4_SRC = \
 	../src/output.m4 \
 	../src/output-standalone.m4 \
@@ -164,4 +166,4 @@ tag:
 
 # Update using
 # grep '^[-a-z]*:' Makefile | cut -f 1 -d ':' | sort | tr '\n' ' '
-.PHONY: altinstall altpreclean bootstrap check define-version develop examples install release tag uninstall unittests version
+.PHONY: altinstall altpreclean bootstrap check check-shellcheck define-version develop examples install release tag uninstall unittests version

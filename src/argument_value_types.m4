@@ -87,9 +87,13 @@ m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 ])],
 	[dnl Don't do anything if we are string
 ],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_list_contains([_POSITIONALS_NAMES], _arg,
-		[_varname(_arg)=_MAYBE_VALIDATE_VALUE(_arg, "$_varname(_arg)") || exit 1
-])])],
+	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_list_contains([_POSITIONALS_NAMES], _arg, [m4_do(
+		[m4_pushdef([_arg_varname], [_varname(_arg)])],
+		
+		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname") || exit 1
+],
+		[m4_popdef([_arg_varname])],
+	)])])],
 )])
 
 

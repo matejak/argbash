@@ -176,18 +176,18 @@ $(TESTDIR)/Makefile: $(TESTDIR)/make/defns.m4 $(TESTDIR)/make/make.m4 $(wildcard
 
 stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 	diff -q $< $(word 2,$^)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 basic: $(TESTDIR)/basic.sh
 	$(generic_regression)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 test-void: $(TESTDIR)/test-void.sh
 	! grep -q 'die' $<
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-void.sh"
 call-salone: $(TESTDIR)/call-salone.sh
 	$(generic_regression)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/call-salone.sh"
 test-most: $(TESTDIR)/test-most.sh
 	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
 	$< xx yy | grep -q "POS_MORE1=xx yy,POS_MORE2=hu lu,"
@@ -195,22 +195,22 @@ test-most: $(TESTDIR)/test-most.sh
 	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
 	$< -h | grep -q '<pos-more1>: @pos-more1-arg@'
 	$< -h | grep -q "<pos-more2>: @pos-more2-arg@ (defaults for <pos-more2-1> to <pos-more2-2> respectively: 'hu' and 'lu')"
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-most.sh"
 test-more: $(TESTDIR)/test-more.sh
 	$< LOO x | grep -q "POS_S=LOO,POS_MORE=x f\[o\]o ba,r,"
 	$< LOO lul laa | grep -q "POS_S=LOO,POS_MORE=lul laa ba,r,"
 	$< LOO laa bus kus | grep -q "POS_S=LOO,POS_MORE=laa bus kus",
 	ERROR="namely: 'pos-arg' and 'pos-more'" $(REVERSE) $<
 	grep -q '^		_positionals' $<
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-more.sh"
 test-onlypos: $(TESTDIR)/test-onlypos.sh
 	$(_test_onlypos)
 	! grep -q '^_arg_pos_arg=$$' $<
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlypos.sh"
 test-onlypos-declared: $(TESTDIR)/test-onlypos-declared.sh
 	$(_test_onlypos)
 	grep -q '^_arg_pos_arg=$$' $<
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlypos-declared.sh"
 test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	grep -q '^    esac$$' $<
 	@# ! negates the return code
@@ -226,10 +226,10 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< -h | grep -q -e '-r\>'
 	$< -h | grep -q -e '-i\>'
 	$< -h | grep -q -e '-B\>'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-standalone.sh"
 $(TESTDIR)/test-ddash.m4: $(TESTDIR)/test-ddash-old.m4 $(ARGBASH_1TO2)
 	$(ARGBASH_1TO2) $< -o $@
 
@@ -242,7 +242,7 @@ test-ddash: $(TESTDIR)/test-ddash.sh
 	$< -- --| grep -q 'POS_OPT=--,'
 	ERROR=spurious 	$(REVERSE) $< -- foo bar
 	ERROR=bar 	$(REVERSE) $< -- foo bar
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-ddash.sh"
 test-simple: $(TESTDIR)/test-simple.sh
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
 	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
@@ -260,18 +260,18 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple.sh"
 test-diy-noop: $(TESTDIR)/test-diy-noop.sh
 	$< LOO --opt_arg > /dev/null
 	$< LOO 1 2 3 3 > /dev/null
 	$< > /dev/null
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-diy-noop.sh"
 $(TESTDIR)/test-diy-noop.m4: $(TESTDIR)/basic.m4
 	sed -e 's/ARGBASH_GO/ARGBASH_PREPARE/' $< > $@
 
 test-diy: $(TESTDIR)/test-diy.sh
 	$(generic_regression)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-diy.sh"
 $(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4
 	sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
 
@@ -287,44 +287,44 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
 test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	ERROR="nexpected argument '--opt-arg'" $(REVERSE) $< --opt-arg lalala
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-more.sh"
 test-wrapping-excl: $(TESTDIR)/test-wrapping-excl.sh $(TESTDIR)/test-onlypos.m4
 	$(_test_onlypos)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-excl.sh"
 stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
 	diff -q $< $(word 2,$^)
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
 test-infinity-minimal_call: $(TESTDIR)/test-infinity-minimal_call.sh
 	$< | grep -q 'POS_S='
 	$< 1 | grep -q 'POS_S=1,'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity-minimal_call.sh"
 test-infinity: $(TESTDIR)/test-infinity.sh
 	$< | grep -q 'POS_S=first,second,third,'
 	$< 1 | grep -q 'POS_S=1,second,third,'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity.sh"
 test-infinity-nodefaults: $(TESTDIR)/test-infinity-nodefaults.sh
 	ERROR="require at least 2" $(REVERSE) $<
 	ERROR="namely: 'pos-arg' (2 times)" $(REVERSE) $<
 	$< 1 "2 3" | grep -q 'POS_S=1,2 3'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity-nodefaults.sh"
 test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
 	$< -h | grep -q '<pos-arg-1> \[<pos-arg-2>\] \.\.\. \[<pos-arg-n>\] \.\.\.$$'
 	ERROR="require at least 1" $(REVERSE) $<
 	$< 1 | grep -q 'POS_S=1,first,second'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity-mixed.sh"
 test-leftovers: $(TESTDIR)/test-leftovers.sh
 	$< -h | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-h|--help\] <another> \.\.\. $$'
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leftovers.sh"
 gen-test-pos: $(TESTDIR)/gen-test-pos.m4 $(ARGBASH_BIN)
 	ERROR="pos-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
 
@@ -373,19 +373,19 @@ test-delim-space: $(TESTDIR)/test-delim-space.sh
 	$< --opt something | grep -q 'OPT_S=something,'
 	ERROR="unexpected argument '--add=three'" $(REVERSE) $< -a one --add two --add=three
 	$< -a one --add two | grep -q 'OPT_REP=one two,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-delim-space.sh"
 test-delim-equals: $(TESTDIR)/test-delim-equals.sh
 	ERROR="unexpected argument '--opt'" $(REVERSE) $< --opt something
 	$< --opt=something | grep -q 'OPT_S=something,'
 	$< --xxx | grep -q 'XXX=on,'
 	ERROR="unexpected argument '--add'" $(REVERSE) $< -a one --add two --add=three
 	$< -a one --add=two | grep -q 'OPT_REP=one two,'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-delim-equals.sh"
 test-delim-both: $(TESTDIR)/test-delim-both.sh
 	$< --opt something | grep -q 'OPT_S=something,'
 	$< --opt=something | grep -q 'OPT_S=something,'
 	$< -a one --add two --add=three | grep -q 'OPT_REP=one two three'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-delim-both.sh"
 test-init_simple: $(TESTDIR)/test-init_simple.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
 	$< foo | grep -q "'pos': foo"
@@ -394,7 +394,7 @@ test-init_simple: $(TESTDIR)/test-init_simple.sh
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
 	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple.sh"
 test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
 	$< foo | grep -q "'pos': foo"
@@ -403,7 +403,7 @@ test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
 	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s.sh"
 test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simple-ss-parsing.sh
 	ERROR="[Nn]ot enough" $(REVERSE) $<
 	$< foo | grep -q "'pos': foo"
@@ -412,7 +412,7 @@ test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simp
 	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
 	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
 	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-ss.sh"
 $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@
 
@@ -438,7 +438,7 @@ test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	$< --ordnung yes > /dev/null
 	$(REVERSE) $<
 	$< -o yes > /dev/null
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s-update.sh"
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
 
@@ -463,11 +463,11 @@ test-env-base: $(TESTDIR)/test-env-base.sh
 	ENVI_FOO=something $< | grep -q 'ENVI_FOO=something'
 	$< -h | grep -q "ENVI_FOO: A sample env, variable. (default: 'def,ault')"
 	$< -h | grep -q "ENVI_BAR: A sample env, variable."
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-env-base.sh"
 test-env-simple: $(TESTDIR)/test-env-simple.sh
 	$< | grep -q 'ENVI_FOO=def,ault,'
 	! $< -h | grep -q 'ENVI_FOO'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-env-simple.sh"
 test-int: $(TESTDIR)/test-int.sh
 	$< 1 | grep -q "POS_S=1,"
 	ERROR="integer" $(REVERSE) $< a
@@ -485,7 +485,7 @@ test-int: $(TESTDIR)/test-int.sh
 	$< 1 --pint 2 | grep -q "P=2,"
 	ERROR="positive" $(REVERSE) $< 1 --pint 0
 	ERROR="negative" $(REVERSE) $< 1 --nnint -1
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-int.sh"
 test-group: $(TESTDIR)/test-group.sh
 	$< foo | grep -q "ACT=foo"
 	$< '' | grep -q "ACT="
@@ -496,7 +496,7 @@ test-group: $(TESTDIR)/test-group.sh
 	@# Assure that there is not the string '_idx' in the script since we don't want indices support in this test
 	! grep -q _idx $<
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-group.sh"
 test-group-idx: $(TESTDIR)/test-group-idx.sh
 	$< foo | grep -q "ACT=foo,IDX=0,"
 	$< foo,baz | grep -q "ACT=foo,baz,IDX=3,"
@@ -507,7 +507,7 @@ test-group-idx: $(TESTDIR)/test-group-idx.sh
 	ERROR="allowed" $(REVERSE) $< fuuuu
 	ERROR="allowed" $(REVERSE) $< bar
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-group-idx.sh"
 $(TESTDIR)/gen-test-group-wrong.m4: $(TESTDIR)/test-group.m4
 	sed -e 's/repeated],/foo,&/' $< > $@
 
@@ -524,13 +524,13 @@ test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	ERROR="omitted the actual value" $(REVERSE) $< -o -o pos-arg
 	ERROR="omitted the actual value" $(REVERSE) $< -o -ofoo pos-arg
 	ERROR="omitted the actual value" $(REVERSE) $< -o --prefix
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-semi_strict.sh"
 test-very_strict: $(TESTDIR)/test-very_strict.sh
 	ERROR="are trying to pass an option" $(REVERSE) $< -o -x pos-arg
 	ERROR="are trying to pass an option" $(REVERSE) $< -o -o pos-arg
 	ERROR="are trying to pass an option" $(REVERSE) $< -x
 	ERROR="are trying to pass an option" $(REVERSE) $< --foobar
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-very_strict.sh"
 $(TESTDIR)/test-getopt-equals.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
 	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-both.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
@@ -545,7 +545,7 @@ test-getopt-both: $(TESTDIR)/test-getopt-both.sh
 	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
 	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
 	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-getopt-both.sh"
 test-getopt-space: $(TESTDIR)/test-getopt-space.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
 	$< --incrx -ii | grep -q 'OPT_INCR=5,'
@@ -554,7 +554,7 @@ test-getopt-space: $(TESTDIR)/test-getopt-space.sh
 	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
 	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
 	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-getopt-space.sh"
 test-getopt-equals: $(TESTDIR)/test-getopt-equals.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
 	$< --incrx -ii | grep -q 'OPT_INCR=5,'
@@ -563,7 +563,7 @@ test-getopt-equals: $(TESTDIR)/test-getopt-equals.sh
 	$< -Biobu | grep 'OPT_INCR=3,' | grep 'BOOL=on,' | grep -q 'OPT_S=bu,'
 	$< -Boibu | grep 'BOOL=on,' | grep 'OPT_INCR=2,' | grep -q 'OPT_S=ibu,'
 	ERROR="'-Bfoo' can't be decomposed to -B and -foo, because -B doesn't accept value and '-f' doesn't correspond to a short option" $(REVERSE) $< -Bfoo
-
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-getopt-equals.sh"
 tests-gen: $(TESTS_GEN)
 
 tests-clean:

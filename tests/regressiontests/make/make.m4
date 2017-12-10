@@ -43,6 +43,7 @@ m4_define([ADD_TEST], [m4_do(
 	[m4_divert_text([STDOUT3], [m4_do(
 		[$1: _script[]m4_ifnblank([$3], [ $3])],
 		[$2],
+		[	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "_script"],
 	)])],
 	[m4_popdef([_script])],
 )])
