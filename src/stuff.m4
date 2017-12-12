@@ -183,7 +183,7 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
 	[m4_list_append([_ARGS_CATH], [$5])],
-	[m4_list_append([_ARGS_VARNAME], [_arg_varname])],
+	[m4_list_append([_ARGS_VARNAME], _arg_varname)],
 	[m4_popdef([_arg_varname])],
 	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
 )])
