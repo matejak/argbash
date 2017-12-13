@@ -123,6 +123,10 @@ m4_define([_sh_quote_also_blanks], [m4_do(
 )])
 
 
+m4_define([_CHECK_ARGNAME_FREE_FATAL],
+	[_CHECK_ARGNAME_FREE([$1], [$2], [m4_fatal])])
+
+
 dnl
 dnl $1: Argument name
 dnl $2: The variable name that would hold the argument value
@@ -130,15 +134,15 @@ dnl Check whether an argument has not (long or short) options that conflict with
 dnl Also writes the argname to the right set
 m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 	[m4_set_contains([_ARGS_LONG], [$2],
-		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a long option used earlier.])])])],
+		[m4_ifnblank([$1], [$3([Argument name '$1' conflicts with a long option used earlier.])])])],
 	[m4_set_contains([_POSITIONALS], [$2],
-		[m4_ifnblank([$1], [m4_fatal([Argument name '$1' conflicts with a positional argument name used earlier.])])])],
+		[m4_ifnblank([$1], [$3([Argument name '$1' conflicts with a positional argument name used earlier.])])])],
 )])
 
 
 m4_define([_CHECK_POSITIONAL_ARGNAME_IS_FREE], [m4_do(
 	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
-	[_CHECK_ARGNAME_FREE([$1], _ARG_VAR_NAME)],
+	[_CHECK_ARGNAME_FREE_FATAL([$1], _ARG_VAR_NAME)],
 	[m4_set_add([_POSITIONALS], _ARG_VAR_NAME)],
 	[m4_popdef([_ARG_VAR_NAME])],
 )])
@@ -146,7 +150,7 @@ m4_define([_CHECK_POSITIONAL_ARGNAME_IS_FREE], [m4_do(
 
 m4_define([_CHECK_OPTIONAL_ARGNAME_IS_FREE], [m4_do(
 	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
-	[_CHECK_ARGNAME_FREE([$1], _ARG_VAR_NAME)],
+	[_CHECK_ARGNAME_FREE_FATAL([$1], _ARG_VAR_NAME)],
 	[m4_set_add([_ARGS_LONG], _ARG_VAR_NAME)],
 	[m4_popdef([_ARG_VAR_NAME])],
 )])
@@ -177,6 +181,7 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	)])],
 	[m4_list_append([_ARGS_LONG], [$1])],
 	[m4_list_append([_ARGS_SHORT], [$2])],
+	[m4_list_append([_ARGS_POS_OR_OPT], [optional])],
 	[m4_set_contains([_ARGS_SHORT], [$2],
 		[m4_ifnblank([$2], [m4_fatal([The short option '$2' (in definition of '--$1') is already used.])])],
 		[m4_set_add([_ARGS_SHORT], [$2])])],
@@ -318,7 +323,7 @@ argbash_api([ARG_POSITIONAL_INF], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[m4_list_contains([BLACKLIST], [$1], , [m4_do(
 		[[$0($@)]],
 		[m4_case(m4_eval($# > 3),
-			0, [_ARG_POSITIONAL_INF([$1], [$2], m4_default([$3], 0))],
+			0, [_ARG_POSITIONAL_INF([$1], [$2], m4_default_quoted([$3], 0))],
 			[_ARG_POSITIONAL_INF([$1], [$2], [$3], [], m4_shiftn(3, $@))])],
 	)])],
 )])
@@ -482,7 +487,7 @@ argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to use 'DEFINE_SCRIPT_DIR' before '$0'.])])],
 	[m4_list_append([_OTHER],
-		m4_expand([[. "$]m4_default([$2], _DEFAULT_SCRIPTDIR)[/$1]"  [# '.' means 'source'
+		m4_expand([[. "$]m4_default_quoted([$2], _DEFAULT_SCRIPTDIR)[/$1]"  [# '.' means 'source'
 ]]))],
 )])
 
@@ -548,7 +553,7 @@ argbash_api([ARG_OPTIONAL_BOOLEAN], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[THIS_ARGUMENT_IS_OPTIONAL],
 	[_some_opt([$1], [$2], [$3],
-		m4_default([$4], [off]), [bool])],
+		m4_default_quoted([$4], [off]), [bool])],
 )])
 
 
