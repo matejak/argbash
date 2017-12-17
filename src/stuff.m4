@@ -13,6 +13,7 @@ dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute
 dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl TODO: Add normalize-args utility --- given described script's command-line, simplify it.
+dnl TODO: Improve help generation - make it docopt-compiant + use printf's %s to print them default values. Currently, having | in default value breaks Argbash. Yes, args with arrays as values will have to be handled differently.
 dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
@@ -169,7 +170,7 @@ dnl $1: Long option
 dnl $2: Short option (opt)
 dnl $3: Help string
 dnl $4: Default, pass it through _sh_quote if needed beforehand (opt)
-dnl $5: Type
+dnl $5: Type (e.g. repeated, incremental, ...)
 dnl $6: Bash variable name
 m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[_CHECK_OPTIONAL_ARGNAME_IS_FREE([$1])],
@@ -179,16 +180,13 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 		[m4_set_add([_ARGS_GROUPS], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
 		[m4_define([_COLLECT_]_varname([$1]),  _args_prefix[]_translit_var(WRAPPED)[]_opt_suffix)],
 	)])],
-	[m4_list_append([_ARGS_LONG], [$1])],
+	[_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT([$1], [$3], _arg_varname)],
 	[m4_list_append([_ARGS_SHORT], [$2])],
-	[m4_list_append([_ARGS_POS_OR_OPT], [optional])],
 	[m4_set_contains([_ARGS_SHORT], [$2],
 		[m4_ifnblank([$2], [m4_fatal([The short option '$2' (in definition of '--$1') is already used.])])],
 		[m4_set_add([_ARGS_SHORT], [$2])])],
-	[m4_list_append([_ARGS_HELP], [$3])],
 	[m4_list_append([_ARGS_DEFAULT], [$4])],
 	[m4_list_append([_ARGS_CATH], [$5])],
-	[m4_list_append([_ARGS_VARNAME], _arg_varname)],
 	[m4_popdef([_arg_varname])],
 	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
 )])
@@ -238,7 +236,7 @@ m4_define([IF_POSITIONALS_INF],
 
 dnl Do something depending on whether there have been optional positional args declared beforehand or not
 m4_define([IF_POSITIONALS_VARNUM],
-	[m4_ifdef([HAVE_POSITIONAL_VARNUM], [$1], [$2])])
+	[m4_if(m4_quote(HAVE_POSITIONAL_VARNUM), 1, [$1], [$2])])
 
 
 dnl
@@ -284,12 +282,73 @@ argbash_api([ARG_POSITIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 )])
 
 
+m4_define([_DISCARD_VALUES_FOR_ALL_ARGUMENTS], [m4_do(
+	[m4_list_destroy([_ARGS_LONG])],
+	[m4_list_destroy([_ARGS_HELP])],
+	[m4_list_destroy([_ARGS_VARNAME])],
+	[m4_list_destroy([_ARGS_POS_OR_OPT])],
+
+	[m4_list_destroy([_ARGS_CATH])],
+
+	[m4_list_destroy([_POSITIONALS_MINS])],
+	[m4_list_destroy([_POSITIONALS_MAXES])],
+	[m4_list_destroy([_POSITIONALS_DEFAULTS])],
+
+	[m4_list_destroy([_ARGS_SHORT])],
+	[m4_list_destroy([_ARGS_DEFAULT])],
+
+	[m4_set_delete([_ARGS_SHORT])],
+	[m4_set_delete([_ARGS_LONG])],
+	[m4_set_delete([_POSITIONALS])],
+
+	[m4_define([_POSITIONALS_INF], 0)],
+	[m4_define([HAVE_POSITIONAL_VARNUM], 0)],
+	[m4_define([HAVE_DOUBLEDASH], 0)],
+)])
+
+
+dnl
+dnl $1: The argument name
+dnl $2: The help message
+dnl $3: The variable name
+m4_define([_FILL_IN_VALUES_FOR_ANY_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
+	[m4_list_append([_ARGS_LONG], [$1])],
+	[m4_list_append([_ARGS_HELP], [$2])],
+	[m4_list_append([_ARGS_VARNAME], [$3])],
+)])
+
+
+dnl
+dnl $1: The argument name
+dnl $2: The help message
+dnl $3: The variable name
+m4_define([_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
+	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3])],
+	[m4_list_append([_ARGS_POS_OR_OPT], [optional])],
+
+	[m4_list_append([_POSITIONALS_MINS], 0)],
+	[m4_list_append([_POSITIONALS_MAXES], 0)],
+	[m4_list_append([_POSITIONALS_DEFAULTS], [])],
+)])
+
+
+dnl
+dnl $1: The argument name
+dnl $2: The help message
+dnl $3: The variable name
+m4_define([_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
+	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3])],
+	[m4_list_append([_ARGS_POS_OR_OPT], [positional])],
+
+	[m4_list_append([_ARGS_SHORT], [])],
+	[m4_list_append([_ARGS_DEFAULT], [])],
+)])
+
+
 m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED("${_varname([$1])}")],
-	[dnl Number of possibly supplied positional arguments just went up
-],
 	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_incr(_HIGHEST_POSITIONAL_VALUES_COUNT))],
 	[dnl If we don't have default, also a number of positional args that are needed went up
 ],
@@ -303,10 +362,9 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 			[m4_list_append([_POSITIONALS_MINS], 0)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
 		)])],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
 	[m4_list_append([_POSITIONALS_MAXES], 1)],
-	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONAL_CATHS], [single])],
-	[m4_list_append([_POSITIONALS_MSGS], [$2])],
+	[m4_list_append([_ARGS_CATH], [single])],
 	[dnl Here, the _sh_quote actually does not ensure that the default is NOT BLANK!
 ],
 )])
@@ -336,14 +394,13 @@ dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
-	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
+	[_POS_WRAPPED(${_varname([$1])[@]})],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
 ],
 	[m4_define([_INF_REPR], [[$4]])],
-	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONAL_CATHS], [inf])],
-	[m4_list_append([_POSITIONALS_MSGS], [$2])],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
+	[m4_list_append([_ARGS_CATH], [inf])],
 	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])],
 	[m4_pushdef([_min_argn], [[$3]])],
 	[m4_define([_INF_ARGN], _min_argn)],
@@ -385,11 +442,10 @@ argbash_api([ARG_POSITIONAL_MULTI], _CHECK_PASSED_ARGS_COUNT(3)_CHECK_INTEGER_TY
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
-	[_POS_WRAPPED(${_varname([$1])@<:@@@:>@})],
+	[_POS_WRAPPED(${_varname([$1])[@]})],
 	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + [$3]))],
-	[m4_list_append([_POSITIONALS_NAMES], [$1])],
-	[m4_list_append([_POSITIONAL_CATHS], [more])],
-	[m4_list_append([_POSITIONALS_MSGS], [$2])],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
+	[m4_list_append([_ARGS_CATH], [more])],
 	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))
 ],
 	[m4_pushdef([_min_argn], m4_eval([$3] - ($# - 3) ))],
@@ -669,28 +725,28 @@ m4_define([_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED],
 
 
 m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
-	[_IF_HAVE_OPTIONAL([m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
-		[ @<:@],
-		[m4_case(_arg_type,
-			[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
-			[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-			[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-			[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
-		[@:>@],
-	)])])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [[ @<:@--@:>@]])],
-	[dnl If we have positionals, display them like <pos1> <pos2> ...
+	[_IF_HAVE_OPTIONAL([m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
+	[ @<:@],
+	[m4_case(_arg_type,
+		[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
+		[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+		[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+		[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
+	[@:>@],
+)])])],
+[m4_if(HAVE_DOUBLEDASH, 1, [[ @<:@--@:>@]])],
+[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
-	[m4_if(HAVE_POSITIONAL, 1, [m4_do(
-		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_MAXES,_POSITIONAL_CATHS], [argname,_min_argn,_max_argn,_arg_type],
-			[_POS_ARG_HELP_LINE(argname, _arg_type, _min_argn, _max_argn)])],
-		[ m4_expand(m4_join([ ], m4_list_contents([_POSITIONALS_LIST])))],
+[m4_if(HAVE_POSITIONAL, 1, [m4_do(
+	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_MAXES,_ARGS_CATH], [argname,_min_argn,_max_argn,_arg_type],
+		[_POS_ARG_HELP_LINE(argname, _arg_type, _min_argn, _max_argn)])],
+	[ m4_expand(m4_join([ ], m4_list_contents([_POSITIONALS_LIST])))],
 	)])],
 )])
 
 
-m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
-	[_POSITIONALS_NAMES,_POSITIONAL_CATHS,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONALS_MSGS],
+m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach_positional(
+	[_ARGS_LONG,_ARGS_CATH,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_HELP],
 	[argname0,_arg_type,_min_argn,_defaults,_msg], [m4_ifnblank(_msg, [m4_do(
 	[dnl We would like something else for argname if the arg type is 'inf' and _INF_VARNAME is not empty
 ],
@@ -705,7 +761,7 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach(
 )])])])
 
 
-m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach(
+m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
 	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME,_ARGS_HELP],
 	[_argname,_arg_short,_arg_type,_default,_arg_varname,_arg_help],
 	[m4_ifnblank(_arg_help, [m4_do(
@@ -1195,7 +1251,7 @@ m4_define([_EVAL_OPTIONALS], [m4_do(
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 	[_INDENT_(2)[case "$_key" in
 ]],
-	[m4_lists_foreach([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
+	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
 	[_HANDLE_POSITIONAL_ARG],
 	[_INDENT_(2)[esac
@@ -1228,7 +1284,7 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 		[# This array is able to hold array elements as targets.],
 	)],
 	[_INDENT_(_indentation_level)[_positional_names=@{:@]],
-	[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
+	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 		[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL, so we really need the check.
 ],
 		[m4_if(_max_argn, 0, , [m4_do(
@@ -1384,13 +1440,13 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 			[# - for example if this script is sourced by an argbash-powered script.])],
 		[[_positionals=()
 ]],
-		[m4_lists_foreach([_POSITIONALS_NAMES,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_POSITIONAL_CATHS], [_argname,_min_argn,_defaults,_arg_type],
+		[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
 			[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
 	)])],
 	[_IF_HAVE_OPTIONAL([m4_do(
 		[# THE DEFAULTS INITIALIZATION - OPTIONALS
 ],
-		[m4_lists_foreach([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
+		[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
 			[dnl We have to handle 'incr' as a special case, there is a m4_default(..., 0)
 ],
 			[m4_case(_arg_type,
@@ -1554,6 +1610,7 @@ m4_define([_GET_VALUE_STR], [m4_do(
 dnl
 dnl If specified, request to initialize positional arguments to empty values (if they don't have defaults)
 argbash_api([ARG_DEFAULTS_POS], [m4_do(
+	[[$0($@)]],
 	[m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[yes]])],
 )])
 
