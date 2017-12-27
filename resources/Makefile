@@ -1,6 +1,8 @@
 NUL =
 
-SHELLCHECK=$(shell shellcheck -V > /dev/null && echo shellcheck)
+SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
+
+SHELLCHECK=$(shell shellcheck -V > /dev/null && echo shellcheck $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT))
 
 M4_SRC = \
 	../src/output.m4 \

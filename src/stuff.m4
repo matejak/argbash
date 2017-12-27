@@ -752,7 +752,7 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach_positional(
 ],
 	[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 	[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-	[_INDENT_()[printf "\t%s\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
+	[_INDENT_()[printf "\\t%s\\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
 	[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
 	[m4_popdef([argname])],
 	[m4_popdef([argname1])],
@@ -765,7 +765,7 @@ m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
 	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME,_ARGS_HELP],
 	[_argname,_arg_short,_arg_type,_default,_arg_varname,_arg_help],
 	[m4_ifnblank(_arg_help, [m4_do(
-		[_INDENT_()printf "\t%s\n" "],
+		[_INDENT_()printf "\\t%s\\n" "],
 		[dnl Display a short one if it is not blank
 ],
 		[m4_ifnblank(_arg_short, -_arg_short[,])],
@@ -814,9 +814,9 @@ m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
 			[m4_ifnblank(_default, [ (default: ']_default'))],
 		)]))])],
 	)])],
-	[printf '\nEnvironment variables that are supported:\n'
+	[printf '\\nEnvironment variables that are supported:\\n'
 ],
-	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\t%s\n" "[]_msg"
+	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\\t%s\\n" "[]_msg"
 ])],
 )])
 
@@ -848,13 +848,13 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\n" "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\\n" "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
 ))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
 	[_MAKE_HELP_SYNOPSIS],
-	[\n' "@S|@0"
+	[\\n' "@S|@0"
 ],
 	[m4_if(HAVE_POSITIONAL, 1, [_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
 	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
@@ -867,7 +867,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
 ])],
 	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
-	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\n%s\n" "]_HELP_MSG_EX"
+	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\\n%s\\n" "]_HELP_MSG_EX"
 ))],
 	[}
 ],
