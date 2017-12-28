@@ -25,8 +25,8 @@ assert_equals_list_next([B])
 assert_equals_list_element([_ARGS_HELP], 1, [Help,BOMB])
 assert_equals_list_element([_ARGS_HELP], 2, [BOMB])
 
-assert_equals_list_element([_ARGS_DEFAULT], , ["Default"])
-assert_equals_list_next(["BOMB"])
+assert_equals_list_element([_ARGS_DEFAULT], , [Default])
+assert_equals_list_next([BOMB])
 
 assert_equals_list_element([_ARGS_VARNAME], 1, [_arg_foo])
 assert_equals_list_next([_arg_bomb])
@@ -36,6 +36,10 @@ assert_equals(m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT],[_arg_long,_arg
 
 assert_equals(m4_lists_foreach_positional([_ARGS_LONG,_ARGS_HELP,_POSITIONALS_MINS,_POSITIONALS_MAXES],[_arg_long,_arg_help,_pmin,_pmax],[_arg_long:_arg_help:_pmin-_pmax;]),
 	      [defaultless:xhelp:1-1;p-BOMB:BOMB:0-1;])
+
+assert_equals([single], _CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], 2), [single], [not single]))
+assert_equals([single], _CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], 3), [single], [not single]))
+assert_equals([not single], _CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], 4), [single], [not single]))
 
 _DISCARD_VALUES_FOR_ALL_ARGUMENTS()
 
@@ -54,7 +58,7 @@ assert_equals_list_element([_ARGS_HELP], 1, [Help,BOMB])
 assert_equals_list_next([xhelp])
 assert_equals_list_next([help-BOMB])
 
-assert_equals_list_element([_ARGS_DEFAULT], , ["Default"])
+assert_equals_list_element([_ARGS_DEFAULT], , [Default])
 assert_equals_list_next([])
 assert_equals_list_next([])
 

@@ -54,7 +54,7 @@ _positionals=()
 _arg_output="-"
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_separate=0
-_arg_hints=off
+_arg_hints="off"
 _arg_pos=()
 _arg_opt=()
 _arg_opt_bool=()
@@ -63,18 +63,18 @@ _arg_mode="default"
 
 print_help ()
 {
-	printf "%s\\n" "Make a template for scripts."
-	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\\n' "$0"
-	printf "\\t%s\\n" "<output>: Name of the output template (default: '""-""')"
-	printf "\\t%s\\n" "-s,--separate: Separate the parsing logic (specify two times for complete separation)"
-	printf "\\t%s\\n" "--hints,--no-hints: Whether to write hints to the script template (off by default)"
-	printf "\\t%s\\n" "--pos: Add a single-valued positional argument (empty by default)"
-	printf "\\t%s\\n" "--opt: Add an single-valued optional argument (empty by default)"
-	printf "\\t%s\\n" "--opt-bool: Add an optional boolean argument (empty by default)"
-	printf "\\t%s\\n" "--wrap: What script(s) to wrap (empty by default)"
-	printf "\\t%s\\n" "-m,--mode: The slider between feature-rich and simple script. (one of 'default', 'full' and 'minimal'; default: '"default"')"
-	printf "\\t%s\\n" "-v,--version: Prints version"
-	printf "\\t%s\\n" "-h,--help: Prints help"
+	printf '%s\n' "Make a template for scripts."
+	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\n' "$0"
+	printf '\t%s\n' "<output>: Name of the output template (default: '"-"')"
+	printf '\t%s\n' "-s,--separate: Separate the parsing logic (specify two times for complete separation)"
+	printf '\t%s\n' "--hints,--no-hints: Whether to write hints to the script template (off by default)"
+	printf '\t%s\n' "--pos: Add a single-valued positional argument (empty by default)"
+	printf '\t%s\n' "--opt: Add an single-valued optional argument (empty by default)"
+	printf '\t%s\n' "--opt-bool: Add an optional boolean argument (empty by default)"
+	printf '\t%s\n' "--wrap: What script(s) to wrap (empty by default)"
+	printf '\t%s\n' "-m,--mode: The slider between feature-rich and simple script. (one of 'default', 'full' and 'minimal'; default: 'default')"
+	printf '\t%s\n' "-v,--version: Prints version"
+	printf '\t%s\n' "-h,--help: Prints help"
 }
 
 parse_commandline ()

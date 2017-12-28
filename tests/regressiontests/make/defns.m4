@@ -54,17 +54,17 @@ TESTS_GEN += \
 	$(NUL)
 [
 define generic_regression
-	$< LOO | grep -q POS_S=LOO,
+	$< LOO | grep -q 'POS_S=LOO',
 	$< "LOO BAR" | grep -q 'POS_S=LOO BAR,'
 	$< LOO | grep -q BOOL=off,
 	$< LOO --boo_l | grep -q BOOL=on,
 	$< LOO --no-boo_l | grep -q BOOL=off,
-	$< LOO | grep -q OPT_S=opt_arg_default,
+	$< LOO | grep -q 'OPT_S=opt_arg_default lolo',
 	$< LOO --opt_arg PoS | grep -q OPT_S=PoS,
 	$< LOO --opt_arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< LOO --opt_arg="PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
-	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default,'
+	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default lala,'
 	$< LOO | grep -q 'OPT_INCR=2,'
 	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
 	$< LOO --opt-incr -i | grep -q 'OPT_INCR=4,'

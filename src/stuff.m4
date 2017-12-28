@@ -44,6 +44,16 @@ dnl typeid: int for integer, uint for non-negative integer, float for whatever
 dnl ARGS_TYPE_CUSTOM([list of args], [name], [shell function name - optional])
 
 
+dnl
+dnl $1: Cathegory
+dnl $2: What to do if so
+dnl $3: What to do if not
+m4_define([_CATH_IS_SINGLE_VALUED], [m4_case([$1],
+	[arg], [$2],
+	[single], [$2],
+	[$3])])
+
+
 m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])
 m4_define([_IF_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [m4_if(_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS,
 	[yes], [$1],
@@ -360,13 +370,11 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 		)], [m4_do(
 			[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])],
 			[m4_list_append([_POSITIONALS_MINS], 0)],
-			[m4_list_append([_POSITIONALS_DEFAULTS], _sh_quote([$3]))],
+			[m4_list_append([_POSITIONALS_DEFAULTS], [$3])],
 		)])],
 	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
 	[m4_list_append([_POSITIONALS_MAXES], 1)],
 	[m4_list_append([_ARGS_CATH], [single])],
-	[dnl Here, the _sh_quote actually does not ensure that the default is NOT BLANK!
-],
 )])
 
 
@@ -455,8 +463,6 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[m4_list_append([_POSITIONALS_MINS], _min_argn)],
 	[_REGISTER_REQUIRED_POSITIONAL_ARGUMENTS([$1], _min_argn)],
 	[m4_list_append([_POSITIONALS_MAXES], [$3])],
-	[dnl Here, the _sh_quote actually ensures that the default is NOT BLANK!
-],
 	[m4_list_append([_POSITIONALS_DEFAULTS], [_$1_DEFAULTS])],
 	[m4_if(m4_cmp($#, 3), 1, [m4_list_append([_$1_DEFAULTS], m4_shiftn(3, $@))])],
 	[m4_popdef([_min_argn])],
@@ -466,7 +472,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
 	[THIS_ARGUMENT_IS_OPTIONAL],
-	[_some_opt([$1], [$2], [$3], _sh_quote([$4]), [arg])],
+	[_some_opt([$1], [$2], [$3], [$4], [arg])],
 )])
 
 
@@ -684,7 +690,7 @@ m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 ],
 	[m4_case([$2],
 		[single],
-			[m4_if([$3], 0, [[ @{:@default: '"$4"'@:}@]])],
+			[m4_if([$3], 0, [[ @{:@default: '$4'@:}@]])],
 		[more], [_FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 		[inf], [_FORMAT_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 	[m4_fatal([$0: Unhandled arg type: '$2'])])],
@@ -752,7 +758,7 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach_positional(
 ],
 	[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 	[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-	[_INDENT_()[printf "\\t%s\\n" "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
+	[_INDENT_()[printf '\t%s\n' "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
 	[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
 	[m4_popdef([argname])],
 	[m4_popdef([argname1])],
@@ -765,7 +771,7 @@ m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
 	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME,_ARGS_HELP],
 	[_argname,_arg_short,_arg_type,_default,_arg_varname,_arg_help],
 	[m4_ifnblank(_arg_help, [m4_do(
-		[_INDENT_()printf "\\t%s\\n" "],
+		[_INDENT_()printf '\t%s\n' "],
 		[dnl Display a short one if it is not blank
 ],
 		[m4_ifnblank(_arg_short, -_arg_short[,])],
@@ -814,9 +820,9 @@ m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
 			[m4_ifnblank(_default, [ (default: ']_default'))],
 		)]))])],
 	)])],
-	[printf '\\nEnvironment variables that are supported:\\n'
+	[printf '\nEnvironment variables that are supported:\n'
 ],
-	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf "\\t%s\\n" "[]_msg"
+	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf '\t%s\n' "[]_msg"
 ])],
 )])
 
@@ -848,13 +854,13 @@ m4_define([_MAKE_HELP], [m4_do(
 	[print_help ()
 {
 ],
-	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] "%s\\n" "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
+	[m4_ifnblank(m4_expand([_HELP_MSG]), m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
 ))],
 	[_INDENT_()[]printf 'Usage: %s],
 	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
 	[_MAKE_HELP_SYNOPSIS],
-	[\\n' "@S|@0"
+	[\n' "@S|@0"
 ],
 	[m4_if(HAVE_POSITIONAL, 1, [_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
 	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
@@ -867,7 +873,7 @@ m4_define([_MAKE_HELP], [m4_do(
 	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
 ])],
 	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
-	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf "\\n%s\\n" "]_HELP_MSG_EX"
+	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf '\n%s\n' "]_HELP_MSG_EX"
 ))],
 	[}
 ],
@@ -1414,7 +1420,7 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 		[dnl We have to double-quote $4 (and underlying stuff) since they are expanded by two macros, so two quotes get stripped.
 ],
 		[m4_case([$2],
-			[single], [[$4]],
+			[single], [_sh_quote([$4])],
 			[more], [_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 			[inf], [_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS([$1], [$2], [$3], [$4])],
 		)],
@@ -1453,7 +1459,9 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 				[action], [],
 				[incr], [_arg_varname=m4_expand(_default)
 ],
-				[_arg_varname=_default
+				[repeated], [_arg_varname=_default
+],
+				[_arg_varname=_sh_quote(_default)
 ])],
 		)])],
 	)])],

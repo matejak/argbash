@@ -1,8 +1,9 @@
 NUL =
 
-SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
+# TODO: Get rid of 1090,2154
+SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015,1090,2154,2034
 
-SHELLCHECK=$(shell shellcheck -V > /dev/null && echo shellcheck $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT))
+SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck -a $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
 
 M4_SRC = \
 	../src/output.m4 \

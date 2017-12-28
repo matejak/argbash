@@ -40,8 +40,7 @@ argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 		m4_expand([[one of ]m4_list_join([_LIST_$1], [, ], ', ', [ and ])]))],
 	[m4_foreach([_argname], [$3], [m4_do(
 		[m4_list_contains([_ARGS_LONG], _argname, ,
-			[m4_list_contains([_POSITIONALS_NAMES], _argname, ,
-				[m4_fatal('_argname' [is not a script argument.])])])],
+				[m4_fatal('_argname' [is not a script argument.])])],
 		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
 		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],
 	)])],
@@ -87,7 +86,8 @@ m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 ])],
 	[dnl Don't do anything if we are string
 ],
-	[m4_set_foreach([TYPED_ARGS], [_arg], [m4_list_contains([_POSITIONALS_NAMES], _arg, [m4_do(
+	[m4_lists_foreach_positional([_ARGS_LONG], [_arg], [m4_set_contains([TYPED_ARGS], _arg, [m4_do(
+
 		[m4_pushdef([_arg_varname], [_varname(_arg)])],
 		
 		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname") || exit 1
@@ -102,13 +102,10 @@ m4_define([_IF_ARG_IS_TYPED], [m4_set_contains([TYPED_ARGS], [$1], [$2], [$3])])
 
 m4_define([_MAYBE_ASSIGN_INDICES_TO_TYPED_SINGLE_VALUED_ARGS], [m4_do(
 	[m4_set_foreach([GROUP_ARGS], [_arg], [m4_do(
-		[m4_if(
-			m4_if(
-				m4_list_nth([_ARGS_CATH], m4_list_indices([_ARGS_LONG], _arg), 123), [arg], 1,
-				m4_list_contains([_POSITIONALS_NAMES], _arg, 1, 0)),
-			1,
+		[_CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], m4_list_indices([_ARGS_LONG], _arg), 123),
 			[_VALIDATE_VALUES_IDX(_arg, m4_indir([_]_arg[_SUFFIX]))
-])],
+],
+			[])],
 	)])],
 )])
 

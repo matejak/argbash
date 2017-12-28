@@ -41,25 +41,25 @@ begins_with_short_option()
 _positionals=()
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output="-"
-_arg_library=off
-_arg_check_typos=on
-_arg_commented=off
+_arg_library="off"
+_arg_check_typos="on"
+_arg_commented="off"
 _arg_search=(".")
 _arg_debug=
 
 print_help ()
 {
-	printf "%s\\n" "Argbash is an argument parser generator for Bash."
-	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [--(no-)check-typos] [-c|--(no-)commented] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\\n' "$0"
-	printf "\\t%s\\n" "<input>: The input template file (pass '-' for stdout)"
-	printf "\\t%s\\n" "-o,--output: Name of the output file (pass '-' for stdout) (default: '"-"')"
-	printf "\\t%s\\n" "--library,--no-library: Whether the input file if the pure parsing library. (off by default)"
-	printf "\\t%s\\n" "--check-typos,--no-check-typos: Whether to check for possible argbash macro typos (on by default)"
-	printf "\\t%s\\n" "-c,--commented,--no-commented: Commented mode - include explanatory comments with the parsing code (off by default)"
-	printf "\\t%s\\n" "-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: (\".\") )"
-	printf "\\t%s\\n" "--debug: (developer option) Tell autom4te to trace a macro (no default)"
-	printf "\\t%s\\n" "-v,--version: Prints version"
-	printf "\\t%s\\n" "-h,--help: Prints help"
+	printf '%s\n' "Argbash is an argument parser generator for Bash."
+	printf 'Usage: %s [-o|--output <arg>] [--(no-)library] [--(no-)check-typos] [-c|--(no-)commented] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
+	printf '\t%s\n' "<input>: The input template file (pass '-' for stdout)"
+	printf '\t%s\n' "-o,--output: Name of the output file (pass '-' for stdout) (default: '-')"
+	printf '\t%s\n' "--library,--no-library: Whether the input file if the pure parsing library. (off by default)"
+	printf '\t%s\n' "--check-typos,--no-check-typos: Whether to check for possible argbash macro typos (on by default)"
+	printf '\t%s\n' "-c,--commented,--no-commented: Commented mode - include explanatory comments with the parsing code (off by default)"
+	printf '\t%s\n' "-I,--search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array: (\".\") )"
+	printf '\t%s\n' "--debug: (developer option) Tell autom4te to trace a macro (no default)"
+	printf '\t%s\n' "-v,--version: Prints version"
+	printf '\t%s\n' "-h,--help: Prints help"
 }
 
 parse_commandline ()
