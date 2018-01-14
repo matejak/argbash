@@ -120,9 +120,9 @@ m4_define([_MAYBE_VALIDATE_VALUE], [m4_case(_GET_VALUE_TYPE([$1]),
 		[string], [[$2]],
 		[generic], [[$2]],
 		[m4_do(
-			["@S|@@{:@],
+			["$(],
 			[_GET_VALUE_TYPE([$1], 1)],
-			[ [$2] "[$1]"@:}@"],
+			[ [$2] "[$1]")"],
 )])])
 
 

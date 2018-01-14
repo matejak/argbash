@@ -140,6 +140,7 @@ ADD_TEST([test-wrapping], [[
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
+	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 ]], [$(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4])
 
 ADD_TEST([test-wrapping-more], [[

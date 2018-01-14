@@ -287,6 +287,7 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
+	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
 test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'

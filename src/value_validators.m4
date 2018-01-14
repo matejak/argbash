@@ -31,7 +31,7 @@ _define_validator([int],
 [[function int
 {
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+	printf "%d" "@S|@1"
 }
 ]], [integer])
 
@@ -41,7 +41,7 @@ _define_validator([pint],
 [[function pint
 {
 	printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+	printf "%d" "@S|@1"
 }
 ]], [positive integer])
 
@@ -51,7 +51,7 @@ _define_validator([nnint],
 [[function nnint
 {
 	printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+	printf "%d" "@S|@1"
 }
 ]], [positive integer or zero])
 
@@ -61,7 +61,7 @@ _define_validator([float],
 [[function float
 {
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+	printf "%d" "@S|@1"
 }
 ]], [floating-point number])
 
@@ -71,7 +71,7 @@ _define_validator([decimal],
 [[function decimal
 {
 	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."
-	printf "%d" @S|@1  # it is a number, so we can relax the quoting
+	printf "%d" "@S|@1"
 }
 ]], [decimal number])
 

@@ -885,11 +885,12 @@ dnl $1: Arg name
 dnl $2: Short arg name (not used here)
 dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
+dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[$3([$1], ["@S|@2"], [$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [@S|@2])])],
 	[shift],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
 )])
 
 
@@ -898,9 +899,10 @@ dnl $1: Arg name
 dnl $2: Action - the variable containing the value to assign is '_val'
 dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
+dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[$3([$1], ["${_key##--$1=}"], [$4])],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS([$4])],
 )])
 
 
@@ -909,10 +911,18 @@ dnl $1: Arg name
 dnl $2: Short arg name
 dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
+dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[$3([$1], ["${_key##-$2}"], [$4])],
-	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$4], $[$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_GETOPT([$4])],
 )])
+
+
+dnl
+dnl $1: The name of the option arg
+dnl $2: What to do if wrapping
+dnl $2: What to do if not wrapping
+m4_define([_IF_WRAPPING_OPTION], [m4_ifdef([_COLLECT_$1], [$2], [$3])])
 
 
 dnl
@@ -922,13 +932,25 @@ dnl Uses:
 dnl _key - the run-time shell variable
 dnl _key - the run-time shell variable
 m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH], [m4_do(
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("${_key%%=*}"m4_ifnblank([$2], [ "$2"]))])],
 )])
 
 
 dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
 m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
-	[m4_ifdef([_COLLECT_$1], [_COLLECT_$1+=("${_key}"m4_ifnblank([$2], [ "$2"]))])],
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("${_key}"m4_ifnblank([$2], [ "$2"]))])],
+)])
+
+
+dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_GETOPT], [m4_do(
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("$_key")])],
+)])
+
+
+dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
+m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS], [m4_do(
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("$_key")])],
 )])
 
 
@@ -1053,8 +1075,6 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 ],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]1))],
-			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
-				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[BOTH]])],
 			[dnl We won't try to show that = and ' ' are possible in the help message
 ],
@@ -1064,8 +1084,6 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 ],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]1))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]2))],
-			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
-				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE]))],
 			[m4_define([_DELIMITER], [[SPACE]])],
 			[m4_define([_DELIM_IN_HELP], [ ])],
 		)])],
@@ -1074,8 +1092,6 @@ m4_define([_SET_OPTION_VALUE_DELIMITER],
 ],
 			[m4_define([_IF_SPACE_IS_A_DELIMITER], m4_quote($[]2))],
 			[m4_define([_IF_EQUALS_IS_A_DELIMITER], m4_quote($[]1))],
-			[m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY],
-				m4_defn([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH]))],
 			[m4_define([_DELIMITER], [[EQUALS]])],
 			[m4_define([_DELIM_IN_HELP], [=])],
 		)], [m4_fatal([We expect at least '=' or ' ' in the expression. Got: '$1'.])])])])
@@ -1136,17 +1152,17 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 		[_IF_ARG_ACCEPTS_VALUE([$3], [_IF_SPACE_IS_A_DELIMITER([[--$1]])], [[--$1]])])],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
 		[incr],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[action],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
@@ -1171,16 +1187,18 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
 		[])])])
 
 
+dnl
+dnl $1: Argname
+dnl $2: Short option
+dnl $3: Argument type
+dnl $4: Argument default
+dnl $5: Value-holding variable name
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
 		[[--$1=*]])],
-	[dnl Output the body of the case
-],
-	[dnl _APPEND_WRAPPED_ARGUMENT_TO_ARRAY: If the arg comes from wrapped script/template, save it in an array
-],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[m4_fatal([Internal error: Argument of type '$3' is other than 'arg' or 'repeated' and shouldn't make it to the '$0' macro.])]
 	)],
 	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
@@ -1195,18 +1213,18 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 ],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
 			_PASS_WHEN_GETOPT([$2]),
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[incr],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
 			_PASS_WHEN_GETOPT([$2]),
-			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY([$5])],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[action],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
@@ -1223,10 +1241,16 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE],
 	[_IF_OPT_GROUPING_GETOPT([m4_ifnblank([$2], [_PICK_GETOPT_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_GETOPT_CASE_SECTION($@)])])])
 
 
+dnl
+dnl $1: Argname
+dnl $2: Short option
+dnl $3: Argument type
+dnl $4: Argument default
+dnl $5: Value-holding variable name
 m4_define([_MAKE_OPTARG_CASE_SECTIONS], [m4_do(
-	[_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE([$1], [$2], [$3], [$4], [$5])],
-	[_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE([$1], [$2], [$3], [$4], [$5])],
-	[_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE([$1], [$2], [$3], [$4], [$5])],
+	[_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE($@)],
+	[_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE($@)],
+	[_MAKE_OPTARG_GETOPT_CASE_SECTION_IF_IT_MAKES_SENSE($@)],
 )])
 
 
