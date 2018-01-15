@@ -5,7 +5,7 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.
 
 version=_ARGBASH_VERSION
-# ARG_POSITIONAL_SINGLE([output], [Name of the output template], "-")
+# ARG_POSITIONAL_SINGLE([output], [Name of the output template], [-])
 # ARG_OPTIONAL_INCREMENTAL([separate], s, [Separate the parsing logic (specify two times for complete separation)])
 # ARG_OPTIONAL_BOOLEAN([hints], ,[Whether to write hints to the script template])
 # ARG_OPTIONAL_REPEATED([pos], , [Add a single-valued positional argument])

@@ -100,6 +100,7 @@ check: $(TESTDIR)/Makefile $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	$(MAKE) tests-clean
 	$(SHELLCHECK) $(ARGBASH_BIN)
 	$(SHELLCHECK) $(ARGBASH_INIT)
+	$(SHELLCHECK) $(ARGBASH_TO)
 	@echo "*** All is OK ***"
 
 # TODO: Think out how to make a multiline foreach

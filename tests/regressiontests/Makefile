@@ -222,14 +222,14 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
 	$(REVERSE) $< LOO 2> /dev/null
-	$< -h | grep -q -e '-B|--boo_l'
-	$< -h | grep -q -e '-B,--boo_l'
+	$< -h | grep -q -e '-B|--(no-)boo_l'
+	! $< -h | grep -q -e '-B,'
 	$< -h | grep -q -e '-i|--incrx'
 	$< -h | grep -q -e '-i,--incrx'
 	$< -h | grep -q -e '-o|--opt-arg <arg>'
-	$< -h | grep -q -e '-o,--opt-arg <arg>'
+	$< -h | grep -q -e '-o,--opt-arg: @opt-arg@'
 	$< -h | grep -q -e '-r|--opt-repeated'
-	$< -h | grep -q -e '-r,--opt-repeated'
+	$< -h | grep -q -e '-r,--opt-repeated:'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)

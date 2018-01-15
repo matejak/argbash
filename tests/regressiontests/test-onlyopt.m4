@@ -2,7 +2,7 @@
 
 dnl m4_define([test], [m4_fatal([BOOM!!!])])
 m4_define([incrx], [m4_fatal([BOOM!!!])])
-# ARG_OPTIONAL_SINGLE([opt-arg], o, [], x)
+# ARG_OPTIONAL_SINGLE([opt-arg], o, [@opt-arg@], x)
 # ARG_VERSION([echo "$0 FOO"])
 # ARG_OPTIONAL_BOOLEAN(boo_l, B)
 # ARG_OPTIONAL_INCREMENTAL([incrx], i, [@pos-opt-arg@], 2)

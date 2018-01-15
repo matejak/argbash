@@ -5,7 +5,7 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.
 
 version=2.5.1
-# ARG_POSITIONAL_SINGLE([output],[Name of the output template],["-"])
+# ARG_POSITIONAL_SINGLE([output],[Name of the output template],[-])
 # ARG_OPTIONAL_INCREMENTAL([separate],[s],[Separate the parsing logic (specify two times for complete separation)])
 # ARG_OPTIONAL_BOOLEAN([hints],[],[Whether to write hints to the script template])
 # ARG_OPTIONAL_REPEATED([pos],[],[Add a single-valued positional argument])
@@ -69,7 +69,7 @@ print_help ()
 {
 	printf '%s\n' "Make a template for scripts."
 	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\n' "$0"
-	printf '\t%s\n' "<output>: Name of the output template (default: '"-"')"
+	printf '\t%s\n' "<output>: Name of the output template (default: '-')"
 	printf '\t%s\n' "-s,--separate: Separate the parsing logic (specify two times for complete separation)"
 	printf '\t%s\n' "--hints,--no-hints: Whether to write hints to the script template (off by default)"
 	printf '\t%s\n' "--pos: Add a single-valued positional argument (empty by default)"
