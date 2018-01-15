@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# shellcheck disable=SC2001,SC2016
+# SC2001: See if you can use ${variable//search/replace} instead.
+# SC2016: Expressions don't expand in single quotes, use double quotes for that.
+
 version=_ARGBASH_VERSION
 # ARG_POSITIONAL_SINGLE([output], [Name of the output template], "-")
 # ARG_OPTIONAL_INCREMENTAL([separate], s, [Separate the parsing logic (specify two times for complete separation)])
@@ -40,8 +44,8 @@ optional_argument_with_hints()
 
 optional_argument()
 {
-	"${FUNCNAME}_$2" "$1"
-	_variables+=("printf 'Value of --%s: %s\n' '$1' \"$(_translit_var "$1")\"")
+	"${FUNCNAME[0]}_$2" "$1"
+	_variables+=("printf 'Value of --%s: %s\\n' '$1' \"$(_translit_var "$1")\"")
 }
 
 
@@ -59,8 +63,8 @@ boolean_argument_without_hints()
 
 boolean_argument()
 {
-	"${FUNCNAME}_$2" "$1"
-	_variables+=("printf \"'%s' is %s\n\" '$1' \"$(_translit_var "$1")\"")
+	"${FUNCNAME[0]}_$2" "$1"
+	_variables+=("printf \"'%s' is %s\\\\n\" '$1' \"$(_translit_var "$1")\"")
 }
 
 
@@ -78,8 +82,8 @@ positional_argument_without_hints()
 
 positional_argument()
 {
-	"${FUNCNAME}_$2" "$1"
-	_variables+=("printf \"Value of '%s': %s\n\" '$1' \"$(_translit_var "$1")\"")
+	"${FUNCNAME[0]}_$2" "$1"
+	_variables+=("printf \"Value of '%s': %s\\\\n\" '$1' \"$(_translit_var "$1")\"")
 }
 
 

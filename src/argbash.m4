@@ -1,14 +1,20 @@
 #!/bin/bash
 
+# shellcheck disable=SC2016,SC2059
+# SC2016: Expressions don't expand in single quotes, use double quotes for that.
+# SC2059 Don't use variables in the printf format string.
+
+
 version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
-# ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdout)])
+# ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_BOOLEAN([check-typos],, [Whether to check for possible argbash macro typos], [on])
 # ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
+# ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 
@@ -16,12 +22,16 @@ version=_ARGBASH_VERSION
 
 # [
 
-_trap=
+_files_to_clean=()
+cleanup()
+{
+	test "${#_files_to_clean[*]}" != 0 && rm -f "${_files_to_clean[@]}"
+}
 
 # $1: What (string) to pipe to autom4te
 run_autom4te()
 {
-	printf "%s\n" "$1" \
+	printf '%s\n' "$1" \
 		| autom4te "${DEBUG[@]}" -l m4sugar -I "$m4dir"
 	return $?
 }
@@ -36,7 +46,7 @@ autom4te_error_messages=(
 # the %.s means "null format"
 argbash_error_response_stem=(
 	'You seem to have an unmatched square bracket on line %d:\n\t%s\n'
-	"You seem to have a '(' open parenthesis unmatched by a closing one somewhere above the line %d (%s)\n"
+	"You seem to have a '(' open parenthesis unmatched by a closing one somewhere above the line %d (%s)\\n"
 )
 
 # $1: The error string
@@ -45,7 +55,7 @@ argbash_error_response_stem=(
 interpret_error()
 {
 	# print the error, smart stuff may follow
-	printf "%s\n" "$1"
+	printf '%s\n' "$1"
 	local eof_lineno line_mentioned
 	for idx in "${!autom4te_error_messages[@]}"
 	do
@@ -64,9 +74,9 @@ do_stuff ()
 {
 	local _pass_also="$_wrapped_defns" input prefix_len _ret
 	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
-	input="$(printf "%s\n" "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
-	prefix_len=$(printf "%s\n" "$input" | wc -l)
-	input="$(printf "%s\n" "$input" | cat - "$infile")"
+	input="$(printf '%s\n' "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
+	prefix_len=$(printf '%s\n' "$input" | wc -l)
+	input="$(printf '%s\n' "$input" | cat - "$infile")"
 	run_autom4te "$input" 2> "$discard" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
@@ -87,8 +97,11 @@ settle_wrapped_fname ()
 {
 	# Get arguments to ARGBASH_WRAP
 	# Based on http://stackoverflow.com/a/19772067/592892
-	IFS=$'\n' _srcfiles=($(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
-			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "$discard"))
+	_srcfiles=()
+	while read -r line; do
+		_srcfiles+=("$line")
+	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
+			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "$discard")
 
 	test "${#_srcfiles[@]}" -gt 0 || return
 	for srcstem in "${_srcfiles[@]}"
@@ -145,14 +158,14 @@ set -o pipefail
 
 infile="$_arg_input"
 
+trap cleanup EXIT
 # If we are reading from stdout, then create a temp file
 if test "$infile" = '-'
 then
 	infile=temp_in_$$
-	rm_temp="yes"
-	_trap="$_trap rm -f $infile;"
-	trap "$_trap" EXIT
+	_files_to_clean+=("$infile")
 	cat > "$infile"
+	sleep 2
 fi
 
 m4dir="$script_dir/../src"
@@ -188,10 +201,10 @@ then
 fi
 if test "$outfname" != '-'
 then
-	printf "%s\n" "$output" > "$outfname"
+	printf "%s\\n" "$output" > "$outfname"
 	chmod a+x "$outfname"
 else
-	printf "%s\n" "$output"
+	printf "%s\\n" "$output"
 fi
 
 # ]dnl

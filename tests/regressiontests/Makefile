@@ -222,10 +222,14 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
 	$(REVERSE) $< LOO 2> /dev/null
-	$< -h | grep -q -e '-o\>'
-	$< -h | grep -q -e '-r\>'
-	$< -h | grep -q -e '-i\>'
-	$< -h | grep -q -e '-B\>'
+	$< -h | grep -q -e '-B|--boo_l'
+	$< -h | grep -q -e '-B,--boo_l'
+	$< -h | grep -q -e '-i|--incrx'
+	$< -h | grep -q -e '-i,--incrx'
+	$< -h | grep -q -e '-o|--opt-arg <arg>'
+	$< -h | grep -q -e '-o,--opt-arg <arg>'
+	$< -h | grep -q -e '-r|--opt-repeated'
+	$< -h | grep -q -e '-r,--opt-repeated'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
@@ -432,12 +436,12 @@ test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	@# Regenerate everyting during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes > /dev/null
-	$(REVERSE) $<
-	ERROR="unexpected argument" $(REVERSE) $< -o yes
+	$(REVERSE) $< > /dev/null
+	ERROR="unexpected argument" $(REVERSE) $< -o yes > /dev/null
 	sed -i 's/\[ordnung\]/&,[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
 	$(ARGBASH_BIN) $< > /dev/null
 	$< --ordnung yes > /dev/null
-	$(REVERSE) $<
+	$(REVERSE) $< > /dev/null
 	$< -o yes > /dev/null
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s-update.sh"
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)

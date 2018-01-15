@@ -36,6 +36,9 @@ dnl $1: The test name
 dnl $2: The test body (see also: TEST_BODY)
 dnl $3: The other deps (literal, feel free to use the | delimiter)
 dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
+dnl
+dnl Remarks:
+dnl No leading/trailing newlines, around the test body as it already has those.
 m4_define([ADD_TEST], [m4_do(
 	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1.sh]))],
 	[m4_set_add([_TESTS], [$1])],
@@ -47,9 +50,6 @@ m4_define([ADD_TEST], [m4_do(
 	)])],
 	[m4_popdef([_script])],
 )])
-dnl $2:
-dnl No leading newline, because the test body definition has one
-dnl No trailing newline because the test body already has it
 
 
 dnl 

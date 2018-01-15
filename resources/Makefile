@@ -98,6 +98,8 @@ check: $(TESTDIR)/Makefile $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	$(MAKE) unittests
 	$(MAKE) regressiontests
 	$(MAKE) tests-clean
+	$(SHELLCHECK) $(ARGBASH_BIN)
+	$(SHELLCHECK) $(ARGBASH_INIT)
 	@echo "*** All is OK ***"
 
 # TODO: Think out how to make a multiline foreach

@@ -54,12 +54,12 @@ ADD_TEST([test-init_simple-s-update], [[
 	@# Regenerate everyting during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes > /dev/null
-	$(REVERSE) $<
-	ERROR="unexpected argument" $(REVERSE) $< -o yes
+	$(REVERSE) $< > /dev/null
+	ERROR="unexpected argument" $(REVERSE) $< -o yes > /dev/null
 	sed -i 's/\[ordnung\]/&,[o]/' $(TESTDIR)/test-init_simple-s-update-parsing.sh
 	$(ARGBASH_BIN) $< > /dev/null
 	$< --ordnung yes > /dev/null
-	$(REVERSE) $<
+	$(REVERSE) $< > /dev/null
 	$< -o yes > /dev/null
 ]])
 

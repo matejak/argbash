@@ -60,10 +60,14 @@ ADD_TEST([test-onlyopt], [[
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
 	$(REVERSE) $< LOO 2> /dev/null
-	$< -h | grep -q -e '-o\>'
-	$< -h | grep -q -e '-r\>'
-	$< -h | grep -q -e '-i\>'
-	$< -h | grep -q -e '-B\>'
+	$< -h | grep -q -e '-B|--boo_l'
+	$< -h | grep -q -e '-B,--boo_l'
+	$< -h | grep -q -e '-i|--incrx'
+	$< -h | grep -q -e '-i,--incrx'
+	$< -h | grep -q -e '-o|--opt-arg <arg>'
+	$< -h | grep -q -e '-o,--opt-arg <arg>'
+	$< -h | grep -q -e '-r|--opt-repeated'
+	$< -h | grep -q -e '-r,--opt-repeated'
 ]])
 
 ADD_SCRIPT([test-standalone2])
