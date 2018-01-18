@@ -5,6 +5,7 @@
 # ARG_OPTIONAL_INCREMENTAL([more], m)
 # ARG_POSITIONAL_SINGLE([another])
 # ARG_LEFTOVERS([just leftovers])
+# ARG_DEFAULTS_POS()
 # ARG_HELP()
 # ARGBASH_GO
 

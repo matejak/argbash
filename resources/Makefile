@@ -1,9 +1,9 @@
 NUL =
 
-# TODO: Get rid of 1090,2154
-SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015,1090,2154,2034
+# SC2015: Note that A && B || C is not if-then-else. C may run when A is true.
+SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
 
-SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
+SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
 
 M4_SRC = \
 	../src/output.m4 \

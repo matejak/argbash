@@ -21,6 +21,7 @@ version=_ARGBASH_VERSION
 
 
 _variables=()
+HAVE_POSITIONAL_ARG=no
 
 
 # This should be in sync with _translit_var in stuff.m4
@@ -82,6 +83,7 @@ positional_argument_without_hints()
 
 positional_argument()
 {
+	HAVE_POSITIONAL_ARG=yes
 	"${FUNCNAME[0]}_$2" "$1"
 	_variables+=("printf \"Value of '%s': %s\\\\n\" '$1' \"$(_translit_var "$1")\"")
 }
@@ -128,13 +130,13 @@ do_args_footer()
 		echo '# ARGBASH_SET_DELIM([ =])'
 		echo '# ARG_OPTION_STACKING([getopt])'
 		echo '# ARG_RESTRICT_VALUES([no-local-options])'
-		echo '# ARG_DEFAULTS_POS'
 	elif test "$_arg_mode" = "minimal"
 	then
 		echo '# ARGBASH_SET_DELIM([ ])'
 		echo '# ARG_OPTION_STACKING([none])'
 		echo '# ARG_RESTRICT_VALUES([none])'
 	fi
+	test "$HAVE_POSITIONAL_ARG" = yes && echo '# ARG_DEFAULTS_POS'
 	echo "# ARG_HELP([<The general help message of my script>])"
 	echo "# ARGBASH_GO"
 }

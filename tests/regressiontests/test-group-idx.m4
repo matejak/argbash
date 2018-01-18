@@ -11,6 +11,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "ACT=$_arg_act_ion,IDX=$_arg_act_ion_index,OPT=$_arg_opt_tion,IDX2=$_arg_opt_tion_index,IDX3=$_arg_repeated_index"
+echo "ACT=$_arg_act_ion,IDX=$_arg_act_ion_index,OPT=$_arg_opt_tion,IDX2=$_arg_opt_tion_index,"
 
 # closing escape square bracket: ]

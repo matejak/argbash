@@ -4,6 +4,7 @@
 # ARG_OPTIONAL_SINGLE([prefix],[o],[help line END-\n-BEGIN line 2END-\\n-2BEGIN],[x])
 # ARG_VERSION([echo "$0 FOO"])
 # ARG_HELP([Testing program m4_fatal(BOOM!)], [m4_fatal([CRASH!])])
+# ARG_DEFAULTS_POS()
 # ARGBASH_GO()
 
 # [ <-- needed because of Argbash

@@ -15,7 +15,7 @@ m4_define([incrx], [m4_fatal([BOOM!!!])])
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "BOOL=$_arg_boo_l,OPT_S=$_arg_opt_arg,POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_INCR=$_arg_incrx,ARG_REPEATED=${_arg_opt_repeated[*]},"
+echo "BOOL=$_arg_boo_l,OPT_S=$_arg_opt_arg,OPT_INCR=$_arg_incrx,ARG_REPEATED=${_arg_opt_repeated[*]},"
 
 # closing escape square bracket: ]
 

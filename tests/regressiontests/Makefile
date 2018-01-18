@@ -423,12 +423,14 @@ $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 
 $(TESTDIR)/test-init_simple-s.m4: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s $@
+	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 
 $(TESTDIR)/regenerate-test-init_simple-s-update.m4:
 	touch $@
 
 $(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --opt ordnung -s $@ > /dev/null
+	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
 
@@ -446,6 +448,7 @@ test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s-update.sh"
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
 	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
+	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 
 $(TESTDIR)/test-init_simple-ss-parsing.m4: $(TESTDIR)/test-init_simple-ss.sh
 	@

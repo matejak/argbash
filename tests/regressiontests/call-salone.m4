@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# shellcheck source=../tests/regressiontests/test-salone.sh
+
 # DEFINE_SCRIPT_DIR
 # INCLUDE_PARSING_CODE([test-salone.sh])
 # ARGBASH_GO
