@@ -5,7 +5,6 @@
 # SC2059 Don't use variables in the printf format string.
 
 
-version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
@@ -21,6 +20,8 @@ version=_ARGBASH_VERSION
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 
 # ARGBASH_GO
+
+version=_ARGBASH_VERSION
 
 # [
 
