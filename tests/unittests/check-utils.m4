@@ -1,5 +1,5 @@
 m4_include([list.m4])
-m4_include([stuff.m4])
+m4_include([utilities.m4])
 m4_include([test-support.m4])
 
 m4_list_append([FOO], [one])

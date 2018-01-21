@@ -9,11 +9,13 @@ version=_ARGBASH_VERSION
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
+# ARG_OPTIONAL_SINGLE([type], t, [Output type to generate], [script])
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_BOOLEAN([check-typos],, [Whether to check for possible argbash macro typos], [on])
 # ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
+# ARG_TYPE_GROUP_SET([type], [], [type], [script,completion])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
@@ -74,6 +76,7 @@ do_stuff ()
 {
 	local _pass_also="$_wrapped_defns" input prefix_len _ret
 	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
+	_pass_also="${_pass_also}m4_define([_OUTPUT_TYPE], [[$1]])"
 	input="$(printf '%s\n' "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
 	prefix_len=$(printf '%s\n' "$input" | wc -l)
 	input="$(printf '%s\n' "$input" | cat - "$infile")"
@@ -190,7 +193,7 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname
 
-output="$(do_stuff)" || die "" "$?"
+output="$(do_stuff "$_arg_type")" || die "" "$?"
 if test "$_arg_check_typos" = on
 then
 	# match against suspicious, then inverse match against correct stuff:

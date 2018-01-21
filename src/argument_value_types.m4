@@ -11,6 +11,16 @@ m4_define([_GET_VALUE_TYPE], [m4_do(
 
 
 dnl
+dnl $1: Cathegory
+dnl $2: What to do if so
+dnl $3: What to do if not
+m4_define([_CATH_IS_SINGLE_VALUED], [m4_case([$1],
+	[arg], [$2],
+	[single], [$2],
+	[$3])])
+
+
+dnl
 dnl $1: The value type string (code)
 dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)

@@ -1,12 +1,61 @@
 m4_include([list.m4])
 
 
+m4_define([_IF_DIY_MODE],
+	[m4_if(_DIY_MODE, 1, [$1], [$2])])
+
+
+m4_define([_IF_HAVE_POSITIONAL_ARGS],
+	[m4_if(HAVE_POSITIONAL, 1, [$1], [$2])])
+
+
+m4_define([_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED],
+	[m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, 0, [$2], [$1])])
+
+
+m4_define([_IF_HAVE_OPTIONAL_ARGS],
+	[m4_if(HAVE_OPTIONAL, 1, [$1], [$2])])
+
+
+dnl
+dnl Encloses string into "" if its first char is not ' or "
+dnl The string is also []-quoted
+dnl Property: Quoting a blank input results in blank result
+dnl to AVOID it, pass string like ""ls -l or "ls" -l
+dnl
+dnl $1: String to quote
+m4_define([_sh_quote], [m4_do(
+	[m4_if(
+		[$1], , ,
+		m4_index([$1], [']), 0, [[$1]],
+		m4_index([$1], ["]), 0, [[$1]],
+		[["$1"]])],
+)])
+
+
+dnl
+dnl Same as _sh_quote, except quoting a blank input results in pair of quotes
+dnl $1: String to quote
+m4_define([_sh_quote_also_blanks], [m4_do(
+	[m4_if(
+		m4_index([$1], [']), 0, [[$1]],
+		m4_index([$1], ["]), 0, [[$1]],
+		[["$1"]])],
+)])
+
+
 dnl
 dnl Define a macro that is part of the public API
 dnl Ensure the replication and also add the macro name to a list of allowed macros
 m4_define([argbash_api], [_argbash_persistent([$1], [$2])])
 m4_define([_argbash_persistent], [m4_set_add([_KNOWN_MACROS],[$1])m4_define([$1], [$2])])
 
+m4_define([argbash_arg_api], [m4_do(
+	[_argbash_api([$1], [_CHECK_PASSED_ARGS_COUNT([$2], [$3])[[m4_do(
+		[_CHECK_ARGUMENT_NAME_IS_VALID([$1])],
+		[m4_list_contains([BLACKLIST], m4_quote($][1), , m4_dquote([$1($][@)])$4)],
+	)]])]],
+)])
 
 dnl
 dnl $1: this comm block ID
@@ -143,3 +192,47 @@ m4_define([_ASSIGN_VALUE_TO_VAR], [[$3=]_MAYBE_VALIDATE_VALUE([$1], [$2])_IF_ARG
 m4_define([_APPEND_VALUE_TO_ARRAY], [[$3+=](_MAYBE_VALIDATE_VALUE([$1], [$2]))_IF_ARG_IS_TYPED([$1], [ || exit 1])])
 dnl m4_define([_ASSIGN_VALUE_TO_VAR], [[$2="$1"]])
 dnl m4_define([_APPEND_VALUE_TO_ARRAY], [[$2+=("$1")]])
+
+
+dnl Do something depending on whether there is already infinitely many args possible or not
+m4_define([IF_POSITIONALS_INF],
+	[m4_if(m4_quote(_POSITIONALS_INF), 1, [$1], [$2])])
+
+
+dnl Do something depending on whether there have been optional positional args declared beforehand or not
+m4_define([IF_VARIABLE_NUMBER_OF_ARGUMENTS_BEFOREHAND],
+	[m4_if(m4_quote(HAVE_POSITIONAL_VARNUM), 1, [$1], [$2])])
+
+
+dnl
+dnl Output some text depending on what strict mode we find ourselves in
+m4_define([_CASE_RESTRICT_VALUES], [m4_case(_RESTRICT_VALUES,
+	[none], [$1],
+	[no-local-options], [$2],
+	[no-any-options], [$3])])
+
+
+dnl
+dnl A very private macro --- return name of the macro containing description for the given type ID
+dnl $1: Type ID
+m4_define([__type_str], [[_type_str_$1]])
+
+dnl
+dnl Return type description for the given argname
+dnl $1: Argument ID
+m4_define([_GET_VALUE_DESC], [m4_expand(__type_str(_GET_VALUE_TYPE([$1])))])
+
+dnl
+dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
+dnl
+dnl $1: argname
+m4_define([_GET_VALUE_STR], [m4_do(
+	[m4_ifdef([$1_VAL_GROUP], [m4_indir([$1_VAL_GROUP])], [arg])],
+)])
+
+
+m4_define([DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
+	[m4_if(m4_cmp(0, m4_list_len([_POSITIONALS_MINS])), 1,
+		m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], [m4_list_sum(_POSITIONALS_MINS)]))])
+
+
