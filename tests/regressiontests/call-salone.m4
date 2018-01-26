@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# shellcheck source=../tests/regressiontests/test-salone.sh
+# shellcheck source=OUTPUT_ABS_DIRNAME/test-salone.sh
 
 # DEFINE_SCRIPT_DIR
 # INCLUDE_PARSING_CODE([test-salone.sh])

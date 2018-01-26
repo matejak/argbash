@@ -1,6 +1,15 @@
 dnl TODO: Basename determination: output filename, or input filename, or nothing.
 
-m4_define([INFERRED_BASENAME], argbash)
+dnl Regexp: The operand ends e.g. with ...m4]$, not with ...m4$, so we have to preserve the closing square bracket.
+m4_define([_STRIP_SUFFIX], [m4_bpatsubst([[$1]], [\.\(sh\|m4\)\(.\)$], [\2])])
+
+dnl Make somehow sure that the program name is translated to a valid shell function identifier
+m4_define([_TRANSLATE_BAD_CHARS], [m4_translit([[$1]], [-.], [__])])
+
+dnl $1: Error
+m4_define([INFERRED_BASENAME],
+	[m4_ifdef([OUTPUT_BASENAME], [_STRIP_SUFFIX(OUTPUT_BASENAME)],
+		[m4_ifdef([INPUT_BASENAME], [_STRIP_SUFFIX(INPUT_BASENAME)], [$1])])])
 
 
 dnl $1: The macro call (the caller is supposed to pass [$0($@)])
@@ -11,9 +20,9 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ]],
 	[dnl ASSERT_THAT_BASENAME_IS_KNOWN
 ],
-	[m4_define([_BASENAME], m4_dquote(INFERRED_BASENAME))],
+	[m4_define([_BASENAME], m4_dquote(INFERRED_BASENAME([m4_fatal([We need to know the basename, and we couldn't infer it. It is likely that you read from stdin and write to stdout, please use at least one filename either for input or for output.])])))],
 	[m4_define([_PROGRAM_NAME], m4_dquote(_BASENAME))],
-	[m4_define([_FUNCTION_NAME], m4_dquote([_]_BASENAME))],
+	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLATE_BAD_CHARS(_PROGRAM_NAME)))],
 	[[# Put this file to /etc/bash_completion.d/]_BASENAME
 ],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@

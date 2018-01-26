@@ -72,15 +72,36 @@ interpret_error()
 	done
 }
 
+# $1: The input file
+# $2: The original intended output file
+define_file_metadata()
+{
+	local _defines='' _input_dirname _output_dirname
+
+	_input_dirname="$(dirname "$1")"
+	test "$1" != '-' && _defines="${_defines}m4_define([INPUT_BASENAME], [[$(basename "$1")]])"
+	_defines="${_defines}m4_define([INPUT_ABS_DIRNAME], [[$(cd "$_input_dirname" && pwd)]])"
+
+	_output_dirname="$(dirname "$2")"
+	test "$2" != '-' && _defines="${_defines}m4_define([OUTPUT_BASENAME], [[$(basename "$2")]])"
+	_defines="${_defines}m4_define([OUTPUT_ABS_DIRNAME], [[$(cd "$_output_dirname" && pwd)]])"
+	printf "%s" "$_defines"
+}
+
+
 # The main function that generates the parsing script body
+# $1: The input file
+# $2: The output file
+# $2: The argument type
 do_stuff ()
 {
 	local _pass_also="$_wrapped_defns" input prefix_len _ret
 	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
-	_pass_also="${_pass_also}m4_define([_OUTPUT_TYPE], [[$1]])"
+	_pass_also="${_pass_also}m4_define([_OUTPUT_TYPE], [[$3]])"
+	_pass_also="${_pass_also}$(define_file_metadata "$_arg_input" "$2")"
 	input="$(printf '%s\n' "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
 	prefix_len=$(printf '%s\n' "$input" | wc -l)
-	input="$(printf '%s\n' "$input" | cat - "$infile")"
+	input="$(printf '%s\n' "$input" | cat - "$1")"
 	run_autom4te "$input" 2> "$discard" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
@@ -194,7 +215,7 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname
 
-output="$(do_stuff "$_arg_type")" || die "" "$?"
+output="$(do_stuff "$infile" "$outfname" "$_arg_type")" || die "" "$?"
 if test "$_arg_check_typos" = on
 then
 	# match against suspicious, then inverse match against correct stuff:
