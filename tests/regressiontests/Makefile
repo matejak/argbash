@@ -395,31 +395,31 @@ test-delim-both: $(TESTDIR)/test-delim-both.sh
 	$< -a one --add two --add=three | grep -q 'OPT_REP=one two three'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-delim-both.sh"
 test-init_simple: $(TESTDIR)/test-init_simple.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
-	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "'pos': foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "'boo' is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple.sh"
 test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
-	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "'pos': foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "'boo' is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s.sh"
 test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simple-ss-parsing.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
-	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $<
+	$< foo | grep -q "'pos': foo"
+	$< foo --opt bar | grep -q " --opt: bar"
+	$< foo --opt bar | grep -q "'boo' is off"
+	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-ss.sh"
 $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
 	$(ARGBASH_INIT_EXEC) --pos pos --opt opt2 --opt opt --opt-bool boo $@

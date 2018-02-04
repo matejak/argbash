@@ -9,9 +9,9 @@ m4_pushdef([tbody], [[[
 ]]])
 
 
-ADD_TEST([test-init_simple], tbody([$(ARGBASH_INIT_EXEC)]))
-ADD_TEST([test-init_simple-s], tbody([$(ARGBASH_INIT_EXEC)]))
-ADD_TEST([test-init_simple-ss], tbody([$(ARGBASH_INIT_EXEC)]), [$(TESTDIR)/test-init_simple-ss-parsing.sh])
+ADD_TEST([test-init_simple], tbody([$<]))
+ADD_TEST([test-init_simple-s], tbody([$<]))
+ADD_TEST([test-init_simple-ss], tbody([$<]), [$(TESTDIR)/test-init_simple-ss-parsing.sh])
 
 
 ADD_SCRIPT([test-init_simple])
