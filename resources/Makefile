@@ -12,11 +12,17 @@ M4_SRC = \
 	../src/version \
 	$(NUL)
 
+M4_SRC += \
+	../src/output-completion.m4 \
+	../src/output-script.m4 \
+	$(NUL)
+
 # generate using
 # grep '^m4_include' ../src/*.m4 | sed -e 's/.*m4_include(\[\(.*\)\])\s*/\t..\/src\/\1 \\/' | sort | uniq
 # which outputs all files that are included using m4_include in .m4 files
 M4_SRC += \
 	../src/argument_value_types.m4 \
+	../src/collectors.m4 \
 	../src/constants.m4 \
 	../src/default_settings.m4 \
 	../src/env_vars.m4 \
