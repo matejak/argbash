@@ -60,10 +60,10 @@ m4_define([ADD_GENTEST], [m4_do(
 	[m4_divert_text([STDOUT3], [m4_do(
 		[_tname: $(TESTDIR)/gen-test-$1.m4 $(ARGBASH_BIN)
 ],
-		[m4_ifblank([$2], [	$(ARGBASH_BIN) $< > /dev/null
+		[m4_ifblank([$2], [	$(ARGBASH_EXEC) $< > /dev/null
 ],
 			[m4_foreach([_errmsg], [m4_shift($@)],
-				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 ])])],
 	)])],
 	[m4_set_add([_TEST_GEN], m4_quote(_tname))],

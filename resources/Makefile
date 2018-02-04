@@ -34,6 +34,8 @@ ROOT ?= /
 
 A_INIT = ../bin/argbash-init
 GENPARSE = ../bin/argbash
+ARGBASH_EXEC ?= $(GENPARSE)
+ARGBASH_INIT_EXEC ?= $(A_INIT)
 EXAMPLES = \
 	examples/minimal.sh \
 	examples/simple.sh \
@@ -46,12 +48,12 @@ $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
 $(A_INIT): ../src/argbash-init.m4 $(GENPARSE)
-	bash $(GENPARSE) $< -o $@
+	$(GENPARSE) $< -o $@
 
 major_version ?= $(shell cat ../src/version | sed -e 's/\..*//')
 
 ../bin/argbash-%to$(major_version): ../src/argbash-%to$(major_version).m4 $(GENPARSE)
-	bash $(GENPARSE) $< -o $@
+	$(ARGBASH_EXEC) $< -o $@
 
 lesser_versions = $(shell seq 1 $$(($(major_version) - 1)))
 ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_version))
@@ -59,26 +61,26 @@ ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_ver
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
-	$(GENPARSE) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --library
 
 # argbash-init uses the -parsing suffix to denote standalone parsing sections of scripts
 %-parsing.sh: %-parsing.m4 $(GENPARSE)
-	$(GENPARSE) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --library
 
 %-standalone2.sh: %-standalone.sh $(GENPARSE)
-	$(GENPARSE) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --library
 
 %.sh: %.m4 $(GENPARSE)
-	$(GENPARSE) $< -o $@
+	$(ARGBASH_EXEC) $< -o $@
 
 %2.sh: %.sh $(GENPARSE)
-	$(GENPARSE) $< -o $@
+	$(ARGBASH_EXEC) $< -o $@
 
 %3.sh: %2.sh $(GENPARSE)
-	$(GENPARSE) $< -o $@
+	$(ARGBASH_EXEC) $< -o $@
 
 examples/minimal.sh: examples/minimal.m4
-	$(GENPARSE) $< -c -o $@
+	$(ARGBASH_EXEC) $< -c -o $@
 
 # Must be included AFTER we have rules for .sh stuff
 TESTDIR = ../tests/regressiontests

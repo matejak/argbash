@@ -32,6 +32,9 @@ ARGBASH_1TO2 = $(TESTDIR)/../../bin/argbash-1to2
 ARGBASH_INIT = $(TESTDIR)/../../bin/argbash-init
 REVERSE = $(TESTDIR)/reverse
 
+ARGBASH_EXEC ?= $(ARGBASH_BIN)
+ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
+
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 m4_divert_pop(STDOUT1)
@@ -85,7 +88,7 @@ endef
 
 regressiontests: $(TESTDIR)/Makefile $(TESTS)
 
-$(TESTDIR)/Makefile: $(TESTDIR)/make/defns.m4 $(TESTDIR)/make/make.m4 $(wildcard $(TESTDIR)/make/tests/*)
+$(TESTDIR)/Makefile: $(TESTDIR)/make/Makefile.m4 $(TESTDIR)/make/make.m4 $(wildcard $(TESTDIR)/make/tests/*)
 	autom4te -l m4sugar -I $(TESTDIR)/make $< -o $@
 
 m4_divert_pop(STDOUT2)

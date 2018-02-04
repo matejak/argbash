@@ -12,6 +12,9 @@ ARGBASH_1TO2 = $(TESTDIR)/../../bin/argbash-1to2
 ARGBASH_INIT = $(TESTDIR)/../../bin/argbash-init
 REVERSE = $(TESTDIR)/reverse
 
+ARGBASH_EXEC ?= $(ARGBASH_BIN)
+ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
+
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 TESTS += \
@@ -171,7 +174,7 @@ endef
 
 regressiontests: $(TESTDIR)/Makefile $(TESTS)
 
-$(TESTDIR)/Makefile: $(TESTDIR)/make/defns.m4 $(TESTDIR)/make/make.m4 $(wildcard $(TESTDIR)/make/tests/*)
+$(TESTDIR)/Makefile: $(TESTDIR)/make/Makefile.m4 $(TESTDIR)/make/make.m4 $(wildcard $(TESTDIR)/make/tests/*)
 	autom4te -l m4sugar -I $(TESTDIR)/make $< -o $@
 
 stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
@@ -331,47 +334,47 @@ test-leftovers: $(TESTDIR)/test-leftovers.sh
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leftovers.sh"
 gen-test-pos: $(TESTDIR)/gen-test-pos.m4 $(ARGBASH_BIN)
-	ERROR="pos-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="pos-arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-opt: $(TESTDIR)/gen-test-opt.m4 $(ARGBASH_BIN)
-	ERROR="opt-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="opt-arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-pos2: $(TESTDIR)/gen-test-pos2.m4 $(ARGBASH_BIN)
-	ERROR="pos_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="pos_arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-opt2: $(TESTDIR)/gen-test-opt2.m4 $(ARGBASH_BIN)
-	ERROR="opt_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="opt_arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-infinity-illegal: $(TESTDIR)/gen-test-infinity-illegal.m4 $(ARGBASH_BIN)
-	ERROR="number of expected positional arguments before 'pos-arg' is unknown (because of argument 'pos-arg', which has a default)" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="number of expected positional arguments before 'pos-arg' is unknown (because of argument 'pos-arg', which has a default)" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-pos-opt: $(TESTDIR)/gen-test-pos-opt.m4 $(ARGBASH_BIN)
-	ERROR="same-arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="same-arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-pos-opt2: $(TESTDIR)/gen-test-pos-opt2.m4 $(ARGBASH_BIN)
-	ERROR="same_arg" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="same_arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
-	ERROR="is unknown" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="is unknown" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-illegal-pos: $(TESTDIR)/gen-test-illegal-pos.m4 $(ARGBASH_BIN)
-	ERROR="contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="contains forbidden characters" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-illegal-opt: $(TESTDIR)/gen-test-illegal-opt.m4 $(ARGBASH_BIN)
-	ERROR="one character" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="one character" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-misspelled: $(TESTDIR)/gen-test-misspelled.m4 $(ARGBASH_BIN)
-	ERROR="ARG_FOOBAR" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
-	ERROR="ARGBASH_GOO" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="ARG_FOOBAR" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="ARGBASH_GOO" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-unmatched_bracket: $(TESTDIR)/gen-test-unmatched_bracket.m4 $(ARGBASH_BIN)
-	ERROR="unmatched square bracket on line 3" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
-	ERROR="# ARG_OPTIONAL_BOOLEAN(\[long\], l, \[)" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="unmatched square bracket on line 3" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="# ARG_OPTIONAL_BOOLEAN(\[long\], l, \[)" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
-	ERROR="3rd argument" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
-	ERROR="num of args" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
-	ERROR="actual number of" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="3rd argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 test-delim-space: $(TESTDIR)/test-delim-space.sh
 	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something
@@ -392,44 +395,44 @@ test-delim-both: $(TESTDIR)/test-delim-both.sh
 	$< -a one --add two --add=three | grep -q 'OPT_REP=one two three'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-delim-both.sh"
 test-init_simple: $(TESTDIR)/test-init_simple.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "'pos': foo"
-	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "'boo' is off"
-	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
+	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple.sh"
 test-init_simple-s: $(TESTDIR)/test-init_simple-s.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "'pos': foo"
-	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "'boo' is off"
-	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
+	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s.sh"
 test-init_simple-ss: $(TESTDIR)/test-init_simple-ss.sh $(TESTDIR)/test-init_simple-ss-parsing.sh
-	ERROR="[Nn]ot enough" $(REVERSE) $<
-	$< foo | grep -q "'pos': foo"
-	$< foo --opt bar | grep -q " --opt: bar"
-	$< foo --opt bar | grep -q "'boo' is off"
-	$< foo --opt bar --opt2 baz | grep -q " --opt: bar"
-	$< foo --opt bar --opt2 baz | grep -q " --opt2: baz"
-	$< foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
+	ERROR="[Nn]ot enough" $(REVERSE) $(ARGBASH_INIT_EXEC)
+	$(ARGBASH_INIT_EXEC) foo | grep -q "'pos': foo"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar | grep -q "'boo' is off"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt: bar"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz | grep -q " --opt2: baz"
+	$(ARGBASH_INIT_EXEC) foo --opt bar --opt2 baz --boo | grep -q "'boo' is on"
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-ss.sh"
 $(TESTDIR)/test-init_simple.m4: $(ARGBASH_INIT)
-	$< --pos pos --opt opt2 --opt opt --opt-bool boo $@
+	$(ARGBASH_INIT_EXEC) --pos pos --opt opt2 --opt opt --opt-bool boo $@
 
 $(TESTDIR)/test-init_simple-s.m4: $(ARGBASH_INIT)
-	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s $@
+	$(ARGBASH_INIT_EXEC) --pos pos --opt opt2 --opt opt --opt-bool boo -s $@
 	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 
 $(TESTDIR)/regenerate-test-init_simple-s-update.m4:
 	touch $@
 
 $(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-test-init_simple-s-update.m4
-	$< --opt ordnung -s $@ > /dev/null
+	$(ARGBASH_INIT_EXEC) --opt ordnung -s $@ > /dev/null
 	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 	sed -i 's/^echo .*//' $@
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
@@ -447,23 +450,23 @@ test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	$< -o yes > /dev/null
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-init_simple-s-update.sh"
 $(TESTDIR)/test-init_simple-ss.sh: $(ARGBASH_INIT)
-	$< --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
+	$(ARGBASH_INIT_EXEC) --pos pos --opt opt2 --opt opt --opt-bool boo -s -s $@
 	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 
 $(TESTDIR)/test-init_simple-ss-parsing.m4: $(TESTDIR)/test-init_simple-ss.sh
 	@
 
 $(TESTDIR)/gen-test-init_name_char.m4: $(ARGBASH_INIT)
-	$< --opt-bool foo/bar-baz $@
+	$(ARGBASH_INIT_EXEC) --opt-bool foo/bar-baz $@
 
 $(TESTDIR)/gen-test-init_name_dash.m4: $(ARGBASH_INIT)
-	$< --pos -bool $@
+	$(ARGBASH_INIT_EXEC) --pos -bool $@
 
 gen-test-init_name_dash: $(TESTDIR)/gen-test-init_name_dash.m4 $(ARGBASH_BIN)
-	ERROR="'-bool' .* begins with a dash" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="'-bool' .* begins with a dash" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-init_name_char: $(TESTDIR)/gen-test-init_name_char.m4 $(ARGBASH_BIN)
-	ERROR="'foo/bar-baz' .* contains forbidden characters" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="'foo/bar-baz' .* contains forbidden characters" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 test-env-base: $(TESTDIR)/test-env-base.sh
 	$< | grep -q 'ENVI_FOO=def,ault,'
@@ -520,7 +523,7 @@ $(TESTDIR)/gen-test-group-wrong.m4: $(TESTDIR)/test-group.m4
 	sed -e 's/repeated],/foo,&/' $< > $@
 
 gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
-	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_BIN) $< > /dev/null
+	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
 	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
