@@ -7,4 +7,4 @@ install:
 
 # command to run tests
 script: 
-  - make check ARGBASH_EXEC=argbash ARGBASH_INIT_EXEC=argbash-init
+  - make check ARGBASH_EXEC=/usr/bin/argbash ARGBASH_INIT_EXEC=/usr/bin/argbash-init
