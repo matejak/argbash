@@ -89,6 +89,15 @@ define_file_metadata()
 }
 
 
+assert_m4_files_are_readable()
+{
+	local _argbash_lib="$m4dir/argbash-lib.m4"
+	test -d "$m4dir" && test -x "$m4dir" || die "The directory '$m4dir' with files needed by Argbash is not browsable. Check whether it exists and review it's permissions."
+	test -r "$_argbash_lib" && test -f "$_argbash_lib" || die "The '$_argbash_lib' file needed by Argbash is not readable. Check whether it exists and review it's permissions."
+	test -r "$output_m4" && test -f "$output_m4" || die "The '$output_m4' file needed by Argbash is not readable. Check whether it exists and review it's permissions."
+}
+
+
 # The main function that generates the parsing script body
 # $1: The input file
 # $2: The output file
@@ -215,6 +224,7 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname
 
+assert_m4_files_are_readable
 output="$(do_stuff "$infile" "$outfname" "$_arg_type")" || die "" "$?"
 if test "$_arg_check_typos" = on
 then
