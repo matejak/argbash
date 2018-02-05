@@ -129,7 +129,7 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [m4_do(
 		_INDENT_MORE(
 			[[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
 			_CASE_RESTRICT_VALUES([], [],
-				[_COMM_BLOCK([# It has been requested that all positional arguments that look like options are rejected]),
+				[_COMM_BLOCK(0, [# It has been requested that all positional arguments that look like options are rejected]),
 				[[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]],
 			]),
 		),

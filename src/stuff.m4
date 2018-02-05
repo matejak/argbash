@@ -763,8 +763,8 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 ],
 	[IF_POSITIONALS_INF([m4_do(
 		[_COMM_BLOCK(_indentation_level,
-			[If we allow up to infinitely many args, we calculate how many of values],
-			[were actually passed, and we extend the target array accordingly.],
+			[# If we allow up to infinitely many args, we calculate how many of values],
+			[# were actually passed, and we extend the target array accordingly.],
 		)],
 		[_JOIN_INDENTED(_indentation_level,
 			[[_our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))]],
