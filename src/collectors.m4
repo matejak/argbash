@@ -52,7 +52,7 @@ m4_define([_varname], [m4_do(
 dnl
 dnl The operation on command names that makes stem of variable names
 dnl Since each call of _translit_var etc. strips one level of quoting, we have to quote $1 more than usually
-m4_define([_translit_var], [m4_translit(m4_translit([[[$1]]], [A-Z], [a-z]), [-], [_])])
+m4_define([_translit_var], [m4_translit(m4_translit([[[$1]]], [A-Z], [a-z]), [-/], [__])])
 m4_define([_translit_prog], [m4_translit(m4_translit([[[$1]]], [a-z], [A-Z]), [-], [_])])
 
 
@@ -163,7 +163,7 @@ dnl TODO: Take the _WRAPPED code and move it one level up
 dnl
 dnl $1 - the variable where the argument value is collected
 m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED],
-	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED))]))],
 )])
 
 m4_define([__POS_WRAPPED], [m4_do(
@@ -173,7 +173,7 @@ m4_define([__POS_WRAPPED], [m4_do(
 )])
 
 m4_define([_OPT_WRAPPED], [m4_ifdef([WRAPPED],
-	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(WRAPPED)]))],
+	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED))]))],
 )])
 
 m4_define([__OPT_WRAPPED], [m4_do(

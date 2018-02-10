@@ -301,7 +301,10 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
 	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
-test-wrapping-otherdir: $(TESTDIR)/test-wrapping-otherdir.sh $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4
+$(TESTDIR)/test-wrapping-otherdir.sh: $(TESTDIR)/test-wrapping-otherdir.m4 $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN)
+	$(ARGBASH_BIN) $< -o $@
+
+test-wrapping-otherdir: $(TESTDIR)/test-wrapping-otherdir.sh
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
@@ -604,6 +607,6 @@ tests-gen: $(TESTS_GEN)
 
 tests-clean:
 	$(RM) $(SCRIPTS)
-	rmdir otherdir
+	rmdir $(TESTDIR)/otherdir
 
 .PHONY: $(PHONIES)
