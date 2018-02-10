@@ -331,7 +331,7 @@ settle_wrapped_fname ()
 			test -f "$searchdir/$srcstem" && { _found=yes; ext=''; break; }
 		done
 		# The last searchdir is a correct one
-		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of dirrectories: ${_arg_search[*]}" >&2; exit 2; }
+		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of directories: ${_arg_search[*]}" >&2; exit 2; }
 		_wrapped_defns="${_wrapped_defns}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem$ext]])"
 	done
 }

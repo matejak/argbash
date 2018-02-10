@@ -98,6 +98,7 @@ tests-gen: $(TESTS_GEN)
 
 tests-clean:
 	$(RM) $(SCRIPTS)
+	rmdir otherdir
 
 .PHONY: $(PHONIES)
 m4_divert_pop(STDOUT4)

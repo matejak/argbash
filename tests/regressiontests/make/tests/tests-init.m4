@@ -19,6 +19,7 @@ ADD_RULE([$(TESTDIR)/test-init_simple.m4], [$(ARGBASH_INIT)],
 	[$(ARGBASH_INIT_EXEC) --pos pos --opt opt2 --opt opt --opt-bool boo $@
 ])
 
+ADD_SCRIPT([test-init_simple-parsing], [m4])
 ADD_SCRIPT([test-init_simple-s])
 ADD_SCRIPT([test-init_simple-s-parsing])
 ADD_SCRIPT([test-init_simple-s-parsing], [m4])
