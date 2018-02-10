@@ -73,7 +73,7 @@ ADD_TEST([test-onlyopt], [[
 ADD_SCRIPT([test-standalone2])
 ADD_TEST([stability-salone], [[
 	diff -q $< $(word 2,$^)
-]], 
+]],
 	[$(TESTDIR)/test-standalone2.sh], [$(TESTDIR)/test-standalone.sh])
 
 ADD_RULE([$(TESTDIR)/test-ddash.m4], [$(TESTDIR)/test-ddash-old.m4 $(ARGBASH_1TO2)],
@@ -132,7 +132,8 @@ ADD_RULE([$(TESTDIR)/test-diy.m4], [$(TESTDIR)/test-diy-noop.m4],
 ]])
 ADD_SCRIPT([test-diy], [m4])
 
-ADD_TEST([test-wrapping], [[
+
+m4_define([test_wrapping_body], [[[
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
@@ -145,7 +146,24 @@ ADD_TEST([test-wrapping], [[
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
 	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
-]], [$(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4])
+]]])
+
+
+ADD_TEST([test-wrapping], test_wrapping_body,
+[$(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4])
+
+ADD_TEST([test-wrapping-otherdir], test_wrapping_body,
+[$(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4])
+
+ADD_RULE([$(TESTDIR)/otherdir/test-onlyopt.m4], [$(TESTDIR)/test-onlyopt.m4],
+	[[mkdir -p $(TESTDIR)/otherdir && cp $< $@
+]])
+ADD_SCRIPT([otherdir/test-onlyopt], [m4])
+
+ADD_RULE([$(TESTDIR)/otherdir/test-onlypos.m4], [$(TESTDIR)/test-onlypos.m4],
+	[[mkdir -p $(TESTDIR)/otherdir && cp $< $@
+]])
+ADD_SCRIPT([otherdir/test-onlypos], [m4])
 
 ADD_TEST([test-wrapping-more], [[
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'

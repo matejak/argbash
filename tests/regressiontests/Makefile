@@ -33,6 +33,7 @@ TESTS += \
 	test-diy-noop \
 	test-diy \
 	test-wrapping \
+	test-wrapping-otherdir \
 	test-wrapping-more \
 	test-wrapping-excl \
 	stability-wrapping \
@@ -82,6 +83,9 @@ SCRIPTS += \
 	$(TESTDIR)/test-diy.sh \
 	$(TESTDIR)/test-diy.m4 \
 	$(TESTDIR)/test-wrapping.sh \
+	$(TESTDIR)/test-wrapping-otherdir.sh \
+	$(TESTDIR)/otherdir/test-onlyopt.m4 \
+	$(TESTDIR)/otherdir/test-onlypos.m4 \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
 	$(TESTDIR)/test-wrapping2.sh \
@@ -97,6 +101,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-init_simple-s.sh \
 	$(TESTDIR)/test-init_simple-ss.sh \
 	$(TESTDIR)/test-init_simple.m4 \
+	$(TESTDIR)/test-init_simple-parsing.m4 \
 	$(TESTDIR)/test-init_simple-s-parsing.sh \
 	$(TESTDIR)/test-init_simple-s-parsing.m4 \
 	$(TESTDIR)/test-init_simple-s.m4 \
@@ -296,6 +301,26 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
 	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
+test-wrapping-otherdir: $(TESTDIR)/test-wrapping-otherdir.sh $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4
+	$< -h | grep -q opt-arg
+	$< -h | grep -q pos-arg
+	@# ! negates the return code
+	! $< -h | grep -q boo_l
+	@# no spaces as indentation (that test-onlyopt uses)
+	! grep -q '^  ' $<
+	grep -q '^		esac' $<
+	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
+	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
+	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-otherdir.sh"
+$(TESTDIR)/otherdir/test-onlyopt.m4: $(TESTDIR)/test-onlyopt.m4
+	mkdir -p $(TESTDIR)/otherdir && cp $< $@
+
+$(TESTDIR)/otherdir/test-onlypos.m4: $(TESTDIR)/test-onlypos.m4
+	mkdir -p $(TESTDIR)/otherdir && cp $< $@
+
 test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 	$< -i -i -i | grep -q 'CMDLINE=-i -i -i,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
@@ -579,5 +604,6 @@ tests-gen: $(TESTS_GEN)
 
 tests-clean:
 	$(RM) $(SCRIPTS)
+	rmdir otherdir
 
 .PHONY: $(PHONIES)
