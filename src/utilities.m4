@@ -18,6 +18,12 @@ m4_define([_IF_HAVE_OPTIONAL_ARGS],
 
 
 dnl
+dnl Get the last component of a filename
+m4_define([_GET_BASENAME],
+	[m4_bpatsubst([$1], [.*/\([^/]+\)], [\1])])
+
+
+dnl
 dnl The helper macro for _CHECK_INTEGER_TYPE
 dnl $1: The caller name
 dnl $2: The arg position

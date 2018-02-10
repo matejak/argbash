@@ -152,8 +152,12 @@ m4_define([test_wrapping_body], [[[
 ADD_TEST([test-wrapping], test_wrapping_body,
 [$(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4])
 
-ADD_TEST([test-wrapping-otherdir], test_wrapping_body,
-[$(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4])
+ADD_RULE([$(TESTDIR)/test-wrapping-otherdir.sh],
+	[$(TESTDIR)/test-wrapping-otherdir.m4 $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN)],
+	[[$(ARGBASH_BIN) $< -o $@
+]])
+
+ADD_TEST([test-wrapping-otherdir], test_wrapping_body)
 
 ADD_RULE([$(TESTDIR)/otherdir/test-onlyopt.m4], [$(TESTDIR)/test-onlyopt.m4],
 	[[mkdir -p $(TESTDIR)/otherdir && cp $< $@

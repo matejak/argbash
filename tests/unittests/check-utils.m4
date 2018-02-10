@@ -44,3 +44,7 @@ assert_equals(_sh_quote_also_blanks(), [""])
 assert_equals(_sh_quote_also_blanks(x), ["x"])
 assert_equals(_sh_quote_also_blanks("x"), ["x"])
 assert_equals(_sh_quote_also_blanks('x'), ['x'])
+
+assert_equals(_GET_BASENAME([BOM]), [BOM])
+assert_equals(_GET_BASENAME([/BOM]), [BOM])
+assert_equals(_GET_BASENAME([/pu/la/BOM]), [BOM])
