@@ -6,8 +6,9 @@ SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
 SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
 
 M4_SRC = \
-	../src/output.m4 \
-	../src/output-standalone.m4 \
+	../src/output-strip-none.m4 \
+	../src/output-strip-script.m4 \
+	../src/output-strip-all.m4 \
 	../src/argbash-lib.m4 \
 	../src/version \
 	$(NUL)
@@ -96,7 +97,7 @@ include ../tests/regressiontests/Makefile
 
 # We include the source dir because there is m4_include in argbash-lib.m4
 bootstrap:
-	cat ../src/argbash-lib.m4 ../src/output.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar -o $(GENPARSE)
+	cat ../src/argbash-lib.m4 ../src/output-strip-none.m4 ../src/argbash.m4 | autom4te -I ../src -l m4sugar -o $(GENPARSE)
 	chmod a+x $(GENPARSE)
 	touch ../src/argbash.m4
 
