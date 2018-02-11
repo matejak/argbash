@@ -103,6 +103,45 @@ Argbash
 So, you have a template and now it is time to (re)generate a shell script from it!
 
 
+Template layout
++++++++++++++++
+
+A template consists of multiple parts that are treated differently during the ``argbash`` operation.
+Depending on the value of the ``--strip`` argument, the third and/or the first parts can be dropped.
+
+Here are those parts of the template:
+
+#. Beginning of the script up to the ``ARGBASH_GO`` or ``ARGBASH_PREPARE`` line:
+
+   If ``--strip all`` is passed as argument to ``argbash``, this section of the file will be discarded.
+   Otherwise, it is left intact, except:
+
+   - All ``m4sugar`` macros are expanded. Typically, the only macros in this section are Argbash public API macros.
+     They expand to their definitions as part of their expansion, so it looks like that nothing happened.
+
+   - One level of square brackets is removed.
+     This is the consequence of the previous point --- if you e.g. use a regular expression with square brackets,
+     they may either disappear or cause an error.
+     Square brackets that are arguments to the Argbash macros calls are preserved.
+
+#. Script body past ``ARGBASH_GO``:
+
+   This is the generated content.
+   Shortly after the ``ARGBASH_GO`` line, you encounter an invocation of ``m4_ignore([...])``.
+   Everything contained within the first level of the square brackets is discarded by a consecutive run of ``argbash``.
+
+#. The rest of the file.
+
+   You may notice the ``... <-- needed because of Argbash`` guards that are comments.
+   The first guard has an opened square bracket, the second guard at the bottom of the file has a closing square bracket.
+
+   This content (typically the hand-written content supplied by the user) is treated in the same way
+   as the beginning of the file that is described in point 1.
+   However, thanks to the opened and closed square brackets, no changes to it will be made.
+
+   If you run ``argbash`` with ``--strip script`` or ``--strip all`` argument, this section will be missing from the output.
+
+
 Parsing code and script body together
 +++++++++++++++++++++++++++++++++++++
 
@@ -167,11 +206,13 @@ If you want/have to take care of including the parsing code yourself, just make 
 
     # HERE GOES THE SCRIPT BODY
 
-Then, you just generate ``my-parsing.sh`` using ``--library`` option:
+Then, you just generate ``my-parsing.sh`` using ``--strip script`` option:
 
 .. code-block:: bash
 
-   argbash my-parsing.m4 -o my-parsing.sh --library
+   argbash my-parsing.m4 -o my-parsing.sh --strip script
+
+The ``--strip script`` argument takes care that the output will contain the Argbash definitions lines and the generated parsing code, but the body of the script will not be included.
 
 
 .. _commented:
