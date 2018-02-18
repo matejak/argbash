@@ -1,15 +1,7 @@
 dnl TODO: Basename determination: output filename, or input filename, or nothing.
 
-dnl Regexp: The operand ends e.g. with ...m4]$, not with ...m4$, so we have to preserve the closing square bracket.
-m4_define([_STRIP_SUFFIX], [m4_bpatsubst([[$1]], [\.\(sh\|m4\)\(.\)$], [\2])])
-
 dnl Make somehow sure that the program name is translated to a valid shell function identifier
 m4_define([_TRANSLATE_BAD_CHARS], [m4_translit([[$1]], [-.], [__])])
-
-dnl $1: Error
-m4_define([INFERRED_BASENAME],
-	[m4_ifdef([OUTPUT_BASENAME], [_STRIP_SUFFIX(OUTPUT_BASENAME)],
-		[m4_ifdef([INPUT_BASENAME], [_STRIP_SUFFIX(INPUT_BASENAME)], [$1])])])
 
 
 dnl $1: The macro call (the caller is supposed to pass [$0($@)])

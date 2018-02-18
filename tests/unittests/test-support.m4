@@ -23,6 +23,7 @@ m4_define([assert_equals_list_next], [m4_do(
 )])
 
 m4_define([BOMB], [m4_fatal(m4_ifblank([$1], [[Bomb has been expanded, which shouldn't happen]], [[$1]]))])
+m4_define([BOMB2], [m4_fatal(m4_ifblank([$1], [[Bomb2 has been expanded, which shouldn't happen]], [[$1]]))])
 m4_define([ANTIBOMB], [m4_ifndef([$1], [m4_fatal([We have expected '$1' to be defined])])])
 m4_define([ANTIFUSE], [m4_define([$1])])
 

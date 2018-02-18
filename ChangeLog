@@ -5,6 +5,7 @@ New features:
 
 * Initial support for bash completion.
 * Introduction of the `--strip` argument to `argbash` (deprecates the `--library option`).
+* Initial support for docopt output.
 
 Bugfixes:
 

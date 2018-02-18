@@ -15,6 +15,7 @@ M4_SRC = \
 
 M4_SRC += \
 	../src/output-completion.m4 \
+	../src/output-docopt.m4 \
 	../src/output-script.m4 \
 	$(NUL)
 

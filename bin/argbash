@@ -15,8 +15,8 @@
 # ARG_OPTIONAL_BOOLEAN([commented],[c],[Commented mode - include explanatory comments with the parsing code],[off])
 # ARG_OPTIONAL_REPEATED([search],[I],[Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)],["."])
 # ARG_OPTIONAL_SINGLE([debug],[],[(developer option) Tell autom4te to trace a macro])
-# ARG_TYPE_GROUP_SET([type],[type],[type],[script,completion])
 # ARG_TYPE_GROUP_SET([content],[content],[strip],[none,script,all])
+# ARG_TYPE_GROUP_SET([type],[type],[type],[script,completion,docopt])
 # ARG_DEFAULTS_POS([])
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
@@ -48,13 +48,13 @@ begins_with_short_option()
 # validators
 type()
 {
-	local _allowed=("script" "completion")
+	local _allowed=("script" "completion" "docopt")
 	local _seeking="$1"
 	for element in "${_allowed[@]}"
 	do
 		test "$element" = "$_seeking" && echo "$element" && return 0
 	done
-	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'script' and 'completion'" 4
+	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'script', 'completion' and 'docopt'" 4
 }
 content()
 {
@@ -86,7 +86,7 @@ print_help ()
 	printf 'Usage: %s [-o|--output <arg>] [-t|--type <type>] [--(no-)library] [--strip <content>] [--(no-)check-typos] [-c|--(no-)commented] [-I|--search <arg>] [--debug <arg>] [-v|--version] [-h|--help] <input>\n' "$0"
 	printf '\t%s\n' "<input>: The input template file (pass '-' for stdin)"
 	printf '\t%s\n' "-o,--output: Name of the output file (pass '-' for stdout) (default: '-')"
-	printf '\t%s\n' "-t,--type: Output type to generate (one of 'script' and 'completion'; default: 'script')"
+	printf '\t%s\n' "-t,--type: Output type to generate (one of 'script', 'completion' and 'docopt'; default: 'script')"
 	printf '\t%s\n' "--library,--no-library: Whether the input file if the pure parsing library. (off by default)"
 	printf '\t%s\n' "--strip: Determines what to have in the output. (one of 'none', 'script' and 'all'; default: 'none')"
 	printf '\t%s\n' "--check-typos,--no-check-typos: Whether to check for possible argbash macro typos (on by default)"
