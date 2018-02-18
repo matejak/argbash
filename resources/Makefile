@@ -38,10 +38,13 @@ M4_SRC += \
 
 PREFIX ?= $(HOME)/.local
 PREFIXED_LIBDIR ?= $(PREFIX)/lib
+SYSCONFDIR ?= /etc
 ROOT ?= /
 
 A_INIT = ../bin/argbash-init
 GENPARSE = ../bin/argbash
+COMPLETION = argbash.sh
+INSTALL_COMPLETION = no
 ARGBASH_EXEC ?= $(GENPARSE)
 ARGBASH_INIT_EXEC ?= $(A_INIT)
 EXAMPLES = \
@@ -57,6 +60,9 @@ $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 
 $(A_INIT): ../src/argbash-init.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@
+
+$(COMPLETION): ../src/argbash.m4 $(GENPARSE)
+	$(GENPARSE) $< --type completion --strip all -o $@
 
 major_version ?= $(shell cat ../src/version | sed -e 's/\..*//')
 
@@ -135,7 +141,7 @@ define-version:
 	$(eval VERSION_MAJOR := $(shell cut -f 1 -d . ../src/version))
 	$(eval VERSION_SUFFIX := -$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH))
 
-install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
+install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
@@ -146,6 +152,7 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO)
 	test -n "$(VERSION_SUFFIX)" || test -z "$(ARGBASH_TO)" || { cp -p $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
 	cp -p $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
+	test "$(INSTALL_COMPLETION) = "yes" && mkdir -p "$(SYSCONFDIR)/bash_completion.d" && mv "$(COMPLETION)" "$(SYSCONFDIR)/bash_completion.d/"
 
 altpreclean: define-version
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
@@ -163,6 +170,7 @@ uninstall:
 	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/version"
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
 	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
+	$(RM) "$(SYSCONFDIR)/bash_completion.d/$(COMPLETION)"
 
 altuninstall: define-version uninstall
 
