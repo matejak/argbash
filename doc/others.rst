@@ -98,6 +98,21 @@ Then read through this list of influences and/or alternatives!
     * We have good documentation with examples.
     * We offer an option to produce battery-included scripts.
 
+* ``docopt``: Umbrella project of parsing code modules for various languages. The interface is based on help messages: http://docopt.org/
+  The shell interface is called `docopts <https://github.com/docopt/docopts>`_ and it is implemented as a standalone executable (in fact a Python script) that consumes the help message of the script it is used in, passed arguments, and exposes collected values via environmental variables.
+
+  * Pros:
+
+    * The help message as an interface is convenient.
+
+  * Cons:
+
+    * You need ``docopts`` installed in every environment where you run scripts that use it.
+
+  * Argbash says:
+
+    * Argbash is :ref:`compatible with docopt <docopt_output>` --- when using Argbash, you can go the ``docopt`` way whenever you want .
+
 Learning resources
 ------------------
 

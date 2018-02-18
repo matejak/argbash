@@ -234,19 +234,20 @@ Argbash outputs
 
 Argbash is able to generate more than just scripts.
 You can change the output type by supplying another value to he ``--type`` optional argument.
-Here is a description of some more noteworthy outputs:
+Next, it doesn't make sense to keep all of the template content in the output, so you may typically want to strip all but the generated content from alternative outputs:
 
-
-==========================      =======================
-Description                     ``--type`` value
-==========================      =======================
-Bash completion                 completion
-docopt help message             docopt
-==========================      =======================
+==========================      =======================         ==========================
+Description                     ``--type`` value                ``--strip`` value
+==========================      =======================         ==========================
+Script                          script                          none
+Script parsing section          script                          script
+Bash completion                 completion                      all
+docopt help message             docopt                          all
+==========================      =======================         ==========================
 
 
 Bash completion
----------------
++++++++++++++++
 
 The output will be a Bash completion script.
 
@@ -261,15 +262,31 @@ The basename is inferred either from the source filename, or from the destinatio
 After you generate the completion file, put it in the appropriate place (which may vary depending on your environment).
 In order to use it right away, simply source it.
 
+Typically, you generate bash completion ``my-script.sh`` from the generated script ``my-script`` by executing
+
+.. code-block:: shell-session
+
+  $ argbash my-script --type completion --strip all -o my-script.sh
+
+and you move the created completion file ``my-script.sh`` to ``/etc/bash_completion.d/`` directory.
+
+.. _docopt_output:
 
 Docopt help message
--------------------
++++++++++++++++++++
 
 `Docopt <http://docopt.org/>`_ is a project that provides argument-parsing libraries for various languages.
 Those libraries accept a help message as an input, and that's all they want to construct a parser.
-This allows you to use Argbash for projects in other languages --- you can leave the parser technicalities to docopt library, which you supply with the Argbash docopt output.
+Argbash scripts don't come with help that conforms to the ``docopt`` format due to its constraints, but you can still generate ``docopt``-compliant help for your script.
 
+This allows you to use Argbash for projects in other languages --- you can leave the parser technicalities to docopt library, which you supply with the Argbash docopt output.
 Then, you may use Argbash for Bash completion and other possible goodies.
+
+Typically, you generate docopt output to the standard output from the generated script ``my-script`` by executing
+
+.. code-block:: shell-session
+
+  $ argbash my-script --type docopt --strip all
 
 
 .. _api_change:
