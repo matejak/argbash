@@ -21,6 +21,13 @@ m4_define([_CATH_IS_SINGLE_VALUED], [m4_case([$1],
 
 
 dnl
+dnl $1: The value type string.
+dnl $2: The group name. If non empty, the macro doesn't do anything.
+m4_define([_INFER_TYPE_GROUP_NAME_FROM_VALUE_IF_NEEDED],
+	[m4_ifnblank([$2], [[$2]], [m4_fatal([Name inference (from value '$1') not implemented yet])])])
+
+
+dnl
 dnl $1: The value type string (code)
 dnl $2: The type group name (optional, try to infer from value type)
 dnl $3: Concerned arguments (as a list)
@@ -28,8 +35,7 @@ dnl TODO: Integrate with help (and not only with the help synopsis)
 dnl TODO: Validate the type value (code) string
 argbash_api([ARG_TYPE_GROUP], [m4_do(
 	[[$0($@)]],
-	[m4_ifblank([$2], [m4_fatal([Name inference not implemented yet])])],
-	[_TYPED_GROUP_STUFF([$1], m4_dquote(m4_default([$2], [???])), [$3])],
+	[_TYPED_GROUP_STUFF([$1], _INFER_TYPE_GROUP_NAME_FROM_VALUE_IF_NEEDED([$1], [$2]), [$3])],
 )])
 
 
@@ -54,7 +60,7 @@ argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 		[m4_set_add([GROUP_ARGS], m4_quote(_argname))],
 		[m4_define([_]m4_quote(_argname)[_SUFFIX], [[$5]])],
 	)])],
-	[_TYPED_GROUP_STUFF([$1], [$2], [$3])],
+	[_TYPED_GROUP_STUFF([$1], _INFER_TYPE_GROUP_NAME_FROM_VALUE_IF_NEEDED([$1], [$2]), [$3])],
 )])
 
 

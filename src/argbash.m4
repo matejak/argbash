@@ -10,11 +10,13 @@
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
 # ARG_OPTIONAL_SINGLE([type], t, [Output type to generate], [script])
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
+# ARG_OPTIONAL_SINGLE([strip],, [Determines what to have in the output.], [none])
 # ARG_OPTIONAL_BOOLEAN([check-typos],, [Whether to check for possible argbash macro typos], [on])
 # ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
-# ARG_TYPE_GROUP_SET([type], [], [type], [script,completion,docopt])
+# ARG_TYPE_GROUP_SET([content], [content], [strip], [none,script,all])
+# ARG_TYPE_GROUP_SET([type], [type], [type], [script,completion,docopt])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
@@ -101,8 +103,8 @@ assert_m4_files_are_readable()
 # The main function that generates the parsing script body
 # $1: The input file
 # $2: The output file
-# $2: The argument type
-do_stuff ()
+# $3: The argument type
+do_stuff()
 {
 	local _pass_also="$_wrapped_defns" input prefix_len _ret
 	test "$_arg_commented" = on && _pass_also="${_pass_also}m4_define([COMMENT_OUTPUT])"
@@ -127,7 +129,7 @@ do_stuff ()
 }
 
 # Fills content to variable _wrapped_defns --- where are scripts of given stems
-settle_wrapped_fname ()
+settle_wrapped_fname()
 {
 	# Get arguments to ARGBASH_WRAP
 	# Based on http://stackoverflow.com/a/19772067/592892
@@ -158,7 +160,7 @@ settle_wrapped_fname ()
 # 2. If the file exists, finish (OK).
 # 3. If the .m4 file exists, finish (OK)
 # 4. Something is wrong
-function get_parsing_code
+get_parsing_code()
 {
 	local _shfile _m4file _newerfile
 	# Get the argument of INCLUDE_PARSING_CODE
@@ -205,8 +207,15 @@ fi
 m4dir="$script_dir/../src"
 test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
-output_m4="$m4dir/output.m4"
-test "$_arg_library" = "on" && output_m4="$m4dir/output-standalone.m4"
+output_m4="$m4dir/output-strip-none.m4"
+test "$_arg_library" = "on" && { echo "The --library option is deprecated, use --strip script" next time >&2; _arg_strip="script"; }
+if test "$_arg_strip" = "script"
+then
+	output_m4="$m4dir/output-strip-script.m4"
+elif test "$_arg_strip" = "all"
+then
+	output_m4="$m4dir/output-strip-all.m4"
+fi
 
 test -f "$infile" || _PRINT_HELP=yes die "argument '$infile' is supposed to be a file!" 1
 test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }

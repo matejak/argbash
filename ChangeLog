@@ -4,13 +4,15 @@
 New features:
 
 * Initial support for bash completion.
+* Introduction of the `--strip` argument to `argbash` (deprecates the `--library option`).
 * Initial support for docopt output.
 
 Bugfixes:
 
 * Fixed wrapping of scripts with repeated optional arguments.
 * All scripts + tests are checked by Shellcheck.
-
+* The `ARGBASH_WRAP` macro now supports templates in subdirectories.
+* Documentation expansion.
 
 2.5.1 (2017-12-06)
 ------------------
