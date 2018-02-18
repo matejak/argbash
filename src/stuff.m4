@@ -151,17 +151,20 @@ m4_define([_POS_ARG_HELP_DEFAULTS], [m4_do(
 dnl
 dnl $1: _argname
 dnl $2: short arg
+dnl $3: value string (optional, empty by default)
+dnl $4: short-long separator (optional, | by default)
 dnl
-dnl Returns either --long or -l|--long if there is that -l
+dnl Returns either --long or -l|--long if there is that -l.
+dnl If you supply a value, it will be included after both long and short option like
+dnl --width <int> or -w <int>|--width <int>. The delimiter is respected.
 m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE], [m4_do(
 	[m4_ifnblank([$2],
-		[-$2|])],
-	[[--$1]],
+		[[-$2]m4_ifnblank([$3], [[ $3]])m4_default_quoted([$4], [|])])],
+	[[--$1]m4_ifnblank([$3], [_DELIM_IN_HELP[$3]])],
 )])
 
 
-m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
-	[_IF_HAVE_OPTIONAL_ARGS([m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
+m4_define([_SYNOPSIS_OF_OPTIONAL_ARGS], [m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
 	[ @<:@],
 	[m4_case(_arg_type,
 		[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
@@ -169,15 +172,22 @@ m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 		[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
 		[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
 	[@:>@],
-)])])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [[ @<:@--@:>@]])],
+)])])
+
+
+m4_define([_SYNOPSIS_OF_POSITIONAL_ARGS], [m4_do(
+	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_MAXES,_ARGS_CATH], [argname,_min_argn,_max_argn,_arg_type],
+		[_POS_ARG_HELP_LINE(argname, _arg_type, _min_argn, _max_argn)])],
+	[ m4_expand(m4_join([ ], m4_list_contents([_POSITIONALS_LIST])))],
+)])
+
+
+m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
+	[_IF_HAVE_OPTIONAL_ARGS([_SYNOPSIS_OF_OPTIONAL_ARGS])],
+	[m4_if(HAVE_DOUBLEDASH, 1, [[ [--]]])],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
-	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
-		[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_MAXES,_ARGS_CATH], [argname,_min_argn,_max_argn,_arg_type],
-			[_POS_ARG_HELP_LINE(argname, _arg_type, _min_argn, _max_argn)])],
-		[ m4_expand(m4_join([ ], m4_list_contents([_POSITIONALS_LIST])))],
-	)])],
+	[_IF_HAVE_POSITIONAL_ARGS([_SYNOPSIS_OF_POSITIONAL_ARGS])],
 )])
 
 

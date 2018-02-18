@@ -241,3 +241,21 @@ m4_define([DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
 		m4_define([_MINIMAL_POSITIONAL_VALUES_COUNT], [m4_list_sum(_POSITIONALS_MINS)]))])
 
 
+dnl $1: Error
+m4_define([INFERRED_BASENAME],
+	[m4_ifdef([OUTPUT_BASENAME], [_STRIP_SUFFIX(OUTPUT_BASENAME)],
+		[m4_ifdef([INPUT_BASENAME], [_STRIP_SUFFIX(INPUT_BASENAME)], [$1])])])
+
+
+dnl Regexp: The operand ends e.g. with ...m4]$, not with ...m4$, so we have to preserve the closing square bracket.
+m4_define([_STRIP_SUFFIX], [m4_bpatsubst([[$1]], [\.m4\(.\)$], [\1])])
+
+
+dnl
+dnl $1: List name
+m4_define([_LIST_LONGEST_TEXT_LENGTH], [m4_do(
+	[m4_pushdef([_longest_label_len], 0)],
+	[m4_list_foreach([$1], [_item], [m4_if(m4_eval(_longest_label_len < m4_len(_item)), 1, [m4_define([_longest_label_len], m4_len(_item))])])],
+	[_longest_label_len],
+	[m4_popdef([_longest_label_len])],
+)])

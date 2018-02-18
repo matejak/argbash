@@ -4,6 +4,7 @@
 New features:
 
 * Initial support for bash completion.
+* Initial support for docopt output.
 
 Bugfixes:
 

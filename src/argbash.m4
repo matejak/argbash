@@ -14,7 +14,7 @@
 # ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
-# ARG_TYPE_GROUP_SET([type], [], [type], [script,completion])
+# ARG_TYPE_GROUP_SET([type], [], [type], [script,completion,docopt])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])

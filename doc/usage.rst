@@ -188,6 +188,49 @@ To generate code with those comments, just call ``argbash`` with the according s
    argbash my-parsing.m4 -c -o my-parsing.sh
 
 
+Argbash outputs
+---------------
+
+Argbash is able to generate more than just scripts.
+You can change the output type by supplying another value to he ``--type`` optional argument.
+Here is a description of some more noteworthy outputs:
+
+
+==========================      =======================
+Description                     ``--type`` value
+==========================      =======================
+Bash completion                 completion
+docopt help message             docopt
+==========================      =======================
+
+
+Bash completion
+---------------
+
+The output will be a Bash completion script.
+
+Notice that in this case, the completion file has to "know" the basename of the script the completion is meant for.
+The basename is inferred either from the source filename, or from the destination by stripping the ``.m4`` suffix if applicable
+
+.. note::
+
+   The general recommendation is not to save your scripts to files without suffixes.
+   Keep the ``.sh`` suffixe only for files that are Bash modules.
+
+After you generate the completion file, put it in the appropriate place (which may vary depending on your environment).
+In order to use it right away, simply source it.
+
+
+Docopt help message
+-------------------
+
+`Docopt <http://docopt.org/>`_ is a project that provides argument-parsing libraries for various languages.
+Those libraries accept a help message as an input, and that's all they want to construct a parser.
+This allows you to use Argbash for projects in other languages --- you can leave the parser technicalities to docopt library, which you supply with the Argbash docopt output.
+
+Then, you may use Argbash for Bash completion and other possible goodies.
+
+
 .. _api_change:
 
 API changes support

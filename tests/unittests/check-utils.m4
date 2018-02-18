@@ -19,8 +19,11 @@ m4_list_append([FUU], [foo])
 _lists_same_len([FOO,BAR,BAZ,FUU], [m4_fatal([Lists don't have the same length])], )
 
 m4_list_append([FUX], [foo])
-m4_list_append([FUX], [bar])
-m4_list_append([FUX], [baz])
+m4_list_append([FUX], [BOMB])
+m4_list_append([FUX], [])
+
+assert_equals(_LIST_LONGEST_TEXT_LENGTH([XXX]), 0)
+assert_equals(_LIST_LONGEST_TEXT_LENGTH([FUX]), 4)
 
 assert_equals(_lists_same_len([FOO,BAR,BAZ,FUU], [m4_fatal([Lists don't have the same length])], OK), OK)
 assert_equals(_lists_same_len([FUU,BAR,BAZ,FOO], [m4_fatal([Lists don't have the same length])], OK), OK)
@@ -48,3 +51,17 @@ assert_equals(_sh_quote_also_blanks('x'), ['x'])
 assert_equals(_GET_BASENAME([BOM]), [BOM])
 assert_equals(_GET_BASENAME([/BOM]), [BOM])
 assert_equals(_GET_BASENAME([/pu/la/BOM]), [BOM])
+
+assert_equals(_STRIP_SUFFIX([BOMB.m4]), [BOMB])
+
+m4_include([stuff.m4])
+_SET_OPTION_VALUE_DELIMITER([ ])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB]), [--BOMB])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b]), [-b|--BOMB])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2]), [-b BOMB2|--BOMB BOMB2])
+
+_SET_OPTION_VALUE_DELIMITER([ =])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2]), [-b BOMB2|--BOMB BOMB2])
+_SET_OPTION_VALUE_DELIMITER([=])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2]), [-b BOMB2|--BOMB=BOMB2])
+assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2], [, ]), [-b BOMB2, --BOMB=BOMB2])
