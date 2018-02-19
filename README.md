@@ -52,6 +52,12 @@ Following argument types are supported:
 - incrementing (such as `--verbose`) optional arguments and
 - action optional arguments (such as `--version`, `--help`).
 
+Following outputs are available:
+
+- Bash scripts, tailor-made bash parsing libraries.
+- Bash completion.
+- [docopt](https://docopt.org)-compliant usage message.
+
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
 **[Read the docs (latest stable version)](http://argbash.readthedocs.org/en/stable/) for more info**
