@@ -247,8 +247,7 @@ m4_define([INFERRED_BASENAME],
 		[m4_ifdef([INPUT_BASENAME], [_STRIP_SUFFIX(INPUT_BASENAME)], [$1])])])
 
 
-dnl Regexp: The operand ends e.g. with ...m4]$, not with ...m4$, so we have to preserve the closing square bracket.
-m4_define([_STRIP_SUFFIX], [m4_bpatsubst([[$1]], [\.m4\(.\)$], [\1])])
+m4_define([_STRIP_SUFFIX], [m4_bpatsubst([$1], [\(.*\)\.m4$], [[\1]])])
 
 
 dnl

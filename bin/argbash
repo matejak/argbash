@@ -46,16 +46,6 @@ begins_with_short_option()
 
 
 # validators
-type()
-{
-	local _allowed=("script" "completion" "docopt")
-	local _seeking="$1"
-	for element in "${_allowed[@]}"
-	do
-		test "$element" = "$_seeking" && echo "$element" && return 0
-	done
-	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'script', 'completion' and 'docopt'" 4
-}
 content()
 {
 	local _allowed=("none" "script" "all")
@@ -65,6 +55,17 @@ content()
 		test "$element" = "$_seeking" && echo "$element" && return 0
 	done
 	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'none', 'script' and 'all'" 4
+}
+
+type()
+{
+	local _allowed=("script" "completion" "docopt")
+	local _seeking="$1"
+	for element in "${_allowed[@]}"
+	do
+		test "$element" = "$_seeking" && echo "$element" && return 0
+	done
+	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'script', 'completion' and 'docopt'" 4
 }
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS

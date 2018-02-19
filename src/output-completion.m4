@@ -17,7 +17,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLATE_BAD_CHARS(_PROGRAM_NAME)))],
 	[[#!/bin/bash
 
-],
+]],
 	[[# Put this file to /etc/bash_completion.d/]_BASENAME
 ],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@
