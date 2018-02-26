@@ -1,0 +1,35 @@
+FROM library/alpine:latest
+
+LABEL \
+	run="docker run -it --rm -v \"$(pwd):/work\" matejak/argbash my-template.m4 -o my-script.sh" \
+	help="docker run -it --rm matejak/argbash -h" \
+	version="@VERSION@" \
+	vendor="matej.tyc@gmail.com" \
+	release="1" \
+	build-date="@NOW@" \
+	summary="The ready-to-use argbash argument parsing code generator" \
+	description="Argbash is a code generator that generates an argument-parsing bash library tailor-made for your script. It lets you to describe arguments your script should take and then, you can generate the bash parsing code, or other outputs from it. Argbash is very simple to use and the generated code is relatively nice to read. Find out how to efficiently use it at https://argbash.readthedocs.io/" \
+	URL="https://hub.docker.com/r/matejak/argbash/" \
+	vcs-url="https://github.com/matejak/argbash" \
+	name="matejak/argbash"
+
+# The application requires bash to run.
+RUN apk add --no-cache \
+	autoconf \
+	bash
+
+# Install argbash from sources
+COPY    argbash/ /usr/src/argbash/
+WORKDIR /usr/src/argbash/resources/
+RUN     apk add --no-cache --virtual .build-dependencies \
+            make \
+     && make install PREFIX=/usr/local \
+     && apk del .build-dependencies
+
+# This is the workspace for exec commands
+WORKDIR /work
+VOLUME  /work
+
+# Run argbash with any default invocation.
+ENTRYPOINT [ "argbash" ]
+CMD [ "" ]
