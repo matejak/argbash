@@ -13,6 +13,8 @@ LABEL \
 	vcs-url="https://github.com/matejak/argbash" \
 	name="matejak/argbash"
 
+ENV PROGRAM=argbash
+
 # The application requires bash to run.
 RUN apk add --no-cache \
 	autoconf \
@@ -20,6 +22,8 @@ RUN apk add --no-cache \
 
 # Install argbash from sources
 COPY    argbash/ /usr/src/argbash/
+COPY    entrypoint.sh /
+
 WORKDIR /usr/src/argbash/resources/
 RUN     apk add --no-cache --virtual .build-dependencies \
             make \
@@ -31,5 +35,5 @@ WORKDIR /work
 VOLUME  /work
 
 # Run argbash with any default invocation.
-ENTRYPOINT [ "argbash" ]
+ENTRYPOINT [ "/entrypoint.sh" ]
 CMD [ "" ]

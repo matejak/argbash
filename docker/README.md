@@ -21,22 +21,26 @@ In any case, you won't need `Argbash` to run the script.
 `Argbash` is very simple to use and the generated code is relatively nice to read.
 Moreover, argument definitions stay embedded in the script, so when you need to update the parsing logic, you just re-run the `argbash` script on the already generated script.
 
+You can start using Argbash even more quickly by generating the initial template for your script using `argbash-init` tool, which is also available in this image.
+
 
 How to use it
 =============
 
 This image is useful if you work with Docker and you would like to use Argbash without having to install it.
-The sensible way how to use the `Argbash` image is to create a one-line shell script that does the same as `argbash`, but accomplishes the task by creating the container and destroying it after the job has been done.
+The sensible way how to use the `Argbash` image is to create a one-line shell script that does the same as `argbash` or `argbash-init`, but accomplishes the task by creating the container and destroying it after the job has been done.
+
 
 | OS | script |
 | --- | --- |
-| Posix (e.g. Linux, MacOS) | `docker run -it --rm -v "$(pwd):/work" matejak/argbash "$@"` |
-| Windows | `docker run -it --rm -v "%CD%:/work" matejak/argbash %*` |
+| Posix (e.g. Linux, MacOS) | `docker run -it --rm -e PROGRAM=argbash -v "$(pwd):/work" matejak/argbash "$@"` |
+| Windows | `docker run -it --rm -e PROGRAM=argbash -v "%CD%:/work" matejak/argbash %*` |
 
 What happens here?
 A container is created from the `matejak/argbash` image.
 
 * The `-t` option is needed for the output to be displayed.
+* The `-e PROGRAM=argbash` option is redundant and it basically affirms the container to invoke `argbash`. If you specify `PROGRAM=argbash-init`, `argbash-init` will be invoked instead, default program is `argbash`.
 * The `-v ...:/work` mounts the current directory to the working directory of the container, which is `/work`.
 * The `"$@"` or `%*` propagates any arguments given to this one-liner script to the `argbash` invocation in the container.
 
@@ -49,9 +53,10 @@ You obviously have to fire up `docker`, but then, you just create the one-liner,
 
 ```
 printf '%s\n' '#!/bin/bash' 'docker run -it --rm -v "$(pwd):/work" matejak/argbash "$@"' > argbash-docker
-chmod a+x argbash-docker
+printf '%s\n' '#!/bin/bash' 'docker run -it -e PROGRAM=argbash-init --rm -v "$(pwd):/work" matejak/argbash "$@"' > argbash-init-docker
+chmod a+x argbash-docker argbash-init-docker
 
-wget https://raw.githubusercontent.com/matejak/argbash/master/resources/examples/minimal.m4
+./argbash-init-docker --pos positional-arg --opt optional-arg minimal.m4
 vim minimal.m4
 
 ./argbash-docker minimal.m4 -o my-script.sh
@@ -62,3 +67,4 @@ Attribution
 ===========
 
 The Argbash docker image has been contributed by [Peter Cummuskey](https://github.com/Tzrlk).
+Idea to dockerize `argbash-init` came up from user [gnoshti](https://hub.docker.com/u/gnosthi/).
