@@ -4,18 +4,20 @@ Contents of '../src' matching '*.m4':
 	argbash-1to2.m4: 1 kiB
 	argbash-init.m4: 5 kiB
 	argbash-lib.m4: 0 kiB
-	argbash.m4: 8 kiB
-	argument_value_types.m4: 4 kiB
+	argbash.m4: 9 kiB
+	argument_value_types.m4: 5 kiB
 	collectors.m4: 17 kiB
 	constants.m4: 0 kiB
 	default_settings.m4: 0 kiB
 	env_vars.m4: 1 kiB
 	function_generators.m4: 5 kiB
 	list.m4: 5 kiB
+	output-bash-script.m4: 1 kiB
 	output-completion.m4: 2 kiB
-	output.m4: 0 kiB
-	output-script.m4: 1 kiB
-	output-standalone.m4: 0 kiB
+	output-docopt.m4: 2 kiB
+	output-strip-all.m4: 0 kiB
+	output-strip-none.m4: 0 kiB
+	output-strip-user-content.m4: 0 kiB
 	progs.m4: 2 kiB
 	stuff.m4: 35 kiB
 	utilities.m4: 8 kiB

@@ -2,7 +2,7 @@
 
 # m4_ignore(
 echo "This is just a script template, not the script (yet) - pass it to 'argbash' to fix this." >&2
-exit 11  #)Created by argbash-init v2.6.0a
+exit 11  #)Created by argbash-init v2.6.0
 # ARG_OPTIONAL_SINGLE([option])
 # ARG_OPTIONAL_BOOLEAN([print])
 # ARG_POSITIONAL_SINGLE([positional-arg])
