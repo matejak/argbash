@@ -7,7 +7,7 @@ SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK
 
 M4_SRC = \
 	../src/output-strip-none.m4 \
-	../src/output-strip-script.m4 \
+	../src/output-strip-user-content.m4 \
 	../src/output-strip-all.m4 \
 	../src/argbash-lib.m4 \
 	../src/version \
@@ -16,7 +16,7 @@ M4_SRC = \
 M4_SRC += \
 	../src/output-completion.m4 \
 	../src/output-docopt.m4 \
-	../src/output-script.m4 \
+	../src/output-bash-script.m4 \
 	$(NUL)
 
 # generate using

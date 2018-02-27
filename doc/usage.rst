@@ -132,14 +132,15 @@ Here are those parts of the template:
 
 #. The rest of the file.
 
-   You may notice the ``... <-- needed because of Argbash`` guards that are comments.
-   The first guard has an opened square bracket, the second guard at the bottom of the file has a closing square bracket.
+   If you run ``argbash`` with ``--strip user-content`` or ``--strip all`` argument, this section will be missing from the output altogether.
+   Otherwise, the preexisting content is preserved with some noteworthy points:
 
-   This content (typically the hand-written content supplied by the user) is treated in the same way
-   as the beginning of the file that is described in point 1.
-   However, thanks to the opened and closed square brackets, no changes to it will be made.
+   - You may notice the ``# [ <-- needed because of Argbash`` and ``# ] <-- needed because of Argbash`` guards.
+     The first guard has an opening square bracket, the second guard at the bottom of the file has a closing square bracket.
+     Don't remove them, they are necessary for ``argbash`` to be idempotent.
 
-   If you run ``argbash`` with ``--strip script`` or ``--strip all`` argument, this section will be missing from the output.
+   - This part of the file (typically the hand-written content supplied by the user) is treated in the same way as the beginning of the file that is described in point 1.
+     However, thanks to the opened and closed square brackets, no changes to it will be made.
 
 
 Parsing code and script body together
@@ -206,13 +207,13 @@ If you want/have to take care of including the parsing code yourself, just make 
 
     # HERE GOES THE SCRIPT BODY
 
-Then, you just generate ``my-parsing.sh`` using ``--strip script`` option:
+Then, you just generate ``my-parsing.sh`` using ``--strip user-content`` option:
 
 .. code-block:: bash
 
-   argbash my-parsing.m4 -o my-parsing.sh --strip script
+   argbash my-parsing.m4 -o my-parsing.sh --strip user-content
 
-The ``--strip script`` argument takes care that the output will contain the Argbash definitions lines and the generated parsing code, but the body of the script will not be included.
+The ``--strip user-content`` argument takes care that the output will contain the Argbash definitions lines and the generated parsing code, but the body of the script will not be included.
 
 
 .. _commented:
@@ -236,14 +237,14 @@ Argbash is able to generate more than just scripts.
 You can change the output type by supplying another value to he ``--type`` optional argument.
 Next, it doesn't make sense to keep all of the template content in the output, so you may typically want to strip all but the generated content from alternative outputs:
 
-==========================      =======================         ==========================
+============================    =======================         ==========================
 Description                     ``--type`` value                ``--strip`` value
-==========================      =======================         ==========================
-Script                          script                          none
-Script parsing section          script                          script
+============================    =======================         ==========================
+Bash script                     bash-script                     none
+Bash script parsing section     bash-script                     user-content
 Bash completion                 completion                      all
 docopt help message             docopt                          all
-==========================      =======================         ==========================
+============================    =======================         ==========================
 
 
 Bash completion

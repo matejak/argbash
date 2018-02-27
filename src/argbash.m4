@@ -8,15 +8,15 @@
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
-# ARG_OPTIONAL_SINGLE([type], t, [Output type to generate], [script])
+# ARG_OPTIONAL_SINGLE([type], t, [Output type to generate], [bash-script])
 # ARG_OPTIONAL_BOOLEAN([library],, [Whether the input file if the pure parsing library.])
 # ARG_OPTIONAL_SINGLE([strip],, [Determines what to have in the output.], [none])
 # ARG_OPTIONAL_BOOLEAN([check-typos],, [Whether to check for possible argbash macro typos], [on])
 # ARG_OPTIONAL_BOOLEAN([commented], c, [Commented mode - include explanatory comments with the parsing code], [off])
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
-# ARG_TYPE_GROUP_SET([content], [content], [strip], [none,script,all])
-# ARG_TYPE_GROUP_SET([type], [type], [type], [script,completion,docopt])
+# ARG_TYPE_GROUP_SET([content], [content], [strip], [none,user-content,all])
+# ARG_TYPE_GROUP_SET([type], [type], [type], [bash-script,completion,docopt])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
@@ -208,10 +208,10 @@ m4dir="$script_dir/../src"
 test -n "$_arg_debug" && DEBUG=('-t' "$_arg_debug")
 
 output_m4="$m4dir/output-strip-none.m4"
-test "$_arg_library" = "on" && { echo "The --library option is deprecated, use --strip script" next time >&2; _arg_strip="script"; }
-if test "$_arg_strip" = "script"
+test "$_arg_library" = "on" && { echo "The --library option is deprecated, use --strip user-content" next time >&2; _arg_strip="user-content"; }
+if test "$_arg_strip" = "user-content"
 then
-	output_m4="$m4dir/output-strip-script.m4"
+	output_m4="$m4dir/output-strip-user-content.m4"
 elif test "$_arg_strip" = "all"
 then
 	output_m4="$m4dir/output-strip-all.m4"
