@@ -12,22 +12,33 @@ BuildRequires: autoconf
 BuildRequires: coreutils
 BuildRequires: make
 BuildRequires: bash
+BuildRequires: bash-completion
 Requires: autoconf
 Requires: bash
 Requires: coreutils
 Requires: grep
 Requires: sed
 
+%if !0%{?rhel} || 0%{?rhel} > 7
+Recommends: bash-completion
+%endif
+
 %description
 @LONGDESC@
 
 %prep
-%autosetup -n argbash-@VERSION@
+%autosetup
 
 %build
 
 %install
-cd resources && ROOT=%{buildroot} PREFIX=%{_prefix} PREFIXED_LIBDIR=${_datarootdir} make install
+cd resources && \
+    ROOT=%{buildroot} \
+    PREFIX=%{_prefix} \
+    PREFIXED_LIBDIR=%{_datarootdir} \
+    SYSCONFDIR=%{_sysconfdir} \
+    INSTALL_COMPLETION=yes \
+    make install
 
 %check
 cd resources && make check
@@ -39,15 +50,8 @@ cd resources && make check
 %{_bindir}/argbash
 %{_bindir}/argbash-1to2
 %{_bindir}/argbash-init
-
 %{_datarootdir}/argbash/
+%dir %{_sysconfdir}/bash_completion.d/
+%{_sysconfdir}/bash_completion.d/argbash.sh
 
 %changelog
-* Mon Oct 16 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.5.0-1
-- Install libdir in /usr/share since it's platform-independent
-
-* Wed May 24 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.4.0-1
-- Use proper libdir path
-
-* Wed Mar 08 2017 Stephen Gallagher <sgallagh@redhat.com> - 2.3.0-0.1
-- Initial package
