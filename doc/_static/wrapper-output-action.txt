@@ -20,7 +20,7 @@ Contents of '../src' matching '*.m4':
 	output-strip-user-content.m4: 0 kiB
 	progs.m4: 2 kiB
 	stuff.m4: 35 kiB
-	utilities.m4: 8 kiB
+	utilities.m4: 9 kiB
 	value_validators.m4: 5 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
