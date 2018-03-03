@@ -1,3 +1,12 @@
+2.6.1 (TBA)
+------------------
+
+Bugfixes:
+
+* Fixed the installation issue related to bash completion.
+* Allowed docopt and completion output even in case of stdin input and stdout output.
+
+
 2.6.0 (2018-02-27)
 ------------------
 
@@ -14,6 +23,7 @@ Bugfixes:
 * The `ARGBASH_WRAP` macro now supports looking for templates in subdirectories.
 * Documentation expansion.
 
+
 2.5.1 (2017-12-06)
 ------------------
 
@@ -23,6 +33,7 @@ Bugfixes:
 * Corrected argbash-init hint mode.
 * Allowed argbash to wrap scripts in files with no extension.
 * Fixed compatibility with the `-e` (i.e. "strict") mode (fixed #30).
+
 
 2.5.0 (2017-09-03)
 ------------------
@@ -45,6 +56,7 @@ Bugfixes:
 * Much-improved handling of typed arguments (fixed #25, #26).
 * Improved documentation. Thanks to [Bianca Tamayo](https://github.com/btamayo)!
 
+
 2.4.0 (2017-04-08)
 ------------------
 
@@ -59,6 +71,7 @@ Bugfixes:
 * Fixed issue #7 with newlines in help strings.
 * The `argbash.spec` file has been corrected, so there is a hope that Argbash will make it to Fedora Linux distribution.
 
+
 2.3.0 (2017-02-07)
 ------------------
 
@@ -70,6 +83,7 @@ New minor features:
 
 * `argbash` provides more useful feedback in case of unmatched square brackets in the input
 * `argbash` in standalone mode now uses the more fresh of the parsing code `.sh` or `.m4` templates (was undocumented, but the `.sh` one was always preferred over the `.m4`).
+
 
 2.2.3 (2016-12-18)
 ------------------
@@ -83,6 +97,7 @@ Bugfixes:
 
 * Fixed handling of help messages in case of missing `ARG_HELP` macro
 
+
 2.2.2 (2016-11-21)
 ------------------
 
@@ -94,6 +109,7 @@ New minor features:
 Bugfixes:
 
 * Fixed quoting-related issues of the underlying code.
+
 
 2.2.0 (2016-11-07)
 ------------------
@@ -110,6 +126,7 @@ Bugfixes:
 * Improved defaults indications in help messages.
 * Overall internal code beautification.
 
+
 2.1.1 (2016-08-26)
 ------------------
 
@@ -117,6 +134,7 @@ Bugfixes:
 
 * Fixed help messages for the repeated optional args and added connected it to the delim choice.
 * Fixed the installation process in `resources/Makefile`
+
 
 2.1.0 (2016-08-26)
 ------------------
@@ -136,6 +154,7 @@ Bugfixes:
 * Beautification of the underlying code.
 * Documentation improvements in the Examples section.
 
+
 2.0.0 (2016-08-03)
 ------------------
 
@@ -149,6 +168,7 @@ Bugfixes:
 
 * Fixed a error handling bug in the `argbash-1to2` script.
 
+
 1.4.2 (2016-08-02)
 ------------------
 
@@ -156,12 +176,14 @@ Bugfixes:
 
 * Fixed the broken `argbash-1to2` script.
 
+
 1.4.1 (2016-08-02)
 ------------------
 
 Bugfixes:
 
 * Fixed broken `Makefile` that prevented (un)installs.
+
 
 1.4.0 (2016-08-02)
 ------------------
@@ -178,6 +200,7 @@ Bugfixes:
 * Fixed spurious default to `ARG_POSITIONAL_INF`.
 * Fixed handling of empty defaults.
 
+
 1.3.0 (2016-07-23)
 ------------------
 
@@ -191,12 +214,14 @@ Bugfixes:
 * Fixed definitions in the parsing part of the script.
 * Expanded documentation --- expanded info about related projects.
 
+
 1.2.1 (2016-07-10)
 ------------------
 
 Bugfixes:
 
 * Improved the wrapping of scripts to work with positional args
+
 
 1.2.0 (2016-07-08)
 ------------------
@@ -206,10 +231,8 @@ New features:
 * Support for repeated arguments, added specialized macro for --verbose
 * Support for double dash (separating positional and optional arguments)
 * Support for multi-valued arguments (with defaults)
-* Improved generated code so users get more descriptive messages when
-  something goes wrong
-* The bash code tries to be minimal - only features that are used are
-  supported
+* Improved generated code so users get more descriptive messages when something goes wrong
+* The bash code tries to be minimal - only features that are used are supported
 * Support for wrapping of other Argbash scripts
 * Support for repeated arguments (s.a. argument `-I` of `gcc`)
 
@@ -219,6 +242,7 @@ Bugfixes:
 * Improved error reports when number of positional args doesn't match
 * Improved m4s list implementation
 * Added `m4_list_contains`
+
 
 1.1.0 (2015-09-06)
 ------------------

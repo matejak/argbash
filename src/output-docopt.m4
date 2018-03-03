@@ -51,7 +51,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ]],
 	[dnl ASSERT_THAT_BASENAME_IS_KNOWN
 ],
-	[m4_define([_BASENAME], m4_dquote(INFERRED_BASENAME([m4_fatal([We need to know the basename, and we couldn't infer it. It is likely that you read from stdin and write to stdout, please use at least one filename either for input or for output.])])))],
+	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
 	[_IF_SOME_ARGS_ARE_DEFINED([m4_do(
 		[Usage: _BASENAME],
 		[_MAKE_HELP_SYNOPSIS

@@ -39,6 +39,7 @@ M4_SRC += \
 PREFIX ?= $(HOME)/.local
 PREFIXED_LIBDIR ?= $(PREFIX)/lib
 SYSCONFDIR ?= /etc
+BASH_COMPLETION_DIRECTORY ?= $(SYSCONFDIR)/bash_completion.d
 ROOT ?= /
 
 A_INIT = ../bin/argbash-init
@@ -152,7 +153,7 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION)
 	test -n "$(VERSION_SUFFIX)" || test -z "$(ARGBASH_TO)" || { cp -p $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-*; }
 	cp -p $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
-	test "$(INSTALL_COMPLETION)" = "no" || (mkdir -p "$(ROOT)/$(SYSCONFDIR)/bash_completion.d" && mv "$(COMPLETION)" "$(ROOT)/$(SYSCONFDIR)/bash_completion.d/")
+	test "$(INSTALL_COMPLETION)" = "no" || (mkdir -p "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)" && mv "$(COMPLETION)" "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/")
 
 altpreclean: define-version
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
@@ -170,7 +171,7 @@ uninstall:
 	$(RM) "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)/version"
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
 	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
-	$(RM) "$(ROOT)/$(SYSCONFDIR)/bash_completion.d/$(COMPLETION)"
+	$(RM) "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/$(COMPLETION)"
 
 altuninstall: define-version uninstall
 

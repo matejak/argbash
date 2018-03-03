@@ -12,7 +12,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ]],
 	[dnl ASSERT_THAT_BASENAME_IS_KNOWN
 ],
-	[m4_define([_BASENAME], m4_dquote(INFERRED_BASENAME([m4_fatal([We need to know the basename, and we couldn't infer it. It is likely that you read from stdin and write to stdout, please use at least one filename either for input or for output.])])))],
+	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
 	[m4_define([_PROGRAM_NAME], m4_dquote(_BASENAME))],
 	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLATE_BAD_CHARS(_PROGRAM_NAME)))],
 	[[#!/bin/bash

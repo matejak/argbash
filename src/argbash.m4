@@ -201,7 +201,6 @@ then
 	infile=temp_in_$$
 	_files_to_clean+=("$infile")
 	cat > "$infile"
-	sleep 2
 fi
 
 m4dir="$script_dir/../src"

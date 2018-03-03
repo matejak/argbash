@@ -243,11 +243,18 @@ m4_define([DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
 
 dnl $1: Error
 m4_define([INFERRED_BASENAME],
-	[m4_ifdef([OUTPUT_BASENAME], [_STRIP_SUFFIX(OUTPUT_BASENAME)],
-		[m4_ifdef([INPUT_BASENAME], [_STRIP_SUFFIX(INPUT_BASENAME)], [$1])])])
+	[m4_ifdef([OUTPUT_BASENAME], [[_STRIP_SUFFIX(OUTPUT_BASENAME)]],
+		[m4_ifdef([INPUT_BASENAME], [[_STRIP_SUFFIX(INPUT_BASENAME)]], [$1])])])
 
 
-m4_define([_STRIP_SUFFIX], [m4_bpatsubst([$1], [\(.*\)\.m4$], [[\1]])])
+m4_define([INFERRED_BASENAME_NOERROR],
+	[INFERRED_BASENAME([m4_errprintn([We need to know the basename, and we couldn't infer it, so we resort to generic 'script'. It is likely that you read from stdin and write to stdout, please prefer to use at least one filename either for input or for output.])[[script]]])])
+
+
+dnl
+dnl \1: The name and leading [
+dnl \2: The ending ] (group regexp is complicated because square brackets have to match. For reference, [][]* matches for zero or more [ or ])
+m4_define([_STRIP_SUFFIX], [m4_bpatsubst([[$1]], [\(.*\)\.m4\([][]*\)$], [\1\2])])
 
 
 dnl
