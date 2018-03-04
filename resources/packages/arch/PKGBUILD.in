@@ -44,5 +44,5 @@ package() {
 	cp LICENSE "$LICENSES"
 
 	cd "$pkgname-$pkgver/resources"
-	make ROOT="$pkgdir" PREFIX="/usr" install
+	make ROOT="$pkgdir" PREFIX="/usr" BASH_COMPLETION_DIRECTORY=/usr/share/bash-completion/completions/ INSTALL_COMPLETION=yes install
 }
