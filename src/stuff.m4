@@ -23,6 +23,9 @@ dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and 
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl
+dnl TODO: Fix docopt and completion for cases when there is only the '=' separator.
+dnl TODO: Enable (at least) docopt generation even if we don't know the basename.
+dnl
 dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
 dnl
 dnl Arg groups:

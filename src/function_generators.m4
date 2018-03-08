@@ -45,11 +45,12 @@ m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Function that evaluates whether a value passed to an argument],
 		[# does not violate the global rule imposed by the ARG_RESTRICT_VALUES macro:],
-		[# _CASE_RESTRICT_VALUES([],
+		[# ]_CASE_RESTRICT_VALUES([],
 		[The value must not match any long or short option this script uses],
-		[The value must not match anything that looks like any long or short option.])],
-		[# _INDENT_()@S|@1: The name of the option],
-		[# _INDENT_()@S|@2: The passed value],
+		[The value must not match anything that looks like any long or short option.]),
+		[# Args:],
+		[# ]_INDENT_()[@S|@1: The name of the option],
+		[# ]_INDENT_()[@S|@2: The passed value],
 	)],
 	[[evaluate_strictness()
 {
