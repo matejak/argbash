@@ -30,6 +30,14 @@ m4_define([ADD_RULE], [m4_do(
 	)])],
 )])
 
+dnl
+dnl Use in the case that you need a rule without registering a test
+dnl We assume that the input is .m4, output .sh and argbash is used to create it.
+dnl $1: Target basename (without the .sh extension that is assumed)
+dnl $2: deps (without the .m4 template that is deduced from the basename)
+dnl $3: body
+m4_define([ADD_ARGBASH_RULE], [ADD_RULE(
+	[$1.sh], [$1.m4 $2 $(ARGBASH_BIN)], [$3])])
 
 dnl 
 dnl $1: The test name

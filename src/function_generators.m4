@@ -139,8 +139,8 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [m4_do(
 	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_do(
 		[m4_set_foreach([_POS_VARNAMES], [varname], [_INDENT_()varname=()
 ])],
-		[_INDENT_()m4_list_join([_WRAPPED_ADD_SINGLE], [
-_INDENT_()])],
+		[_INDENT_()m4_list_join([_WRAPPED_ADD_SINGLE], m4_expand([
+_INDENT_()]))],
 		[
 ],
 	)])],

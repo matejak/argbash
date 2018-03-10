@@ -162,8 +162,8 @@ dnl TODO: Take the _WRAPPED code and move it one level up
 
 dnl
 dnl $1 - the variable where the argument value is collected
-m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED],
-	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED))]))],
+m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED_FILE_STEM],
+	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
 )])
 
 m4_define([__POS_WRAPPED], [m4_do(
@@ -172,8 +172,8 @@ m4_define([__POS_WRAPPED], [m4_do(
 	[__ANY_WRAPPED([$2])],
 )])
 
-m4_define([_OPT_WRAPPED], [m4_ifdef([WRAPPED],
-	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED))]))],
+m4_define([_OPT_WRAPPED], [m4_ifdef([WRAPPED_FILE_STEM],
+	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
 )])
 
 m4_define([__OPT_WRAPPED], [m4_do(
@@ -524,6 +524,12 @@ argbash_api([ARG_LEFTOVERS],
 
 
 dnl
+dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
+dnl $2: What to do if the argument of the ARGBASH_WRAP macro has surprised us - it has not been processed by argbash script.
+m4_define([_IF_WRAPPING_FILE_UNEXPECTEDLY],
+	[m4_ifndef([_SCRIPT_$1], [$2])])
+
+dnl
 dnl Wrap an Argbash-aware script.
 dnl In the wrapping script, just point to the location of the wrapping script (template) and specify what options of the script NOT to "inherit".
 dnl You can wrap multiple scripts using multiple ARGBASH_WRAP statements.
@@ -532,14 +538,15 @@ dnl $2: Names of blacklisted args (list)
 dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
 argbash_api([ARGBASH_WRAP], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 	[[$0($@)]],
-	[m4_pushdef([WRAPPED], [[$1]])],
+	[m4_pushdef([WRAPPED_FILE_STEM], m4_indir([_GROUP_OF_$1]))],
 	[m4_list_append([BLACKLIST], $2)],
 	[m4_pushdef([_W_FLAGS], [m4_default_quoted([$3], _DEFAULT_WRAP_FLAGS)])],
-	[m4_ifndef([_SCRIPT_$1], [m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
+	[_IF_WRAPPING_FILE_UNEXPECTEDLY([$1],
+		[m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
 	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
 	[m4_popdef([_W_FLAGS])],
 	[m4_list_destroy([BLACKLIST])],
-	[m4_popdef([WRAPPED])],
+	[m4_popdef([WRAPPED_FILE_STEM])],
 )])
 
 

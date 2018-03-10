@@ -6,7 +6,7 @@ Contents of '../src' matching '*.m4':
 	argbash-lib.m4: 0 kiB
 	argbash.m4: 9 kiB
 	argument_value_types.m4: 5 kiB
-	collectors.m4: 17 kiB
+	collectors.m4: 18 kiB
 	constants.m4: 0 kiB
 	default_settings.m4: 0 kiB
 	env_vars.m4: 1 kiB

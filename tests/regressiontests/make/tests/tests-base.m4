@@ -133,7 +133,7 @@ ADD_RULE([$(TESTDIR)/test-diy.m4], [$(TESTDIR)/test-diy-noop.m4],
 ADD_SCRIPT([test-diy], [m4])
 
 
-m4_define([test_wrapping_body], [[[
+m4_define([test_wrapping_body_base], [[[
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg
 	@# ! negates the return code
@@ -144,17 +144,44 @@ m4_define([test_wrapping_body], [[[
 	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
 	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
-	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
-	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 ]]])
 
+m4_define([test_wrapping_body], m4_dquote(m4_do(
+	[test_wrapping_body_base],
+	[[	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
+]],
+	[[	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
+]],
+	)))
+
+ADD_TEST([test-wrapping-second_level], [m4_do(
+	test_wrapping_body_base,
+	[[	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala XX LOOL pos-default,'
+]],
+	[[	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz XX LOOL pos-default,'
+]],
+	[[	$< XX LOOL | grep -q 'POS_S1=,'
+]],
+	)])
+
+ADD_ARGBASH_RULE([$(TESTDIR)/test-wrapping-second_level],
+	[$(TESTDIR)/test-wrapping-single_level.sh $(TESTDIR)/test-onlyopt.m4],
+	[[$(ARGBASH_EXEC) $< -o $@
+]])
+
+ADD_SCRIPT([test-wrapping-single_level])
+ADD_ARGBASH_RULE([$(TESTDIR)/test-wrapping-single_level],
+	[$(TESTDIR)/test-onlypos.m4],
+	[[$(ARGBASH_EXEC) $< -o $@
+]])
+ADD_SCRIPT([otherdir/test-onlyopt], [m4])
 
 ADD_TEST([test-wrapping], test_wrapping_body,
 [$(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4])
 
-ADD_RULE([$(TESTDIR)/test-wrapping-otherdir.sh],
-	[$(TESTDIR)/test-wrapping-otherdir.m4 $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN)],
-	[[$(ARGBASH_BIN) $< -o $@
+ADD_ARGBASH_RULE([$(TESTDIR)/test-wrapping-otherdir],
+	[$(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN)],
+	[[$(ARGBASH_EXEC) $< -o $@
 ]])
 
 ADD_TEST([test-wrapping-otherdir], test_wrapping_body)

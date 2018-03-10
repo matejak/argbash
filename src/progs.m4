@@ -59,7 +59,7 @@ dnl  In case of path issues (i.e. script is in a crontab), update the PATH varia
 dnl
 dnl  internally:
 dnl  PROG_NAMES, PROG_VARS, PROG_MSGS, PROG_HELPS, PROG_ARGS, PROG_HAVE_ARGS
-argbash_api([ARG_USE_PROG], [m4_ifndef([WRAPPED], [m4_do(
+argbash_api([ARG_USE_PROG], [m4_ifndef([WRAPPED_FILE_STEM], [m4_do(
 	[m4_list_append([PROG_VARS], m4_default([$1], _translit_prog([$2])))],
 	[m4_list_append([PROG_NAMES], [$2])],
 	[m4_list_append([PROG_MSGS], [$3])],

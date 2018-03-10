@@ -11,7 +11,7 @@ dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
 dnl TODO: Hanlde the case of wrapping correctly
 dnl TODO: Find out a proper name for this
-argbash_api([ARG_USE_ENV], [m4_ifndef([WRAPPED], [m4_do(
+argbash_api([ARG_USE_ENV], [m4_ifndef([WRAPPED_FILE_STEM], [m4_do(
 	[[$0($@)]],
 	[m4_list_append([ENV_NAMES], [$1])],
 	[m4_list_append([ENV_DEFAULTS], [$2])],

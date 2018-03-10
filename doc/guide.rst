@@ -462,7 +462,9 @@ Plus, there are convenience macros:
     S         Don't use wrapped script's option--value separator
     ========= ===================
 
-  * As a convenience feature, if you wrap a script with stem ``process_single``, all options that come from the wrapped script (both arguments and values) are stored in an array ``_args_process_single``.
+  .. _argbash_wrap_vars:
+
+  * As a convenience feature, if you wrap a script with stem ``process_single``, all options that are part of the wrapped script's interface (both arguments and values) are stored in an array ``_args_process_single``.
     In the case where there may be issues with positional arguments (they are order-dependent and the wrapping script may want to inject its own to the wrapped script), you can use ``_args_process_single_opt``, or ``_args_process_single_pos``, where only optional/positional arguments are stored.
     Therefore, when you finally decide to call ``process-single.sh`` in your script with all wrapped arguments (e.g. ``--some-opt foo --bar``), all you have to do is to write
 
@@ -491,6 +493,8 @@ Plus, there are convenience macros:
 
        Check out the example: :ref:`ex_wrapping`
 
+  * The wrap functionality works recursively, so you can wrap scripts that wrap scripts in a similar manner as you use class inheritance in object-oriented programming languages.
+    More precisely, it is like the private inheritance --- the ``_args_...`` :ref:`variables <argbash_wrap_vars>` will be generated only for first-order wrapped scripts.
 
 .. warning::
 

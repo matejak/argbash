@@ -32,6 +32,7 @@ TESTS += \
 	test-simple \
 	test-diy-noop \
 	test-diy \
+	test-wrapping-second_level \
 	test-wrapping \
 	test-wrapping-otherdir \
 	test-wrapping-more \
@@ -82,9 +83,11 @@ SCRIPTS += \
 	$(TESTDIR)/test-diy-noop.m4 \
 	$(TESTDIR)/test-diy.sh \
 	$(TESTDIR)/test-diy.m4 \
+	$(TESTDIR)/test-wrapping-second_level.sh \
+	$(TESTDIR)/test-wrapping-single_level.sh \
+	$(TESTDIR)/otherdir/test-onlyopt.m4 \
 	$(TESTDIR)/test-wrapping.sh \
 	$(TESTDIR)/test-wrapping-otherdir.sh \
-	$(TESTDIR)/otherdir/test-onlyopt.m4 \
 	$(TESTDIR)/otherdir/test-onlypos.m4 \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
@@ -287,6 +290,27 @@ test-diy: $(TESTDIR)/test-diy.sh
 $(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4
 	sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
 
+test-wrapping-second_level: $(TESTDIR)/test-wrapping-second_level.sh
+	$< -h | grep -q opt-arg
+	$< -h | grep -q pos-arg
+	@# ! negates the return code
+	! $< -h | grep -q boo_l
+	@# no spaces as indentation (that test-onlyopt uses)
+	! grep -q '^  ' $<
+	grep -q '^		esac' $<
+	$< XX LOOL | grep -q 'POS_S0=XX,POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL | grep -q 'POS_S=LOOL,POS_OPT=pos-default'
+	$< XX LOOL --opt-arg lalala | grep -q OPT_S=lalala,
+	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala XX LOOL pos-default,'
+	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz XX LOOL pos-default,'
+	$< XX LOOL | grep -q 'POS_S1=,'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-second_level.sh"
+$(TESTDIR)/test-wrapping-second_level.sh: $(TESTDIR)/test-wrapping-second_level.m4 $(TESTDIR)/test-wrapping-single_level.sh $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
+	$(ARGBASH_EXEC) $< -o $@
+
+$(TESTDIR)/test-wrapping-single_level.sh: $(TESTDIR)/test-wrapping-single_level.m4 $(TESTDIR)/test-onlypos.m4 $(ARGBASH_BIN)
+	$(ARGBASH_EXEC) $< -o $@
+
 test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)/test-onlypos.m4
 	$< -h | grep -q opt-arg
 	$< -h | grep -q pos-arg
@@ -301,8 +325,8 @@ test-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-onlyopt.m4 $(TESTDIR)
 	$< XX LOOL --opt-arg lalala | grep -q 'CMDLINE=--opt-arg lalala LOOL pos-default,'
 	$< XX LOOL --opt-repeated w -r x --opt-repeated=y -rz | grep -q 'CMDLINE=--opt-repeated w -r x --opt-repeated=y -rz LOOL pos-default,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"
-$(TESTDIR)/test-wrapping-otherdir.sh: $(TESTDIR)/test-wrapping-otherdir.m4 $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN)
-	$(ARGBASH_BIN) $< -o $@
+$(TESTDIR)/test-wrapping-otherdir.sh: $(TESTDIR)/test-wrapping-otherdir.m4 $(TESTDIR)/otherdir/test-onlyopt.m4 $(TESTDIR)/otherdir/test-onlypos.m4 $(ARGBASH_BIN) $(ARGBASH_BIN)
+	$(ARGBASH_EXEC) $< -o $@
 
 test-wrapping-otherdir: $(TESTDIR)/test-wrapping-otherdir.sh
 	$< -h | grep -q opt-arg

@@ -333,14 +333,16 @@ do_stuff()
 }
 
 # Fills content to variable _wrapped_defns --- where are scripts of given stems
+# $1: Infile
+# $2: Stem - what should be the umbrella of the args
 settle_wrapped_fname()
 {
 	# Get arguments to ARGBASH_WRAP
 	# Based on http://stackoverflow.com/a/19772067/592892
-	_srcfiles=()
+	local _srcfiles=() _file_found _found ext srcstem searchdir line stem="$2"
 	while read -r line; do
 		_srcfiles+=("$line")
-	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$infile")" \
+	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$1")" \
 			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "$discard")
 
 	test "${#_srcfiles[@]}" -gt 0 || return
@@ -354,8 +356,11 @@ settle_wrapped_fname()
 			test -f "$searchdir/$srcstem" && { _found=yes; ext=''; break; }
 		done
 		# The last searchdir is a correct one
-		test $_found = yes || { echo "Couldn't find wrapped file of stem '$srcstem' in any of directories: ${_arg_search[*]}" >&2; exit 2; }
-		_wrapped_defns="${_wrapped_defns}m4_define([_SCRIPT_$srcstem], [[$searchdir/$srcstem$ext]])"
+		test $_found = yes || die "Couldn't find wrapped file of stem '$srcstem' in any of directories: ${_arg_search[*]}" 2
+		_file_found="$searchdir/${srcstem}${ext}"
+		stem=${2:-$srcstem}
+		settle_wrapped_fname "$_file_found" "$stem"
+		_wrapped_defns="${_wrapped_defns}m4_define([_GROUP_OF_$srcstem], [[$stem]])m4_define([_SCRIPT_$srcstem], [[$_file_found]])"
 	done
 }
 
@@ -434,7 +439,7 @@ test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
 test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing_code" -o "$parsing_code_out")
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
-settle_wrapped_fname
+settle_wrapped_fname "$infile"
 
 assert_m4_files_are_readable
 output="$(do_stuff "$infile" "$outfname" "$_arg_type")" || die "" "$?"

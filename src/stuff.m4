@@ -977,12 +977,12 @@ m4_define([_IF_SOME_ARGS_ARE_DEFINED],
 
 
 argbash_api([ARGBASH_GO], [m4_do(
-	[m4_ifndef([WRAPPED], [_ARGBASH_GO([$0()])])],
+	[m4_ifndef([WRAPPED_FILE_STEM], [_ARGBASH_GO([$0()])])],
 )])
 
 
 argbash_api([ARGBASH_PREPARE], [m4_do(
-	[m4_ifndef([WRAPPED], [m4_do(
+	[m4_ifndef([WRAPPED_FILE_STEM], [m4_do(
 		[_SET_DIY_MODE()],
 		[_ARGBASH_GO([$0()])],
 	)])],

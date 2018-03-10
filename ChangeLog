@@ -1,6 +1,10 @@
 2.6.2 (TBA)
 ------------------
 
+New features:
+
+* `ARGBASH_WRAP` works recursively - you can wrap wrapped scripts.
+
 Bugfixes:
 
 * Fixed comment of the evaluate_strictness function in commented mode.
