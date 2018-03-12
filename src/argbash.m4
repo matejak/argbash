@@ -4,6 +4,8 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.
 # SC2059 Don't use variables in the printf format string.
 
+version=_ARGBASH_VERSION
+
 
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
@@ -22,8 +24,6 @@
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 
 # ARGBASH_GO
-
-version=_ARGBASH_VERSION
 
 # [
 
