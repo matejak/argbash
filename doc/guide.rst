@@ -222,6 +222,10 @@ Optional arguments
 
   The specified values are appended to defaults, so if you consider a script that accepts the ``--include`` argument due to the directive above, if you pass it ``-I src/include``, the argument-holding array will have three elements --- ``/usr/include``, ``/usr/local/include`` and ``src/include``.
 
+  Unlike the rest of the Argbash macros, you are responsible to quote the defaults properly.
+  Therefore, if you pass ``"one two three"`` as default, it will translate to a 1-element array with the sole element ``"one two three``.
+  Typically, you will want ``one two three``, or maybe even ``"${one_to_nineteen[@]}" twenty "twenty one"`` passed to the macro.
+
 * Action optional arguments (i.e. the ``--version`` and ``--help`` type of comments):
   ::
 

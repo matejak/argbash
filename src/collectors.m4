@@ -260,7 +260,7 @@ dnl $3: help
 dnl $4: default (empty array)
 argbash_api([ARG_OPTIONAL_REPEATED], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
-	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3], [($4)], [repeated])],
+	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3], [$4], [repeated])],
 )])
 
 

@@ -210,50 +210,48 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach_positional(
 )])])])
 
 
+dnl
+dnl $1: argname
+dnl $2: short
+dnl $3: type
+dnl $4: default
+dnl $5: help msg
+m4_define([_MAKE_PRINTF_OPTARG_HELP_STATEMENTS], [m4_do(
+	[m4_pushdef([_type_spec],
+		[m4_expand([m4_case(_GET_VALUE_TYPE([$1]),
+			[generic], [],
+			[string], [],
+			[_GET_VALUE_DESC([$1])])])])],
+	[m4_pushdef([_options], [m4_do(
+		[m4_ifnblank([$2], [[-$2, ]])],
+		[[--$1]],
+		[m4_case([$3], [bool], [[, --no-$1]])],
+	)])],
+	[m4_pushdef([_help_msg], [_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([$5])])],
+	[m4_case([$3],
+		[action],
+		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg"],
+		[incr],
+		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg"],
+		[bool],
+		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[ ($4 by default)]"],
+		[repeated], [m4_ifblank([$4],
+			[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[ (empty by default)]"],
+			[_INDENT_()[printf '\t%s'] "_options: _help_msg[ default array: @{:@]"
+_INDENT_()[printf " '%s'" $4]
+_INDENT_()[printf ' @:}@\n']])],
+		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[]m4_ifblank(_default, [[ (no default)]], [ ([default: ]'_default')])"])],
+	[m4_popdef([_help_msg])],
+	[m4_popdef([_options])],
+	[m4_popdef([_type_spec])],
+)])
+
+
 m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
-	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME,_ARGS_HELP],
-	[_argname,_arg_short,_arg_type,_default,_arg_varname,_arg_help],
-	[m4_ifnblank(_arg_help, [m4_do(
-		[_INDENT_()printf '\t%s\n' "],
-		[dnl Display a short one if it is not blank
-],
-		[m4_ifnblank(_arg_short, -_arg_short[,])],
-		[dnl Long one is never blank
-],
-		[--_argname],
-		[dnl Bool have a long beginning with --no-
-],
-		[m4_case(_arg_type, [bool], [,--no-]_argname)],
-		[: _SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_arg_help)],
-		[dnl Actions don't have defaults
-],
-		[dnl We save the default to a temp var whichwe expand later.
-],
-		[m4_pushdef([_default_val],
-			[m4_expand([m4_case(_arg_type,
-				[action], [],
-				[incr], [],
-				[bool], [_default[ by default]],
-				[repeated], [m4_if(_default, [()], [[empty by default]], [[default array: ]m4_bpatsubst(_default, ", \\") ])],
-				[m4_ifblank(_default, [[no default]], [[default: ]'_default'])])])])],
-		[m4_pushdef([_type_spec],
-			[m4_expand([m4_case(_GET_VALUE_TYPE(_argname),
-				[generic], [],
-				[string], [],
-				[_GET_VALUE_DESC(_argname)])])])],
-		[m4_ifnblank(m4_quote(_default_val _type_spec), [m4_do(
-			[[ @{:@]],
-			[m4_ifnblank(m4_quote(_type_spec), m4_expand([_type_spec])m4_ifnblank(m4_quote(_default_val), [; ]))],
-			[m4_expand([_default_val])],
-			[[@:}@]],
-		)])],
-		[m4_popdef([_type_spec])],
-		[m4_popdef([_default_val])],
-		["
-],
-		[dnl Single: We are already quoted
-],
-)])])])
+	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
+	[_argname,_arg_short,_arg_type,_default,_arg_help],
+	[m4_ifnblank(_arg_help, [_MAKE_PRINTF_OPTARG_HELP_STATEMENTS(_argname, _arg_short, _arg_type, _default, _arg_help)]
+)])])
 
 
 m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
@@ -927,7 +925,7 @@ m4_define([_MAKE_DEFAULTS], [m4_do(
 				[action], [],
 				[incr], [_arg_varname=m4_expand(_default)
 ],
-				[repeated], [_arg_varname=_default
+				[repeated], [_arg_varname=(_default)
 ],
 				[_arg_varname=_sh_quote(_default)
 ])],

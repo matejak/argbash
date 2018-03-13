@@ -63,11 +63,11 @@ ADD_TEST([test-onlyopt], [[
 	$< -h | grep -q -e '-B|--(no-)boo_l'
 	! $< -h | grep -q -e '-B,'
 	$< -h | grep -q -e '-i|--incrx'
-	$< -h | grep -q -e '-i,--incrx'
+	$< -h | grep -q -e '-i, --incrx'
 	$< -h | grep -q -e '-o|--opt-arg <arg>'
-	$< -h | grep -q -e '-o,--opt-arg: @opt-arg@'
+	$< -h | grep -q -e '-o, --opt-arg: @opt-arg@'
 	$< -h | grep -q -e '-r|--opt-repeated'
-	$< -h | grep -q -e '-r,--opt-repeated:'
+	$< -h | grep -q -e '-r, --opt-repeated:'
 ]])
 
 ADD_SCRIPT([test-standalone2])
