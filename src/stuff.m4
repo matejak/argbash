@@ -25,6 +25,7 @@ dnl WIP vvvvvvvvvvvvvvv
 dnl
 dnl TODO: Fix docopt and completion for cases when there is only the '=' separator.
 dnl TODO: Enable (at least) docopt generation even if we don't know the basename.
+dnl TODO: Make the m4_lists_foreach_optional etc. accept second batch of lists.
 dnl
 dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
 dnl
@@ -237,9 +238,9 @@ m4_define([_MAKE_PRINTF_OPTARG_HELP_STATEMENTS], [m4_do(
 		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[ ($4 by default)]"],
 		[repeated], [m4_ifblank([$4],
 			[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[ (empty by default)]"],
-			[_INDENT_()[printf '\t%s'] "_options: _help_msg[ default array: @{:@]"
+			[_INDENT_()[printf '\t%s'] "_options: _help_msg[ @{:@default array elements:]"
 _INDENT_()[printf " '%s'" $4]
-_INDENT_()[printf ' @:}@\n']])],
+_INDENT_()[printf '@:}@\n']])],
 		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg[]m4_ifblank(_default, [[ (no default)]], [ ([default: ]'_default')])"])],
 	[m4_popdef([_help_msg])],
 	[m4_popdef([_options])],
