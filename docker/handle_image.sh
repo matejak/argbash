@@ -4,7 +4,7 @@ set -e
 
 version="$(cat ../src/version)"
 
-another_tag="matejak/argbash:$version"
+another_tag="matejak/argbash:$version-${pkgrel:-1}"
 another_tag_option=(-t "$another_tag")
 dest="$version.tar.gz"
 

@@ -43,6 +43,9 @@ A container is created from the `matejak/argbash` image.
 * The `-e PROGRAM=argbash` option is redundant and it basically affirms the container to invoke `argbash`. If you specify `PROGRAM=argbash-init`, `argbash-init` will be invoked instead, default program is `argbash`.
 * The `-v ...:/work` mounts the current directory to the working directory of the container, which is `/work`.
 * The `"$@"` or `%*` propagates any arguments given to this one-liner script to the `argbash` invocation in the container.
+  Make sure that you use the `-o|--output` option - if you intend to use the Argbash output from stdout, the line endings will be of the DOS kind (i.e. `\r\n` instead of just `\n` - thanks to [Filip Filmar](https://github.com/filmil) who found this out).
+
+Note that as the container mounts the host directory, you may have issues with SELinux or similar measures enforcing proactive security.
 
 
 Example
