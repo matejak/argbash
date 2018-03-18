@@ -277,6 +277,8 @@ dnl $3: help
 dnl $4: default (=off)
 argbash_api([ARG_OPTIONAL_BOOLEAN], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 	[[$0($@)]],
+	[m4_ifnblank([$4], [m4_case([$4], [on], , [off], ,
+		[m4_fatal([Problem with argument '$1': Only 'on' or 'off' are allowed as boolean defaults, you have specified '$4'.])])])],
 	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3],
 		m4_default_quoted([$4], [off]), [bool])],
 )])

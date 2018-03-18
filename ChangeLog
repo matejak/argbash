@@ -8,6 +8,7 @@ New features:
 Bugfixes:
 
 * Fixed comment of the evaluate_strictness function in commented mode.
+* `ARG_OPTIONAL_BOOL` won't let you specify other default values than `on` or `off`.
 
 
 2.6.1 (2018-03-04)

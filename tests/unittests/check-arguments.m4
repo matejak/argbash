@@ -7,7 +7,7 @@ dnl - defaults are quoted.
 ARG_OPTIONAL_SINGLE([foo], [f], [Help,BOMB], [Default])
 ARG_OPTIONAL_SINGLE([BOMB], [B], [BOMB], [BOMB])
 ARG_POSITIONAL_SINGLE([defaultless], [xhelp])
-ARG_OPTIONAL_BOOLEAN([b-BOMB], [X], [BOMB], [BOMB])
+ARG_OPTIONAL_BOOLEAN([b-BOMB], [X], [BOMB], [on])
 ARG_POSITIONAL_SINGLE([p-BOMB], [BOMB], [BOMB])
 
 assert_equals_list_element([_ARGS_LONG], 1, [foo])
