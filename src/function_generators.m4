@@ -66,24 +66,24 @@ m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [m4_do(
 m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
 	[_INDENT_(1)_required_args_string="m4_list_join([_POSITIONALS_REQUIRED], [, ], , , [ and ])"
 ],
-	[_INDENT_(1)[test ${#_positionals[@]} -ge ]],
+	[_INDENT_(1)[test ${_positionals_count} -ge ]],
 	[_MINIMAL_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 	[ (namely: $_required_args_string)],
-	[[, but got only ${#_positionals[@]}." 1
+	[[, but got only ${_positionals_count}." 1
 ]],
 )])
 
 
 m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_do(
-	[_INDENT_(1)[test ${#_positionals[@]} -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
+	[_INDENT_(1)[test ${_positionals_count} -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
 	[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
 ],
-	[[, but got ${#_positionals[@]} (the last one was: '${_positionals[*]: -1}')." 1
+	[[, but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
 ]],
 )])
 
@@ -155,6 +155,7 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [m4_do(
 {
 ],
 	[_JOIN_INDENTED(1,
+		_IF_HAVE_POSITIONAL_ARGS([[_positionals_count=0],]),
 		[while test $[]# -gt 0],
 		[do],
 	)],

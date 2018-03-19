@@ -708,6 +708,9 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
 		_INDENT_MORE(
 			[shift],
 			[_positionals+=("@S|@@")],
+			[_positionals_count=$((_positionals_count + @S|@#))],
+			[shift $((@S|@# - 1))],
+			[_last_positional="@S|@1"],
 			[break]),
 		[fi])],
 )])
@@ -737,17 +740,22 @@ m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
 	[*@:}@
 ],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-		[_IF_HAVE_POSITIONAL_ARGS(
-			[_positionals+=("$[]1")],
-			[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1])],
+		_IF_HAVE_POSITIONAL_ARGS(
+			[_STORE_CURRENT_ARG_AS_POSITIONAL_BODY],
+			[[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1]]),
 		[;;],
 	)],
 )])
 
 
-m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL],
-	[_INDENT_(2)[_positionals+=("$][1")]
-])
+m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL_BODY], 
+	[[_last_positional="@S|@1"],
+	[_positionals+=("$_last_positional")],
+	[_positionals_count=$((_positionals_count + 1))]])
+
+
+m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL], [_JOIN_INDENTED(2,
+	_STORE_CURRENT_ARG_AS_POSITIONAL_BODY)])
 
 
 m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
