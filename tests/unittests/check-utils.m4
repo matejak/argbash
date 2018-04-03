@@ -1,5 +1,6 @@
 m4_include([list.m4])
 m4_include([utilities.m4])
+m4_include([function_generators.m4])
 m4_include([test-support.m4])
 
 m4_list_append([FOO], [one])
@@ -29,13 +30,13 @@ assert_equals(_lists_same_len([FOO,BAR,BAZ,FUU], [m4_fatal([Lists don't have the
 assert_equals(_lists_same_len([FUU,BAR,BAZ,FOO], [m4_fatal([Lists don't have the same length])], OK), OK)
 assert_equals(_lists_same_len([FUU,BAZ,BAR,FOO], [m4_fatal([Lists don't have the same length])], OK), OK)
 
-assert_equals(m4_lists_foreach([FOO,BAR],[fu,ba],[fu: ba@ ]), 
+assert_equals(m4_lists_foreach([FOO,BAR],[fu,ba],[fu: ba@ ]),
 	[one: 1@ two: 2@ ])
 
-assert_equals(m4_lists_foreach([FOO],[fu],[fu:]), 
+assert_equals(m4_lists_foreach([FOO],[fu],[fu:]),
 	[one:two:])
 
-assert_equals(m4_lists_foreach([FOO,BAR,BAZ],[fu,ba,za],[fu: ba-za@]), 
+assert_equals(m4_lists_foreach([FOO,BAR,BAZ],[fu,ba,za],[fu: ba-za@]),
 	[one: 1-foo@two: 2-bar@])
 
 assert_equals(_sh_quote(), [])
@@ -65,3 +66,31 @@ assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2]), 
 _SET_OPTION_VALUE_DELIMITER([=])
 assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2]), [-b BOMB2|--BOMB=BOMB2])
 assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2], [, ]), [-b BOMB2, --BOMB=BOMB2])
+
+_SET_INDENT([  ])
+m4_define([COMMENT_OUTPUT])
+assert_equals(MAKE_BASH_FUNCTION([# one], [something],
+	[[BOMB=$x],
+	[echo "$BOMB"]], [x=1], [BOMB]),
+
+[# one
+something()
+{
+  local x=1 BOMB
+  BOMB=$x
+  echo "$BOMB"
+}])
+
+assert_equals(MAKE_POSIX_FUNCTION([[# BOMB], [# o,ne]], [something],
+	[[BOMB=$x],
+	[echo "$BOMB"]], [x=1], [BOMB], [z=BOMB]),
+
+[# BOMB
+# o,ne
+something()
+{
+  x=1
+  z=BOMB
+  BOMB=$x
+  echo "$BOMB"
+}])

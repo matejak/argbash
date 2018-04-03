@@ -165,11 +165,6 @@ m4_define([_INDENT_MORE], [m4_do(
 )])
 
 
-dnl Take precaution that if the indentation depth is 0, nothing happens
-m4_define([_SET_INDENT], [m4_define([_INDENT_],
-	[m4_for(_, 1, m4_default($][1, 1), 1,
-		[[$1]])])])
-
 m4_define([_SET_INDENT], [__SET_INDENT([$1], $[]1)])
 
 
