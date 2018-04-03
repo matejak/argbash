@@ -1,23 +1,50 @@
-m4_define([_MAKE_DIE_FUNCTION], [m4_do(
-	[_COMM_BLOCK(0,
-		[# When called, the process ends.],
+
+m4_define([_FORMAT_LOCALS_BASH], [[local ]m4_join([ ], m4_dquote_elt($@))])
+m4_define([_FORMAT_LOCALS_POSIX], [m4_do(
+	[m4_list_destroy([_posix_locals])],
+	[m4_foreach([el], [$@], [m4_if(m4_bregexp(m4_quote(el), =), -1, , [m4_list_append([_posix_locals], m4_quote(el))])])],
+	[m4_dquote_elt(m4_list_contents([_posix_locals]))],
+	[m4_list_destroy([_posix_locals])],
+)])
+
+
+dnl
+dnl $1: Local variables formatting function
+dnl $2: Comment lines list (optional)
+dnl $3: Function name.
+dnl $4: Function body - list of lists
+dnl $5, $6, ...: Local variable initializations
+m4_define([MAKE_FUNCTION], [m4_do(
+	m4_ifnblank([$2], [_COMM_BLOCK(0, m4_dquote_elt($2))]),
+	[[$3()
+{
+]],
+	_JOIN_INDENTED(1,
+		$1(m4_shiftn(4, m4_dquote_elt($@))),
+		m4_dquote_elt(m4_dquote_elt($4))),
+	[}],
+)])
+
+
+m4_define([MAKE_BASH_FUNCTION], [MAKE_FUNCTION([_FORMAT_LOCALS_BASH], $@)])
+m4_define([MAKE_POSIX_FUNCTION], [MAKE_FUNCTION([_FORMAT_LOCALS_POSIX], $@)])
+
+
+dnl TODO: Maybe make use of m4_map?
+m4_define([_MAKE_DIE_FUNCTION], [MAKE_BASH_FUNCTION(
+	[[# When called, the process ends.],
 		[# Args:],
 		[# ]_INDENT_()[@S|@1: The exit message (print to stderr)],
 		[# ]_INDENT_()[@S|@2: The exit code (default is 1)],
-		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to $1)],
+		[# if env var _PRINT_HELP is set to 'yes', the usage is print to stderr (prior to @S|@1)],
 		[# Example:],
-		[# ]_INDENT_()[test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4],
-	)],
-	[[die()
-{
-]],
-	[_JOIN_INDENTED(1,
-		[local _ret=$[]2],
-		[test -n "$_ret" || _ret=1],
+		[# ]_INDENT_()[test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4]],
+	[die],
+	[[test -n "$_ret" || _ret=1],
 		[test "$_PRINT_HELP" = yes && print_help >&2],
-		[echo "$[]1" >&2],
-		[exit ${_ret}])],
-	[}],
+		[echo "@S|@1" >&2],
+		[exit ${_ret}]],
+	[_ret=@S|@2],
 )])
 
 
