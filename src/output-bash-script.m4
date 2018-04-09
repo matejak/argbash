@@ -28,15 +28,11 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ]],
 	[_SETTLE_ENV],
 	[_IF_SOME_ARGS_ARE_DEFINED([m4_do(
-		[_MAKE_UTILS
-],
-		[_MAKE_DEFAULTS
-],
-		[_MAKE_HELP
-],
+		[_MAKE_UTILS()_ENDL_()],
+		[_MAKE_DEFAULTS()_ENDL_()],
+		[_ENDL_()_MAKE_HELP()_ENDL_(2)],
 		[_MAKE_VALUES_ASSIGNMENTS_BASE(
-			[_IF_DIY_MODE([_ASSIGN_PREPARE], [_ASSIGN_GO])])
-],
+			[_IF_DIY_MODE([_ASSIGN_PREPARE], [_ASSIGN_GO])])_ENDL_()],
 	)])],
 	[_MAKE_OTHER
 ],

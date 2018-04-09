@@ -287,39 +287,30 @@ m4_define([_MAKE_ARGS_STACKING_HELP_MESSAGE], [m4_do(
 )])
 
 
-m4_define([_MAKE_HELP], [m4_do(
-	[_COMM_BLOCK(0,
-		[# Function that prints general usage of the script.],
-		[# This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)],
-		[# and it makes sense to remind the user how the script is supposed to be called.],
+m4_define([_MAKE_HELP], [MAKE_BASH_FUNCTION(
+	[[Function that prints general usage of the script.],
+		[This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)],
+		[and it makes sense to remind the user how the script is supposed to be called.]],
+	[print_help], [m4_do(
+		[m4_ifnblank(m4_expand([_HELP_MSG]),
+			m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"_ENDL_()))],
+		[_INDENT_()[]printf 'Usage: %s],
+		[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
+],
+		[_MAKE_HELP_SYNOPSIS],
+		[\n' "@S|@0"_ENDL_()],
+		[_IF_HAVE_POSITIONAL_ARGS([_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
+		[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
+],
+		[dnl Plus, don't display extended help for an arg if it doesn't have a description
+],
+		[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, , [_MAKE_HELP_FUNCTION_OPTIONAL_PART])],
+		[dnl Print a more verbose help message to the end of the help (if requested)
+],
+		[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART()_ENDL_()])],
+		[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
+		[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf '\n%s\n' "]_HELP_MSG_EX"_ENDL_()))],
 	)],
-	[print_help ()
-{
-],
-	[m4_ifnblank(m4_expand([_HELP_MSG]),
-		m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"
-))],
-	[_INDENT_()[]printf 'Usage: %s],
-	[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
-],
-	[_MAKE_HELP_SYNOPSIS],
-	[\n' "@S|@0"
-],
-	[_IF_HAVE_POSITIONAL_ARGS([_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
-	[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
-],
-	[dnl Plus, don't display extended help for an arg if it doesn't have a description
-],
-	[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, , [_MAKE_HELP_FUNCTION_OPTIONAL_PART])],
-	[dnl Print a more verbose help message to the end of the help (if requested)
-],
-	[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART
-])],
-	[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
-	[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf '\n%s\n' "]_HELP_MSG_EX"
-))],
-	[}
-],
 )])
 
 
@@ -808,15 +799,10 @@ dnl Generates functions and outputs either hints or function calls
 dnl
 dnl $1: Callback --- how to deal with actual function calls
 m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE], [m4_do(
-	[_MAKE_ARGV_PARSING_FUNCTION
-],
+	[_ENDL_()_MAKE_ARGV_PARSING_FUNCTION()_ENDL_(2)],
 	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
-		[
-],
-		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION
-])],
-		[_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION
-],
+		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
+		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
 	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args])],
 )])
@@ -947,15 +933,9 @@ dnl
 dnl Make some utility stuff.
 dnl Those include the die function as well as optional validators
 m4_define([_MAKE_UTILS], [m4_do(
-	[_MAKE_DIE_FUNCTION
-
-],
-	[_IF_RESTRICT_VALUES([_MAKE_RESTRICT_VALUES_FUNCTION]
-
-)],
-	[_IF_HAVE_OPTIONAL_ARGS([_IF_OPT_GROUPING_GETOPT([_MAKE_NEXT_OPTARG_FUNCTION]
-
-)])],
+	[_ENDL_()_MAKE_DIE_FUNCTION()_ENDL_(2)],
+	[_IF_RESTRICT_VALUES([_ENDL_()_MAKE_RESTRICT_VALUES_FUNCTION()_ENDL_(2)])],
+	[_IF_HAVE_OPTIONAL_ARGS([_IF_OPT_GROUPING_GETOPT([_ENDL_()_MAKE_NEXT_OPTARG_FUNCTION()_ENDL_()])])],
 	[_PUT_VALIDATORS],
 )])
 

@@ -69,9 +69,9 @@ assert_equals(_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([BOMB], [b], [BOMB2], [
 
 _SET_INDENT([  ])
 m4_define([COMMENT_OUTPUT])
-assert_equals(MAKE_BASH_FUNCTION([# one], [something],
-	[[BOMB=$x],
-	[echo "$BOMB"]], [x=1], [BOMB]),
+assert_equals(MAKE_BASH_FUNCTION([one], [something],
+	[_JOIN_INDENTED(1, [[BOMB=$x]], [[echo "$BOMB"]])],
+	[x=1], [BOMB]),
 
 [# one
 something()
@@ -81,9 +81,16 @@ something()
   echo "$BOMB"
 }])
 
-assert_equals(MAKE_POSIX_FUNCTION([[# BOMB], [# o,ne]], [something],
-	[[BOMB=$x],
-	[echo "$BOMB"]], [x=1], [BOMB], [z=BOMB]),
+assert_equals(MAKE_BASH_FUNCTION(, [something],
+	[m4_n([_INDENT_()[BOMB]])],),
+[something()
+{
+  BOMB
+}])
+
+assert_equals(MAKE_POSIX_FUNCTION([[BOMB], [o,ne]], [something],
+	[_JOIN_INDENTED(1, [[BOMB=$x]], [[echo "$BOMB"]])],
+	[BOMB], [x=1], [z=BOMB]),
 
 [# BOMB
 # o,ne
