@@ -1,6 +1,10 @@
 m4_include([list.m4])
 
 
+m4_define([_ENDL_],
+	[m4_for(_, 1, m4_default([$1], 1), 1, [
+])])
+
 m4_define([_IF_DIY_MODE],
 	[m4_if(_DIY_MODE, 1, [$1], [$2])])
 
@@ -99,7 +103,15 @@ m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION],
 	[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))],
 )])])
 
-m4_define([_COMM_BLOCK], _CHECK_INTEGER_TYPE(1, [depth of indentation])[m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$1], m4_shift(m4_dquote_elt($@)))])])
+
+m4_define([_COMMENT_PREFIX_NOTHING], [[$1],])
+m4_define([_COMMENT_PREFIX_HASH], [[# $1],])
+
+
+m4_define([_COMM_BLOCK], [__COMM_BLOCK([_COMMENT_PREFIX_NOTHING], $@)])
+m4_define([_COMM_BLOCK_HASH], [__COMM_BLOCK([_COMMENT_PREFIX_HASH], $@)])
+
+m4_define([__COMM_BLOCK], _CHECK_INTEGER_TYPE(2, [depth of indentation])[m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$2], m4_map_args([$1], m4_shiftn(2, m4_dquote_elt($@))))])])
 m4_define([_COMMENT_CHAIN], [m4_ifdef([COMMENT_OUTPUT], [$@])])
 m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])
 

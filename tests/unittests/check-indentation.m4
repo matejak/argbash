@@ -66,3 +66,9 @@ assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [BOMB,two])
 
 assert_equals(_ASSIGN_VALUE_TO_VAR(x, ["some, thing BOMB"], [somewhere]), [somewhere="some, thing BOMB"])
 assert_equals(_APPEND_VALUE_TO_ARRAY(x, ["some, thing BOMB"], [somewhere]), [somewhere+=("some, thing BOMB")])
+
+assert_equals(@[]_ENDL_()@, [@
+@])
+assert_equals(@[]_ENDL_(2)@, [@
+
+@])

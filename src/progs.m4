@@ -5,19 +5,14 @@ dnl Function:
 dnl $1: Name of the env var
 dnl $2: The program name
 dnl $3: The error message
-m4_define([_CHECK_PROG_FACTORY_INDIR], [m4_do(
-	[check_prog
-],
-	[{
-],
+m4_define([_CHECK_PROG_FACTORY_INDIR], [MAKE_BASH_FUNCTION(
+	[check_prog],
 	[_JOIN_INDENTED(1,
-		[local _msg="@S|@3"],
 		[test -n "$_msg" || _msg="Unable to find a reachable executable '@S|@2'"],
 		[eval "test -n \"@S|@@S|@1\" || @S|@1=\"@S|@2\""],
 		[eval "test -x \"$(which \"@S|@2\")\" && @S|@1=\"$(which \"@S|@2\")\" || die \"$_msg\" 1"],
 	)],
-	[}
-],
+	[local _msg="@S|@3"],
 )])
 
 
@@ -28,18 +23,12 @@ dnl $2: The prog name
 dnl $3: The msg
 dnl Function:
 dnl no args
-m4_define([_CHECK_PROG_FACTORY_SINGLE], [m4_do(
-	[check_prog
-],
-	[{
-],
+m4_define([_CHECK_PROG_FACTORY_SINGLE], [MAKE_BASH_FUNCTION(
+	[check_prog],
 	[_JOIN_INDENTED(1,
 		[test -n "@S|@$1" || $1="$2"],
 		[test -x "$(which "@S|@$1")" && $1="$(which "@S|@$1")" || die "m4_default([$3], [Unable to find a reachable executable '$2'])" 1],
-	)],
-	[}
-],
-)])
+	)])])
 
 
 dnl
@@ -73,8 +62,9 @@ argbash_api([ARG_USE_PROG], [m4_ifndef([WRAPPED_FILE_STEM], [m4_do(
 
 dnl
 dnl $1: A prologue message
-m4_define([_HELP_PROGS], [m4_list_ifempty([PROG_VARS], ,
-	[$1
-m4_for([idx], 1, m4_list_len([PROG_VARS]), 1, [m4_do(
+m4_define([_HELP_PROGS], [m4_list_ifempty([PROG_VARS], , [m4_do(
+	[m4_n([$1])],
+	[m4_for([idx], 1, m4_list_len([PROG_VARS]), 1, [m4_do(
 		[],
-)])])])
+	)])],
+)])])

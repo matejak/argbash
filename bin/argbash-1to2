@@ -15,6 +15,7 @@ version=2.6.1
 # Argbash is a bash code generator used to get arguments parsing right.
 # Argbash is FREE SOFTWARE, see https://argbash.io for more info
 
+
 die()
 {
 	local _ret=$2
@@ -24,15 +25,13 @@ die()
 	exit ${_ret}
 }
 
+
 begins_with_short_option()
 {
-	local first_option all_short_options
-	all_short_options='ovh'
+	local first_option all_short_options='ovh'
 	first_option="${1:0:1}"
 	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
 }
-
-
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _positionals=()
@@ -40,7 +39,8 @@ _arg_input=('' )
 # THE DEFAULTS INITIALIZATION - OPTIONALS
 _arg_output=""
 
-print_help ()
+
+print_help()
 {
 	printf '%s\n' "Convert a template for argbash>=1,<2 to argbash>=2,<3"
 	printf 'Usage: %s [-o|--output <arg>] [-v|--version] [-h|--help] <input-1> [<input-2>] ... [<input-n>] ...\n' "$0"
@@ -50,7 +50,8 @@ print_help ()
 	printf '\t%s\n' "-h, --help: Prints help"
 }
 
-parse_commandline ()
+
+parse_commandline()
 {
 	_positionals_count=0
 	while test $# -gt 0
@@ -95,13 +96,14 @@ parse_commandline ()
 }
 
 
-handle_passed_args_count ()
+handle_passed_args_count()
 {
-	_required_args_string="'input'"
+	local _required_args_string="'input'"
 	test ${_positionals_count} -ge 1 || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: $_required_args_string), but got only ${_positionals_count}." 1
 }
 
-assign_positional_args ()
+
+assign_positional_args()
 {
 	_positional_names=('_arg_input' )
 	_our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
