@@ -287,7 +287,7 @@ m4_define([_MAKE_ARGS_STACKING_HELP_MESSAGE], [m4_do(
 )])
 
 
-m4_define([_MAKE_HELP], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 	[[Function that prints general usage of the script.],
 		[This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)],
 		[and it makes sense to remind the user how the script is supposed to be called.]],

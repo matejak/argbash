@@ -46,6 +46,7 @@ dnl $3: Concerned arguments (as a list)
 dnl $4: The set of possible values (as a list)
 dnl $5: The index variable suffix
 dnl TODO: Integrate with help (and not only with the help synopsis)
+dnl TODO: We expand the _MK_VALIDATE_GROUP_FUNCTION one time too much
 argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 	[[$0($@)]],
 	[m4_foreach([_val], [$4], [m4_do(

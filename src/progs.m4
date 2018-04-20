@@ -5,7 +5,7 @@ dnl Function:
 dnl $1: Name of the env var
 dnl $2: The program name
 dnl $3: The error message
-m4_define([_CHECK_PROG_FACTORY_INDIR], [MAKE_BASH_FUNCTION(
+m4_define([_CHECK_PROG_FACTORY_INDIR], [MAKE_FUNCTION(
 	[check_prog],
 	[_JOIN_INDENTED(1,
 		[test -n "$_msg" || _msg="Unable to find a reachable executable '@S|@2'"],
@@ -23,7 +23,7 @@ dnl $2: The prog name
 dnl $3: The msg
 dnl Function:
 dnl no args
-m4_define([_CHECK_PROG_FACTORY_SINGLE], [MAKE_BASH_FUNCTION(
+m4_define([_CHECK_PROG_FACTORY_SINGLE], [MAKE_FUNCTION(
 	[check_prog],
 	[_JOIN_INDENTED(1,
 		[test -n "@S|@$1" || $1="$2"],

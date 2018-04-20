@@ -1,4 +1,3 @@
-
 m4_define([_FORMAT_LOCALS_BASH], [m4_ifnblank($1, [[local ]m4_join([ ], m4_dquote_elt($@))])])
 m4_define([_FORMAT_LOCALS_POSIX], [m4_do(
 	[m4_list_destroy([_posix_locals])],
@@ -14,7 +13,7 @@ dnl $2: Comment lines list (optional)
 dnl $3: Function name.
 dnl $4: Function body - will be expanded
 dnl $5, $6, ...: Local variable initializations
-m4_define([MAKE_FUNCTION], [m4_do(
+m4_define([MAKE_SHELL_FUNCTION], [m4_do(
 	m4_ifnblank([$2], [_COMM_BLOCK_HASH(0, m4_dquote_elt($2))]),
 	[m4_n([$3()])],
 	[m4_n({)],
@@ -24,12 +23,11 @@ m4_define([MAKE_FUNCTION], [m4_do(
 )])
 
 
-m4_define([MAKE_BASH_FUNCTION],  [MAKE_FUNCTION([_FORMAT_LOCALS_BASH], $@)])
-m4_define([MAKE_POSIX_FUNCTION], [MAKE_FUNCTION([_FORMAT_LOCALS_POSIX], $@)])
-
+m4_define([MAKE_BASH_FUNCTION],  [MAKE_SHELL_FUNCTION([_FORMAT_LOCALS_BASH], $@)])
+m4_define([MAKE_POSIX_FUNCTION], [MAKE_SHELL_FUNCTION([_FORMAT_LOCALS_POSIX], $@)])
 
 dnl TODO: Maybe make use of m4_map?
-m4_define([_MAKE_DIE_FUNCTION], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_DIE_FUNCTION], [MAKE_FUNCTION(
 	[[# When called, the process ends.],
 		[Args:],
 		_INDENT_()[@S|@1: The exit message (print to stderr)],
@@ -47,7 +45,7 @@ m4_define([_MAKE_DIE_FUNCTION], [MAKE_BASH_FUNCTION(
 )])
 
 
-m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [MAKE_FUNCTION(
 	[[Function that evaluates whether a value passed to it begins by a character],
 		[that is a short option of an argument the script knows about.],
 		[This is required in order to support getopts-like short options grouping.]],
@@ -59,7 +57,7 @@ m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [MAKE_BASH_FUNCTION(
 )])
 
 
-m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_RESTRICT_VALUES_FUNCTION], [MAKE_FUNCTION(
 	[[Function that evaluates whether a value passed to an argument],
 		[does not violate the global rule imposed by the ARG_RESTRICT_VALUES macro:],
 		_CASE_RESTRICT_VALUES([],
@@ -107,7 +105,7 @@ m4_define([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION], [m4_do(
 		[[at least ]_MINIMAL_POSITIONAL_VALUES_COUNT], m4_if(_MINIMAL_POSITIONAL_VALUES_COUNT, _HIGHEST_POSITIONAL_VALUES_COUNT,
 		[[exactly _MINIMAL_POSITIONAL_VALUES_COUNT]],
 		[[between _MINIMAL_POSITIONAL_VALUES_COUNT and _HIGHEST_POSITIONAL_VALUES_COUNT]])))],
-	[MAKE_BASH_FUNCTION(
+	[MAKE_FUNCTION(
 		[[Check that we receive expected amount positional arguments.],
 			[Return 0 if everything is OK, 1 if we have too little arguments],
 			[and 2 if we have too much arguments]],
@@ -124,7 +122,7 @@ m4_define([_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION], [m4_do(
 	[m4_popdef([_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT])],
 )])
 
-m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	[[Take arguments that we have received, and save them in variables of given names.],
 		[The 'eval' command is needed as the name of target variable is saved into another variable.]],
 	[assign_positional_args], [m4_do(
@@ -150,7 +148,7 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_BASH_FUNCTION(
 )])])
 
 
-m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_BASH_FUNCTION(
+m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	[[The parsing of the command-line]],
 	[parse_commandline], [m4_do(
 		[_JOIN_INDENTED(1,

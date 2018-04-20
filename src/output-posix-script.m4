@@ -5,6 +5,13 @@ m4_include([progs.m4])
 m4_include([value_validators.m4])
 
 
+dnl TODO: Can't do:
+dnl  - validation of group options
+dnl  - multi-valued arguments
+
+m4_define([MAKE_FUNCTION], [MAKE_POSIX_FUNCTION($@)])
+
+
 m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])
 m4_define([_IF_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [m4_if(_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS,
 	[yes], [$1],
