@@ -4,10 +4,12 @@ dnl
 dnl $1: The argument name
 dnl $2: The help message
 dnl $3: The variable name
+dnl $4: The argument cathegory
 m4_define([_FILL_IN_VALUES_FOR_ANY_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
 	[m4_list_append([_ARGS_LONG], [$1])],
 	[m4_list_append([_ARGS_HELP], [$2])],
 	[m4_list_append([_ARGS_VARNAME], [$3])],
+	[m4_list_append([_ARGS_CATH], [$4])],
 )])
 
 
@@ -15,13 +17,23 @@ dnl
 dnl $1: The argument name
 dnl $2: The help message
 dnl $3: The variable name
+dnl $4: The argument cathegory
+dnl $5: The short option
+dnl $6: The default value
 m4_define([_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
-	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3])],
+	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3], [$4])],
 	[m4_list_append([_ARGS_POS_OR_OPT], [optional])],
 
 	[m4_list_append([_POSITIONALS_MINS], 0)],
 	[m4_list_append([_POSITIONALS_MAXES], 0)],
 	[m4_list_append([_POSITIONALS_DEFAULTS], [])],
+
+	[m4_list_append([_ARGS_SHORT], [$5])],
+	[m4_set_contains([_ARGS_SHORT], [$5],
+		[m4_ifnblank([$5], [m4_fatal([The short option '$5' (in definition of '--$1') is already used.])])],
+		[m4_set_add([_ARGS_SHORT], [$2])])],
+
+	[m4_list_append([_ARGS_DEFAULT], [$6])],
 )])
 
 
@@ -29,12 +41,13 @@ dnl
 dnl $1: The argument name
 dnl $2: The help message
 dnl $3: The variable name
+dnl $4: The argument cathegory
 m4_define([_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT], _CHECK_PASSED_ARGS_COUNT(3)[m4_do(
-	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3])],
+	[_FILL_IN_VALUES_FOR_ANY_ARGUMENT([$1], [$2], [$3], [$4])],
 	[m4_list_append([_ARGS_POS_OR_OPT], [positional])],
 
-	[m4_list_append([_ARGS_SHORT], [])],
 	[m4_list_append([_ARGS_DEFAULT], [])],
+	[m4_list_append([_ARGS_SHORT], [])],
 )])
 
 
@@ -146,13 +159,7 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[m4_pushdef([_arg_varname], [m4_default([$6], [_varname([$1]]))])],
 	[_OPT_WRAPPED(_arg_varname)],
 	[THIS_ARGUMENT_IS_OPTIONAL],
-	[_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT([$1], [$3], _arg_varname)],
-	[m4_list_append([_ARGS_SHORT], [$2])],
-	[m4_set_contains([_ARGS_SHORT], [$2],
-		[m4_ifnblank([$2], [m4_fatal([The short option '$2' (in definition of '--$1') is already used.])])],
-		[m4_set_add([_ARGS_SHORT], [$2])])],
-	[m4_list_append([_ARGS_DEFAULT], [$4])],
-	[m4_list_append([_ARGS_CATH], [$5])],
+	[_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT([$1], [$3], _arg_varname, [$5], [$2], [$4])],
 	[m4_popdef([_arg_varname])],
 	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
 )])
@@ -355,9 +362,8 @@ m4_define([_ARG_POSITIONAL_SINGLE], [m4_do(
 			[m4_list_append([_POSITIONALS_MINS], 0)],
 			[m4_list_append([_POSITIONALS_DEFAULTS], [$3])],
 		)])],
-	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]), [single])],
 	[m4_list_append([_POSITIONALS_MAXES], 1)],
-	[m4_list_append([_ARGS_CATH], [single])],
 )])
 
 
@@ -390,8 +396,7 @@ m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of argum
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
 ],
 	[m4_define([_INF_REPR], [[$4]])],
-	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
-	[m4_list_append([_ARGS_CATH], [inf])],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]), [inf])],
 	[_DECLARE_THAT_RANGE_OF_POSITIONAL_ARGUMENTS_IS_ACCEPTED([$1])],
 	[m4_pushdef([_min_argn], [[$3]])],
 	[m4_define([_INF_ARGN], _min_argn)],
@@ -427,8 +432,7 @@ m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
 	[_POS_WRAPPED(${_varname([$1])[@]})],
 	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + [$3]))],
-	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]))],
-	[m4_list_append([_ARGS_CATH], [more])],
+	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]), [more])],
 	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))
 ],
 	[m4_pushdef([_min_argn], m4_eval([$3] - ($# - 3) ))],
