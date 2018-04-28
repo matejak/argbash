@@ -122,13 +122,18 @@ ADD_RULE([$(TESTDIR)/test-diy-noop.m4], [$(TESTDIR)/basic.m4],
 ]])
 ADD_SCRIPT([test-diy-noop], [m4])
 
+ADD_RULE([$(TESTDIR)/test-diy-noop.sh], [$(TESTDIR)/test-diy-noop.m4],
+	[[$(ARGBASH_BIN) -c -o "$@" "$<"
+]])
+
 dnl This is the body of test-simple
 ADD_TEST([test-diy], [[
 	$(generic_regression)
 ]])
 
-ADD_RULE([$(TESTDIR)/test-diy.m4], [$(TESTDIR)/test-diy-noop.m4],
-	[[sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
+dnl Use comments in test-diy-noop.sh to generate the actual commands to parse args. .
+ADD_RULE([$(TESTDIR)/test-diy.m4], [$(TESTDIR)/test-diy-noop.m4 $(TESTDIR)/test-diy-noop.sh],
+	[[sed -e "s/#.*\@<:@$$/&\n$$(grep -e '#  \S' "$(TESTDIR)/test-diy-noop.sh" | sed -e 's/^#  //' | tr '\n' ';')/" $< > $@
 ]])
 ADD_SCRIPT([test-diy], [m4])
 

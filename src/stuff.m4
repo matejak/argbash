@@ -804,33 +804,37 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE], [m4_do(
 		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
-	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args])],
+	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args "${_positionals[@]}"])],
 )])
 
 
+dnl
+dnl $1: The parse_commandline function call
+dnl $2: The handle_passed_args_count function call
+dnl $3: The assign_positional_args function call
 m4_define([_ASSIGN_GO], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Now call all the functions defined above that are needed to get the job done],
 	)],
-	[$1
-],
+	[m4_n([[$1]])],
 	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
-		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([$2
-])],
-		[$3
-],
+		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([m4_n([[$2]])])],
+		[m4_n([[$3]])],
 	)])],
 )])
 
 
+dnl
+dnl $1: The parse_commandline function call
+dnl $2: The handle_passed_args_count function call
+dnl $3: The assign_positional_args function call
 dnl
 dnl Convention:
 dnl The commented-out calls are supposed to be preceded by regexp '^# '
 m4_define([_ASSIGN_PREPARE], [m4_do(
 	[_COMM_BLOCK(0,
 		[# Call the function that assigns passed optional arguments to variables:],
-		[#  $1],)
-	],
+		[#  $1])],
 	[_IF_HAVE_POSITIONAL_ARGS([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED(
 		[_COMM_BLOCK(0,
 			[# Then, call the function that checks that the amount of passed arguments is correct],
