@@ -128,14 +128,16 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	[assign_positional_args], [m4_do(
 	[m4_n([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS])],
 	[_JOIN_INDENTED(1,
-		[[for (( ii = 0; ii < ${#_positionals[@]}; ii++))]],
+		[[for _positional_name in "${_positional_names[@]}"]],
 		[[do]],
 		_INDENT_MORE(
-			[[eval "${_positional_names[ii]}=\${_positionals[ii]}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
+			[[test @S|@# -gt 0 || break]],
+			[[eval "$_positional_name=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
 			_CASE_RESTRICT_VALUES([], [],
 				[_COMM_BLOCK(0, [# It has been requested that all positional arguments that look like options are rejected]),
-				[[evaluate_strictness "${_positional_names[ii]}" "${_positionals[ii]##_arg}"]],
+				[[evaluate_strictness "$_positional_name" "${1##_arg}"]],
 			]),
+			[[shift]],
 		),
 		[[done]],
 	)],
@@ -145,7 +147,8 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 		[
 ],
 	)])],
-)])])
+)],
+	[_positional_name])])
 
 
 m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(

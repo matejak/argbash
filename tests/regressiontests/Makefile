@@ -285,11 +285,14 @@ test-diy-noop: $(TESTDIR)/test-diy-noop.sh
 $(TESTDIR)/test-diy-noop.m4: $(TESTDIR)/basic.m4
 	sed -e 's/ARGBASH_GO/ARGBASH_PREPARE/' $< > $@
 
+$(TESTDIR)/test-diy-noop.sh: $(TESTDIR)/test-diy-noop.m4
+	$(ARGBASH_BIN) -c -o "$@" "$<"
+
 test-diy: $(TESTDIR)/test-diy.sh
 	$(generic_regression)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-diy.sh"
-$(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4
-	sed -e 's/ARGBASH_PREPARE.*/&\nparse_commandline "$$@"\nhandle_passed_args_count\nassign_positional_args/' $< > $@
+$(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4 $(TESTDIR)/test-diy-noop.sh
+	sed -e "s/#.*\[$$/&\n$$(grep -e '#  \S' "$(TESTDIR)/test-diy-noop.sh" | sed -e 's/^#  //' | tr '\n' ';')/" $< > $@
 
 test-wrapping-second_level: $(TESTDIR)/test-wrapping-second_level.sh
 	$< -h | grep -q opt-arg
