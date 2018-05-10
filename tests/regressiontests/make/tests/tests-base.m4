@@ -4,10 +4,12 @@ ADD_TEST([stability], [[
 ]], [$(TESTDIR)/basic2.sh], [$(TESTDIR)/basic.sh])
 
 ADD_TEST([basic], [[
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 ]])
+
 
 ADD_TEST([test-void], [[
 	! grep -q 'die' $<
@@ -16,7 +18,8 @@ ADD_TEST([test-void], [[
 ADD_SCRIPT([test-salone])
 #  the dependency $(TESTDIR)/test-standalone.sh should be assumed
 ADD_TEST([call-salone], [[
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 ]])
 
 ADD_TEST([test-most], [[
@@ -128,7 +131,8 @@ ADD_RULE([$(TESTDIR)/test-diy-noop.sh], [$(TESTDIR)/test-diy-noop.m4],
 
 dnl This is the body of test-simple
 ADD_TEST([test-diy], [[
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 ]])
 
 dnl Use comments in test-diy-noop.sh to generate the actual commands to parse args. .

@@ -25,7 +25,7 @@ ADD_TEST([test-group], [[
 	ERROR="allowed" $(REVERSE) $< fuuuu
 	ERROR="allowed" $(REVERSE) $< bar
 	@# Assure that there is not the string '_idx' in the script since we don't want indices support in this test
-	! grep -q _idx $< 
+	! grep -q _idx $<
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
 ]])
 

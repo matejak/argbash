@@ -30,11 +30,11 @@ If you want to use Argbash locally, you have to download the software package an
 
      This way of installation won't install the ``argbash-xtoy`` :ref:`migration scripts <argbash_components>`.
 
-#. Optional: 
+#. Optional:
 
    * Supply ``INSTALL_COMPLETION=yes`` as an installation argument to install bash completion for ``argbash`` to ``$(SYSCONFDIR)/bash_completion.d``.
      The default ``SYSCONFDIR`` is ``/etc``, but you may override it in the same way as you can override the ``PREFIX`` variable.
-   
+
    * Run some checks by executing: ``make check`` (still in the ``resources`` folder).
      You should get a message ``All is OK`` at the bottom.
 

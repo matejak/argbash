@@ -106,7 +106,7 @@ m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 	[m4_lists_foreach_positional([_ARGS_LONG], [_arg], [m4_set_contains([TYPED_ARGS], _arg, [m4_do(
 
 		[m4_pushdef([_arg_varname], [_varname(_arg)])],
-		
+
 		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname") || exit 1
 ],
 		[m4_popdef([_arg_varname])],
