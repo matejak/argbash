@@ -128,7 +128,8 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	[assign_positional_args], [m4_do(
 	[m4_n([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS])],
 	[_JOIN_INDENTED(1,
-		[[for _positional_name in "${_positional_names[@]}"]],
+		[[shift "$_shift_for"]],
+		[[for _positional_name in ]IF_POSITIONALS_INF([["${_positional_names[@]}"]], [[${_positional_names}]])],
 		[[do]],
 		_INDENT_MORE(
 			[[test @S|@# -gt 0 || break]],
@@ -148,9 +149,10 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 ],
 	)])],
 )],
-	[_positional_name])])
+	[_positional_name], [_shift_for=@S|@1])])
 
 
+dnl TODO: Remove code duplication
 m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	[[The parsing of the command-line]],
 	[parse_commandline], [m4_do(
@@ -160,7 +162,25 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 			[do],
 		)],
 		[_IF_HAVE_OPTIONAL_ARGS(
-			[_EVAL_OPTIONALS],
+			[_EVAL_OPTIONALS_AND_POSITIONALS],
+			[_STORE_CURRENT_ARG_AS_POSITIONAL])],
+		[_JOIN_INDENTED(1,
+			[_INDENT_()[shift]],
+			[done])],
+	)],
+)])
+
+
+m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
+	[[The parsing of the command-line]],
+	[parse_commandline], [m4_do(
+		[_JOIN_INDENTED(1,
+			_IF_HAVE_POSITIONAL_ARGS([[_positionals_index=1],]),
+			[while test $[]# -gt 0],
+			[do],
+		)],
+		[_IF_HAVE_OPTIONAL_ARGS(
+			[_EVAL_OPTIONALS_AND_POSITIONALS_POSIX],
 			[_STORE_CURRENT_ARG_AS_POSITIONAL])],
 		[_JOIN_INDENTED(1,
 			[_INDENT_()[shift]],

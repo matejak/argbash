@@ -15,6 +15,10 @@ REVERSE = $(TESTDIR)/reverse
 ARGBASH_EXEC ?= $(ARGBASH_BIN)
 ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
+%-dash.sh: %.m4 $(ARGBASH_BIN)
+	$(word 2,$^) --type posix-script -o $@ $<
+	sed -i 's|#!/bin/bash|#!/usr/bin/env dash|' $@
+
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 TESTS += \
@@ -151,25 +155,28 @@ TESTS_GEN += \
 	gen-test-group-wrong \
 	$(NUL)
 
-define generic_regression
+define generic_regression_posix
 	$< LOO | grep -q 'POS_S=LOO',
 	$< "LOO BAR" | grep -q 'POS_S=LOO BAR,'
 	$< LOO | grep -q BOOL=off,
-	$< LOO --boo_l | grep -q BOOL=on,
-	$< LOO --no-boo_l | grep -q BOOL=off,
+	$< --no-boo_l LOO | grep -q BOOL=off,
 	$< LOO | grep -q 'OPT_S=opt_arg_default lolo',
-	$< LOO --opt_arg PoS | grep -q OPT_S=PoS,
-	$< LOO --opt_arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
-	$< LOO --opt_arg="PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< --opt_arg PoS LOO | grep -q OPT_S=PoS,
+	$< --opt_arg="PoS sob" LOO | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
-	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default lala,'
 	$< LOO | grep -q 'OPT_INCR=2,'
 	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
-	$< LOO --opt-incr -i | grep -q 'OPT_INCR=4,'
 	$< -h | grep -- pos_arg | grep -q pos_arg_help
 	$< -h | grep -- pos-opt | grep -q @pos-opt-arg@
 	$< -h | grep -q ' \[<pos-opt>\]'
 	$(REVERSE) $< LOO --opt_arg 2> /dev/null
+endef
+
+define generic_regression_gnu_only
+	$< LOO --boo_l | grep -q BOOL=on,
+	$< LOO --opt_arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default lala,'
+	$< --opt-incr -i LOO | grep -q 'OPT_INCR=4,'
 endef
 
 define _test_onlypos
@@ -190,7 +197,8 @@ stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 	diff -q $< $(word 2,$^)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 basic: $(TESTDIR)/basic.sh
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
@@ -198,7 +206,8 @@ test-void: $(TESTDIR)/test-void.sh
 	! grep -q 'die' $<
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-void.sh"
 call-salone: $(TESTDIR)/call-salone.sh
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/call-salone.sh"
 test-most: $(TESTDIR)/test-most.sh
 	$< -h | grep -q '<pos-more1-1> <pos-more1-2> \[<pos-more2-1>\] \[<pos-more2-2>\]'
@@ -289,7 +298,8 @@ $(TESTDIR)/test-diy-noop.sh: $(TESTDIR)/test-diy-noop.m4
 	$(ARGBASH_BIN) -c -o "$@" "$<"
 
 test-diy: $(TESTDIR)/test-diy.sh
-	$(generic_regression)
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-diy.sh"
 $(TESTDIR)/test-diy.m4: $(TESTDIR)/test-diy-noop.m4 $(TESTDIR)/test-diy-noop.sh
 	sed -e "s/#.*\[$$/&\n$$(grep -e '#  \S' "$(TESTDIR)/test-diy-noop.sh" | sed -e 's/^#  //' | tr '\n' ';')/" $< > $@

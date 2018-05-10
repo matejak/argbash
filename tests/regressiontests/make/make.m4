@@ -1,5 +1,5 @@
 dnl And stop those annoying diversion warnings
-m4_for([idx], 1, 4, 1, 
+m4_for([idx], 1, 4, 1,
 	[m4_define([_m4_divert(STDOUT]idx[)], idx)])
 
 
@@ -39,16 +39,17 @@ dnl $3: body
 m4_define([ADD_ARGBASH_RULE], [ADD_RULE(
 	[$1.sh], [$1.m4 $2 $(ARGBASH_BIN)], [$3])])
 
-dnl 
+dnl
 dnl $1: The test name
 dnl $2: The test body (see also: TEST_BODY)
 dnl $3: The other deps (literal, feel free to use the | delimiter)
 dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
+dnl $5: The suffix of the test script basename
 dnl
 dnl Remarks:
 dnl No leading/trailing newlines, around the test body as it already has those.
 m4_define([ADD_TEST], [m4_do(
-	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1.sh]))],
+	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1$5.sh]))],
 	[m4_set_add([_TESTS], [$1])],
 	[m4_set_add([_TEST_SCRIPTS], m4_quote(_script))],
 	[m4_divert_text([STDOUT3], [m4_do(
@@ -60,7 +61,23 @@ m4_define([ADD_TEST], [m4_do(
 )])
 
 
-dnl 
+dnl
+dnl $1: The test name
+dnl $2: The test body (see also: TEST_BODY)
+dnl $3: The other deps (literal, feel free to use the | delimiter)
+dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
+m4_define([ADD_TEST_BASH], [ADD_TEST($@)])
+
+
+dnl
+dnl $1: The test name
+dnl $2: The test body (see also: TEST_BODY)
+dnl $3: The other deps (literal, feel free to use the | delimiter)
+dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
+m4_define([ADD_TEST_POSIX], [ADD_TEST([$1], [$2], [$3], [$4], [-dash])])
+
+
+dnl
 dnl $1: The test stem (gen-test-<stem>.m4)
 dnl $2, $3, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
 m4_define([ADD_GENTEST], [m4_do(

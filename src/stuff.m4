@@ -707,27 +707,55 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
 )])
 
 
-m4_define([_EVAL_OPTIONALS], [m4_do(
-	[_INDENT_(2)_key="$[]1"
-],
-	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
-	[_MAKE_CASE_STATEMENT],
+m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX], [m4_do(
+	[_COMM_BLOCK(1,
+		[# If two dashes (i.e. '--') were passed on the command-line,],
+		[# mark the first positional argument the one right after this one.],
+	)],
+	[_JOIN_INDENTED(1,
+		[if test "$_key" = '--'],
+		[then],
+		_INDENT_MORE(
+			[_positionals_index=$((_positionals_index + 1))],
+			[shift $((@S|@# - 1))],
+			[_last_positional="@S|@1"],
+			[break]),
+		[fi])],
 )])
 
 
+m4_define([_EVAL_OPTIONALS_AND_POSITIONALS], [m4_do(
+	[m4_n([_INDENT_(2)_key="$[]1"])],
+	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
+	[_MAKE_CASE_STATEMENT([_HANDLE_POSITIONAL_ARG])],
+)])
+
+
+dnl
+dnl $1: Case when positional argument is encountered
+m4_define([_EVAL_OPTIONALS_AND_POSITIONALS_POSIX], [m4_do(
+	[m4_n([_INDENT_(2)_key="$[]1"])],
+	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
+	[_MAKE_CASE_STATEMENT([_HANDLE_POSITIONAL_ARG_POSIX])],
+	[m4_n([_INDENT_(2)_positionals_index=$((_positionals_index + 1))])],
+)])
+
+
+dnl
+dnl $1: Case when positional argument is encountered
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 	[_INDENT_(2)[case "$_key" in
 ]],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
-	[_HANDLE_POSITIONAL_ARG],
+	[$1],
 	[_INDENT_(2)[esac
 ]],
 )])
 
 
 m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
-	[_INDENT_(3)],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE)],
 	[*@:}@
 ],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
@@ -739,7 +767,25 @@ m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
 )])
 
 
-m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL_BODY], 
+m4_define([_HANDLE_POSITIONAL_ARG_POSIX], [m4_do(
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE)],
+	[*@:}@
+],
+	[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+		[# As the first positional argument has been reached,],
+		[# only positional arguments will follow, as we are in POSIX mode.],
+		[# Jus bail out of the loop, there is nothing to do here.],
+	)],
+	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+		_IF_HAVE_POSITIONAL_ARGS(
+			[[return],],
+			[[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1]]),
+		[;;],
+	)],
+)])
+
+
+m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL_BODY],
 	[[_last_positional="@S|@1"],
 	[_positionals+=("$_last_positional")],
 	[_positionals_count=$((_positionals_count + 1))]])
@@ -754,24 +800,23 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 	[_COMM_BLOCK(_indentation_level,
 		[# We have an array of variables to which we want to save positional args values.],
 		[# This array is able to hold array elements as targets.],
+		[# As variables don't contain spaces, they may be held in space-separated string.],
 	)],
-	[_INDENT_(_indentation_level)[_positional_names=@{:@]],
+	[_INDENT_(_indentation_level)[_positional_names=]IF_POSITIONALS_INF(@{:@, ")],
 	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 		[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL, so we really need the check.
 ],
 		[m4_if(_max_argn, 0, , [m4_do(
 			[m4_for([_arg_index], 1, _max_argn, 1, [m4_do(
-				['],
 				[_varname(_pos_name)],
 				[dnl If we handle a multi-value arg, we assign to an array => we add '[_arg_index - 1]' (i.e. zero-based argument index) to LHS.
 ],
 				[m4_if(_max_argn, 1, , [@<:@m4_eval(_arg_index - 1)@:>@])],
-				[' ],
+				[ ],
 			)])],
 		)])],
 	)])],
-	[@:}@
-],
+	[IF_POSITIONALS_INF(@:}@, ")_ENDL_],
 	[IF_POSITIONALS_INF([m4_do(
 		[_COMM_BLOCK(_indentation_level,
 			[# If we allow up to infinitely many args, we calculate how many of values],
@@ -804,7 +849,21 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE], [m4_do(
 		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
-	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args "${_positionals[@]}"])],
+	[$1([parse_commandline "@S|@@"], [handle_passed_args_count], [assign_positional_args 1 "${_positionals[@]}"])],
+)])
+
+
+dnl
+dnl Generates functions and outputs either hints or function calls
+dnl
+dnl $1: Callback --- how to deal with actual function calls
+m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
+	[_ENDL_()_MAKE_ARGV_PARSING_FUNCTION_POSIX()_ENDL_(2)],
+	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
+		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
+		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
+	)])],
+	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - _positionals_index + 1)); handle_passed_args_count], [assign_positional_args "$_positionals_index" "@S|@@"])],
 )])
 
 
@@ -900,35 +959,38 @@ m4_define([_MAKE_DEFAULTS_POSITIONALS_LOOP], [m4_do(
 )])
 
 
-dnl
-dnl Create the part of the script where default values for arguments are assigned.
-m4_define([_MAKE_DEFAULTS], [m4_do(
-	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
-		[# THE DEFAULTS INITIALIZATION - POSITIONALS
+m4_define([_MAKE_DEFAULTS_POSITIONAL], [m4_do(
+	[[# THE DEFAULTS INITIALIZATION - POSITIONALS]_ENDL_],
+	[_COMM_BLOCK(0,
+		[# The positional args array has to be reset before the parsing, because it may already be defined],
+		[# - for example if this script is sourced by an argbash-powered script.])],
+	[[_positionals=()]_ENDL_],
+	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
+		[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
+)])
+
+
+m4_define([_MAKE_DEFAULTS_POSITIONAL_POSIX], [m4_do(
+	[[# THE DEFAULTS INITIALIZATION - POSITIONALS]_ENDL_],
+	[_COMM_BLOCK(0,
+		[# TBD],
+		[# TBD])],
+	[[_positionals_index=0]_ENDL_],
+	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
+		[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
+)])
+
+
+m4_define([_MAKE_DEFAULTS_OPTIONAL], [m4_do(
+	[[# THE DEFAULTS INITIALIZATION - OPTIONALS]_ENDL_],
+	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
+		[dnl We have to handle 'incr' as a special case, there is a m4_default(..., 0)
 ],
-		[_COMM_BLOCK(0,
-			[# The positional args array has to be reset before the parsing, because it may already be defined],
-			[# - for example if this script is sourced by an argbash-powered script.])],
-		[[_positionals=()
-]],
-		[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
-			[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
-	)])],
-	[_IF_HAVE_OPTIONAL_ARGS([m4_do(
-		[# THE DEFAULTS INITIALIZATION - OPTIONALS
-],
-		[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
-			[dnl We have to handle 'incr' as a special case, there is a m4_default(..., 0)
-],
-			[m4_case(_arg_type,
-				[action], [],
-				[incr], [_arg_varname=m4_expand(_default)
-],
-				[repeated], [_arg_varname=(_default)
-],
-				[_arg_varname=_sh_quote(_default)
-])],
-		)])],
+		[m4_case(_arg_type,
+			[action], [],
+			[incr], [_arg_varname=m4_expand(_default)_ENDL_],
+			[repeated], [_arg_varname=(_default)_ENDL_],
+			[_arg_varname=_sh_quote(_default)_ENDL_])],
 	)])],
 )])
 
@@ -945,16 +1007,13 @@ m4_define([_MAKE_UTILS], [m4_do(
 
 
 m4_define([_MAKE_OTHER], [m4_do(
-	[[# OTHER STUFF GENERATED BY Argbash
-]],
+	[[# OTHER STUFF GENERATED BY Argbash]_ENDL_],
 	[dnl Put the stuff below into some condition block
 ],
 	[dnl _ARGS_GROUPS is a set of arguments lists where all args inherited from a wrapped script are
 ],
-	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup=("${agroup[]_opt_suffix@<:@@@:>@}" "${agroup[]_pos_suffix@<:@@@:>@}")
-])],
-	[m4_list_foreach([_OTHER], [item], [item
-])],
+	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup=("${agroup[]_opt_suffix@<:@@@:>@}" "${agroup[]_pos_suffix@<:@@@:>@}")_ENDL_])],
+	[m4_list_foreach([_OTHER], [item], [item[]_ENDL_])],
 	[_VALIDATE_POSITIONAL_ARGUMENTS],
 	[_MAYBE_ASSIGN_INDICES_TO_TYPED_SINGLE_VALUED_ARGS],
 )])

@@ -310,7 +310,7 @@ You have these possibilities:
 * Built-in types:
 
   ::
-    
+
      ARG_TYPE_GROUP([type code], [type string], [list of arguments of that type])
 
   Type code is a code of one of the types that are supported, type string is used in help.
@@ -325,7 +325,7 @@ You have these possibilities:
   decimal               float without the exponential stuff (e.g. 42.0)
   string                anything [*]_
   ==============        ===============================================
-  
+
   .. [*] The type ``string`` is used as a means to modify the help message, no validation or conversion takes place.
 
   As an example, if you have an argument ``--iterations`` that accepts a value representing how many times to repeat something, you use
@@ -340,7 +340,7 @@ You have these possibilities:
 
      ARG_TYPE_GROUP_SET([type code], [type string], [list of arguments of that type], [list of values of that type], [suffix of the index variable (optional)])
 
-  If the suffix of the index variable is provided, each argument of the type will have a variable ``_arg_<stem>_<suffix>`` that contains the 0-based index of the argument value in the allowed values list. 
+  If the suffix of the index variable is provided, each argument of the type will have a variable ``_arg_<stem>_<suffix>`` that contains the 0-based index of the argument value in the allowed values list.
   You will typically want to use it as described in the next example:
 
   Remarks:
@@ -369,7 +369,7 @@ You have these possibilities:
 
   * The ``type`` string is either ``in`` or ``out``.
     Input files have to exist, output files have to have their parent directory writable.
-    
+
   * ``mode`` string is a ``rwx``-type of string.
 
 
@@ -399,7 +399,7 @@ Plus, there are convenience macros:
   * ``ARGBASH_SET_DELIM([ ])``: Either of ``--option value``, ``--o value`` assigns value to the ``option`` argument.
     ``--option=value`` will be considered as a single positional argument.
 
-  * ``ARGBASH_SET_DELIM([=])``: Either of ``--option=value``, ``--o value`` assigns value to the ``option`` argument. 
+  * ``ARGBASH_SET_DELIM([=])``: Either of ``--option=value``, ``--o value`` assigns value to the ``option`` argument.
     ``--option value`` will result in both ``--option`` and ``value`` to be considered as two positional arguments.
     ``-o=value`` will also be considered as a positional argument.
 
@@ -517,7 +517,7 @@ Plus, there are convenience macros:
 
   For instance, if you declare ``ARG_USE_ENV([ENVIRONMENT], [production], [The default environment])``, the value of the ``ENVIRONMENT`` environmental variable won't be empty --- if the user doesn't do anything, it will be ``production`` and if the user overrides it, it will stay that way.
   It is undefined whether the user can override it so it has a blank value in the script due to the user override (i.e. it is not possible now, but it may become possible in a later release.).
-  
+
 * Declare that your script calls a program and enable the caller to set it using an environmental variable.
 
   ::
@@ -533,7 +533,7 @@ Plus, there are convenience macros:
   * ``args`` are given:
     The program is called with ``args`` and if the return code is non-zero, the script will terminate with an error.
     If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``ARG_USE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
-    
+
     Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the interactive Python interpreter) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
 
   In either case, the value of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
@@ -565,7 +565,7 @@ Plus, there are convenience macros:
   =======================       ====================================================================
 
   You may want to restrict argument values in order to prevent these possible confusions:
- 
+
   * The user forgets to supply value to an optional argument, so the next argument is mistaken for it.
     For example, when we leave ``time`` from ``ls --sort time --long /home/me/*``, we get a syntactically valid command-line ``ls --sort --long /home/me/*``, where ``--long`` is identified as value of the argument ``--sort`` instead an argument on its own.
   * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo, (e.g. ``--srot``), or the script actually doesn't support that argument.
@@ -609,7 +609,7 @@ You can either let the parsing code to be executed (carefree mode), or you can j
   ::
 
      ARGBASH_PREPARE
-  
+
   .. warning::
 
     This feature is under development and not part of the stable API.
