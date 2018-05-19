@@ -37,7 +37,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %-dash.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) --type posix-script -o $@ $<
-	sed -i 's|#!/bin/bash|#!/usr/bin/env dash|' $@
+	sed -i 's|#!/bin/bash|#!/usr/bin/dash|' $@
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@

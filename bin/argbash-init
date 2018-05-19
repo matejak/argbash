@@ -33,13 +33,6 @@ die()
 	exit ${_ret}
 }
 
-
-begins_with_short_option()
-{
-	local first_option all_short_options='smvh'
-	first_option="${1:0:1}"
-	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
-}
 # validators
 
 mode()
@@ -52,6 +45,13 @@ mode()
 	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'default', 'full' and 'minimal'" 4
 }
 
+
+begins_with_short_option()
+{
+	local first_option all_short_options='smvh'
+	first_option="${1:0:1}"
+	test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
+}
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
 _positionals=()

@@ -92,8 +92,6 @@ m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_do(
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
-	[dnl The last element of _positionals (even) for bash < 4.3 according to http://unix.stackexchange.com/a/198790
-],
 	[[, but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
 ]],
 )])
@@ -184,6 +182,29 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
 			[_STORE_CURRENT_ARG_AS_POSITIONAL])],
 		[_JOIN_INDENTED(1,
 			[_INDENT_()[shift]],
+			[done])],
+	)],
+)])
+
+
+m4_define([_GET_GETOPTS_STRING], [m4_do(
+	[m4_lists_foreach_optional([_ARGS_SHORT,_ARGS_CATH], [_arg_short,_arg_type], [m4_case(_arg_type,
+		[arg], [_arg_short:],
+		[_arg_short])])],
+)])
+
+
+m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
+	[[The parsing of the command-line]],
+	[parse_commandline], [m4_do(
+		[_JOIN_INDENTED(1,
+			[while getopts '_GET_GETOPTS_STRING()' _key],
+			[do],
+		)],
+		[_IF_HAVE_OPTIONAL_ARGS(
+			[_EVAL_OPTIONALS_GETOPTS],
+			[m4_fatal([Intermediate positional args are not supported in POSIX mode.])])],
+		[_JOIN_INDENTED(1,
 			[done])],
 	)],
 )])

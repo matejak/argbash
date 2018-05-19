@@ -161,20 +161,37 @@ dnl
 dnl Returns either --long or -l|--long if there is that -l.
 dnl If you supply a value, it will be included after both long and short option like
 dnl --width <int> or -w <int>|--width <int>. The delimiter is respected.
-m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE], [m4_do(
+m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_SYNOPSIS], [m4_do(
 	[m4_ifnblank([$2],
 		[[-$2]m4_ifnblank([$3], [[ $3]])m4_default_quoted([$4], [|])])],
 	[[--$1]m4_ifnblank([$3], [_DELIM_IN_HELP[$3]])],
 )])
 
 
+dnl
+dnl $1: _argname
+dnl $2: short arg
+dnl $3: value string (optional, empty by default)
+dnl $4: short-long separator (optional, | by default)
+dnl
+dnl Returns either --long or -l|--long if there is that -l.
+dnl If you supply a value, it will be included after both long and short option like
+dnl --width <int> or -w <int>|--width <int>. The delimiter is respected.
+m4_define([_FORMAT_OPTIONAL_ARGUMENT_FOR_POSIX_HELP_SYNOPSIS], [m4_do(
+	[m4_ifblank([$2], [m4_fatal([Argument '$1': Blank short option!])],
+		[[-$2]m4_ifnblank([$3], [[ $3]])])],
+)])
+
+
+dnl
+dnl $1: Formatter of opt arg synopsis FORMATTER(_argname,_arg_short,value string,short-long separator)
 m4_define([_SYNOPSIS_OF_OPTIONAL_ARGS], [m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [m4_do(
 	[ @<:@],
 	[m4_case(_arg_type,
-		[bool], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE([(no-)]_argname, _arg_short)],
-		[arg], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-		[repeated], [_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
-		[_FORMAT_OPTIONAL_ARGUMENT_FOR_HELP_MESSAGE(_argname, _arg_short)])],
+		[bool], [$1([(no-)]_argname, _arg_short)],
+		[arg], [$1(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+		[repeated], [$1(_argname, _arg_short)[]_DELIM_IN_HELP[<]_GET_VALUE_STR(_argname)>],
+		[$1(_argname, _arg_short)])],
 	[@:>@],
 )])])
 
@@ -186,8 +203,10 @@ m4_define([_SYNOPSIS_OF_POSITIONAL_ARGS], [m4_do(
 )])
 
 
+dnl
+dnl $1: Formatter of opt arg synopsis, see _SYNOPSIS_OF_OPTIONAL_ARGS
 m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
-	[_IF_HAVE_OPTIONAL_ARGS([_SYNOPSIS_OF_OPTIONAL_ARGS])],
+	[_IF_HAVE_OPTIONAL_ARGS([_SYNOPSIS_OF_OPTIONAL_ARGS([$1])])],
 	[m4_if(HAVE_DOUBLEDASH, 1, [[ [--]]])],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
@@ -217,17 +236,14 @@ dnl $2: short
 dnl $3: type
 dnl $4: default
 dnl $5: help msg
+dnl $6: Option formatter: FORMATTER(argname, short, type)
 m4_define([_MAKE_PRINTF_OPTARG_HELP_STATEMENTS], [m4_do(
 	[m4_pushdef([_type_spec],
 		[m4_expand([m4_case(_GET_VALUE_TYPE([$1]),
 			[generic], [],
 			[string], [],
 			[_GET_VALUE_DESC([$1])])])])],
-	[m4_pushdef([_options], [m4_do(
-		[m4_ifnblank([$2], [[-$2, ]])],
-		[[--$1]],
-		[m4_case([$3], [bool], [[, --no-$1]])],
-	)])],
+	[m4_pushdef([_options], [$6([$1], [$2], [$3])])],
 	[m4_pushdef([_help_msg], [_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([$5])])],
 	[m4_case([$3],
 		[action],
@@ -248,10 +264,33 @@ _INDENT_()[printf '@:}@\n']])],
 )])
 
 
+dnl
+dnl Option formatter supporting long options
+dnl $1: argname
+dnl $2: short
+dnl $3: type
+m4_define([_GNU_HELP_OPTION_COMPOSER], [m4_do(
+	[m4_ifnblank([$2], [[-$2, ]])],
+	[[--$1]],
+	[m4_case([$3], [bool], [[, --no-$1]])],
+)])
+
+
+dnl
+dnl Option formatter supporting only short options
+dnl $1: argname
+dnl $2: short
+dnl $3: type
+m4_define([_POSIX_HELP_OPTION_COMPOSER], [m4_do(
+	[m4_ifblank([$2], [m4_fatal([Argument '$1': Blank short option!])], [[-$2]])],
+)])
+
+
+dnl $1: Option formatter (see _MAKE_PRINTF_OPTARG_HELP_STATEMENTS): FORMATTER(argname, short, type)
 m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
 	[_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_HELP],
 	[_argname,_arg_short,_arg_type,_default,_arg_help],
-	[m4_ifnblank(_arg_help, [_MAKE_PRINTF_OPTARG_HELP_STATEMENTS(_argname, _arg_short, _arg_type, _default, _arg_help)]
+	[m4_ifnblank(_arg_help, [_MAKE_PRINTF_OPTARG_HELP_STATEMENTS(_argname, _arg_short, _arg_type, _default, _arg_help, [$1])]
 )])])
 
 
@@ -287,6 +326,9 @@ m4_define([_MAKE_ARGS_STACKING_HELP_MESSAGE], [m4_do(
 )])
 
 
+dnl
+dnl $1: Synopsis option formatter (see _MAKE_HELP_SYNOPSIS)
+dnl $2: List option formatter (see _MAKE_HELP_FUNCTION_OPTIONAL_PART)
 m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 	[[Function that prints general usage of the script.],
 		[This is useful if users asks for it, or if there is an argument parsing error (unexpected / spurious arguments)],
@@ -297,14 +339,14 @@ m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 		[_INDENT_()[]printf 'Usage: %s],
 		[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
-		[_MAKE_HELP_SYNOPSIS],
+		[_MAKE_HELP_SYNOPSIS([$1])],
 		[\n' "@S|@0"_ENDL_()],
 		[_IF_HAVE_POSITIONAL_ARGS([_MAKE_HELP_FUNCTION_POSITIONAL_PART])],
 		[dnl If we have 0 optional args, don't do anything (FOR loop would assert, 0 < 1)
 ],
 		[dnl Plus, don't display extended help for an arg if it doesn't have a description
 ],
-		[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, , [_MAKE_HELP_FUNCTION_OPTIONAL_PART])],
+		[m4_if(_DISTINCT_OPTIONAL_ARGS_COUNT, 0, , [_MAKE_HELP_FUNCTION_OPTIONAL_PART([$2])])],
 		[dnl Print a more verbose help message to the end of the help (if requested)
 ],
 		[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART()_ENDL_()])],
@@ -325,6 +367,19 @@ m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_IND
 	[$3([$1], ["@S|@2"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [@S|@2])])],
 	[shift],
+)])
+
+
+dnl
+dnl $1: Arg name
+dnl $2: Short arg name (not used here)
+dnl $3: Name of the value-to-variable macro
+dnl $4: The name of the argument-holding variable
+dnl $5: Where to get the last value (optional)
+m4_define([_VAL_OPT_ADD_GETOPTS], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+	[test "x$OPTARG" = x && die "Missing value for the optional argument '-$_key'." 1],
+	[$3([$1], ["$OPTARG"], [$4])],
+	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [$OPTARG])])],
 )])
 
 
@@ -610,6 +665,37 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 
 
 dnl
+dnl TODO: We have to restrict case match for long options only if those long opts accept value.
+dnl We always match for --help - even if delim is = only.
+dnl And we also match for --no-that
+dnl And for -h*, since this is an action and argbash then ends (but maybe not, what if one has passed -hx, while -x is invalid?)
+m4_define([_MAKE_OPTARG_GETOPTS_CASE_SECTION], [m4_do(
+	[_INDENT_AND_END_CASE_MATCH([[$2]])],
+	[m4_case([$3],
+		[arg], [_VAL_OPT_ADD_GETOPTS([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
+		[repeated], [m4_fatal([Repeated arguments are not supported in the POSIX mode])],
+		[bool],
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+			[[$5="on"]],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
+		)],
+		[incr],
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+			[[$5=$(($5 + 1))]],
+			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
+		)],
+		[action],
+		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
+			[[$4]],
+			[exit 0],
+		)],
+	)],
+	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
+],
+)])
+
+
+dnl
 dnl Call the _MAKE_OPTARG_SIMPLE_CASE_SECTION only if we
 dnl - have eqals as a delimiter
 m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION_IF_IT_MAKES_SENSE],
@@ -735,7 +821,7 @@ dnl
 dnl $1: Case when positional argument is encountered
 m4_define([_EVAL_OPTIONALS_AND_POSITIONALS_POSIX], [m4_do(
 	[m4_n([_INDENT_(2)_key="$[]1"])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
+	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX])],
 	[_MAKE_CASE_STATEMENT([_HANDLE_POSITIONAL_ARG_POSIX])],
 	[m4_n([_INDENT_(2)_positionals_index=$((_positionals_index + 1))])],
 )])
@@ -749,6 +835,21 @@ m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
 	[$1],
+	[_INDENT_(2)[esac
+]],
+)])
+
+
+m4_define([_EVAL_OPTIONALS_GETOPTS], [m4_do(
+	[_MAKE_POSIX_CASE_STATEMENT],
+)])
+
+
+m4_define([_MAKE_POSIX_CASE_STATEMENT], [m4_do(
+	[_INDENT_(2)[case "$_key" in
+]],
+	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
+		[_MAKE_OPTARG_GETOPTS_CASE_SECTION(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
 	[_INDENT_(2)[esac
 ]],
 )])
@@ -863,7 +964,7 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
 		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
-	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - _positionals_index + 1)); handle_passed_args_count], [assign_positional_args "$_positionals_index" "@S|@@"])],
+	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); eval "_last_positional=\"\@S|@@S|@#\""; handle_passed_args_count], [assign_positional_args "$OPTIND" "@S|@@"])],
 )])
 
 
@@ -975,7 +1076,6 @@ m4_define([_MAKE_DEFAULTS_POSITIONAL_POSIX], [m4_do(
 	[_COMM_BLOCK(0,
 		[# TBD],
 		[# TBD])],
-	[[_positionals_index=0]_ENDL_],
 	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
 		[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
 )])
@@ -996,13 +1096,21 @@ m4_define([_MAKE_DEFAULTS_OPTIONAL], [m4_do(
 
 
 dnl
-dnl Make some utility stuff.
+dnl Make basic utility stuff.
 dnl Those include the die function as well as optional validators
-m4_define([_MAKE_UTILS], [m4_do(
+m4_define([_MAKE_UTILS_POSIX], [m4_do(
 	[_ENDL_()_MAKE_DIE_FUNCTION()_ENDL_(2)],
 	[_IF_RESTRICT_VALUES([_ENDL_()_MAKE_RESTRICT_VALUES_FUNCTION()_ENDL_(2)])],
-	[_IF_HAVE_OPTIONAL_ARGS([_IF_OPT_GROUPING_GETOPT([_ENDL_()_MAKE_NEXT_OPTARG_FUNCTION()_ENDL_()])])],
 	[_PUT_VALIDATORS],
+)])
+
+
+dnl
+dnl Make additional stuff.
+dnl Those include the die function as well as optional validators
+m4_define([_MAKE_UTILS], [m4_do(
+	[_MAKE_UTILS_POSIX()],
+	[_IF_HAVE_OPTIONAL_ARGS([_IF_OPT_GROUPING_GETOPT([_ENDL_()_MAKE_NEXT_OPTARG_FUNCTION()_ENDL_()])])],
 )])
 
 
