@@ -77,7 +77,7 @@ m4_define([_DECLARE_REQUIRED_ARGS_STRING], [[_required_args_string]="m4_list_joi
 
 
 m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
-	[_INDENT_(1)[test ${_positionals_count} -ge ]],
+	[_INDENT_(1)[test "${_positionals_count}" -ge ]],
 	[_MINIMAL_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
@@ -88,7 +88,7 @@ m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
 
 
 m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_do(
-	[_INDENT_(1)[test ${_positionals_count} -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
+	[_INDENT_(1)[test "${_positionals_count}" -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
@@ -169,24 +169,6 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 )])
 
 
-m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
-	[[The parsing of the command-line]],
-	[parse_commandline], [m4_do(
-		[_JOIN_INDENTED(1,
-			_IF_HAVE_POSITIONAL_ARGS([[_positionals_index=1],]),
-			[while test $[]# -gt 0],
-			[do],
-		)],
-		[_IF_HAVE_OPTIONAL_ARGS(
-			[_EVAL_OPTIONALS_AND_POSITIONALS_POSIX],
-			[_STORE_CURRENT_ARG_AS_POSITIONAL])],
-		[_JOIN_INDENTED(1,
-			[_INDENT_()[shift]],
-			[done])],
-	)],
-)])
-
-
 m4_define([_GET_GETOPTS_STRING], [m4_do(
 	[m4_lists_foreach_optional([_ARGS_SHORT,_ARGS_CATH], [_arg_short,_arg_type], [m4_case(_arg_type,
 		[arg], [_arg_short:],
@@ -194,6 +176,7 @@ m4_define([_GET_GETOPTS_STRING], [m4_do(
 )])
 
 
+dnl TODO: Don't make this if phaving only positional args.
 m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
 	[[The parsing of the command-line]],
 	[parse_commandline], [m4_do(
