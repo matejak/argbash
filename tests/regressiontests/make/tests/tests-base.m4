@@ -52,26 +52,37 @@ ADD_TEST([test-onlypos-declared], [[
 ]])
 
 
-ADD_TEST([test-onlyopt], [[
+m4_define([test_onlyopt_posix_body], [[
 	grep -q '^    esac$$' $<
 	@# ! negates the return code
 	! grep -q '^	' $<
 	$(REVERSE) grep -q POSITION $<
+	$< -o "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< -B | grep -q 'BOOL=on'
+	$< -i | grep -q 'OPT_INCR=3,'
+	$< -i -i | grep -q 'OPT_INCR=4,'
+	! $< -h | grep -q -e '-B,'
+	$(REVERSE) $< LOO 2> /dev/null]])
+
+
+ADD_TEST([test-onlyopt], [test_onlyopt_posix_body
 	$< --opt-arg PoS | grep -q OPT_S=PoS,
 	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< --boo_l | grep -q 'BOOL=on'
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
-	$(REVERSE) $< LOO 2> /dev/null
 	$< -h | grep -q -e '-B|--(no-)boo_l'
-	! $< -h | grep -q -e '-B,'
 	$< -h | grep -q -e '-i|--incrx'
 	$< -h | grep -q -e '-i, --incrx'
 	$< -h | grep -q -e '-o|--opt-arg <arg>'
 	$< -h | grep -q -e '-o, --opt-arg: @opt-arg@'
 	$< -h | grep -q -e '-r|--opt-repeated'
 	$< -h | grep -q -e '-r, --opt-repeated:'
-]])
+])
+
+dnl TODO: The error that occurs when supplied with positional arg needs fixing.
+ADD_TEST([test-onlyopt-dash], [test_onlyopt_posix_body
+])
 
 ADD_SCRIPT([test-standalone2])
 ADD_TEST([stability-salone], [[
@@ -94,9 +105,10 @@ ADD_TEST([test-ddash], [[
 	ERROR=bar 	$(REVERSE) $< -- foo bar
 ]])
 
-ADD_TEST([test-simple], [[
+
+m4_define([test_simple_body], [[
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
-	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< -o 'uf ta' pos | grep -q 'OPT_S=uf ta,POS_S=pos,'
 	$< -h | grep -q 'END-$$'
 	$< -h | grep -q '^\s*-BEGIN'
 	$< -h | grep -q '^		-BEGIN'
@@ -110,8 +122,18 @@ ADD_TEST([test-simple], [[
 	ERROR="last one was: 'two'" 	$(REVERSE) $< one two
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
-	ERROR="require exactly 1" 	$(REVERSE) $<
-]])
+	ERROR="require exactly 1" 	$(REVERSE) $<]])
+
+
+ADD_TEST([test-simple], [test_simple_body
+	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+])
+
+ADD_TEST([test-simple-dash], [test_simple_body
+	ERROR="got 3" $(REVERSE) $< -- -o 'uf ta' pos
+	ERROR="got 3" $(REVERSE) $< pos -o 'uf ta'
+	ERROR="last one was: 'uf ta'" $(REVERSE) $< pos -o 'uf ta'
+])
 
 dnl The invocation like this is supposed to trigger complaints
 ADD_TEST([test-diy-noop], [[

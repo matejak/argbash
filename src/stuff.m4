@@ -813,28 +813,24 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX], [m4_do(
 m4_define([_EVAL_OPTIONALS_AND_POSITIONALS], [m4_do(
 	[m4_n([_INDENT_(2)_key="$[]1"])],
 	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
-	[_MAKE_CASE_STATEMENT([_HANDLE_POSITIONAL_ARG])],
+	[_MAKE_CASE_STATEMENT()],
 )])
 
 
-dnl
-dnl $1: Case when positional argument is encountered
 m4_define([_EVAL_OPTIONALS_AND_POSITIONALS_POSIX], [m4_do(
 	[m4_n([_INDENT_(2)_key="$[]1"])],
 	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX])],
-	[_MAKE_CASE_STATEMENT([_HANDLE_POSITIONAL_ARG_POSIX])],
+	[_MAKE_CASE_STATEMENT()],
 	[m4_n([_INDENT_(2)_positionals_index=$((_positionals_index + 1))])],
 )])
 
 
-dnl
-dnl $1: Case when positional argument is encountered
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
 	[_INDENT_(2)[case "$_key" in
 ]],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
-	[$1],
+	[_HANDLE_NON_OPTION_MATCH],
 	[_INDENT_(2)[esac
 ]],
 )])
@@ -850,12 +846,13 @@ m4_define([_MAKE_POSIX_CASE_STATEMENT], [m4_do(
 ]],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_GETOPTS_CASE_SECTION(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
+	[_HANDLE_NON_OPTION_MATCH_POSIX],
 	[_INDENT_(2)[esac
 ]],
 )])
 
 
-m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
+m4_define([_HANDLE_NON_OPTION_MATCH], [m4_do(
 	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE)],
 	[*@:}@
 ],
@@ -868,19 +865,17 @@ m4_define([_HANDLE_POSITIONAL_ARG], [m4_do(
 )])
 
 
-m4_define([_HANDLE_POSITIONAL_ARG_POSIX], [m4_do(
+m4_define([_HANDLE_NON_OPTION_MATCH_POSIX], [m4_do(
 	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE)],
 	[*@:}@
 ],
 	[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-		[# As the first positional argument has been reached,],
-		[# only positional arguments will follow, as we are in POSIX mode.],
-		[# Jus bail out of the loop, there is nothing to do here.],
+		[# This is clearly an error, getopts get here iff an option has been detected,],
+		[# which is not the case.],
+		[# In any case, raise an error here.],
 	)],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-		_IF_HAVE_POSITIONAL_ARGS(
-			[[return],],
-			[[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected argument '$[]1'" 1]]),
+		[[_PRINT_HELP=yes die "FATAL ERROR: Got an unexpected option '-${_key}'" 1]],
 		[;;],
 	)],
 )])
@@ -964,7 +959,7 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
 		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
-	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); eval "_last_positional=\"\@S|@@S|@#\""; handle_passed_args_count], [assign_positional_args "$OPTIND" "@S|@@"])],
+	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); _last_positional=$(eval "printf '%s' \"\@S|@@S|@#\""); handle_passed_args_count], [assign_positional_args "$OPTIND" "@S|@@"])],
 )])
 
 

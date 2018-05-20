@@ -31,9 +31,11 @@ TESTS += \
 	test-onlypos \
 	test-onlypos-declared \
 	test-onlyopt \
+	test-onlyopt-dash \
 	stability-salone \
 	test-ddash \
 	test-simple \
+	test-simple-dash \
 	test-diy-noop \
 	test-diy \
 	test-wrapping-second_level \
@@ -78,11 +80,13 @@ SCRIPTS += \
 	$(TESTDIR)/test-onlypos.sh \
 	$(TESTDIR)/test-onlypos-declared.sh \
 	$(TESTDIR)/test-onlyopt.sh \
+	$(TESTDIR)/test-onlyopt-dash.sh \
 	$(TESTDIR)/test-standalone2.sh \
 	$(TESTDIR)/test-standalone.sh \
 	$(TESTDIR)/test-ddash.m4 \
 	$(TESTDIR)/test-ddash.sh \
 	$(TESTDIR)/test-simple.sh \
+	$(TESTDIR)/test-simple-dash.sh \
 	$(TESTDIR)/test-diy-noop.sh \
 	$(TESTDIR)/test-diy-noop.m4 \
 	$(TESTDIR)/test-diy.sh \
@@ -237,14 +241,17 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	@# ! negates the return code
 	! grep -q '^	' $<
 	$(REVERSE) grep -q POSITION $<
+	$< -o "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< -B | grep -q 'BOOL=on'
+	$< -i | grep -q 'OPT_INCR=3,'
+	$< -i -i | grep -q 'OPT_INCR=4,'
+	! $< -h | grep -q -e '-B,'
 	$< --opt-arg PoS | grep -q OPT_S=PoS,
 	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< --boo_l | grep -q 'BOOL=on'
 	$< --no-boo_l | grep -q 'BOOL=off'
 	$< -r /usr/lib --opt-repeated /usr/local/lib | grep -q 'ARG_REPEATED=/usr/lib /usr/local/lib,'
-	$(REVERSE) $< LOO 2> /dev/null
 	$< -h | grep -q -e '-B|--(no-)boo_l'
-	! $< -h | grep -q -e '-B,'
 	$< -h | grep -q -e '-i|--incrx'
 	$< -h | grep -q -e '-i, --incrx'
 	$< -h | grep -q -e '-o|--opt-arg <arg>'
@@ -252,6 +259,17 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< -h | grep -q -e '-r|--opt-repeated'
 	$< -h | grep -q -e '-r, --opt-repeated:'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt.sh"
+test-onlyopt-dash: $(TESTDIR)/test-onlyopt-dash.sh
+	grep -q '^    esac$$' $<
+	@# ! negates the return code
+	! grep -q '^	' $<
+	$(REVERSE) grep -q POSITION $<
+	$< -o "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< -B | grep -q 'BOOL=on'
+	$< -i | grep -q 'OPT_INCR=3,'
+	$< -i -i | grep -q 'OPT_INCR=4,'
+	! $< -h | grep -q -e '-B,'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt-dash.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-standalone.sh"
@@ -270,7 +288,7 @@ test-ddash: $(TESTDIR)/test-ddash.sh
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-ddash.sh"
 test-simple: $(TESTDIR)/test-simple.sh
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
-	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< -o 'uf ta' pos | grep -q 'OPT_S=uf ta,POS_S=pos,'
 	$< -h | grep -q 'END-$$'
 	$< -h | grep -q '^\s*-BEGIN'
 	$< -h | grep -q '^		-BEGIN'
@@ -285,7 +303,29 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="expect exactly 1" 	$(REVERSE) $< one two
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
+	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple.sh"
+test-simple-dash: $(TESTDIR)/test-simple-dash.sh
+	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
+	$< -o 'uf ta' pos | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< -h | grep -q 'END-$$'
+	$< -h | grep -q '^\s*-BEGIN'
+	$< -h | grep -q '^		-BEGIN'
+	$< -h | grep -q -v '^\s*-BEGIN2'
+	$< -h | grep -q -v 'END2-$$'
+	$< -h | grep -q '^		-PBEGIN'
+	$< -h | grep -q 'PEND-$$'
+	grep -q '^		esac' $<
+	grep -q '^			\*)' $<
+	ERROR=spurious 	$(REVERSE) $< -- one two
+	ERROR="last one was: 'two'" 	$(REVERSE) $< one two
+	ERROR="expect exactly 1" 	$(REVERSE) $< one two
+	ERROR="[Nn]ot enough" 	$(REVERSE) $<
+	ERROR="require exactly 1" 	$(REVERSE) $<
+	ERROR="got 3" $(REVERSE) $< -- -o 'uf ta' pos
+	ERROR="got 3" $(REVERSE) $< pos -o 'uf ta'
+	ERROR="last one was: 'uf ta'" $(REVERSE) $< pos -o 'uf ta'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple-dash.sh"
 test-diy-noop: $(TESTDIR)/test-diy-noop.sh
 	$< LOO --opt_arg > /dev/null
 	$< LOO 1 2 3 3 > /dev/null
