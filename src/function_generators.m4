@@ -87,11 +87,24 @@ m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
 )])
 
 
-m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_do(
+m4_define([_CHECK_FOR_TOO_MANY_ARGS], [m4_if(_HIGHEST_POSITIONAL_VALUES_COUNT,
+	0, [_CHECK_FOR_AT_MOST_NONE_ARGS()],
+	[__CHECK_FOR_TOO_MANY_ARGS()])])
+
+
+m4_define([__CHECK_FOR_TOO_MANY_ARGS], [m4_do(
 	[_INDENT_(1)[test "${_positionals_count}" -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
 	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
+	[[, but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
+]],
+)])
+
+
+m4_define([_CHECK_FOR_AT_MOST_NONE_ARGS], [m4_do(
+	[_INDENT_(1)[test "${_positionals_count}" -eq 0]],
+	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we don't expect any]],
 	[[, but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
 ]],
 )])

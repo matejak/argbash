@@ -955,8 +955,8 @@ dnl
 dnl $1: Callback --- how to deal with actual function calls
 m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
 	[_ENDL_()_MAKE_ARGV_PARSING_FUNCTION_POSIX()_ENDL_(2)],
+	[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
-		[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
 	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); _last_positional=$(eval "printf '%s' \"\@S|@@S|@#\""); handle_passed_args_count], [assign_positional_args "$OPTIND" "@S|@@"])],
@@ -983,6 +983,30 @@ dnl
 dnl $1: The parse_commandline function call
 dnl $2: The handle_passed_args_count function call
 dnl $3: The assign_positional_args function call
+m4_define([_ASSIGN_GO_POSIX], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Now call all the functions defined above that are needed to get the job done],
+	)],
+	[m4_n([[$1]])],
+	[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([m4_n([[$2]])])],
+	[_IF_HAVE_POSITIONAL_ARGS(
+		[m4_do(
+			[m4_n([[$3]])],
+		[m4_do(
+			[_COMM_BLOCK(0,
+				[# Even if we don't accept any positional arguments, we may get some,],
+				[# and we can't handle them in the while loop.],
+			)],
+			[[$2]],
+	)],
+	)])],
+)])
+
+
+dnl
+dnl $1: The parse_commandline function call
+dnl $2: The handle_passed_args_count function call
+dnl $3: The assign_positional_args function call
 dnl
 dnl Convention:
 dnl The commented-out calls are supposed to be preceded by regexp '^# '
@@ -996,10 +1020,41 @@ m4_define([_ASSIGN_PREPARE], [m4_do(
 			[# followed by the function that assigns passed positional arguments to variables:],
 			[#  $2],
 			[#  $3],
-		)])],
+		)],
 		[_COMM_BLOCK(0,
 			[# Then, call the function that assigns passed positional arguments to variables:],
 			[# $3],
+		)])],
+	)],
+)])
+
+
+dnl
+dnl $1: The parse_commandline function call
+dnl $2: The handle_passed_args_count function call
+dnl $3: The assign_positional_args function call
+dnl
+dnl Convention:
+dnl The commented-out calls are supposed to be preceded by regexp '^# '
+m4_define([_ASSIGN_PREPARE_POSIX], [m4_do(
+	[_COMM_BLOCK(0,
+		[# Call the function that assigns passed optional arguments to variables:],
+		[#  $1])],
+	[_IF_HAVE_POSITIONAL_ARGS([_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED(
+		[_COMM_BLOCK(0,
+			[# Then, call the function that checks that the amount of passed arguments is correct],
+			[# followed by the function that assigns passed positional arguments to variables:],
+			[#  $2],
+			[#  $3],
+		)],
+		[_COMM_BLOCK(0,
+			[# Then, call the function that assigns passed positional arguments to variables:],
+			[# $3],
+		)])],
+		[_COMM_BLOCK(0,
+			[# Then, call the function that checks that the amount of passed arguments is correct],
+			[# We may get positional args even if we don't explicitly accept them.],
+			[#  $2],
 		)],
 	)],
 )])
