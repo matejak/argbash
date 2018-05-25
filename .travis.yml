@@ -7,4 +7,5 @@ install:
 
 # command to run tests
 script: 
-  - make check ARGBASH_EXEC=argbash ARGBASH_INIT_EXEC=argbash-init
+  # Remake the target Makefile, so it is regenerated based on the target system.
+  - make -B ../tests/regressiontests/Makefile && make check ARGBASH_EXEC=argbash ARGBASH_INIT_EXEC=argbash-init
