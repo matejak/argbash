@@ -17,7 +17,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %-dash.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) --type posix-script -o $@ $<
-	sed -i 's|#!/bin/bash|#!/usr/bin/dash|' $@
+	sed -i "s|#!/bin/bash|#!/usr/bin/dash|" $@
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
@@ -246,6 +246,7 @@ test-onlyopt: $(TESTDIR)/test-onlyopt.sh
 	$< -i | grep -q 'OPT_INCR=3,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	! $< -h | grep -q -e '-B,'
+	$(REVERSE) $< LOO 2> /dev/null
 	$< --opt-arg PoS | grep -q OPT_S=PoS,
 	$< --opt-arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
 	$< --boo_l | grep -q 'BOOL=on'
@@ -269,6 +270,7 @@ test-onlyopt-dash: $(TESTDIR)/test-onlyopt-dash.sh
 	$< -i | grep -q 'OPT_INCR=3,'
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	! $< -h | grep -q -e '-B,'
+	$(REVERSE) $< LOO 2> /dev/null
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt-dash.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
