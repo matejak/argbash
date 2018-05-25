@@ -1,6 +1,6 @@
 before_install:
   - sudo apt-get update
-  - sudo apt-get install make autoconf
+  - sudo apt-get install make autoconf dash
 
 install:
   - cd resources && sudo make install PREFIX=/usr
