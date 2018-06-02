@@ -242,9 +242,32 @@ Description                     ``--type`` value                ``--strip`` valu
 ============================    =======================         ==========================
 Bash script                     bash-script                     none
 Bash script parsing section     bash-script                     user-content
+POSIX script                    posix-script                    none
+POSIX script parsing section    posix-script                    user-content
 Bash completion                 completion                      all
 docopt help message             docopt                          all
 ============================    =======================         ==========================
+
+
+POSIX script
+++++++++++++
+
+Argbash is able to generate code that will work with POSIX shells.
+Due to limitations of those shells (mainly absence of arrays), the generated interface features are limited:
+
+* All options have to have short option.
+  Those short options are the only user-visible element of the interface.
+
+* Mixing optional and positional arguments is not supported, all arguments that follow the first positional argument are considered positional.
+
+* Certain arguments are not supported:
+
+  * Repeated arguments.
+  * Multi-valued argumetns.
+
+Internally, Argbash uses the ``getopts`` shell builtin to handle optional arguments parsing.
+Then, checks for positional arguments are generated and applied, ditto for positional arguments processing, and the help message is generated.
+As a result, the parsing section of a POSIX script is shorter.
 
 
 Bash completion
