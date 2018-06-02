@@ -140,7 +140,7 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	[m4_n([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS])],
 	[_JOIN_INDENTED(1,
 		[[shift "$_shift_for"]],
-		[[for _positional_name in ]IF_POSITIONALS_INF([["${_positional_names[@]}"]], [[${_positional_names}]])],
+		[[for _positional_name in ${_positional_names}]],
 		[[do]],
 		_INDENT_MORE(
 			[[test @S|@# -gt 0 || break]],
@@ -189,7 +189,7 @@ m4_define([_GET_GETOPTS_STRING], [m4_do(
 )])
 
 
-dnl TODO: Don't make this if phaving only positional args.
+dnl TODO: Don't make this if having only positional args.
 m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
 	[[The parsing of the command-line]],
 	[parse_commandline], [m4_do(
@@ -197,10 +197,7 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
 			[while getopts '_GET_GETOPTS_STRING()' _key],
 			[do],
 		)],
-		[_IF_HAVE_OPTIONAL_ARGS(
-			[_EVAL_OPTIONALS_GETOPTS],
-			[m4_fatal([Intermediate positional args are not supported in POSIX mode.])])],
-		[_JOIN_INDENTED(1,
-			[done])],
+		[_EVAL_OPTIONALS_GETOPTS],
+		[_INDENT_()done[]_ENDL_()],
 	)],
 )])

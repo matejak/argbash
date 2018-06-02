@@ -20,12 +20,16 @@ dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
 dnl TODO: Support custom error messages
 dnl TODO: Make positional args check optional - make it a function(n_positionals, n_expected, what is expected, msg[when less args], [msg when more args])
 dnl TODO: Introduce alternative REPEATED/INCREMENTAL version of macros (add and replace mode with respect to defaults)
-dnl
-dnl WIP vvvvvvvvvvvvvvv
-dnl
 dnl TODO: Fix docopt and completion for cases when there is only the '=' separator.
 dnl TODO: Enable (at least) docopt generation even if we don't know the basename.
 dnl TODO: Make the m4_lists_foreach_optional etc. accept second batch of lists.
+dnl
+dnl WIP vvvvvvvvvvvvvvv
+dnl
+dnl TODO: Ensure that we don't check for min pos args if the actual minimum is 0
+dnl TODO: Ensure that we don't check for max pos args if we accept up to infinity args
+dnl TODO: Don't generate and/or call functions if we don't check for counts.
+dnl TODO: Print doubledash in POSIX help.
 dnl
 dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
 dnl
@@ -898,7 +902,8 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 		[# This array is able to hold array elements as targets.],
 		[# As variables don't contain spaces, they may be held in space-separated string.],
 	)],
-	[_INDENT_(_indentation_level)[_positional_names=]IF_POSITIONALS_INF(@{:@, ")],
+	[_INDENT_(_indentation_level)[_positional_names="]],
+	[m4_define([_pos_names_count], 0)],
 	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MAXES], [_pos_name,_max_argn], [m4_do(
 		[dnl If we accept inf args, it may be that _max_argn == 0 although we HAVE_POSITIONAL, so we really need the check.
 ],
@@ -909,23 +914,26 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 ],
 				[m4_if(_max_argn, 1, , [@<:@m4_eval(_arg_index - 1)@:>@])],
 				[ ],
+				[m4_define([_pos_names_count], m4_incr(_pos_names_count))],
 			)])],
 		)])],
 	)])],
-	[IF_POSITIONALS_INF(@:}@, ")_ENDL_],
+	["_ENDL_],
 	[IF_POSITIONALS_INF([m4_do(
 		[_COMM_BLOCK(_indentation_level,
 			[# If we allow up to infinitely many args, we calculate how many of values],
 			[# were actually passed, and we extend the target array accordingly.],
+			[# We also know that we have _pos_names_count known positional arguments.],
 		)],
 		[_JOIN_INDENTED(_indentation_level,
-			[[_our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))]],
+			[_our_args=$(([${#_positionals[@]} - ]_pos_names_count))],
 			[[for ((ii = 0; ii < _our_args; ii++))]],
 			[do],
-			[_INDENT_()_positional_names+=("_INF_VARNAME@<:@$((ii + _INF_ARGN))@:>@")],
+			[_INDENT_()_positional_names="$_positional_names _INF_VARNAME@<:@$((ii + _INF_ARGN))@:>@"],
 			[done],
 		)],
 	)])],
+	[m4_undefine([_pos_names_count])],
 	[m4_popdef([_indentation_level])],
 )])
 
@@ -954,7 +962,7 @@ dnl Generates functions and outputs either hints or function calls
 dnl
 dnl $1: Callback --- how to deal with actual function calls
 m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
-	[_ENDL_()_MAKE_ARGV_PARSING_FUNCTION_POSIX()_ENDL_(2)],
+	[_ENDL_()_IF_HAVE_OPTIONAL_ARGS([_MAKE_ARGV_PARSING_FUNCTION_POSIX()_ENDL_(2)])],
 	[_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([_ENDL_()_MAKE_CHECK_POSITIONAL_COUNT_FUNCTION()_ENDL_(2)])],
 	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],

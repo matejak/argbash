@@ -24,6 +24,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 TESTS += \
 	stability \
 	basic \
+	basic-dash \
 	test-void \
 	call-salone \
 	test-most \
@@ -72,6 +73,7 @@ TESTS += tests-gen
 SCRIPTS += \
 	$(TESTDIR)/basic2.sh \
 	$(TESTDIR)/basic.sh \
+	$(TESTDIR)/basic-dash.sh \
 	$(TESTDIR)/test-void.sh \
 	$(TESTDIR)/test-salone.sh \
 	$(TESTDIR)/call-salone.sh \
@@ -162,25 +164,28 @@ TESTS_GEN += \
 define generic_regression_posix
 	$< LOO | grep -q 'POS_S=LOO',
 	$< "LOO BAR" | grep -q 'POS_S=LOO BAR,'
+	$< -b LOO | grep -q BOOL=on,
 	$< LOO | grep -q BOOL=off,
-	$< --no-boo_l LOO | grep -q BOOL=off,
 	$< LOO | grep -q 'OPT_S=opt_arg_default lolo',
-	$< --opt_arg PoS LOO | grep -q OPT_S=PoS,
-	$< --opt_arg="PoS sob" LOO | grep -q 'OPT_S=PoS sob,'
 	$< LOO UFTA | grep -q 'POS_OPT=UFTA,'
 	$< LOO | grep -q 'OPT_INCR=2,'
-	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
+	$< -ii LOO | grep -q 'OPT_INCR=4,'
 	$< -h | grep -- pos_arg | grep -q pos_arg_help
 	$< -h | grep -- pos-opt | grep -q @pos-opt-arg@
 	$< -h | grep -q ' \[<pos-opt>\]'
-	$(REVERSE) $< LOO --opt_arg 2> /dev/null
 endef
 
 define generic_regression_gnu_only
-	$< LOO --boo_l | grep -q BOOL=on,
 	$< LOO --opt_arg "PoS sob" | grep -q 'OPT_S=PoS sob,'
+	$< --opt_arg PoS LOO | grep -q OPT_S=PoS,
+	$< --opt_arg="PoS sob" LOO | grep -q 'OPT_S=PoS sob,'
+	$< LOO -b | grep -q BOOL=on,
+	$< LOO --boo_l | grep -q BOOL=on,
 	$< LOO --boo_l --boo_l | grep -q 'POS_OPT=pos_opt_default lala,'
+	$< --no-boo_l LOO | grep -q BOOL=off,
 	$< --opt-incr -i LOO | grep -q 'OPT_INCR=4,'
+	$< LOO --opt-incr | grep -q 'OPT_INCR=3,'
+	$(REVERSE) $< LOO --opt_arg 2> /dev/null
 endef
 
 define _test_onlypos
@@ -206,6 +211,12 @@ basic: $(TESTDIR)/basic.sh
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
+basic-dash: $(TESTDIR)/basic-dash.sh
+	$(generic_regression_posix)
+	$< LOO -b | grep -q BOOL=off,
+	$< -h | grep -q 'P percent: %'
+	$< -h | grep -q 'O percent: %'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic-dash.sh"
 test-void: $(TESTDIR)/test-void.sh
 	! grep -q 'die' $<
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-void.sh"
@@ -271,6 +282,12 @@ test-onlyopt-dash: $(TESTDIR)/test-onlyopt-dash.sh
 	$< -i -i | grep -q 'OPT_INCR=4,'
 	! $< -h | grep -q -e '-B,'
 	$(REVERSE) $< LOO 2> /dev/null
+	$< -h | grep -q -e '-B'
+	$< -h | grep -q -e '-i'
+	$< -h | grep -q -e '-o <arg>'
+	$< -h | grep -q -e '-o: @opt-arg@'
+	! $< -h | grep -q -e '-r'
+	ERROR=cosi $(REVERSE) $< -o lala cosi
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-onlyopt-dash.sh"
 stability-salone: $(TESTDIR)/test-standalone.sh $(TESTDIR)/test-standalone2.sh
 	diff -q $< $(word 2,$^)
