@@ -106,15 +106,15 @@ handle_passed_args_count()
 assign_positional_args()
 {
 	local _positional_name _shift_for=$1
-	_positional_names=(_arg_input )
-	_our_args=$((${#_positionals[@]} - ${#_positional_names[@]}))
+	_positional_names="_arg_input "
+	_our_args=$((${#_positionals[@]} - 1))
 	for ((ii = 0; ii < _our_args; ii++))
 	do
-		_positional_names+=("_arg_input[$((ii + 1))]")
+		_positional_names="$_positional_names _arg_input[$((ii + 1))]"
 	done
 
 	shift "$_shift_for"
-	for _positional_name in "${_positional_names[@]}"
+	for _positional_name in ${_positional_names}
 	do
 		test $# -gt 0 || break
 		eval "$_positional_name=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1

@@ -15,7 +15,7 @@ m4_define([opt_arg_help], [m4_fatal([The option 'opt_arg' help string got expand
 # ARG_OPTIONAL_SINGLE([opt_arg], o, [opt_arg_help O percent: %], [opt_arg_default lolo])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "$0 FOO"])
-# ARG_OPTIONAL_BOOLEAN(boo_l)
+# ARG_OPTIONAL_BOOLEAN(boo_l, b)
 # ARG_OPTIONAL_INCREMENTAL([opt-incr], i, [@pos-opt-arg@], 2)
 # ARG_HELP([Testing program])
 # ARGBASH_GO

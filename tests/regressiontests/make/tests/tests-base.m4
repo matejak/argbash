@@ -11,6 +11,14 @@ ADD_TEST([basic], [[
 ]])
 
 
+ADD_TEST([basic-dash], [[
+	$(generic_regression_posix)
+	$< LOO -b | grep -q BOOL=off,
+	$< -h | grep -q 'P percent: %'
+	$< -h | grep -q 'O percent: %'
+]])
+
+
 ADD_TEST([test-void], [[
 	! grep -q 'die' $<
 ]])
@@ -82,6 +90,12 @@ ADD_TEST([test-onlyopt], [test_onlyopt_posix_body
 
 dnl TODO: The error that occurs when supplied with positional arg needs fixing.
 ADD_TEST([test-onlyopt-dash], [test_onlyopt_posix_body
+	$< -h | grep -q -e '-B'
+	$< -h | grep -q -e '-i'
+	$< -h | grep -q -e '-o <arg>'
+	$< -h | grep -q -e '-o: @opt-arg@'
+	! $< -h | grep -q -e '-r'
+	ERROR=cosi $(REVERSE) $< -o lala cosi
 ])
 
 ADD_SCRIPT([test-standalone2])
@@ -243,11 +257,15 @@ ADD_TEST([stability-wrapping], [[
 ]],
 	[$(TESTDIR)/test-wrapping2.sh], [$(TESTDIR)/test-wrapping.sh])
 
-ADD_TEST([test-infinity-minimal_call], [[
+
+m4_define([test_body], [[
 	$< | grep -q 'POS_S='
 	$< 1 | grep -q 'POS_S=1,'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
 ]])
+
+ADD_TEST([test-infinity-minimal_call], [test_body])
+dnl ADD_TEST([test-infinity-minimal_call-dash], [test_body])
 
 ADD_TEST([test-infinity], [[
 	$< | grep -q 'POS_S=first,second,third,'
