@@ -8,6 +8,7 @@ ADD_TEST([basic], [[
 	$(generic_regression_gnu_only)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
+	! $< -h | grep -qe '\[--\]'
 ]])
 
 
@@ -16,6 +17,7 @@ ADD_TEST([basic-dash], [[
 	$< LOO -b | grep -q BOOL=off,
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
+	$< -h | grep -qe '\[--\]'
 ]])
 
 

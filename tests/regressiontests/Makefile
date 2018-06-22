@@ -210,12 +210,14 @@ basic: $(TESTDIR)/basic.sh
 	$(generic_regression_gnu_only)
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
+	! $< -h | grep -qe '\[--\]'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 basic-dash: $(TESTDIR)/basic-dash.sh
 	$(generic_regression_posix)
 	$< LOO -b | grep -q BOOL=off,
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
+	$< -h | grep -qe '\[--\]'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic-dash.sh"
 test-void: $(TESTDIR)/test-void.sh
 	! grep -q 'die' $<

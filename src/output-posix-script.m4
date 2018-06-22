@@ -10,6 +10,7 @@ dnl  - validation of group options
 dnl  - multi-valued arguments
 
 m4_define([MAKE_FUNCTION], [MAKE_POSIX_FUNCTION($@)])
+m4_define([HAVE_DOUBLEDASH], [1])
 
 
 m4_define([_MAKE_DEFAULTS_TO_ALL_POSITIONAL_ARGUMENTS], [[no]])

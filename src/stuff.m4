@@ -29,7 +29,6 @@ dnl
 dnl TODO: Ensure that we don't check for min pos args if the actual minimum is 0
 dnl TODO: Ensure that we don't check for max pos args if we accept up to infinity args
 dnl TODO: Don't generate and/or call functions if we don't check for counts.
-dnl TODO: Print doubledash in POSIX help.
 dnl
 dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
 dnl
@@ -64,6 +63,10 @@ m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], 0)
 dnl We expect infinitely many args (keep in mind that we still need _HIGHEST_POSITIONAL_VALUES_COUNT)
 m4_define([_POSITIONALS_INF], 0)
 
+dnl btw no double dash if there are no positional arguments.
+m4_define([_IF_HAVE_DOUBLEDASH], [m4_if(
+	m4_quote(HAVE_DOUBLEDASH), 1, [_IF_HAVE_POSITIONAL_ARGS([$1], [$2])],
+	[$2])])
 
 dnl
 dnl In your script, include just this directive (and DEFINE_SCRIPT_DIR before) to include the parsing stuff from a standalone file.
@@ -211,7 +214,7 @@ dnl
 dnl $1: Formatter of opt arg synopsis, see _SYNOPSIS_OF_OPTIONAL_ARGS
 m4_define([_MAKE_HELP_SYNOPSIS], [m4_do(
 	[_IF_HAVE_OPTIONAL_ARGS([_SYNOPSIS_OF_OPTIONAL_ARGS([$1])])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [[ [--]]])],
+	[_IF_HAVE_DOUBLEDASH([[ [--]]])],
 	[dnl If we have positionals, display them like <pos1> <pos2> ...
 ],
 	[_IF_HAVE_POSITIONAL_ARGS([_SYNOPSIS_OF_POSITIONAL_ARGS])],
@@ -816,14 +819,14 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX], [m4_do(
 
 m4_define([_EVAL_OPTIONALS_AND_POSITIONALS], [m4_do(
 	[m4_n([_INDENT_(2)_key="$[]1"])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
+	[_IF_HAVE_DOUBLEDASH([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG])],
 	[_MAKE_CASE_STATEMENT()],
 )])
 
 
 m4_define([_EVAL_OPTIONALS_AND_POSITIONALS_POSIX], [m4_do(
 	[m4_n([_INDENT_(2)_key="$[]1"])],
-	[m4_if(HAVE_DOUBLEDASH, 1, [_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX])],
+	[_IF_HAVE_DOUBLEDASH([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX])],
 	[_MAKE_CASE_STATEMENT()],
 	[m4_n([_INDENT_(2)_positionals_index=$((_positionals_index + 1))])],
 )])
