@@ -3,7 +3,7 @@ resources/examples/minimal.sh -h
 This is a minimal demo of Argbash potential
 Usage: ../resources/examples/minimal.sh [-o|--option <arg>] [--(no-)print] [-h|--help] [-v|--version] <positional-arg>
 	<positional-arg>: Positional arg description
-	-o,--option: A option with short and long flags and default (default: 'boo')
-	--print,--no-print: A boolean option with long flag (and implicit default: off) (off by default)
-	-h,--help: Prints help
-	-v,--version: Prints version
+	-o, --option: A option with short and long flags and default (default: 'boo')
+	--print, --no-print: A boolean option with long flag (and implicit default: off) (off by default)
+	-h, --help: Prints help
+	-v, --version: Prints version
