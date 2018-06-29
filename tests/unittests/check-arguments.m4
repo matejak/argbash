@@ -68,3 +68,27 @@ assert_equals_list_next([_arg_multi_bomb])
 
 assert_equals(m4_lists_foreach_positional([_ARGS_LONG,_ARGS_HELP,_POSITIONALS_MINS,_POSITIONALS_MAXES],[_arg_long,_arg_help,_pmin,_pmax],[_arg_long:_arg_help:_pmin-_pmax;]),
 	      [defaultless:xhelp:1-1;multi-BOMB:help-BOMB:1-3;])
+
+m4_pushdef([_POSITIONALS_INF], 1)
+
+m4_pushdef([_MINIMAL_POSITIONAL_VALUES_COUNT], 0)
+assert_equals(_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([needed], [not needed]), [not needed])
+m4_popdef([_MINIMAL_POSITIONAL_VALUES_COUNT])
+
+m4_pushdef([_MINIMAL_POSITIONAL_VALUES_COUNT], 2)
+assert_equals(_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([needed], [not needed]), [needed])
+m4_popdef([_MINIMAL_POSITIONAL_VALUES_COUNT])
+
+m4_popdef([_POSITIONALS_INF])
+
+m4_pushdef([_POSITIONALS_INF], 0)
+
+m4_pushdef([_MINIMAL_POSITIONAL_VALUES_COUNT], 0)
+assert_equals(_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([needed], [not needed]), [needed])
+m4_popdef([_MINIMAL_POSITIONAL_VALUES_COUNT])
+
+m4_pushdef([_MINIMAL_POSITIONAL_VALUES_COUNT], 2)
+assert_equals(_IF_POSITIONAL_ARGS_COUNT_CHECK_NEEDED([needed], [not needed]), [needed])
+m4_popdef([_MINIMAL_POSITIONAL_VALUES_COUNT])
+
+m4_popdef([_POSITIONALS_INF])

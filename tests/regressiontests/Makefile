@@ -142,6 +142,7 @@ SCRIPTS += \
 	$(NUL)
 
 TESTS_GEN += \
+	gen-test-infinity-dash \
 	gen-test-pos \
 	gen-test-opt \
 	gen-test-pos2 \
@@ -443,12 +444,14 @@ test-infinity: $(TESTDIR)/test-infinity.sh
 	$< | grep -q 'POS_S=first,second,third,'
 	$< 1 | grep -q 'POS_S=1,second,third,'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+	! grep -q handle_passed_args_count $<
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity.sh"
 test-infinity-nodefaults: $(TESTDIR)/test-infinity-nodefaults.sh
 	ERROR="require at least 2" $(REVERSE) $<
 	ERROR="namely: 'pos-arg' (2 times)" $(REVERSE) $<
 	$< 1 "2 3" | grep -q 'POS_S=1,2 3'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+	grep -q handle_passed_args_count $<
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-infinity-nodefaults.sh"
 test-infinity-mixed: $(TESTDIR)/test-infinity-mixed.sh
 	$< -h | grep -q '<pos-arg-1> \[<pos-arg-2>\] \.\.\. \[<pos-arg-n>\] \.\.\.$$'
@@ -460,6 +463,10 @@ test-leftovers: $(TESTDIR)/test-leftovers.sh
 	$< -h | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-h|--help\] <another> \.\.\. $$'
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leftovers.sh"
+gen-test-infinity-dash: $(TESTDIR)/gen-test-infinity.m4 $(ARGBASH_BIN)
+	ERROR="supported" $(REVERSE) $(ARGBASH_EXEC) --type posix-script $< > /dev/null
+	ERROR="infinite" $(REVERSE) $(ARGBASH_EXEC) --type posix-script $< > /dev/null
+
 gen-test-pos: $(TESTDIR)/gen-test-pos.m4 $(ARGBASH_BIN)
 	ERROR="pos-arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 

@@ -530,10 +530,11 @@ argbash_api([ARG_LEFTOVERS],
 
 
 dnl
-dnl $1: Stem of file are we wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
+dnl $1: Stem of file we are wrapping. We expect macro _SCRIPT_$1 to be defined and to contain the full filefilename
 dnl $2: What to do if the argument of the ARGBASH_WRAP macro has surprised us - it has not been processed by argbash script.
 m4_define([_IF_WRAPPING_FILE_UNEXPECTEDLY],
 	[m4_ifndef([_SCRIPT_$1], [$2])])
+
 
 dnl
 dnl Wrap an Argbash-aware script.
@@ -556,3 +557,4 @@ argbash_api([ARGBASH_WRAP], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 )])
 
 
+m4_define([MAKE_ARGBASH_WRAP_IMPOSSIBLE], [argbash_api([ARGBASH_WRAP], [m4_fatal([Argbash wrapping is not supported: $1])])])

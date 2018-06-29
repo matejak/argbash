@@ -85,8 +85,8 @@ ADD_RULE([$(TESTDIR)/gen-test-init_name_dash.m4], [$(ARGBASH_INIT)],
 	[$(ARGBASH_INIT_EXEC) --pos -bool $@
 ])
 
-ADD_GENTEST([init_name_dash], ['-bool' .* begins with a dash])
+ADD_GENTEST_BASH([init_name_dash], ['-bool' .* begins with a dash])
 
-ADD_GENTEST([init_name_char], ['foo/bar-baz' .* contains forbidden characters])
+ADD_GENTEST_BASH([init_name_char], ['foo/bar-baz' .* contains forbidden characters])
 
 m4_popdef([tbody])

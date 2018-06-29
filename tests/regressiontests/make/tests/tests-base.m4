@@ -273,6 +273,7 @@ ADD_TEST([test-infinity], [[
 	$< | grep -q 'POS_S=first,second,third,'
 	$< 1 | grep -q 'POS_S=1,second,third,'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+	! grep -q handle_passed_args_count $<
 ]])
 
 ADD_TEST([test-infinity-nodefaults], [[
@@ -280,6 +281,7 @@ ADD_TEST([test-infinity-nodefaults], [[
 	ERROR="namely: 'pos-arg' (2 times)" $(REVERSE) $<
 	$< 1 "2 3" | grep -q 'POS_S=1,2 3'
 	$< 1 2 "3 1 4" 4 5 | grep -q 'POS_S=1,2,3 1 4,4,5,'
+	grep -q handle_passed_args_count $<
 ]])
 
 ADD_TEST([test-infinity-mixed], [[
@@ -294,18 +296,19 @@ ADD_TEST([test-leftovers], [[
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 ]])
 
-ADD_GENTEST([pos], [pos-arg])
-ADD_GENTEST([opt], [opt-arg])
-ADD_GENTEST([pos2], [pos_arg])
-ADD_GENTEST([opt2], [opt_arg])
-ADD_GENTEST([infinity-illegal], [number of expected positional arguments before 'pos-arg' is unknown (because of argument 'pos-arg', which has a default)])
-ADD_GENTEST([bool-default], ['on' or 'off' are allowed as boolean defaults])
-ADD_GENTEST([pos-opt], [same-arg])
-ADD_GENTEST([pos-opt2], [same_arg])
-ADD_GENTEST([more], [is unknown])
-ADD_GENTEST([illegal-pos], [contains forbidden characters])
-ADD_GENTEST([illegal-opt], [one character])
-ADD_GENTEST([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
+ADD_GENTEST_DASH([infinity], [supported], [infinite])
+ADD_GENTEST_BASH([pos], [pos-arg])
+ADD_GENTEST_BASH([opt], [opt-arg])
+ADD_GENTEST_BASH([pos2], [pos_arg])
+ADD_GENTEST_BASH([opt2], [opt_arg])
+ADD_GENTEST_BASH([infinity-illegal], [number of expected positional arguments before 'pos-arg' is unknown (because of argument 'pos-arg', which has a default)])
+ADD_GENTEST_BASH([bool-default], ['on' or 'off' are allowed as boolean defaults])
+ADD_GENTEST_BASH([pos-opt], [same-arg])
+ADD_GENTEST_BASH([pos-opt2], [same_arg])
+ADD_GENTEST_BASH([more], [is unknown])
+ADD_GENTEST_BASH([illegal-pos], [contains forbidden characters])
+ADD_GENTEST_BASH([illegal-opt], [one character])
+ADD_GENTEST_BASH([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
-ADD_GENTEST([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
-ADD_GENTEST([badcall-multi], [3rd argument], [num of args], [actual number of])
+ADD_GENTEST_BASH([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
+ADD_GENTEST_BASH([badcall-multi], [3rd argument], [num of args], [actual number of])
