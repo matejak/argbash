@@ -79,17 +79,23 @@ m4_define([ADD_TEST_POSIX], [ADD_TEST([$1], [$2], [$3], [$4], [-dash])])
 
 dnl
 dnl $1: The test stem (gen-test-<stem>.m4)
-dnl $2, $3, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
+dnl $2: The script suffix
+dnl $3: The output type
+dnl $4, $5, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
 m4_define([ADD_GENTEST], [m4_do(
-	[m4_pushdef([_tname], [gen-test-$1])],
+	[m4_pushdef([_tname], [[gen-test-$1]]m4_ifnblank([$2], [[[-$2]]]))],
 	[m4_divert_text([STDOUT3], [m4_do(
 		[_tname: $(TESTDIR)/gen-test-$1.m4 $(ARGBASH_BIN)
 ],
-		[m4_ifblank([$2], [	$(ARGBASH_EXEC) $< > /dev/null
+		[m4_ifblank([$4], [	$(ARGBASH_EXEC) m4_ifnblank([$3], [--type $3 ])$< > /dev/null
 ],
-			[m4_foreach([_errmsg], [m4_shift($@)],
-				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+			[m4_foreach([_errmsg], [m4_shift3($@)],
+				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_EXEC) m4_ifnblank([$3], [--type $3 ])$< > /dev/null
 ])])],
 	)])],
-	[m4_set_add([_TEST_GEN], m4_quote(_tname))],
+	[m4_set_add([_TEST_GEN], _tname)],
 )])
+
+
+m4_define([ADD_GENTEST_BASH], [ADD_GENTEST([$1], [], [], m4_shift($@))])
+m4_define([ADD_GENTEST_DASH], [ADD_GENTEST([$1], [dash], [posix-script], m4_shift($@))])

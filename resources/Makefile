@@ -17,6 +17,7 @@ M4_SRC += \
 	../src/output-completion.m4 \
 	../src/output-docopt.m4 \
 	../src/output-bash-script.m4 \
+	../src/output-posix-script.m4 \
 	$(NUL)
 
 # generate using

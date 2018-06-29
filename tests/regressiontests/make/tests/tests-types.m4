@@ -45,4 +45,4 @@ ADD_RULE([$(TESTDIR)/gen-test-group-wrong.m4], [$(TESTDIR)/test-group.m4],
 	[[sed -e 's/repeated@:>@,/foo,&/' $< > $@
 ]])
 ADD_SCRIPT([gen-test-group-wrong], [m4])
-ADD_GENTEST([group-wrong], ['foo' is not a script argument])
+ADD_GENTEST_BASH([group-wrong], ['foo' is not a script argument])
