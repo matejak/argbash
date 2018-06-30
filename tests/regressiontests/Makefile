@@ -143,6 +143,7 @@ SCRIPTS += \
 
 TESTS_GEN += \
 	gen-test-infinity-dash \
+	gen-test-wrap-dash \
 	gen-test-pos \
 	gen-test-opt \
 	gen-test-pos2 \
@@ -466,6 +467,9 @@ test-leftovers: $(TESTDIR)/test-leftovers.sh
 gen-test-infinity-dash: $(TESTDIR)/gen-test-infinity.m4 $(ARGBASH_BIN)
 	ERROR="supported" $(REVERSE) $(ARGBASH_EXEC) --type posix-script $< > /dev/null
 	ERROR="infinite" $(REVERSE) $(ARGBASH_EXEC) --type posix-script $< > /dev/null
+
+gen-test-wrap-dash: $(TESTDIR)/gen-test-wrap.m4 $(ARGBASH_BIN)
+	ERROR="supported" $(REVERSE) $(ARGBASH_EXEC) --type posix-script $< > /dev/null
 
 gen-test-pos: $(TESTDIR)/gen-test-pos.m4 $(ARGBASH_BIN)
 	ERROR="pos-arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null

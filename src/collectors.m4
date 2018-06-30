@@ -546,13 +546,16 @@ dnl $3: Codes of blacklisted args (string, default is HVI for help + version)
 argbash_api([ARGBASH_WRAP], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
 	[[$0($@)]],
 	[m4_pushdef([WRAPPED_FILE_STEM], m4_indir([_GROUP_OF_$1]))],
+	[m4_pushdef([WRAPPED_SCRIPT_FILENAME], m4_dquote(m4_indir([_SCRIPT_$1])))],
+	[m4_list_append([LIST_OF_FILES_WRAPPED], WRAPPED_SCRIPT_FILENAME)],
 	[m4_list_append([BLACKLIST], $2)],
 	[m4_pushdef([_W_FLAGS], [m4_default_quoted([$3], _DEFAULT_WRAP_FLAGS)])],
 	[_IF_WRAPPING_FILE_UNEXPECTEDLY([$1],
 		[m4_fatal([The calling script was supposed to find location of the file with stem '$1' and define it as a macro, but the latter didn't happen.])])],
-	[m4_ignore(m4_include(m4_indir([_SCRIPT_$1])))],
+	[m4_ignore(m4_include(WRAPPED_SCRIPT_FILENAME))],
 	[m4_popdef([_W_FLAGS])],
 	[m4_list_destroy([BLACKLIST])],
+	[m4_popdef([WRAPPED_SCRIPT_FILENAME])],
 	[m4_popdef([WRAPPED_FILE_STEM])],
 )])
 

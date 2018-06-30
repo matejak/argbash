@@ -297,6 +297,7 @@ ADD_TEST([test-leftovers], [[
 ]])
 
 ADD_GENTEST_DASH([infinity], [supported], [infinite])
+ADD_GENTEST_DASH([wrap], [supported])
 ADD_GENTEST_BASH([pos], [pos-arg])
 ADD_GENTEST_BASH([opt], [opt-arg])
 ADD_GENTEST_BASH([pos2], [pos_arg])

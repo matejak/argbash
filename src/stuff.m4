@@ -26,9 +26,8 @@ dnl TODO: Make the m4_lists_foreach_optional etc. accept second batch of lists.
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl
-dnl TODO: Ensure that we don't check for max pos args if we accept up to infinity args
+dnl TODO: Ensure that we don't check for max pos args if we accept up to infinity args (test)
 dnl TODO: Don't generate and/or call functions if we don't check for counts. (test DIY)
-dnl TODO: Ensure that we don't allow wrapping in the POSIX mode.
 dnl
 dnl Redesign intermediate layer: Arguments have long, short options, positional/optional, help msg, default, varname, type, ???
 dnl
