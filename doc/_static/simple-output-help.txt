@@ -2,6 +2,6 @@ resources/examples/simple.sh -h
 
 This program tells you size of file that you pass to it in chosen units.
 Usage: ../resources/examples/simple.sh [-u|--unit <arg>] [-v|--version] [--(no-)verbose] [-h|--help] <filename>
-	-u,--unit: What unit we accept (b for bytes, k for kibibytes, M for mebibytes) (default: 'b')
-	-v,--version: Prints version
-	-h,--help: Prints help
+	-u, --unit: What unit we accept (b for bytes, k for kibibytes, M for mebibytes) (default: 'b')
+	-v, --version: Prints version
+	-h, --help: Prints help

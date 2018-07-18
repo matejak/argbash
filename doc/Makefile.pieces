@@ -51,10 +51,9 @@ $(STATICDIR)/minimal_init-create.txt: $(AB_INIT)
 	$(CMD_OUT)
 	$(RM) minimal.m4
 
-$(STATICDIR)/index_script-create.txt: $(AB_INIT)
+$(STATICDIR)/index_script-create.txt: $(AB_INIT) $(INDEX_SCRIPT)
 	$(eval FLAGS := $(A_INIT_ARGS) - | $(AB) -o $(INDEX_SCRIPT) -)
 	$(CMD_OUT)
-	$(RM) $(INDEX_SCRIPT)
 
 $(STATICDIR)/index_script-help.txt: $(INDEX_SCRIPT)
 	$(eval FLAGS := -h)
@@ -114,4 +113,4 @@ clean-pieces: clean-tmp
 	$(RM) $(PIECES)
 
 clean-tmp:
-	$(RM) $(MINIMAL_SCRIPT) $(INDEX_SCRIPT)
+	$(RM) $(MINIMAL_SCRIPT) $(INDEX_SCRIPT) $(MINIMAL_INIT_POST)

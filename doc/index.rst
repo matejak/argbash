@@ -22,7 +22,7 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 :Authors:
   `Matěj Týč <https://github.com/matejak>`_
 :Copyright:
-  2014--2017, Matěj Týč
+  2014--|current-year|, Matěj Týč
 :Website:
   https://argbash.io
 

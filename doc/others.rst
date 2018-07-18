@@ -60,6 +60,10 @@ Then read through this list of influences and/or alternatives!
 
     * Supports only short optional arguments.
 
+  * Argbash says:
+
+    * ``argbash>=2.7.0`` can generate code that uses ``getopts`` in the :ref:`POSIX mode <posix>`, so there is no reason any longer to write that code manually.
+
 .. _easy_options:
 
 * ``EasyOptions``: ``Ruby`` utility with a ``bash`` interface as well as its pure ``bash`` implementation: https://github.com/renatosilva/easyoptions

@@ -55,6 +55,7 @@ Following argument types are supported:
 Following outputs are available:
 
 - Bash scripts, tailor-made bash parsing libraries.
+- POSIX scripts that use `getopts`, also tailor-made.
 - Bash completion.
 - [docopt](https://docopt.org)-compliant usage message.
 

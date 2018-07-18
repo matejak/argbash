@@ -4,5 +4,5 @@ This program tells you size of specified files in given directories in units you
 Usage: ../resources/examples/simple-wrapper.sh [--glob <arg>] [-u|--unit <arg>] [--(no-)verbose] [-h|--help] <directory-1> [<directory-2>] ... [<directory-n>] ...
 	<directory>: Directories to go through
 	--glob: What files to match in the directory (default: '*')
-	-u,--unit: What unit we accept (b for bytes, k for kibibytes, M for mebibytes) (default: 'b')
-	-h,--help: Prints help
+	-u, --unit: What unit we accept (b for bytes, k for kibibytes, M for mebibytes) (default: 'b')
+	-h, --help: Prints help

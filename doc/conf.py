@@ -13,9 +13,8 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
-import shlex
+import datetime
 
 
 version_fname = os.path.join('..', 'src', 'version')
@@ -55,8 +54,13 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Argbash'
-copyright = u'2015--2017, Matěj Týč'
+copyright = u'2015–{0}, Matěj Týč'.format(datetime.datetime.now().year)
 author = u'Matěj Týč'
+
+rst_epilog = """
+.. |current-year| date:: %Y
+"""
+
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
