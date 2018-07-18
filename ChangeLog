@@ -1,9 +1,10 @@
-2.7.0 (2018-07-18)
+2.7.0 (2018-07-19)
 ------------------
 
 New features:
 
 * `ARGBASH_WRAP` works recursively - you can wrap wrapped scripts.
+* Introduced new output - the strict POSIX shell output.
 
 Bugfixes:
 

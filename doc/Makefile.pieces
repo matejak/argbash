@@ -7,6 +7,7 @@ AB_INIT = ../bin/argbash-init
 # example exclusively in index.rst
 INDEX_SCRIPT = script.sh
 MINIMAL_INIT_TPL = $(RESOURCES)/examples/minimal-raw.m4
+MINIMAL_INIT_CREATE = minimal.m4
 MINIMAL_INIT_POST = $(RESOURCES)/examples/minimal.m4
 MINIMAL_SCRIPT = $(RESOURCES)/examples/minimal.sh
 SIMPLE = $(RESOURCES)/examples/simple.sh
@@ -47,9 +48,8 @@ endef
 
 A_INIT_ARGS = --pos positional-arg --opt option --opt-bool print
 $(STATICDIR)/minimal_init-create.txt: $(AB_INIT)
-	$(eval FLAGS := $(A_INIT_ARGS) minimal.m4)
+	$(eval FLAGS := $(A_INIT_ARGS) $(MINIMAL_INIT_CREATE))
 	$(CMD_OUT)
-	$(RM) minimal.m4
 
 $(STATICDIR)/index_script-create.txt: $(AB_INIT) $(INDEX_SCRIPT)
 	$(eval FLAGS := $(A_INIT_ARGS) - | $(AB) -o $(INDEX_SCRIPT) -)
@@ -70,7 +70,7 @@ $(MINIMAL_INIT_TPL): $(AB_INIT)
 	$(AB_INIT) $(A_INIT_ARGS) $@
 
 $(MINIMAL_INIT_POST): $(MINIMAL_INIT_TPL) $(PWD)/_static/minimal.patch
-	cat $(word 2,$^) | sed -e 's/@VERSION@/$(shell cat ../src/version)/' | patch -d $(dir $<) -o $(notdir $@) $(notdir $<)
+	cat $(word 2,$^) | sed -e 's/@VERSION@/$(shell cat ../src/version)/' | patch -d $(dir $@) -o $(notdir $@) $(notdir $<)
 
 # We enable the comments-in mode for the minimal script, so they are can be observed in the documentation
 $(MINIMAL_SCRIPT): $(MINIMAL_INIT_POST) $(AB)
@@ -79,7 +79,6 @@ $(MINIMAL_SCRIPT): $(MINIMAL_INIT_POST) $(AB)
 $(STATICDIR)/minimal_argbash-create.txt: $(AB) $(MINIMAL_INIT_POST)
 	$(eval FLAGS := -o $(MINIMAL_SCRIPT) $(MINIMAL_INIT_POST))
 	$(CMD_OUT_LOCAL)
-	rm $(MINIMAL_SCRIPT)
 
 $(STATICDIR)/minimal_init-output.txt: $(MINIMAL_SCRIPT)
 	$(eval FLAGS := --option value1 --print value0)
@@ -113,4 +112,4 @@ clean-pieces: clean-tmp
 	$(RM) $(PIECES)
 
 clean-tmp:
-	$(RM) $(MINIMAL_SCRIPT) $(INDEX_SCRIPT) $(MINIMAL_INIT_POST)
+	$(RM) $(MINIMAL_SCRIPT) $(INDEX_SCRIPT) $(MINIMAL_INIT_CREATE)
