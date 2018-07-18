@@ -45,7 +45,7 @@ ROOT ?= /
 
 A_INIT = ../bin/argbash-init
 GENPARSE = ../bin/argbash
-COMPLETION = argbash.sh
+COMPLETION = argbash
 INSTALL_COMPLETION ?= no
 ARGBASH_EXEC ?= $(GENPARSE)
 ARGBASH_INIT_EXEC ?= $(A_INIT)

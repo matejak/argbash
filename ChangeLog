@@ -1,4 +1,4 @@
-2.6.2 (TBA)
+2.7.0 (TBA)
 ------------------
 
 New features:
@@ -9,6 +9,8 @@ Bugfixes:
 
 * Fixed comment of the evaluate_strictness function in commented mode.
 * `ARG_OPTIONAL_BOOL` won't let you specify other default values than `on` or `off`.
+* Fixed bash completion containing a leading newline.
+* Fixed Argbash bash completion generated filename.
 
 
 2.6.1 (2018-03-04)
