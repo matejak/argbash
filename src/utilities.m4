@@ -111,6 +111,7 @@ m4_define([_COMMENT_PREFIX_HASH], [[# $1],])
 m4_define([_COMM_BLOCK], [__COMM_BLOCK([_COMMENT_PREFIX_NOTHING], $@)])
 m4_define([_COMM_BLOCK_HASH], [__COMM_BLOCK([_COMMENT_PREFIX_HASH], $@)])
 
+m4_define([_IF_COMMENTED_OUTPUT], [m4_ifdef([COMMENT_OUTPUT], [[$1]], [[$2]])])
 m4_define([__COMM_BLOCK], _CHECK_INTEGER_TYPE(2, [depth of indentation])[m4_ifdef([COMMENT_OUTPUT], [_JOIN_INDENTED([$2], m4_map_args([$1], m4_shiftn(2, m4_dquote_elt($@))))])])
 m4_define([_COMMENT_CHAIN], [m4_ifdef([COMMENT_OUTPUT], [$@])])
 m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])

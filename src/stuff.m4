@@ -26,6 +26,8 @@ dnl TODO: Make the m4_lists_foreach_optional etc. accept second batch of lists.
 dnl
 dnl WIP vvvvvvvvvvvvvvv
 dnl
+dnl TODO: Unify the _COMMENT, _COMMENTED_BLOCK etc. macros.
+dnl TODO: Evaluate need for _HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX
 dnl TODO: Ensure that we don't check for max pos args if we accept up to infinity args (test)
 dnl TODO: Don't generate and/or call functions if we don't check for counts. (test DIY)
 dnl
@@ -781,15 +783,17 @@ m4_define([_MAKE_OPTARG_CASE_SECTIONS], [m4_do(
 
 
 m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
-	[_COMM_BLOCK(1,
+	[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_WHILE,
 		[# If two dashes (i.e. '--') were passed on the command-line,],
 		[# assign the rest of arguments as positional arguments and bail out.],
 	)],
-	[_JOIN_INDENTED(1,
+	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_WHILE,
 		[if test "$_key" = '--'],
 		[then],
 		_INDENT_MORE(
 			[shift],
+			_IF_COMMENTED_OUTPUT([# Handle the case when the double dash is the last argument.]),
+			[test @S|@# -gt 0 || break],
 			[_positionals+=("@S|@@")],
 			[_positionals_count=$((_positionals_count + @S|@#))],
 			[shift $((@S|@# - 1))],
@@ -800,11 +804,11 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
 
 
 m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX], [m4_do(
-	[_COMM_BLOCK(1,
+	[_COMM_BLOCK(_INDENT_LEVEL_IN_ARGV_WHILE,
 		[# If two dashes (i.e. '--') were passed on the command-line,],
 		[# mark the first positional argument the one right after this one.],
 	)],
-	[_JOIN_INDENTED(1,
+	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_WHILE,
 		[if test "$_key" = '--'],
 		[then],
 		_INDENT_MORE(

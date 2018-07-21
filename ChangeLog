@@ -1,3 +1,12 @@
+2.7.1 (TBA)
+------------------
+
+Bugfixes:
+
+* Tests pass when there is no dash shell installed.
+* The double-dash handling when `--` is the last argument has been improved.
+
+
 2.7.0 (2018-07-19)
 ------------------
 
