@@ -45,13 +45,14 @@ dnl $2: The test body (see also: TEST_BODY)
 dnl $3: The other deps (literal, feel free to use the | delimiter)
 dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
 dnl $5: The suffix of the test script basename
+dnl $6: Prefix of the _TESTS make variable and _TEST_..._SCRIPTS
 dnl
 dnl Remarks:
 dnl No leading/trailing newlines, around the test body as it already has those.
 m4_define([ADD_TEST], [m4_do(
 	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1$5.sh]))],
-	[m4_set_add([_TESTS], [$1])],
-	[m4_set_add([_TEST_SCRIPTS], m4_quote(_script))],
+	[m4_set_add([$6_TESTS], [$1])],
+	[m4_set_add([_TEST_$6_SCRIPTS], m4_quote(_script))],
 	[m4_divert_text([STDOUT3], [m4_do(
 		[$1: _script[]m4_ifnblank([$3], [ $3])],
 		[$2],
@@ -66,7 +67,7 @@ dnl $1: The test name
 dnl $2: The test body (see also: TEST_BODY)
 dnl $3: The other deps (literal, feel free to use the | delimiter)
 dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
-m4_define([ADD_TEST_BASH], [ADD_TEST($@)])
+m4_define([ADD_TEST_BASH], [ADD_TEST([$1], [$2], [$3], [$4], [], [BASH])])
 
 
 dnl
@@ -74,28 +75,34 @@ dnl $1: The test name
 dnl $2: The test body (see also: TEST_BODY)
 dnl $3: The other deps (literal, feel free to use the | delimiter)
 dnl $4: The first dep (default: $(TESTDIR)/<name>.sh)
-m4_define([ADD_TEST_POSIX], [ADD_TEST([$1], [$2], [$3], [$4], [-dash])])
+m4_define([ADD_TEST_DASH], [ADD_TEST([$1-dash], [$2], [$3], [$4], [], [DASH])])
 
 
 dnl
 dnl $1: The test stem (gen-test-<stem>.m4)
 dnl $2: The script suffix
 dnl $3: The output type
-dnl $4, $5, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
+dnl $4: The gentest type
+dnl $5, $6, ...: The test error (optional, if the test is not supposed to throw errors, pass just $1 and leave others blank)
 m4_define([ADD_GENTEST], [m4_do(
 	[m4_pushdef([_tname], [[gen-test-$1]]m4_ifnblank([$2], [[[-$2]]]))],
 	[m4_divert_text([STDOUT3], [m4_do(
 		[_tname: $(TESTDIR)/gen-test-$1.m4 $(ARGBASH_BIN)
 ],
-		[m4_ifblank([$4], [	$(ARGBASH_EXEC) m4_ifnblank([$3], [--type $3 ])$< > /dev/null
+		[m4_ifblank([$5], [	$(ARGBASH_EXEC) m4_ifnblank([$3], [--type $3 ])$< > /dev/null
 ],
-			[m4_foreach([_errmsg], [m4_shift3($@)],
+			[m4_foreach([_errmsg], [m4_shiftn(4, $@)],
 				[	ERROR="_errmsg" $(REVERSE) $(ARGBASH_EXEC) m4_ifnblank([$3], [--type $3 ])$< > /dev/null
 ])])],
 	)])],
-	[m4_set_add([_TEST_GEN], _tname)],
+	[m4_set_add([_TEST_GEN_$4], _tname)],
 )])
 
 
-m4_define([ADD_GENTEST_BASH], [ADD_GENTEST([$1], [], [], m4_shift($@))])
-m4_define([ADD_GENTEST_DASH], [ADD_GENTEST([$1], [dash], [posix-script], m4_shift($@))])
+m4_define([ADD_GENTEST_BASH],
+	[ADD_GENTEST([$1], [], [],
+		[BASH], m4_shift($@))])
+
+m4_define([ADD_GENTEST_DASH],
+	[ADD_GENTEST([$1], [dash], [posix-script],
+		[DASH], m4_shift($@))])

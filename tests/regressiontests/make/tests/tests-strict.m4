@@ -6,7 +6,7 @@ ADD_RULE([$(TESTDIR)/test-very_strict.sh], [$(TESTDIR)/test-simple.m4 $(ARGBASH_
 
 
 dnl We have to pass a positional argument, so sometimes we pass 'pos-arg', sometimes stuff that looks like a option
-ADD_TEST([test-semi_strict], [[
+ADD_TEST_BASH([test-semi_strict], [[
 	$< -o -x pos-arg | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx pos-arg | grep -q 'OPT_S=--opt-argx,'
 	ERROR="omitted the actual value" $(REVERSE) $< -o -o pos-arg
@@ -14,7 +14,7 @@ ADD_TEST([test-semi_strict], [[
 	ERROR="omitted the actual value" $(REVERSE) $< -o --prefix
 ]])
 
-ADD_TEST([test-very_strict], [[
+ADD_TEST_BASH([test-very_strict], [[
 	ERROR="are trying to pass an option" $(REVERSE) $< -o -x pos-arg
 	ERROR="are trying to pass an option" $(REVERSE) $< -o -o pos-arg
 	ERROR="are trying to pass an option" $(REVERSE) $< -x

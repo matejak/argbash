@@ -9,9 +9,9 @@ m4_pushdef([tbody], [[[
 ]]])
 
 
-ADD_TEST([test-init_simple], tbody([$<]))
-ADD_TEST([test-init_simple-s], tbody([$<]))
-ADD_TEST([test-init_simple-ss], tbody([$<]), [$(TESTDIR)/test-init_simple-ss-parsing.sh])
+ADD_TEST_BASH([test-init_simple], tbody([$<]))
+ADD_TEST_BASH([test-init_simple-s], tbody([$<]))
+ADD_TEST_BASH([test-init_simple-ss], tbody([$<]), [$(TESTDIR)/test-init_simple-ss-parsing.sh])
 
 
 ADD_SCRIPT([test-init_simple])
@@ -53,7 +53,7 @@ dnl
 dnl 1. The parsing part fails if --ordnung does not receive the "yes" value, but the -o alias doesn't work
 dnl 2. The support for -o is injected to the parsing shell script
 dnl 3. The script is regenerated and this time, we expect that the parsing stuff got also regenerated, so the -o alias is functional.
-ADD_TEST([test-init_simple-s-update], [[
+ADD_TEST_BASH([test-init_simple-s-update], [[
 	@# Regenerate everyting during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes > /dev/null

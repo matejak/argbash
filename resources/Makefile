@@ -77,14 +77,14 @@ ARGBASH_TO = $(foreach ver,$(lesser_versions),../bin/argbash-$(ver)to$(major_ver
 CHANGELOG = ../ChangeLog
 
 %-standalone.sh: %-standalone.m4 $(GENPARSE)
-	$(ARGBASH_EXEC) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --strip user-content
 
 # argbash-init uses the -parsing suffix to denote standalone parsing sections of scripts
 %-parsing.sh: %-parsing.m4 $(GENPARSE)
-	$(ARGBASH_EXEC) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --strip user-content
 
 %-standalone2.sh: %-standalone.sh $(GENPARSE)
-	$(ARGBASH_EXEC) $< -o $@ --library
+	$(ARGBASH_EXEC) $< -o $@ --strip user-content
 
 %.sh: %.m4 $(GENPARSE)
 	$(ARGBASH_EXEC) $< -o $@

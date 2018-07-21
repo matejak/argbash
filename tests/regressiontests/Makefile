@@ -1,7 +1,3 @@
-TESTS =
-SCRIPTS =
-TESTS_GEN =
-
 TESTDIR ?= ../regressiontests
 PHONIES ?=
 
@@ -21,10 +17,53 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
+TESTS =
+TESTS_GEN =
+
+# presumably always-executed and created scripts
+SCRIPTS = \
+	$(TESTDIR)/basic2.sh \
+	$(TESTDIR)/test-salone.sh \
+	$(TESTDIR)/test-standalone2.sh \
+	$(TESTDIR)/test-ddash.m4 \
+	$(TESTDIR)/test-diy-noop.m4 \
+	$(TESTDIR)/test-diy-noop.sh \
+	$(TESTDIR)/test-diy.m4 \
+	$(TESTDIR)/test-wrapping-second_level.sh \
+	$(TESTDIR)/test-wrapping-single_level.sh \
+	$(TESTDIR)/otherdir/test-onlyopt.m4 \
+	$(TESTDIR)/test-wrapping-otherdir.sh \
+	$(TESTDIR)/otherdir/test-onlypos.m4 \
+	$(TESTDIR)/test-wrapping2.sh \
+	$(TESTDIR)/test-init_simple.sh \
+	$(TESTDIR)/test-init_simple.m4 \
+	$(TESTDIR)/test-init_simple-parsing.m4 \
+	$(TESTDIR)/test-init_simple-s.sh \
+	$(TESTDIR)/test-init_simple-s-parsing.sh \
+	$(TESTDIR)/test-init_simple-s-parsing.m4 \
+	$(TESTDIR)/test-init_simple-s.m4 \
+	$(TESTDIR)/regenerate-test-init-simple-s-update.m4 \
+	$(TESTDIR)/test-init_simple-s-update-parsing.sh \
+	$(TESTDIR)/test-init_simple-s-update-parsing.m4 \
+	$(TESTDIR)/regenerate-test-init_simple-s-update.m4 \
+	$(TESTDIR)/test-init_simple-s-update.m4 \
+	$(TESTDIR)/test-init_simple-ss-parsing.sh \
+	$(TESTDIR)/test-init_simple-ss-parsing.m4 \
+	$(TESTDIR)/test-init_simple-ss.sh \
+	$(TESTDIR)/gen-test-init_name_char.m4 \
+	$(TESTDIR)/gen-test-init_name_dash.m4 \
+	$(TESTDIR)/gen-test-group-wrong.m4 \
+	$(TESTDIR)/test-semi_strict.sh \
+	$(TESTDIR)/test-very_strict.sh \
+	$(TESTDIR)/test-getopt-equals.sh \
+	$(TESTDIR)/test-getopt-both.sh \
+	$(TESTDIR)/test-getopt-space.sh \
+	$(NUL)
+
+# bash tests
 TESTS += \
 	stability \
 	basic \
-	basic-dash \
 	test-void \
 	call-salone \
 	test-most \
@@ -32,11 +71,9 @@ TESTS += \
 	test-onlypos \
 	test-onlypos-declared \
 	test-onlyopt \
-	test-onlyopt-dash \
 	stability-salone \
 	test-ddash \
 	test-simple \
-	test-simple-dash \
 	test-diy-noop \
 	test-diy \
 	test-wrapping-second_level \
@@ -68,82 +105,8 @@ TESTS += \
 	test-getopt-space \
 	test-getopt-equals \
 	$(NUL)
-TESTS += tests-gen
-
-SCRIPTS += \
-	$(TESTDIR)/basic2.sh \
-	$(TESTDIR)/basic.sh \
-	$(TESTDIR)/basic-dash.sh \
-	$(TESTDIR)/test-void.sh \
-	$(TESTDIR)/test-salone.sh \
-	$(TESTDIR)/call-salone.sh \
-	$(TESTDIR)/test-most.sh \
-	$(TESTDIR)/test-more.sh \
-	$(TESTDIR)/test-onlypos.sh \
-	$(TESTDIR)/test-onlypos-declared.sh \
-	$(TESTDIR)/test-onlyopt.sh \
-	$(TESTDIR)/test-onlyopt-dash.sh \
-	$(TESTDIR)/test-standalone2.sh \
-	$(TESTDIR)/test-standalone.sh \
-	$(TESTDIR)/test-ddash.m4 \
-	$(TESTDIR)/test-ddash.sh \
-	$(TESTDIR)/test-simple.sh \
-	$(TESTDIR)/test-simple-dash.sh \
-	$(TESTDIR)/test-diy-noop.sh \
-	$(TESTDIR)/test-diy-noop.m4 \
-	$(TESTDIR)/test-diy.sh \
-	$(TESTDIR)/test-diy.m4 \
-	$(TESTDIR)/test-wrapping-second_level.sh \
-	$(TESTDIR)/test-wrapping-single_level.sh \
-	$(TESTDIR)/otherdir/test-onlyopt.m4 \
-	$(TESTDIR)/test-wrapping.sh \
-	$(TESTDIR)/test-wrapping-otherdir.sh \
-	$(TESTDIR)/otherdir/test-onlypos.m4 \
-	$(TESTDIR)/test-wrapping-more.sh \
-	$(TESTDIR)/test-wrapping-excl.sh \
-	$(TESTDIR)/test-wrapping2.sh \
-	$(TESTDIR)/test-infinity-minimal_call.sh \
-	$(TESTDIR)/test-infinity.sh \
-	$(TESTDIR)/test-infinity-nodefaults.sh \
-	$(TESTDIR)/test-infinity-mixed.sh \
-	$(TESTDIR)/test-leftovers.sh \
-	$(TESTDIR)/test-delim-space.sh \
-	$(TESTDIR)/test-delim-equals.sh \
-	$(TESTDIR)/test-delim-both.sh \
-	$(TESTDIR)/test-init_simple.sh \
-	$(TESTDIR)/test-init_simple-s.sh \
-	$(TESTDIR)/test-init_simple-ss.sh \
-	$(TESTDIR)/test-init_simple.m4 \
-	$(TESTDIR)/test-init_simple-parsing.m4 \
-	$(TESTDIR)/test-init_simple-s-parsing.sh \
-	$(TESTDIR)/test-init_simple-s-parsing.m4 \
-	$(TESTDIR)/test-init_simple-s.m4 \
-	$(TESTDIR)/regenerate-test-init-simple-s-update.m4 \
-	$(TESTDIR)/test-init_simple-s-update-parsing.sh \
-	$(TESTDIR)/test-init_simple-s-update-parsing.m4 \
-	$(TESTDIR)/regenerate-test-init_simple-s-update.m4 \
-	$(TESTDIR)/test-init_simple-s-update.m4 \
-	$(TESTDIR)/test-init_simple-s-update.sh \
-	$(TESTDIR)/test-init_simple-ss-parsing.sh \
-	$(TESTDIR)/test-init_simple-ss-parsing.m4 \
-	$(TESTDIR)/gen-test-init_name_char.m4 \
-	$(TESTDIR)/gen-test-init_name_dash.m4 \
-	$(TESTDIR)/test-env-base.sh \
-	$(TESTDIR)/test-env-simple.sh \
-	$(TESTDIR)/test-int.sh \
-	$(TESTDIR)/test-group.sh \
-	$(TESTDIR)/test-group-idx.sh \
-	$(TESTDIR)/gen-test-group-wrong.m4 \
-	$(TESTDIR)/test-semi_strict.sh \
-	$(TESTDIR)/test-very_strict.sh \
-	$(TESTDIR)/test-getopt-equals.sh \
-	$(TESTDIR)/test-getopt-both.sh \
-	$(TESTDIR)/test-getopt-space.sh \
-	$(NUL)
 
 TESTS_GEN += \
-	gen-test-infinity-dash \
-	gen-test-wrap-dash \
 	gen-test-pos \
 	gen-test-opt \
 	gen-test-pos2 \
@@ -162,6 +125,72 @@ TESTS_GEN += \
 	gen-test-init_name_char \
 	gen-test-group-wrong \
 	$(NUL)
+
+SCRIPTS += \
+	$(TESTDIR)/basic.sh \
+	$(TESTDIR)/test-void.sh \
+	$(TESTDIR)/call-salone.sh \
+	$(TESTDIR)/test-most.sh \
+	$(TESTDIR)/test-more.sh \
+	$(TESTDIR)/test-onlypos.sh \
+	$(TESTDIR)/test-onlypos-declared.sh \
+	$(TESTDIR)/test-onlyopt.sh \
+	$(TESTDIR)/test-standalone.sh \
+	$(TESTDIR)/test-ddash.sh \
+	$(TESTDIR)/test-simple.sh \
+	$(TESTDIR)/test-diy-noop.sh \
+	$(TESTDIR)/test-diy.sh \
+	$(TESTDIR)/test-wrapping-second_level.sh \
+	$(TESTDIR)/test-wrapping.sh \
+	$(TESTDIR)/test-wrapping-otherdir.sh \
+	$(TESTDIR)/test-wrapping-more.sh \
+	$(TESTDIR)/test-wrapping-excl.sh \
+	$(TESTDIR)/test-infinity-minimal_call.sh \
+	$(TESTDIR)/test-infinity.sh \
+	$(TESTDIR)/test-infinity-nodefaults.sh \
+	$(TESTDIR)/test-infinity-mixed.sh \
+	$(TESTDIR)/test-leftovers.sh \
+	$(TESTDIR)/test-delim-space.sh \
+	$(TESTDIR)/test-delim-equals.sh \
+	$(TESTDIR)/test-delim-both.sh \
+	$(TESTDIR)/test-init_simple.sh \
+	$(TESTDIR)/test-init_simple-s.sh \
+	$(TESTDIR)/test-init_simple-ss.sh \
+	$(TESTDIR)/test-init_simple-s-update.sh \
+	$(TESTDIR)/test-env-base.sh \
+	$(TESTDIR)/test-env-simple.sh \
+	$(TESTDIR)/test-int.sh \
+	$(TESTDIR)/test-group.sh \
+	$(TESTDIR)/test-group-idx.sh \
+	$(TESTDIR)/test-semi_strict.sh \
+	$(TESTDIR)/test-very_strict.sh \
+	$(TESTDIR)/test-getopt-both.sh \
+	$(TESTDIR)/test-getopt-space.sh \
+	$(TESTDIR)/test-getopt-equals.sh \
+	$(NUL)
+
+ifneq "$(shell which dash 2> /dev/null)" ""
+
+TESTS += \
+	basic-dash \
+	test-onlyopt-dash \
+	test-simple-dash \
+	$(NUL)
+
+TESTS_GEN += \
+	gen-test-infinity-dash \
+	gen-test-wrap-dash \
+	$(NUL)
+
+SCRIPTS += \
+	$(TESTDIR)/basic-dash.sh \
+	$(TESTDIR)/test-onlyopt-dash.sh \
+	$(TESTDIR)/test-simple-dash.sh \
+	$(NUL)
+
+endif
+
+TESTS += tests-gen
 
 define generic_regression_posix
 	$< LOO | grep -q 'POS_S=LOO',

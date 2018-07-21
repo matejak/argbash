@@ -18,10 +18,6 @@ m4_include([tests/tests-strict.m4])
 m4_include([tests/tests-getopt.m4])
 
 m4_divert_push(STDOUT1)dnl
-TESTS =
-SCRIPTS =
-TESTS_GEN =
-
 TESTDIR ?= ../regressiontests
 PHONIES ?=
 
@@ -44,21 +40,51 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 m4_divert_pop(STDOUT1)
 
 m4_divert_push(STDOUT2)dnl
-TESTS += \
-	m4_join([ \
-	], m4_set_list([_TESTS])) \
-	$(NUL)
-TESTS += tests-gen
+TESTS =
+TESTS_GEN =
 
-SCRIPTS += \
+# presumably always-executed and created scripts
+SCRIPTS = \
 	m4_join([ \
 	], m4_set_list([_TEST_SCRIPTS])) \
 	$(NUL)
 
+# bash tests
+TESTS += \
+	m4_join([ \
+	], m4_set_list([BASH_TESTS])) \
+	$(NUL)
+
 TESTS_GEN += \
 	m4_join([ \
-	], m4_set_list([_TEST_GEN])) \
+	], m4_set_list([_TEST_GEN_BASH])) \
 	$(NUL)
+
+SCRIPTS += \
+	m4_join([ \
+	], m4_set_list([_TEST_BASH_SCRIPTS])) \
+	$(NUL)
+
+ifneq "$(shell which dash 2> /dev/null)" ""
+
+TESTS += \
+	m4_join([ \
+	], m4_set_list([DASH_TESTS])) \
+	$(NUL)
+
+TESTS_GEN += \
+	m4_join([ \
+	], m4_set_list([_TEST_GEN_DASH])) \
+	$(NUL)
+
+SCRIPTS += \
+	m4_join([ \
+	], m4_set_list([_TEST_DASH_SCRIPTS])) \
+	$(NUL)
+
+endif
+
+TESTS += tests-gen
 [
 define generic_regression_posix
 	$< LOO | grep -q 'POS_S=LOO',

@@ -1,4 +1,4 @@
-ADD_TEST([test-int], [[
+ADD_TEST_BASH([test-int], [[
 	$< 1 | grep -q "POS_S=1,"
 	ERROR="integer" $(REVERSE) $< a
 	ERROR="integer" $(REVERSE) $< 1.5
@@ -17,7 +17,7 @@ ADD_TEST([test-int], [[
 	ERROR="negative" $(REVERSE) $< 1 --nnint -1
 ]])
 
-ADD_TEST([test-group], [[
+ADD_TEST_BASH([test-group], [[
 	$< foo | grep -q "ACT=foo"
 	$< '' | grep -q "ACT="
 	$< foo,baz | grep -q "ACT=foo,baz,"
@@ -29,7 +29,7 @@ ADD_TEST([test-group], [[
 	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
 ]])
 
-ADD_TEST([test-group-idx], [[
+ADD_TEST_BASH([test-group-idx], [[
 	$< foo | grep -q "ACT=foo,IDX=0,"
 	$< foo,baz | grep -q "ACT=foo,baz,IDX=3,"
 	$< "bar bar" | grep -q "ACT=bar bar,IDX=2,"
