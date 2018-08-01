@@ -1,10 +1,13 @@
 2.7.1 (TBA)
 ------------------
 
+New features:
+
 Bugfixes:
 
 * Tests pass when there is no dash shell installed.
 * The double-dash handling when `--` is the last argument has been improved.
+* The generated bash completion is now complementing (i.e. not shadowing) the default bash completion.
 
 
 2.7.0 (2018-07-19)
