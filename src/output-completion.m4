@@ -1,13 +1,26 @@
 dnl TODO: Basename determination: output filename, or input filename, or nothing.
+m4_include([argument_value_types.m4])
+m4_include([value_validators.m4])
 
 dnl Make somehow sure that the program name is translated to a valid shell function identifier
 m4_define([_TRANSLATE_BAD_CHARS], [m4_translit([[$1]], [-.], [__])])
 
 m4_define([GATHER_OPTIONS_OF_ARGUMENTS_THAT_ACCEPT_SOME_VALUE], [m4_do(
-	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [_IF_ARG_ACCEPTS_VALUE(_arg_type, [m4_do(
-		[m4_list_append([_OPTIONS_FOLLOWED_BY_VALUE], [--]_argname)],
-		[m4_ifnblank(_arg_short, [m4_list_append([_OPTIONS_FOLLOWED_BY_VALUE], [-]_arg_short)])],
-	)])])],
+	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [_IF_ARG_ACCEPTS_VALUE(_arg_type,
+		[m4_set_contains([GROUP_SET_ARGS], _argname,
+			[m4_do(
+				[m4_pushdef([_group_set], _GET_VALUE_TYPE(_argname))],
+				[m4_set_add([_GROUP_SETS], _group_set)],
+				[m4_list_append([OPTIONS_FOLLOWED_BY_]_group_set, [--]_argname)],
+				[m4_ifnblank(_arg_short, [m4_list_append([OPTIONS_FOLLOWED_BY_]_group_set, [-]_arg_short)])],
+				[m4_popdef([_group_set])],
+			)],
+			[m4_do(
+				[m4_list_append([OPTIONS_FOLLOWED_BY_SOME_VALUE], [--]_argname)],
+				[m4_ifnblank(_arg_short, [m4_list_append([OPTIONS_FOLLOWED_BY_SOME_VALUE], [-]_arg_short)])],
+			)],
+		)],
+	)])],
 )])
 
 
@@ -83,8 +96,18 @@ m4_define([_OUTER_CASE_ELEMENTS], [m4_do(
 	[_JOIN_INDENTED(1,
 		[[case "$prev" in]],
 	)],
+	[m4_set_foreach([_GROUP_SETS], [_group_set], [m4_do(
+		[_JOIN_INDENTED(2,
+			[m4_list_join([OPTIONS_FOLLOWED_BY_]_group_set, [|])[@:}@]],
+			_INDENT_MORE(m4_dquote_elt(
+				[COMPREPLY=( $(compgen -W "]m4_list_join([_LIST_]_group_set, [ ])[" -- "${cur}") )],
+				[return 0],
+				[;;],
+			)),
+		)],
+	)])],
 	[_JOIN_INDENTED(2,
-		[m4_list_join([_OPTIONS_FOLLOWED_BY_VALUE], [|])[@:}@]],
+		[m4_list_join([OPTIONS_FOLLOWED_BY_SOME_VALUE], [|])[@:}@]],
 		_INDENT_MORE(m4_dquote_elt(
 			[COMPREPLY=( $(compgen -o bashdefault -o default -- "${cur}") )],
 			[return 0],
