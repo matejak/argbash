@@ -3,6 +3,8 @@
 
 New features:
 
+* The bash completion now supports arguments of one-of-restricted values.
+
 Bugfixes:
 
 * Tests pass when there is no dash shell installed.
