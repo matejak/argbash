@@ -33,7 +33,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %-dash.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) --type posix-script -o $@ $<
-	[sed -i "s|#!/bin/bash|#!]m4_esyscmd_s([which dash])|" $@
+	[sed -i "s|#!/bin/bash|#!]$(shell which dash)|" $@
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
