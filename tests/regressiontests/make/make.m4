@@ -39,6 +39,29 @@ dnl $3: body
 m4_define([ADD_ARGBASH_RULE], [ADD_RULE(
 	[$1.sh], [$1.m4 $2 $(ARGBASH_BIN)], [$3])])
 
+
+dnl
+dnl $1: The test name
+dnl $2: The test body (see also: TEST_BODY)
+dnl $3: The other deps (literal, feel free to use the | delimiter)
+dnl $4: The first dep (default: $(TESTDIR)/<name>.txt)
+dnl
+dnl Remarks:
+dnl No leading/trailing newlines, around the test body as it already has those.
+m4_define([ADD_DOCOPT_TEST], [m4_do(
+	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1.txt]))],
+	[m4_pushdef([_testname], [[$1-docopt]])],
+	[m4_set_add([DOCOPT_TESTS], _testname)],
+	[m4_set_add([_TEST_DOCOPT_SCRIPTS], m4_quote(_script))],
+	[m4_divert_text([STDOUT3], [m4_do(
+		_testname[: _script[]m4_ifnblank([$3], [ $3])],
+		[$2],
+	)])],
+	[m4_popdef([_testname])],
+	[m4_popdef([_script])],
+)])
+
+
 dnl
 dnl $1: The test name
 dnl $2: The test body (see also: TEST_BODY)
