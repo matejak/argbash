@@ -17,6 +17,9 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
+
+%.txt: %.m4 $(ARGBASH_BIN)
+	$(word 2,$^) $< -t docopt --strip all -o $@
 TESTS =
 TESTS_GEN =
 
@@ -106,6 +109,12 @@ TESTS += \
 	test-getopt-equals \
 	$(NUL)
 
+# docopt tests
+TESTS += \
+	basic-docopt \
+	test-onlyopt-docopt \
+	$(NUL)
+
 TESTS_GEN += \
 	gen-test-pos \
 	gen-test-opt \
@@ -167,6 +176,8 @@ SCRIPTS += \
 	$(TESTDIR)/test-getopt-both.sh \
 	$(TESTDIR)/test-getopt-space.sh \
 	$(TESTDIR)/test-getopt-equals.sh \
+	$(TESTDIR)/basic.txt \
+	$(TESTDIR)/test-onlyopt.txt \
 	$(NUL)
 
 ifneq "$(shell which dash 2> /dev/null)" ""
@@ -545,6 +556,15 @@ gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
 	ERROR="3rd argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
+basic-docopt: $(TESTDIR)/basic.txt
+	grep -q "\[<pos-opt>\]" $<
+	grep -q "\[--opt_arg OPT_ARG\]" $<
+	grep -q "\s-o OPT_ARG, --opt_arg OPT_ARG\s" $<
+
+test-onlyopt-docopt: $(TESTDIR)/test-onlyopt.txt
+	grep -q "\[--opt-repeated OPT-REPEATED\]\.\.\." $<
+	grep -q "\[--incrx\]\.\.\." $<
 
 test-delim-space: $(TESTDIR)/test-delim-space.sh
 	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something

@@ -10,6 +10,7 @@ m4_define([include_test], [m4_do(
 )])
 
 m4_include([tests/tests-base.m4])
+m4_include([tests/tests-docopt.m4])
 m4_include([tests/tests-delimiters.m4])
 m4_include([tests/tests-init.m4])
 m4_include([tests/tests-env.m4])
@@ -37,6 +38,9 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
+
+%.txt: %.m4 $(ARGBASH_BIN)
+	$(word 2,$^) $< -t docopt --strip all -o $@
 m4_divert_pop(STDOUT1)
 
 m4_divert_push(STDOUT2)dnl
@@ -55,6 +59,12 @@ TESTS += \
 	], m4_set_list([BASH_TESTS])) \
 	$(NUL)
 
+# docopt tests
+TESTS += \
+	m4_join([ \
+	], m4_set_list([DOCOPT_TESTS])) \
+	$(NUL)
+
 TESTS_GEN += \
 	m4_join([ \
 	], m4_set_list([_TEST_GEN_BASH])) \
@@ -62,7 +72,7 @@ TESTS_GEN += \
 
 SCRIPTS += \
 	m4_join([ \
-	], m4_set_list([_TEST_BASH_SCRIPTS])) \
+	], m4_set_list([_TEST_BASH_SCRIPTS]),m4_set_list([_TEST_DOCOPT_SCRIPTS])) \
 	$(NUL)
 
 ifneq "$(shell which dash 2> /dev/null)" ""
