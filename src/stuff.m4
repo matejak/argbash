@@ -92,7 +92,7 @@ argbash_api([DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_append([_OTHER],
-		m4_quote(_sciptdir[="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
+		m4_quote(_sciptdir[="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
 	[m4_popdef([_sciptdir])],
 )])
 
