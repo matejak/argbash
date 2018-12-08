@@ -133,14 +133,14 @@ We generate the script from the template:
 
 ::
 
-   bin/argbash minimal.m4 -o script.sh
+   bin/argbash minimal.m4 -o minimal.sh
 
 
 Now we launch it and the output is good!
 
 ::
 
-   ./script.sh posi-tional -o opt-ional --print
+   ./minimal.sh posi-tional -o opt-ional --print
 
    Positional arg value: posi-tional
    Optional arg --option value: opt-ional
