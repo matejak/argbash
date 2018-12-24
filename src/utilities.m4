@@ -276,3 +276,17 @@ m4_define([_LIST_LONGEST_TEXT_LENGTH], [m4_do(
 	[_longest_label_len],
 	[m4_popdef([_longest_label_len])],
 )])
+
+
+m4_define([_CAPITALIZE], [m4_translit([[$1]], [a-z], [A-Z])])
+
+
+dnl
+dnl $1: What to underline
+dnl $2: By what
+m4_define([UNDERLINE], [m4_do(
+	[$1],
+	[_ENDL_()],
+	[m4_if(m4_len([$1]), 0, ,
+		[m4_for(idx, 1, m4_len([$1]), 1, [$2])])],
+)])
