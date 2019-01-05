@@ -139,7 +139,7 @@ m4_define([m4_list_join], [m4_do(
 )])
 
 dnl
-dnl Returns its n-th element
+dnl Returns its n-th element, first item has index of 1.
 dnl If the element index is wrong, return $3
 m4_define([m4_list_nth], [m4_do(
 	[m4_bmatch([$2], [[1-9][0-9]*], [m4_do(
