@@ -114,9 +114,13 @@ something()
 assert_equals(UNDERLINE(), [
 ])
 
+assert_equals(UNDERLINE(,=,=), [
+])
+
 assert_equals(UNDERLINE([a], [-]), [a
 -])
 
 
-assert_equals(UNDERLINE([Abc], [+]), [Abc
+assert_equals(UNDERLINE([Abc], [+], [=]), [===
+Abc
 +++])

@@ -283,8 +283,13 @@ m4_define([_CAPITALIZE], [m4_translit([[$1]], [a-z], [A-Z])])
 
 dnl
 dnl $1: What to underline
-dnl $2: By what
+dnl $2: By what to underline
+dnl $3: By what to overline (optional)
 m4_define([UNDERLINE], [m4_do(
+	[m4_if(m4_len([$1]), 0, , [m4_if([$3], , , [m4_do(
+		[m4_for(idx, 1, m4_len([$1]), 1, [$3])],
+		[_ENDL_()],
+	)])])],
 	[$1],
 	[_ENDL_()],
 	[m4_if(m4_len([$1]), 0, ,

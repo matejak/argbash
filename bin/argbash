@@ -11,8 +11,8 @@ version=2.7.1
 # ARG_POSITIONAL_SINGLE([input],[The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output],[o],[Name of the output file (pass '-' for stdout)],[-])
 # ARG_OPTIONAL_SINGLE([type],[t],[Output type to generate],[bash-script])
-# ARG_OPTIONAL_BOOLEAN([library],[],[Whether the input file if the pure parsing library.])
-# ARG_OPTIONAL_SINGLE([strip],[],[Determines what to have in the output.],[none])
+# ARG_OPTIONAL_BOOLEAN([library],[],[Whether the input file if the pure parsing library])
+# ARG_OPTIONAL_SINGLE([strip],[],[Determines what to have in the output],[none])
 # ARG_OPTIONAL_BOOLEAN([check-typos],[],[Whether to check for possible argbash macro typos],[on])
 # ARG_OPTIONAL_BOOLEAN([commented],[c],[Commented mode - include explanatory comments with the parsing code],[off])
 # ARG_OPTIONAL_REPEATED([search],[I],[Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)],["."])
@@ -91,8 +91,8 @@ print_help()
 	printf '\t%s\n' "<input>: The input template file (pass '-' for stdin)"
 	printf '\t%s\n' "-o, --output: Name of the output file (pass '-' for stdout) (default: '-')"
 	printf '\t%s\n' "-t, --type: Output type to generate (default: 'bash-script')"
-	printf '\t%s\n' "--library, --no-library: Whether the input file if the pure parsing library. (off by default)"
-	printf '\t%s\n' "--strip: Determines what to have in the output. (default: 'none')"
+	printf '\t%s\n' "--library, --no-library: Whether the input file if the pure parsing library (off by default)"
+	printf '\t%s\n' "--strip: Determines what to have in the output (default: 'none')"
 	printf '\t%s\n' "--check-typos, --no-check-typos: Whether to check for possible argbash macro typos (on by default)"
 	printf '\t%s\n' "-c, --commented, --no-commented: Commented mode - include explanatory comments with the parsing code (off by default)"
 	printf '\t%s' "-I, --search: Directories to search for the wrapped scripts (directory of the template will be added to the end of the list) (default array elements:"

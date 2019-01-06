@@ -10,28 +10,60 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[dnl ASSERT_THAT_BASENAME_IS_KNOWN
 ],
 	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
-	[MAKE_RST_CONTENT(m4_quote(_BASENAME))],
+	[MAKE_RST_CONTENT(m4_quote(_BASENAME), _HELP_MSG, _HELP_MSG_EX)],
+)])
+
+
+dnl
+dnl $1: date
+m4_define([_MAKE_METADATA], [
+:Author: |AUTHOR|
+:Date:   $1
+:Version: |VERSION|
+:Manual section: 1
+])
+
+
+m4_define([__today__], m4_dquote(m4_esyscmd_s([date +%F])))
+
+dnl
+dnl $1: Long + short
+dnl $2: Padding of $1
+dnl $3: Help (optional)
+dnl $4: Default (optional)
+m4_define([_FORMAT_MANPAGE_OPTION], [m4_do(
+	[m4_format([[%-$2s]]m4_ifnblank([$3$4], [[[  %s.]]])m4_ifnblank([$4], [_ENDL_()[[%-$2s  %s]]]),
+		[$1], [$3], [ ], m4_ifnblank([$4], [[[Default: $4]]]))],
+	[_ENDL_(2)],
 )])
 
 
 dnl
 dnl $1: Program name
 dnl $2: Program description
-dnl $3: Program help synopsis
+dnl $3: Program description 2
 m4_define([MAKE_RST_CONTENT], [m4_do(
-	[UNDERLINE([$1], =)_ENDL_()],
+	[.. include:: defs.rst],
+	[_ENDL_(3)],
+	[UNDERLINE([$1], =, =)],
+	[_ENDL_(2)],
+	[UNDERLINE([$2], -, -)],
 	[_ENDL_()],
-	[_ENDL_()],
-	[UNDERLINE([$2], +)_ENDL_()],
-	[_ENDL_()],
-	[_ENDL_()],
-	[UNDERLINE([SYNOPSIS], -)_ENDL_()],
-	[_ENDL_()],
+	[_MAKE_METADATA(__today__)],
+	[_ENDL_(2)],
+	[UNDERLINE([SYNOPSIS], =)],
+	[_ENDL_(2)],
 	[``$1 _MAKE_HELP_SYNOPSIS()``],
-	[_ENDL_()],
-	[_ENDL_()],
-	[_ENDL_()],
-	[UNDERLINE([ARGUMENTS], -)_ENDL_()],
-	[_ENDL_()],
-	[],
+	[_ENDL_(3)],
+	[UNDERLINE([DESCRIPTION], =)],
+	[m4_ifnblank([$3], [m4_dquote_elt(
+		[_ENDL_(2)],
+		[$3],
+	)])],
+	[_ENDL_(2)],
+	[|DESCRIPTION|],
+	[_ENDL_(3)],
+	[UNDERLINE([ARGUMENTS], =)],
+	[_ENDL_(2)],
+	[MAKE_OPTIONS_SUMMARY([_FORMAT_MANPAGE_OPTION])],
 )])
