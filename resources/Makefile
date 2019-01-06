@@ -14,9 +14,10 @@ M4_SRC = \
 	$(NUL)
 
 M4_SRC += \
+	../src/output-bash-script.m4 \
 	../src/output-completion.m4 \
 	../src/output-docopt.m4 \
-	../src/output-bash-script.m4 \
+	../src/output-manpage.m4 \
 	../src/output-posix-script.m4 \
 	$(NUL)
 
@@ -28,6 +29,7 @@ M4_SRC += \
 	../src/collectors.m4 \
 	../src/constants.m4 \
 	../src/default_settings.m4 \
+	../src/docopt.m4 \
 	../src/env_vars.m4 \
 	../src/function_generators.m4 \
 	../src/list.m4 \

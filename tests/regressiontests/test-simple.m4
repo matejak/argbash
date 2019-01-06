@@ -14,3 +14,4 @@
 echo "OPT_S=$_arg_prefix,POS_S=$_arg_pos_arg,"
 
 # ] <-- needed because of Argbash
+m4_ifdef([m4_esyscmd], [m4_fatal([The m4_esyscmd macro is enabled!])])
