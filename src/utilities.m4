@@ -49,7 +49,9 @@ m4_define([_CHECK_INTEGER_TYPE],
 
 
 dnl
-dnl Encloses string into "" if its first char is not ' or "
+dnl If first char of string is not ' or " enclose it into ""
+dnl and escape " with \".
+dnl
 dnl The string is also []-quoted
 dnl Property: Quoting a blank input results in blank result
 dnl to AVOID it, pass string like ""ls -l or "ls" -l
@@ -58,9 +60,7 @@ dnl $1: String to quote
 m4_define([_sh_quote], [m4_do(
 	[m4_if(
 		[$1], , ,
-		m4_index([$1], [']), 0, [[$1]],
-		m4_index([$1], ["]), 0, [[$1]],
-		[["$1"]])],
+		m4_dquote(_sh_quote_also_blanks([$1])))],
 )])
 
 
@@ -73,7 +73,6 @@ m4_define([_sh_quote_also_blanks], [m4_do(
 		m4_index([$1], ["]), 0, [[$1]],
 		[["$1"]])],
 )])
-
 
 dnl
 dnl Define a macro that is part of the public API
@@ -120,12 +119,16 @@ m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])
 dnl
 dnl $1: The text to substitute
 dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
-m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT], [m4_bpatsubst([[$1]], [\([^\\]\)\(\\\\\)*\\n],  [\1\2
-		])])
+dnl The indentation is a display indentation - not source code one.
+m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES],
+	[m4_bpatsubsts([[$1]], 
+		[\([^\\]\)\(\\\\\)*\\n], m4_expand([[\1\2]_ENDL_()		]),
+		[\([^\]\)"], [\1\\"])])
 
 
 m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_FEW],
 	[m4_fatal([You have passed $2 arguments to macro $1, while it requires at least $3.]m4_ifnblank([$4], [ Call it like: $4]))])
+
 
 m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_MANY],
 	[m4_fatal([You have passed $2 arguments to macro $1, while it accepts at most $3.]m4_ifnblank([$4], [ Call it like: $4]))])

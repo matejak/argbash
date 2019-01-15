@@ -130,6 +130,7 @@ m4_define([test_simple_body], [[
 	$< -h | grep -q '^		-BEGIN'
 	$< -h | grep -q -v '^\s*-BEGIN2'
 	$< -h | grep -q -v 'END2-$$'
+	$< -h | grep -q '"line 2" END-\\n'
 	$< -h | grep -q '^		-PBEGIN'
 	$< -h | grep -q 'PEND-$$'
 	grep -q '^		esac' $<

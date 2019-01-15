@@ -229,7 +229,7 @@ m4_define([_MAKE_HELP_FUNCTION_POSITIONAL_PART], [m4_lists_foreach_positional(
 ],
 	[m4_pushdef([argname1], <m4_dquote(argname0)[[]m4_ifnblank(m4_quote($][1), m4_quote(-$][1))]>)],
 	[m4_pushdef([argname], m4_if(_arg_type, [inf], [m4_default(_INF_REPR, argname1)], [[argname1($][@)]]))],
-	[_INDENT_()[printf '\t%s\n' "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_msg)],
+	[_INDENT_()[printf '\t%s\n' "]argname[: ]_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES(_msg)],
 	[_POS_ARG_HELP_DEFAULTS([argname], _arg_type, _min_argn, _defaults)],
 	[m4_popdef([argname])],
 	[m4_popdef([argname1])],
@@ -252,7 +252,7 @@ m4_define([_MAKE_PRINTF_OPTARG_HELP_STATEMENTS], [m4_do(
 			[string], [],
 			[_GET_VALUE_DESC([$1])])])])],
 	[m4_pushdef([_options], [$6([$1], [$2], [$3])])],
-	[m4_pushdef([_help_msg], [_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([$5])])],
+	[m4_pushdef([_help_msg], [_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES([$5])])],
 	[m4_case([$3],
 		[action],
 		[_INDENT_()[printf '\t%s\n'] "_options: _help_msg"],
@@ -343,7 +343,7 @@ m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 		[and it makes sense to remind the user how the script is supposed to be called.]],
 	[print_help], [m4_do(
 		[m4_ifnblank(m4_expand([_HELP_MSG]),
-			m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT(_HELP_MSG)"_ENDL_()))],
+			m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES(_HELP_MSG)"_ENDL_()))],
 		[_INDENT_()[]printf 'Usage: %s],
 		[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
@@ -1079,6 +1079,7 @@ dnl $1: argname macro
 dnl $2: _arg_type
 dnl $3: _min_argn
 dnl $4: _defaults
+dnl TODO: The changed doublequote-escape behavior may have ugly side-effects.
 dnl
 m4_define([_MAKE_DEFAULTS_FOR_MULTIVALUED_ARGUMENTS], [m4_do(
 	[@{:@],
