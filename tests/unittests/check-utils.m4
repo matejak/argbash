@@ -41,8 +41,11 @@ assert_equals(m4_lists_foreach([FOO,BAR,BAZ],[fu,ba,za],[fu: ba-za@]),
 
 assert_equals(_sh_quote(), [])
 assert_equals(_sh_quote(x), ["x"])
+assert_equals(_sh_quote([m4_ignore()]), ["m4_ignore()"])
 assert_equals(_sh_quote("x"), ["x"])
+assert_equals(_sh_quote("x "f f""), ["x "f f""])
 assert_equals(_sh_quote('x'), ['x'])
+assert_equals(_sh_quote(['x "m4_ignore()\"']), ['x "m4_ignore()\"'])
 
 assert_equals(_sh_quote_also_blanks(), [""])
 assert_equals(_sh_quote_also_blanks(x), ["x"])

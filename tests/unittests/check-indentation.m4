@@ -57,10 +57,14 @@ assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [comment at ther
 assert_equals(_POSSIBLY_REPEATED_COMMENT_BLOCK([comment-topic], [here], 1, x, [BOMB]), [  # comment at there BOMB
 ])
 
-assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\nsecond]), [first
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES([first\nsecond]), [first
 		second])
-
-assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_AND_INDENT([first\\nsecond]), [first\\nsecond])
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES([first\nsecond\nthird]), [first
+		second
+		third])
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES([first\\nsecond]), [first\\nsecond])
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES(x "y z"), [x \"y z\"])
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES([x \"m4_ignore() z"]), [x \"m4_ignore() z\"])
 
 assert_equals(m4_quote(_COMMENT_CHAIN([BOMB], [two])), [BOMB,two])
 
