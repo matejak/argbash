@@ -60,7 +60,7 @@ EXAMPLES = \
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
-	bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
+	ARGBASH_INTENDED_DESTINATION="$@" bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
 
 $(A_INIT): ../src/argbash-init.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@

@@ -4,8 +4,6 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.
 # SC2059 Don't use variables in the printf format string.
 
-version=_ARGBASH_VERSION
-
 
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
@@ -20,8 +18,8 @@ version=_ARGBASH_VERSION
 # ARG_TYPE_GROUP_SET([content], [content], [strip], [none,user-content,all])
 # ARG_TYPE_GROUP_SET([type], [type], [type], [bash-script,posix-script,manpage,completion,docopt])
 # ARG_DEFAULTS_POS()
-# ARG_VERSION([echo "argbash v$version"])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
+# ARG_VERSION_AUTO([_ARGBASH_VERSION])
 
 # ARGBASH_GO
 
@@ -78,14 +76,15 @@ interpret_error()
 # $2: The original intended output file
 define_file_metadata()
 {
-	local _defines='' _input_dirname _output_dirname
+	local _defines='' _intended_destination="$ARGBASH_INTENDED_DESTINATION" _input_dirname _output_dirname
+	test -n "$_intended_destination" || _intended_destination="$2"
 
 	_input_dirname="$(dirname "$1")"
 	test "$1" != '-' && _defines="${_defines}m4_define([INPUT_BASENAME], [[$(basename "$1")]])"
 	_defines="${_defines}m4_define([INPUT_ABS_DIRNAME], [[$(cd "$_input_dirname" && pwd)]])"
 
-	_output_dirname="$(dirname "$2")"
-	test "$2" != '-' && _defines="${_defines}m4_define([OUTPUT_BASENAME], [[$(basename "$2")]])"
+	_output_dirname="$(dirname "$_intended_destination")"
+	test "$_intended_destination" != '-' && _defines="${_defines}m4_define([OUTPUT_BASENAME], [[$(basename "$_intended_destination" "$SPURIONS_OUTPUT_SUFFIX")]])"
 	_defines="${_defines}m4_define([OUTPUT_ABS_DIRNAME], [[$(cd "$_output_dirname" && pwd)]])"
 	printf "%s" "$_defines"
 }

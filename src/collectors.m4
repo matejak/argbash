@@ -206,7 +206,46 @@ argbash_api([ARG_VERSION], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[dnl Just record how have we called ourselves
 ],
 	[[$0($@)]],
-	[m4_bmatch(m4_expand([_W_FLAGS]), [V], ,[_ARG_VERSION([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [V], ,
+		[_ARG_VERSION([$1])])],
+)])
+
+
+dnl
+dnl $1: The possibly blank additional message
+m4_define([_VERSION_PRINTF_FORMAT], [m4_do(
+	[['%s %s\n]],
+	[m4_ifnblank([_HELP_MSG], [[\n%s\n]])],
+	[m4_ifnblank([$1], [[%s\n]])],
+	['],
+)])
+
+
+dnl
+dnl $1: The complete version string
+dnl $2: The possibly blank additional message
+m4_define([_VERSION_PRINTF_ARGS], [m4_do(
+	[[$1]],
+	[m4_ifnblank([_HELP_MSG], [ 'm4_quote(_HELP_MSG)'])],
+	[m4_ifnblank([$2], [[ $2]])],
+)])
+
+
+dnl
+dnl $1: The possibly blank additional message
+m4_define([_VERSION_PRINTF_COMMAND],
+	[[printf] _VERSION_PRINTF_FORMAT([$1]) _VERSION_PRINTF_ARGS(m4_quote("INFERRED_BASENAME" "PROVIDED_VERSION_STRING"), [$1])])
+
+
+dnl
+dnl Try to guess the program name
+dnl $1 The version string.
+dnl $2 The version message (incl. quotes) to printf past the simple <program> <version> display. (optional), UNDOCUMENTED NON-FEATURE
+argbash_api([ARG_VERSION_AUTO], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
+	[[$0($@)]],
+	[m4_define([PROVIDED_VERSION_STRING], [m4_expand([$1])])],
+	[m4_bmatch(m4_expand([_W_FLAGS]), [V], ,
+		[_ARG_VERSION(_VERSION_PRINTF_COMMAND([$2]))])],
 )])
 
 

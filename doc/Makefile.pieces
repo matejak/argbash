@@ -18,6 +18,7 @@ STATICDIR = _static
 NUL =
 
 PIECES = \
+	$(STATICDIR)/argbash-version.txt \
 	$(STATICDIR)/index_script-create.txt \
 	$(STATICDIR)/index_script-help.txt \
 	$(STATICDIR)/index_script-output.txt \
@@ -46,7 +47,11 @@ define CMD_OUT_LOCAL
 	./$< $(FLAGS) >> $@
 endef
 
+$(STATICDIR)/argbash-version.txt:
+	$(AB) --version > "$@"
+
 A_INIT_ARGS = --pos positional-arg --opt option --opt-bool print
+
 $(STATICDIR)/minimal_init-create.txt: $(AB_INIT)
 	$(eval FLAGS := $(A_INIT_ARGS) $(MINIMAL_INIT_CREATE))
 	$(CMD_OUT)

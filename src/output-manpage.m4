@@ -16,12 +16,12 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 
 dnl
 dnl $1: date
-m4_define([_MAKE_METADATA], [
+m4_define([_MAKE_METADATA], [[
 :Author: |AUTHOR|
 :Date:   $1
-:Version: |VERSION|
+:Version: ]m4_ifdef([PROVIDED_VERSION_STRING], PROVIDED_VERSION_STRING, [[|VERSION|]])[
 :Manual section: 1
-])
+]])
 
 
 m4_define([__today__], m4_dquote(m4_esyscmd_s([date +%F])))
