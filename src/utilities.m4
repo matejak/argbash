@@ -98,8 +98,8 @@ dnl Otherwise, act like _COMM_BLOCK
 m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION], [m4_do(
 	[m4_define([_COMMENT_$1_LOCATION], [[$2]])],
 	[_COMM_BLOCK($3, m4_shiftn(3, $@))],
-)], [m4_do(
-	[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))],
+)], [m4_do(m4_ifblank([$2], ,
+		[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))]),
 )])])
 
 

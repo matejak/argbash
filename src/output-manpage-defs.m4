@@ -33,8 +33,10 @@ dnl $3: Padding of $2
 dnl $4: Help (optional)
 dnl $5: Default (optional)
 m4_define([_FORMAT_MANPAGE_OPTION], [m4_do(
+	[_POSSIBLY_REPEATED_COMMENT_BLOCK([option], [], 0,
+		m4_quote([..  You can have single-paragraph multi-line indented description instead of the '\']_ENDL_()))],
 	[_FORMAT_REPLACEMENT([OPTION_]m4_toupper(m4_translit([[$1]], [-], [_])),
-		[<Elaborate description], [of the option --$1], [or just leave there \ for no description]>.])],
+		[\])],
 	[_ENDL_()],
 )])
 
@@ -45,6 +47,8 @@ dnl $2: Program description
 dnl $3: Program description 2
 m4_define([MAKE_RST_CONTENT], [m4_do(
 	[_FORMAT_REPLACEMENT([AUTHOR], [<Your name goes here>])_ENDL_()],
+	[_FORMAT_REPLACEMENT([VERSION], [\])_ENDL_()],
+	[_FORMAT_REPLACEMENT([MAN_SECTION], [1])_ENDL_()],
 	[_FORMAT_REPLACEMENT([DESCRIPTION], [<More elaborate description], [goes here>.])_ENDL_()],
 	[MAKE_OPTIONS_SUMMARY([_FORMAT_MANPAGE_OPTION])],
 )])

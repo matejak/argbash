@@ -16,11 +16,12 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 
 dnl
 dnl $1: date
+dnl $2: program name
 m4_define([_MAKE_METADATA], [[
 :Author: |AUTHOR|
 :Date:   $1
-:Version: ]m4_ifdef([PROVIDED_VERSION_STRING], PROVIDED_VERSION_STRING, [[|VERSION|]])[
-:Manual section: 1
+:Version: ]m4_ifdef([PROVIDED_VERSION_STRING], m4_quote([$2 ]PROVIDED_VERSION_STRING), [[|VERSION|]])[
+:Manual section: |MAN_SECTION|
 ]])
 
 
@@ -56,7 +57,7 @@ m4_define([MAKE_RST_CONTENT], [m4_do(
 	[_ENDL_(2)],
 	[UNDERLINE([$2], -, -)],
 	[_ENDL_()],
-	[_MAKE_METADATA(__today__)],
+	[_MAKE_METADATA(__today__, [$1])],
 	[_ENDL_(2)],
 	[UNDERLINE([SYNOPSIS], =)],
 	[_ENDL_(2)],

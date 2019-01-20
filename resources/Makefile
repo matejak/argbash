@@ -59,6 +59,7 @@ EXAMPLES = \
 	$(NUL)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+MANPAGE = argbash.1.gz
 
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	ARGBASH_INTENDED_DESTINATION="$@" bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
@@ -146,7 +147,15 @@ define-version:
 	$(eval VERSION_MAJOR := $(shell cut -f 1 -d . ../src/version))
 	$(eval VERSION_SUFFIX := -$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH))
 
-install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION)
+argbash.rst: ../src/argbash.m4 $(ARGBASH_EXEC)
+	$(ARGBASH_EXEC) --type manpage --strip all -o $@ $<
+
+man: $(MANPAGE)
+
+$(MANPAGE): argbash.rst argbash-defs.rst
+	rst2man $< | gzip > $@
+
+install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION) $(MANPAGE)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
@@ -158,6 +167,8 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION)
 	cp -p $(A_INIT) "$(ROOT)/$(PREFIX)/bin/argbash-init$(VERSION_SUFFIX)" && chmod a+x "$(ROOT)/$(PREFIX)"/bin/argbash-init$(VERSION_SUFFIX)
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
 	test "$(INSTALL_COMPLETION)" = "no" || (mkdir -p "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)" && mv "$(COMPLETION)" "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/")
+	mkdir -p "$(ROOT)/$(PREFIX)/share/man/man1/"
+	cp -p $(MANPAGE) "$(ROOT)/$(PREFIX)/share/man/man1/"
 
 altpreclean: define-version
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
@@ -176,6 +187,7 @@ uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
 	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
 	$(RM) "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/$(COMPLETION)"
+	$(RM) "$(ROOT)/$(PREFIX)/share/man/man1/$(MANPAGE)"
 
 altuninstall: define-version uninstall
 
@@ -199,4 +211,4 @@ tag:
 
 # Update using
 # grep '^[-a-z]*:' Makefile | cut -f 1 -d ':' | sort | tr '\n' ' '
-.PHONY: altinstall altpreclean bootstrap check check-shellcheck define-version develop examples install release tag uninstall unittests version
+.PHONY: altinstall altpreclean bootstrap check check-shellcheck define-version develop examples install man release tag uninstall unittests version
