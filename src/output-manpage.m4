@@ -9,7 +9,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 ]],
 	[dnl ASSERT_THAT_BASENAME_IS_KNOWN
 ],
-	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
+	[m4_define([_BASENAME], m4_bpatsubst(INFERRED_BASENAME_NOERROR, [\.rst$], ))],
 	[MAKE_RST_CONTENT(m4_quote(_BASENAME), _HELP_MSG, _HELP_MSG_EX)],
 )])
 
@@ -27,15 +27,22 @@ m4_define([_MAKE_METADATA], [[
 m4_define([__today__], m4_dquote(m4_esyscmd_s([date +%F])))
 
 dnl
-dnl $1: Long + short
-dnl $2: Padding of $1
-dnl $3: Help (optional)
-dnl $4: Default (optional)
+dnl $1: Argname
+dnl $2: Long + short
+dnl $3: Padding of $2
+dnl $4: Help (optional)
+dnl $5: Default (optional)
 m4_define([_FORMAT_MANPAGE_OPTION], [m4_do(
-	[m4_format([[%-$2s]]m4_ifnblank([$3$4], [[[  %s.]]])m4_ifnblank([$4], [_ENDL_()[[%-$2s  %s]]]),
-		[$1], [$3], [ ], m4_ifnblank([$4], [[[Default: $4]]]))],
+	[m4_format([[%-$3s]]m4_ifnblank([$4$5], [[[  %s.]]])m4_ifnblank([$5], [_ENDL_()[[%-$3s  %s]]])_ENDL_(2)[[%-$3s  %s]],
+		[$2], [$4], m4_ifnblank([$5], [[ ], [[Default: $5]],]) [ ], m4_quote(|[OPTION_]m4_toupper(m4_translit([[$1]], [-], [_]))|))],
 	[_ENDL_(2)],
 )])
+
+
+dnl
+dnl $1: The current output
+m4_define([_GET_DEFS_FILENAME],
+	[m4_bpatsubst([$1], [$], [-defs.rst])])
 
 
 dnl
@@ -43,7 +50,7 @@ dnl $1: Program name
 dnl $2: Program description
 dnl $3: Program description 2
 m4_define([MAKE_RST_CONTENT], [m4_do(
-	[.. include:: defs.rst],
+	[[.. include:: ]_GET_DEFS_FILENAME([$1])],
 	[_ENDL_(3)],
 	[UNDERLINE([$1], =, =)],
 	[_ENDL_(2)],

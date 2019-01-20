@@ -18,6 +18,7 @@ M4_SRC += \
 	../src/output-completion.m4 \
 	../src/output-docopt.m4 \
 	../src/output-manpage.m4 \
+	../src/output-manpage-defs.m4 \
 	../src/output-posix-script.m4 \
 	$(NUL)
 
