@@ -98,8 +98,8 @@ dnl Otherwise, act like _COMM_BLOCK
 m4_define([_POSSIBLY_REPEATED_COMMENT_BLOCK], [m4_ifndef([_COMMENT_$1_LOCATION], [m4_do(
 	[m4_define([_COMMENT_$1_LOCATION], [[$2]])],
 	[_COMM_BLOCK($3, m4_shiftn(3, $@))],
-)], [m4_do(
-	[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))],
+)], [m4_do(m4_ifblank([$2], ,
+		[_COMM_BLOCK([$3], m4_quote([# ]m4_indir([_COMMENT_$1_LOCATION])))]),
 )])])
 
 
@@ -254,7 +254,7 @@ m4_define([DEFINE_MINIMAL_POSITIONAL_VALUES_COUNT],
 
 dnl $1: Error
 m4_define([INFERRED_BASENAME],
-	[m4_ifdef([OUTPUT_BASENAME], [[_STRIP_SUFFIX(OUTPUT_BASENAME)]],
+	[m4_ifdef([OUTPUT_BASENAME], [_STRIP_SUFFIX(OUTPUT_BASENAME)],
 		[m4_ifdef([INPUT_BASENAME], [[_STRIP_SUFFIX(INPUT_BASENAME)]], [$1])])])
 
 
@@ -275,4 +275,23 @@ m4_define([_LIST_LONGEST_TEXT_LENGTH], [m4_do(
 	[m4_list_foreach([$1], [_item], [m4_if(m4_eval(_longest_label_len < m4_len(_item)), 1, [m4_define([_longest_label_len], m4_len(_item))])])],
 	[_longest_label_len],
 	[m4_popdef([_longest_label_len])],
+)])
+
+
+m4_define([_CAPITALIZE], [m4_translit([[$1]], [a-z], [A-Z])])
+
+
+dnl
+dnl $1: What to underline
+dnl $2: By what to underline
+dnl $3: By what to overline (optional)
+m4_define([UNDERLINE], [m4_do(
+	[m4_if(m4_len([$1]), 0, , [m4_if([$3], , , [m4_do(
+		[m4_for(idx, 1, m4_len([$1]), 1, [$3])],
+		[_ENDL_()],
+	)])])],
+	[$1],
+	[_ENDL_()],
+	[m4_if(m4_len([$1]), 0, ,
+		[m4_for(idx, 1, m4_len([$1]), 1, [$2])])],
 )])

@@ -246,6 +246,8 @@ POSIX script                    posix-script                    none
 POSIX script parsing section    posix-script                    user-content
 Bash completion                 completion                      all
 docopt help message             docopt                          all
+manpage template                manpage                         all
+manpage template definitions    manpage-defs                    all
 ============================    =======================         ==========================
 
 
@@ -296,6 +298,7 @@ Typically, you generate bash completion ``my-script.sh`` from the generated scri
 
 and you move the created completion file ``my-script.sh`` to ``/etc/bash_completion.d/`` directory.
 
+
 .. _docopt_output:
 
 Docopt help message
@@ -313,6 +316,27 @@ Typically, you generate docopt output to the standard output from the generated 
 .. code-block:: shell-session
 
   $ argbash my-script --type docopt --strip all
+
+
+Manpage output
+++++++++++++++
+
+Argbash can generate source for the manual page for your script.
+There are two files in the process --- the template, and definitions.
+Those two files are in the `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ format, and the template is supposed to be processed by the `rst2man <http://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt>`_ utility.
+
+The manpage template is supposed to be generated as script's metadata change, definitions are required to be maintained manually, as they are supposed to contain content that is not present in the script.
+You can regenerate the template using the ``manpage`` output, while you are probably going to use the ``manpage-defs`` once to get you kickstarted and then continue to maintain it manually.
+
+So given a argbash-powered script or m4 file, your manpage workflow will typically look like this:
+
+.. code-block:: shell-session
+
+  $ argbash my-script --type manpage-defs --strip all -o my-script-defs.rst
+  $ argbash my-script --type manpage --strip all -o my-script.rst
+  $ vim my-script-defs.rst  # Edit the definitions file
+  $ rst2man my-script.rst > my-script.1
+  $ man ./my-script.1
 
 
 .. _api_change:

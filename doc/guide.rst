@@ -255,6 +255,23 @@ Special arguments
 
      ARG_VERSION([code to execute when specified])
 
+* Enhanced version argument (a special case of an action argument):
+  ::
+
+     ARG_VERSION_AUTO([version number or macro containing it])
+
+  The macro will take it's first argument, expands it, and treats it as a version number.
+  This allows you to use a quoted macro containing the version number as the first argument.
+  Then, it attempts to detect the basename of the generated script and outputs a version message out of those two.
+
+  If the ``ARG_HELP([MSG], ...)`` macro has been used before, it also outputs the ``MSG`` below the program name --- version pair.
+
+  For example, for argbashm, it yields
+
+  .. literalinclude:: _static/argbash-version.txt
+     :language: text
+
+
 * Verbose argument (a special case of a repeated argument):
   ::
 

@@ -110,3 +110,17 @@ something()
   BOMB=$x
   echo "$BOMB"
 }])
+
+assert_equals(UNDERLINE(), [
+])
+
+assert_equals(UNDERLINE(,=,=), [
+])
+
+assert_equals(UNDERLINE([a], [-]), [a
+-])
+
+
+assert_equals(UNDERLINE([Abc], [+], [=]), [===
+Abc
++++])

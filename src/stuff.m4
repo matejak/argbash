@@ -1271,6 +1271,3 @@ dnl * Upon arg encounter, validate the value. Die in case of no compliance.
 dnl * Help: optional args - value should take the name.
 dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
 
-dnl These macros that are being undefined are not needed and they present a security threat when exposed during Argbash run
-m4_undefine([m4_esyscmd])
-m4_undefine([m4_syscmd])
