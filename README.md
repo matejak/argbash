@@ -58,6 +58,7 @@ Following outputs are available:
 - POSIX scripts that use `getopts`, also tailor-made.
 - Bash completion.
 - [docopt](https://docopt.org)-compliant usage message.
+- Manpage output using [rst2man](http://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt).
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 

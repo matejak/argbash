@@ -79,6 +79,7 @@ So let's get back to argument types.
 Below, is a list of argument types and macros that you have to write to support those (e.g. ``ARGBASH_GO`` is a macro and ``ARG_OPTIONAL_BOOLEAN([verbose], [Verbose mode])`` is a macro called wit two arguments --- ``verbose`` and ``Verbose mode``).
 Place those macros in your files as ``bash`` comments.
 
+
 Your script
 -----------
 

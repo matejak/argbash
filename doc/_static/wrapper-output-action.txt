@@ -16,6 +16,7 @@ Contents of '../src' matching '*.m4':
 	output-bash-script.m4: 1 kiB
 	output-completion.m4: 4 kiB
 	output-docopt.m4: 0 kiB
+	output-manpage-defs.m4: 1 kiB
 	output-manpage.m4: 1 kiB
 	output-posix-script.m4: 3 kiB
 	output-strip-all.m4: 0 kiB
