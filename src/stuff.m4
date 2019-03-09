@@ -343,7 +343,7 @@ m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 		[and it makes sense to remind the user how the script is supposed to be called.]],
 	[print_help], [m4_do(
 		[m4_ifnblank(m4_expand([_HELP_MSG]),
-			m4_dquote(_INDENT_()[printf] '%s\n' "_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES(_HELP_MSG)"_ENDL_()))],
+			m4_dquote(_INDENT_()[printf] '%s\n' "SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES(_HELP_MSG, [])"_ENDL_()))],
 		[_INDENT_()[]printf 'Usage: %s],
 		[dnl If we have optionals, display them like [--opt1 arg] [--(no-)opt2] ... according to their type. @<:@ becomes square bracket at the end of processing
 ],
@@ -359,7 +359,8 @@ m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 ],
 		[m4_list_ifempty([ENV_NAMES], ,[_MAKE_HELP_FUNCTION_ENVVARS_PART()_ENDL_()])],
 		[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
-		[m4_ifnblank(m4_quote(_HELP_MSG_EX), m4_dquote(_INDENT_()[printf '\n%s\n' "]_HELP_MSG_EX"_ENDL_()))],
+		[m4_ifnblank(m4_quote(_HELP_MSG_EX),
+			m4_dquote(_INDENT_()[printf] '\n%s\n' "SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES(_HELP_MSG_EX, [])"_ENDL_()))],
 	)],
 )])
 

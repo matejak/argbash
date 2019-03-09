@@ -120,6 +120,9 @@ assert_equals(UNDERLINE(,=,=), [
 assert_equals(UNDERLINE([a], [-]), [a
 -])
 
+assert_equals(SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([The Castle\n"Totenhammer"], [-]), [The Castle
+-\"Totenhammer\"])
+
 
 assert_equals(UNDERLINE([Abc], [+], [=]), [===
 Abc
