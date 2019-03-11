@@ -121,8 +121,16 @@ dnl $1: The text to substitute
 dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
 dnl The indentation is a display indentation - not source code one.
 m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES],
+	[SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([$1], [		])])
+
+dnl
+dnl $1: The text to substitute
+dnl $2: The indent for the new line.
+dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
+dnl The indentation is a display indentation - not source code one.
+m4_define([SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES],
 	[m4_bpatsubsts([[$1]], 
-		[\([^\\]\)\(\\\\\)*\\n], m4_expand([[\1\2]_ENDL_()		]),
+		[\([^\\]\)\(\\\\\)*\\n], m4_expand([[\1\2]_ENDL_()$2]),
 		[\([^\]\)"], [\1\\"])])
 
 
