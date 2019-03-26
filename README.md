@@ -24,7 +24,7 @@ Make your existing script powered by `Argbash` [in a couple of minutes](http://a
 Flavour               | Target group
 -------               | ------------
 [Argbash online](https://argbash.io/generate) | Use it if you want to try Argbash without installing it and you have permanent access to the Internet.
-[Argbash CLI](https://github.com/matejak/argbash/releases/tag/2.5.0) | Install the package to have `argbash` ready locally all the time.
+[Argbash CLI](https://github.com/matejak/argbash/releases/latest) | Install the package to have `argbash` ready locally all the time.
 [Argbash Docker](https://hub.docker.com/r/matejak/argbash/) | Pretty much like Argbash CLI, but you don't have to install it, you just download the image.
 
 
