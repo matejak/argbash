@@ -16,8 +16,10 @@ LABEL \
 ENV PROGRAM=argbash
 
 # The application requires bash to run.
+# and coreutils for readlink
 RUN apk add --no-cache \
 	autoconf \
+	coreutils \
 	bash
 
 # Install argbash from sources
