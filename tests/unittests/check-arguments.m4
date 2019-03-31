@@ -44,6 +44,9 @@ assert_equals([not single], _CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], 4),
 
 _DISCARD_VALUES_FOR_ALL_ARGUMENTS()
 
+assert_equals(m4_list_len([_ARGS_LONG]), 0)
+
+
 ARG_OPTIONAL_SINGLE([foo], [f], [Help,BOMB], [Default])
 ARG_POSITIONAL_SINGLE([defaultless], [xhelp])
 ARG_POSITIONAL_MULTI([multi-BOMB], [help-BOMB], 3, [one], [two])
@@ -106,3 +109,14 @@ m4_popdef([_COLLECTOR_FEEDBACK])
 
 assert_equals(_VERSION_PRINTF_COMMAND([], [1.2]), [printf '%s %s\n\n%s\n' "" "1.2" ''])
 assert_equals(_VERSION_PRINTF_COMMAND(["hello"], [1.2]), [printf '%s %s\n\n%s\n%s\n' "" "1.2" '' "hello"])
+
+_DISCARD_VALUES_FOR_ALL_ARGUMENTS()
+
+ARG_OPTIONAL_SWITCH_ON([foo], [f])
+assert_equals_list_element([_ARGS_LONG], 1, [foo])
+assert_equals_list_element([_ARGS_DEFAULT], 1, [off])
+
+ARG_OPTIONAL_SWITCH_OFF([bar], [b], , [BOMB])
+assert_equals_list_element([_ARGS_LONG], 2, [bar])
+assert_equals_list_element([_ARGS_DEFAULT], 2, [on])
+assert_equals(GET_NEGATION_PREFIX([bar]), [BOMB])
