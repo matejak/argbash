@@ -302,16 +302,32 @@ m4_define([_MAKE_HELP_FUNCTION_OPTIONAL_PART], [m4_lists_foreach_optional(
 )])])
 
 
+dnl
+dnl $1: list name
+dnl $2: name
+dnl $3: default
+dnl $4: help
+m4_define([_MAKE_ENV_HELP_MESSAGE], [m4_do(
+	[m4_ifnblank([$4], [m4_list_append([$1], m4_do(
+		[[$2: $4.]],
+		[m4_ifnblank([$3], [[ (default: '$3')]])],
+	))])],
+)])
+
+
+dnl
+dnl $1: The name of list for help messages
+m4_define([_MAKE_ENV_HELP_MESSAGES], [m4_do(
+	[m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], 
+		[_MAKE_ENV_HELP_MESSAGE([$1], _name, _default, _help)])],
+)])
+
+
 m4_define([_MAKE_HELP_FUNCTION_ENVVARS_PART], [m4_do(
-	[m4_lists_foreach([ENV_NAMES,ENV_DEFAULTS,ENV_HELPS], [_name,_default,_help], [m4_do(
-		[m4_ifnblank(_help, [m4_list_append([LIST_ENV_HELP], m4_expand([m4_do(
-			[m4_expand([_name: _help.])],
-			[m4_ifnblank(_default, [ (default: ']_default'))],
-		)]))])],
-	)])],
-	[printf '\nEnvironment variables that are supported:\n'
+	[_MAKE_ENV_HELP_MESSAGES([LIST_ENV_HELP])],
+	[_INDENT_()printf '\nEnvironment variables that are supported:\n'
 ],
-	[m4_list_foreach([LIST_ENV_HELP], [_msg], [printf '\t%s\n' "[]_msg"
+	[m4_list_foreach([LIST_ENV_HELP], [_msg], [_INDENT_()printf '\t%s\n' "[]_msg"
 ])],
 )])
 

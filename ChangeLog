@@ -1,5 +1,13 @@
-2.8.0 (2019-01-26)
+2.8.1 (TBA)
 -----------
+
+Bugfixes:
+
+* The environment variables help message has been fixed (#79).
+
+
+2.8.0 (2019-01-26)
+------------------
 
 New features:
 
