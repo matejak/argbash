@@ -120,9 +120,21 @@ assert_equals(UNDERLINE(,=,=), [
 assert_equals(UNDERLINE([a], [-]), [a
 -])
 
-assert_equals(SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([The Castle\n"Totenhammer"], [-]), [The Castle
+assert_equals(UNDERLINE([BOMB], [-]), [BOMB
+----])
+
+assert_equals(SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([BOMB Castle\n"Totenhammer"], [-]), [BOMB Castle
 -\"Totenhammer\"])
 
+
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES([The Castle\n"Totenhammer"], [0]), [The Castle
+\"Totenhammer\"])
+
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES([The Castle\n"Totenhammer"], [1]), [The Castle
+ \"Totenhammer\"])
+
+assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES([The Castle\n"Totenhammer"], [2]), [The Castle
+  \"Totenhammer\"])
 
 assert_equals(UNDERLINE([Abc], [+], [=]), [===
 Abc

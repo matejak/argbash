@@ -19,8 +19,10 @@ dnl $2: Long + short
 dnl $3: Padding of $2
 dnl $4: Help (optional)
 dnl $5: Default (optional)
+dnl
+dnl 2 + 2 in the substitute function: 2 leading spaces + 2 spaces between options and text.
 m4_define([_FORMAT_DOCOPT_OPTION], [m4_do(
-	[m4_format([[  %-$3s]]m4_ifnblank([$4$5], [[[  %s]]])m4_ifnblank([$5], [[[ [default: %s]]]])._ENDL_(), [$2], [$4], [$5])],
+	[m4_format([[  %-$3s]]m4_ifnblank([$4$5], [[[  %s]]])m4_ifnblank([$5], [[[ [default: %s]]]])._ENDL_(), [$2], _SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES([$4], m4_eval([$3] + 2 + 2)), [$5])],
 )])
 
 

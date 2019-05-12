@@ -118,10 +118,18 @@ m4_define([_COMMENT], [m4_ifdef([COMMENT_OUTPUT], [$1])])
 
 dnl
 dnl $1: The text to substitute
-dnl Regexp: Find beginning of backslashes, match for pairs, and if \\n is left, then substitute it for literal newline.
 dnl The indentation is a display indentation - not source code one.
 m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_WITH_DISPLAY_INDENT_AND_ESCAPE_DOUBLEQUOTES],
 	[SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([$1], [		])])
+
+
+dnl
+dnl $1: The text to substitute
+dnl $2: The width of space indentation
+dnl The indentation is a display indentation - not source code one.
+m4_define([_SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES],
+	[SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES([$1], m4_if([$2], 0, [], [m4_for(_, 1, [$2], 1, [ ])]))])
+
 
 dnl
 dnl $1: The text to substitute
@@ -298,7 +306,7 @@ m4_define([UNDERLINE], [m4_do(
 		[m4_for(idx, 1, m4_len([$1]), 1, [$3])],
 		[_ENDL_()],
 	)])])],
-	[$1],
+	[[$1]],
 	[_ENDL_()],
 	[m4_if(m4_len([$1]), 0, ,
 		[m4_for(idx, 1, m4_len([$1]), 1, [$2])])],

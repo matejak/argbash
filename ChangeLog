@@ -4,6 +4,7 @@
 Bugfixes:
 
 * The environment variables help message has been fixed (#79).
+* The manpage generation works when long description is supplied (#78).
 
 
 2.8.0 (2019-01-26)
