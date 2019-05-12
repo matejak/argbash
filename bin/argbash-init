@@ -77,7 +77,7 @@ print_help()
 	printf '\t%s\n' "--opt: Add an single-valued optional argument (empty by default)"
 	printf '\t%s\n' "--opt-bool: Add an optional boolean argument (empty by default)"
 	printf '\t%s\n' "--wrap: What script(s) to wrap (empty by default)"
-	printf '\t%s\n' "-m, --mode: The slider between feature-rich and simple script. (default: 'default')"
+	printf '\t%s\n' "-m, --mode: The slider between feature-rich and simple script.. Can be one of: 'default', 'full' and 'minimal' (default: 'default')"
 	printf '\t%s\n' "-v, --version: Prints version"
 	printf '\t%s\n' "-h, --help: Prints help"
 }

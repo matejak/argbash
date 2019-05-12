@@ -74,6 +74,16 @@ argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 
 
 dnl
+dnl $1: Argname
+dnl $2: If it is of the set type
+dnl $3: If it is NOT of the set type
+m4_define([_IF_ARG_IS_OF_SET_TYPE], [m4_set_contains([GROUP_SET_ARGS], [$1], [$2], [$3])])
+
+
+m4_define([LIST_OF_VALUES_OF_ARGNAME], [[_LIST_]m4_quote(m4_indir([$1_VAL_TYPE]))])
+
+
+dnl
 dnl The common stuff to perform when adding a typed group
 dnl Registers the argument-type pair to be retreived by _GET_VALUE_TYPE or _GET_VALUE_STR
 dnl $1: The value type

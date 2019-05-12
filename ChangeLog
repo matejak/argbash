@@ -1,5 +1,9 @@
 2.8.1 (TBA)
------------
+------------------
+
+New features:
+
+* The help message now contains reference for one-of argument types (#76).
 
 Bugfixes:
 
