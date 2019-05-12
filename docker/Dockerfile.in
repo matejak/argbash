@@ -23,8 +23,8 @@ RUN apk add --no-cache \
 	bash
 
 # Install argbash from sources
-COPY    argbash/ /usr/src/argbash/
-COPY    entrypoint.sh /
+COPY [".", "/usr/src/argbash//"]
+COPY ["./docker/entrypoint.sh", "/"]
 
 WORKDIR /usr/src/argbash/resources/
 RUN     apk add --no-cache --virtual .build-dependencies \
