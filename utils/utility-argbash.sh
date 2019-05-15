@@ -168,7 +168,7 @@ if [[ -z "$_workdir" || "$_workdir" == "TODO" ]] ; then
   exit 1
 fi
 
-if [ ! -f "$_arg_template" ] ; then
+if [ ! -f "$_workdir/$_arg_template" ] ; then
   echo "Template file \"$_workdir/$_arg_template\" not found!"
   exit 1
 fi
