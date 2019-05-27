@@ -35,7 +35,7 @@ dnl $4: Help (optional)
 dnl $5: Default (optional)
 m4_define([_FORMAT_MANPAGE_OPTION], [m4_do(
 	[m4_format([[%-$3s]]m4_ifnblank([$4$5], [[[  %s.]]])m4_ifnblank([$5], [_ENDL_()[[%-$3s  %s]]])_ENDL_(2)[[%-$3s  %s]],
-		[$2], [$4], m4_ifnblank([$5], [[ ], [[Default: $5]],]) [ ], m4_quote(|[OPTION_]m4_toupper(m4_translit([[$1]], [-], [_]))|))],
+		[$2], _SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOTES([$4], m4_eval([$3] + 2)), m4_ifnblank([$5], [[ ], [[Default: $5]],]) [ ], m4_quote(|[OPTION_]m4_toupper(m4_translit([[$1]], [-], [_]))|))],
 	[_ENDL_(2)],
 )])
 
@@ -61,13 +61,10 @@ m4_define([MAKE_RST_CONTENT], [m4_do(
 	[_ENDL_(2)],
 	[UNDERLINE([SYNOPSIS], =)],
 	[_ENDL_(2)],
-	[``$1 _MAKE_HELP_SYNOPSIS()``],
+	[``[$1] _MAKE_HELP_SYNOPSIS()``],
 	[_ENDL_(3)],
 	[UNDERLINE([DESCRIPTION], =)],
-	[m4_ifnblank([$3], [m4_dquote_elt(
-		[_ENDL_(2)],
-		[$3],
-	)])],
+	m4_ifnblank([$3], [[_ENDL_(2)],[[$3]]]),
 	[_ENDL_(2)],
 	[|DESCRIPTION|],
 	[_ENDL_(3)],
