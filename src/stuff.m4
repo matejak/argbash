@@ -1269,7 +1269,7 @@ m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
 		[[[_next="${_key##-$1}"]],
 		[[if test -n "$_next" -a "$_next" != "$_key"]],
 		[[then]],
-		[_INDENT_()[begins_with_short_option "$_next" && shift && set -- "-$1" "-${_next}" "@S|@@" || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."]],
+		[_INDENT_()[{ begins_with_short_option "$_next" && shift && set -- "-$1" "-${_next}" "@S|@@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."]],
 		[[fi]]])],
 )])])
 
