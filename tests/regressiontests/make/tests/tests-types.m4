@@ -26,7 +26,8 @@ ADD_TEST_BASH([test-group], [[
 	ERROR="allowed" $(REVERSE) $< bar
 	@# Assure that there is not the string '_idx' in the script since we don't want indices support in this test
 	! grep -q _idx $<
-	# $< -h | grep action | grep ACTION | grep -q 'foo,baz'
+	$< -h | grep act-ion | grep -q "'foo,baz'"
+	$< -h | grep act-ion | grep -q "'bar bar'"
 ]])
 
 ADD_TEST_BASH([test-group-idx], [[

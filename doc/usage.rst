@@ -285,7 +285,7 @@ The basename is inferred either from the source filename, or from the destinatio
 .. note::
 
    The general recommendation is not to save your scripts to files without suffixes.
-   Keep the ``.sh`` suffixe only for files that are Bash modules.
+   Keep the ``.sh`` suffix only for files that are Bash modules.
 
 After you generate the completion file, put it in the appropriate place (which may vary depending on your environment).
 In order to use it right away, simply source it.
@@ -297,6 +297,11 @@ Typically, you generate bash completion ``my-script.sh`` from the generated scri
   $ argbash my-script --type completion --strip all -o my-script.sh
 
 and you move the created completion file ``my-script.sh`` to ``/etc/bash_completion.d/`` directory.
+
+.. note::
+
+   Completion is not implemented for positional arguments.
+   The corresponding Bash completion algorithm has to be much more complex in order to distinguish between 1st, 2nd etc. positional arguments.
 
 
 .. _docopt_output:
