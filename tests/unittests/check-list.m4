@@ -1,5 +1,5 @@
-m4_include([list.m4])
-m4_include([test-support.m4])
+m4_include([utilities.m4])
+m4_include_once([test-support.m4])
 
 dnl If BOMB gets expanded, we will be noticed.
 assert_equals(m4_quote(m4_list_contents([lol])), [])

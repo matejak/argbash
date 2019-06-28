@@ -1,4 +1,4 @@
-m4_include([function_generators.m4])
+m4_include_once([function_generators.m4])
 
 dnl
 dnl Define a validator for a particular type. Instead of using m4_define, use this:

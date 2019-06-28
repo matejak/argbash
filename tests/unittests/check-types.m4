@@ -1,5 +1,5 @@
 m4_include([utilities.m4])
-m4_include([test-support.m4])
+m4_include_once([test-support.m4])
 
 m4_define([CHECK], _CHECK_PASSED_ARGS_COUNT(2, 3, [[one], [two (opt.)]]))
 

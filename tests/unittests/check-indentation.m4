@@ -1,7 +1,7 @@
-m4_include([list.m4])
 m4_include([utilities.m4])
-m4_include([argument_value_types.m4])
-m4_include([test-support.m4])
+m4_include_once([list.m4])
+m4_include_once([argument_value_types.m4])
+m4_include_once([test-support.m4])
 
 _SET_INDENT([x-])
 assert_equals(_INDENT_(0)y, y)

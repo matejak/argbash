@@ -1,4 +1,15 @@
-m4_include([list.m4])
+
+m4_set_delete([__FILES_ALREADY_INCLUDED__])
+m4_set_add([__FILES_ALREADY_INCLUDED__], __file__)
+dnl
+dnl $1: The filename to include
+m4_define([m4_include_once], [m4_do(
+	[m4_set_contains([__FILES_ALREADY_INCLUDED__], [$1], [], 
+		[m4_set_add([__FILES_ALREADY_INCLUDED__], [$1])m4_include([$1])])],
+)])
+
+
+m4_include_once([list.m4])
 
 
 m4_define([_ENDL_],

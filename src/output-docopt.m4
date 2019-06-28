@@ -1,4 +1,4 @@
-m4_include([docopt.m4])
+m4_include_once([docopt.m4])
 
 
 dnl
