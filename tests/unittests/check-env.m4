@@ -1,5 +1,6 @@
-m4_include([argbash-lib.m4])
-m4_include([test-support.m4])
+m4_include([utilities.m4])
+m4_include_once([argbash-lib.m4])
+m4_include_once([test-support.m4])
 
 ARG_USE_ENV([OS_CLOUD], , [my blah help text])
 ARG_USE_ENV([BOMB], [default BOMB], [a, BOMB])

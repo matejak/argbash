@@ -1,7 +1,6 @@
-m4_include([list.m4])
 m4_include([utilities.m4])
-m4_include([function_generators.m4])
-m4_include([test-support.m4])
+m4_include_once([function_generators.m4])
+m4_include_once([test-support.m4])
 
 m4_list_append([FOO], [one])
 m4_list_append([FOO], [two])

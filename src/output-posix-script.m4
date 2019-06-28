@@ -1,8 +1,8 @@
-m4_include([function_generators.m4])
-m4_include([argument_value_types.m4])
-m4_include([env_vars.m4])
-m4_include([progs.m4])
-m4_include([value_validators.m4])
+m4_include_once([function_generators.m4])
+m4_include_once([argument_value_types.m4])
+m4_include_once([env_vars.m4])
+m4_include_once([progs.m4])
+m4_include_once([value_validators.m4])
 
 
 dnl TODO: Can't do:
