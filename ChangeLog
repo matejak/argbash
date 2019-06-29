@@ -1,6 +1,10 @@
 2.8.1 (TBA)
 ------------------
 
+Incompatible changes (minor):
+
+* The `DEFINE_SCRIPT_DIR` macro doesn't resolve symlinks as it started to do so in `2.8.0`, use `DEFINE_SCRIPT_DIR_GNU` if you need the functionality.
+
 New features:
 
 * The help message now contains reference for one-of argument types (#76).
@@ -9,6 +13,7 @@ Bugfixes:
 
 * The environment variables help message has been fixed (#79).
 * The manpage generation works when long description is supplied (#78).
+* The `DEFINE_SCRIPT_DIR` macro doesn't use `readlink -e` any more (#74).
 
 
 2.8.0 (2019-01-26)

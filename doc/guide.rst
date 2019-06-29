@@ -429,9 +429,19 @@ Plus, there are convenience macros:
 * Add a line where the directory where the script is running is stored in an environmental variable:
   ::
 
-     DEFINE_SCRIPT_DIR([variable name (optional, default is script_dir)])
+     DEFINE_SCRIPT_DIR([variable name (optional, default is 'script_dir')])
 
   You can use this variable to e.g. source ``bash`` snippets that are in a known location relative to the script's parent directory.
+
+  ::
+
+     DEFINE_SCRIPT_DIR_GNU([variable name (optional, default is 'script_dir')])
+
+  Does the same as ``DEFINE_SCRIPT_DIR``, but it uses the ``readlink -e`` to determine the real script directory by resolving symlinks.
+
+  .. warning::
+    This command is available only on GNU systems, so be very careful with its usage --- it won't work for OSX users, and for users on non-GNU based Linux distributions (s.a. Alpine Linux).
+    Don't use it unless you need the functionality AND you are sure that the script will be used only on systems with GNU coreutils.
 
 .. _parsing_code:
 

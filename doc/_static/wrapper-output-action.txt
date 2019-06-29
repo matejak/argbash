@@ -9,7 +9,7 @@ Contents of '../src' matching '*.m4':
 	collectors.m4: 20 kiB
 	constants.m4: 0 kiB
 	default_settings.m4: 0 kiB
-	docopt.m4: 2 kiB
+	docopt.m4: 3 kiB
 	env_vars.m4: 1 kiB
 	function_generators.m4: 7 kiB
 	list.m4: 5 kiB
@@ -23,8 +23,8 @@ Contents of '../src' matching '*.m4':
 	output-strip-none.m4: 0 kiB
 	output-strip-user-content.m4: 0 kiB
 	progs.m4: 2 kiB
-	stuff.m4: 44 kiB
-	utilities.m4: 10 kiB
+	stuff.m4: 46 kiB
+	utilities.m4: 11 kiB
 	value_validators.m4: 5 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
