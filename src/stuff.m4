@@ -89,10 +89,35 @@ dnl $1: Name of the holding variable
 dnl Taken from: http://stackoverflow.com/a/246128/592892
 argbash_api([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
+	[dnl Taken from: http://stackoverflow.com/a/246128/592892
+],
+	[_DEFINE_SCRIPT_DIR([$1], [cd "$(dirname "${BASH_SOURCE[0]}")" && pwd])],
+)])
+
+
+dnl
+dnl Does the same as DEFINE_SCRIPT_DIR, but uses 'readlink -e' to follow symlinks.
+dnl Works only on GNU systems.
+dnl
+dnl $1: Name of the holding variable
+dnl Taken from: http://stackoverflow.com/a/246128/592892
+argbash_api([DEFINE_SCRIPT_DIR_GNU], [m4_do(
+	[[$0($@)]],
+	[dnl Taken from: http://stackoverflow.com/a/246128/592892
+],
+	[_DEFINE_SCRIPT_DIR([$1], [cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd])],
+)])
+
+
+dnl
+dnl $1: Name of the holding variable
+dnl $2: Command to find the script dir
+argbash_api([_DEFINE_SCRIPT_DIR], [m4_do(
+	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_append([_OTHER],
-		m4_quote(_sciptdir[="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
+		m4_quote(_sciptdir[="$($2)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
 	[m4_popdef([_sciptdir])],
 )])
 

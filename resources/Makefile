@@ -3,7 +3,9 @@ NUL =
 # SC2015: Note that A && B || C is not if-then-else. C may run when A is true.
 SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
 
-SHELLCHECK=$(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
+SHELLCHECK = $(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
+
+DEFINE_SCRIPT_DIR_FORM ?= DEFINE_SCRIPT_DIR$(shell readlink -e /dev/null > /dev/null && echo "_GNU")
 
 M4_SRC = \
 	../src/output-strip-none.m4 \
@@ -63,6 +65,10 @@ MANPAGE = argbash.1.gz
 
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	ARGBASH_INTENDED_DESTINATION="$@" bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
+
+# TODO: Figure out how to use the GNU version of DEFINE_SCRIPT_DIR based on autodetection.
+../src/argbash.m4.script-dir: ../src/argbash.m4
+	sed "s/\\bDEFINE_SCRIPT_DIR\\b/$(DEFINE_SCRIPT_DIR_FORM)/" $< > $@
 
 $(A_INIT): ../src/argbash-init.m4 $(GENPARSE)
 	$(GENPARSE) $< -o $@
