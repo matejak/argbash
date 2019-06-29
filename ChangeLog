@@ -14,6 +14,7 @@ Bugfixes:
 * The environment variables help message has been fixed (#79).
 * The manpage generation works when long description is supplied (#78).
 * The `DEFINE_SCRIPT_DIR` macro doesn't use `readlink -e` any more (#74).
+* Completion generation works when there are no options followed by value (#77).
 
 
 2.8.0 (2019-01-26)
