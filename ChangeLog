@@ -1,11 +1,11 @@
-2.8.1 (TBA)
+2.8.1 (2019-06-30)
 ------------------
 
 Incompatible changes (minor):
 
 * The `DEFINE_SCRIPT_DIR` macro doesn't resolve symlinks as it started to do so in `2.8.0`, use `DEFINE_SCRIPT_DIR_GNU` if you need the functionality.
 
-New features:
+New features (minor):
 
 * The help message now contains reference for one-of argument types (#76).
 
