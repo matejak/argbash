@@ -37,11 +37,10 @@ m4_define([_MAKE_DIE_FUNCTION], [MAKE_FUNCTION(
 		_INDENT_()[test -f "$_arg_infile" || _PRINT_HELP=yes die "Can't continue, have to supply file as an argument, got '$_arg_infile'" 4]],
 	[die],
 	[_JOIN_INDENTED(1,
-		[[test -n "$_ret" || _ret=1]],
-		[[test "$_PRINT_HELP" = yes && print_help >&2]],
+		[[test "${_PRINT_HELP:-no}" = yes && print_help >&2]],
 		[[echo "@S|@1" >&2]],
-		[[exit ${_ret}]])],
-	[_ret=@S|@2],
+		[[exit "${_ret}"]])],
+	[_ret="${2:-1}"],
 )])
 
 
