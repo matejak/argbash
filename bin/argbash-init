@@ -286,6 +286,9 @@ do_header()
 	if test "$1" = "lib"
 	then
 		echo "echo \"This is just a parsing library template, not the library - pass the parent script '$outfname' to 'argbash' to fix this.\" >&2"
+	elif test "$1" = "standalone_lib"
+	then
+		echo "echo \"This is just a parsing library template, not the library - pass this file to 'argbash' to fix this.\" >&2"
 	else
 		echo "echo \"This is just a script template, not the script (yet) - pass it to 'argbash' to fix this.\" >&2"
 	fi
@@ -341,12 +344,16 @@ do_script_assisted()
 }
 
 
-do_script_bare()
+#
+# $1: The filename of the parsing library
+do_script_separate()
 {
 	do_header script
 	parse_fname=${parse_fname_stem}.sh
 
-	echo "# Run 'argbash --library \"$parse_fname\" -o \"$parse_fname\""
+	echo "# Run 'argbash --strip user-content \"$1\" -o \"$parse_fname\"' to generate the '$parse_fname' file."
+	echo "# If you need to make changes later, edit '$parse_fname' directly, and regenerate by running"
+	echo "# 'argbash --strip user-content \"$parse_fname\" -o \"$parse_fname\"'"
 	echo 'script_dir="$(cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd)"'
 	echo '. "${script_dir}/'"$(basename "$parse_fname")\" || { echo \"Couldn't find '$(basename "$parse_fname")' parsing library in the '"'$script_dir'"' directory\"; exit 1; }"
 	echo
@@ -405,8 +412,9 @@ else
 			do_script_assisted > "$outfname"
 		else
 			test "$_arg_separate" = 2 || echo "The greatest separation value is 2, got $_arg_separate" >&2
-			do_stuff 'lib'  > "${parse_fname_stem}.m4"
-			do_script_bare > "$outfname"
+			parsing_library_file="${parse_fname_stem}.m4"
+			do_stuff 'standalone_lib'  > "${parsing_library_file}"
+			do_script_separate "$parsing_library_file" > "$outfname"
 		fi
 	fi
 	chmod a+x -- "$outfname"
