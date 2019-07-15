@@ -142,8 +142,8 @@ develop: $(ARGBASH_TO)
 	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
-	test -z "$(ARGBASH_TO)" || ln -s -r $(ARGBASH_TO) "$(ROOT)/$(PREFIX)/bin"
-	ln -s -r $(A_INIT) "$(ROOT)/$(PREFIX)/bin"
+	test -z "$(ARGBASH_TO)" || ln -s $(abspath $(ARGBASH_TO)) "$(ROOT)/$(PREFIX)/bin"
+	ln -s $(abspath $(A_INIT)) "$(ROOT)/$(PREFIX)/bin"
 
 # Parse the version file and expose version numbers as variables
 # that are available in targets that have this target as prerequisite
