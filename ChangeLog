@@ -1,3 +1,9 @@
+2.9.0 (TBA)
+------------------
+
+*  Fixed typo in `argbash-init` and updated obsolete/incaccurate hints (#97).
+
+
 2.8.1 (2019-06-30)
 ------------------
 
