@@ -190,6 +190,18 @@ get_parsing_code()
 	echo "$_newerfile"
 }
 
+
+# $1: The output file
+# $2: The output type string
+set_output_permission()
+{
+	if grep -q '\<script\>' <<< "$2"
+	then
+		chmod a+x "$1"
+	fi
+}
+
+
 # MS Windows compatibility fix
 discard=/dev/null
 test -e $discard || discard=NUL
@@ -249,7 +261,7 @@ fi
 if test "$outfname" != '-'
 then
 	printf "%s\\n" "$output" > "$outfname"
-	chmod a+x "$outfname"
+	set_output_permission "$outfname" "$_arg_type"
 else
 	printf "%s\\n" "$output"
 fi

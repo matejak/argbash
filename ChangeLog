@@ -1,7 +1,10 @@
 2.9.0 (TBA)
 ------------------
 
+Buxfixes:
+
 *  Fixed typo in `argbash-init` and updated obsolete/incaccurate hints (#97).
+*  Fixed incorrect permission of non-script output files (#104).
 
 
 2.8.1 (2019-06-30)
