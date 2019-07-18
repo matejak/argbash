@@ -563,6 +563,7 @@ basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<
 	grep -q "\[--opt_arg OPT_ARG\]" $<
 	grep -q "\s-o OPT_ARG, --opt_arg OPT_ARG\s" $<
+	! test -x $<
 
 test-onlyopt-docopt: $(TESTDIR)/test-onlyopt.txt
 	grep -q "\[--opt-repeated OPT-REPEATED\]\.\.\." $<

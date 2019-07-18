@@ -18,11 +18,10 @@ version=2.8.1
 
 die()
 {
-	local _ret=$2
-	test -n "$_ret" || _ret=1
-	test "$_PRINT_HELP" = yes && print_help >&2
+	local _ret="${2:-1}"
+	test "${_PRINT_HELP:-no}" = yes && print_help >&2
 	echo "$1" >&2
-	exit ${_ret}
+	exit "${_ret}"
 }
 
 
