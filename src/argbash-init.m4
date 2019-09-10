@@ -230,7 +230,7 @@ else
 			do_script_separate "$parsing_library_file" > "$outfname"
 		fi
 	fi
-	chmod a+x -- "$outfname"
+	chmod a+x "$outfname"
 fi
 
 # ]dnl
