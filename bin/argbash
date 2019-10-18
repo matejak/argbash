@@ -469,8 +469,9 @@ then
 fi
 
 test -f "$infile" || _PRINT_HELP=yes die "argument '$infile' is supposed to be a file!" 1
-if [ $_arg_in_place = on ]; then
-	_arg_output=$infile
+if test "$_arg_in_place" = on
+then
+	_arg_output="$infile"
 fi
 test -n "$_arg_output" || { echo "The output can't be blank - it is not a legal filename!" >&2; exit 1; }
 outfname="$_arg_output"
@@ -505,5 +506,4 @@ else
 	printf "%s\\n" "$output"
 fi
 
-# #  <-- needed because of Argbash
-# ] <-- needed because of Argbash
+# # ] <-- needed because of Argbash
