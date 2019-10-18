@@ -253,7 +253,7 @@ _wrapped_defns=""
 parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
-test "$_arg_library" = off && test -n "$parsing_code" && ($0 --library "$parsing_code" -o "$parsing_code_out")
+test "$_arg_library" = off && test -n "$parsing_code" && ($0 --strip user-content "$parsing_code" -o "$parsing_code_out")
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname "$infile"

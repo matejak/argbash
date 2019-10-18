@@ -113,7 +113,6 @@ dnl
 dnl $1: Name of the holding variable
 dnl $2: Command to find the script dir
 m4_define([_DEFINE_SCRIPT_DIR], [m4_do(
-	[[$0($@)]],
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_pushdef([_sciptdir], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_append([_OTHER],
