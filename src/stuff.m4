@@ -421,7 +421,7 @@ dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+	[[test $][# -lt 2 && die "Missing value for the optional argument '$_key'." 1]],
 	[$3([$1], ["@S|@2"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [@S|@2])])],
 	[shift],

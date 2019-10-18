@@ -2,7 +2,7 @@
 
 m4_define([if_not_posix], [m4_if(m4_quote(_OUTPUT_TYPE), [posix-script], [$2], [$1])])
 
-dnl m4_define([test], [m4_fatal([BOOM!!!])])
+dnl m4_define([test], [huuuuuuuuuu])
 m4_define([incrx], [m4_fatal([BOOM!!!])])
 # ARG_OPTIONAL_SINGLE([opt-arg], o, [@opt-arg@], x)
 # ARG_VERSION([echo "$0 FOO"])

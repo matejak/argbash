@@ -44,6 +44,9 @@ assert_equals([not single], _CATH_IS_SINGLE_VALUED(m4_list_nth([_ARGS_CATH], 4),
 
 _DISCARD_VALUES_FOR_ALL_ARGUMENTS()
 
+assert_equals(m4_list_len([_ARGS_LONG]), 0)
+
+
 ARG_OPTIONAL_SINGLE([foo], [f], [Help,BOMB], [Default])
 ARG_POSITIONAL_SINGLE([defaultless], [xhelp])
 ARG_POSITIONAL_MULTI([multi-BOMB], [help-BOMB], 3, [one], [two])
@@ -103,3 +106,23 @@ ARG_OPTIONAL_SINGLE([bar], [f])
 assert_equals(m4_list_len([_ERRORS_]), 1)
 m4_bmatch(m4_list_nth([_ERRORS_], 1), ['f'.*already used], [], [m4_fatal([Expected error reflecting duplicate short option, got] 'm4_list_nth([_ERRORS_], 1)' instead.)])
 m4_popdef([_COLLECTOR_FEEDBACK])
+
+_DISCARD_VALUES_FOR_ALL_ARGUMENTS()
+
+ARG_OPTIONAL_SWITCH_ON([foo], [f])
+assert_equals_list_element([_ARGS_LONG], 1, [foo])
+assert_equals_list_element([_ARGS_DEFAULT], 1, [off])
+
+ARG_OPTIONAL_SWITCH_OFF([bar], [b], , [BOMB])
+assert_equals_list_element([_ARGS_LONG], 2, [bar])
+assert_equals_list_element([_ARGS_DEFAULT], 2, [on])
+assert_equals(GET_NEGATION_PREFIX([bar]), [BOMB])
+
+ARG_OPTIONAL_SWITCH_OFF([BOMB])
+assert_equals_list_element([_ARGS_LONG], 3, [BOMB])
+assert_equals_list_element([_ARGS_DEFAULT], 2, [on])
+assert_equals(GET_NEGATION_PREFIX([BOMB]), [no-])
+
+ARG_SET_DEFAULT_NEGATION_PREFIX([BOMB])
+ARG_OPTIONAL_SWITCH_OFF([xx])
+assert_equals(GET_NEGATION_PREFIX([xx]), [BOMB])

@@ -4,6 +4,6 @@ tmux send-keys 'vim stuff.m4' C-m
 tmux new-window -c resources
 tmux send-keys -l 'make unittests'
 tmux new-window -c tests/unittests
-tmux send-keys -l 'vim '
+tmux send-keys -l 'vim -p test-support.m4 '
 tmux select-window -t argbash:0
 tmux -2 attach-session -t argbash

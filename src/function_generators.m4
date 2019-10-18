@@ -168,7 +168,7 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	[parse_commandline], [m4_do(
 		[_JOIN_INDENTED(1,
 			_IF_HAVE_POSITIONAL_ARGS([[_positionals_count=0],]),
-			[while test $[]# -gt 0],
+			[[while test $][# -gt 0]],
 			[do],
 		)],
 		[_IF_HAVE_OPTIONAL_ARGS(
@@ -193,8 +193,8 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(
 	[[The parsing of the command-line]],
 	[parse_commandline], [m4_do(
 		[_JOIN_INDENTED(1,
-			[while getopts '_GET_GETOPTS_STRING()' _key],
-			[do],
+			[[while getopts ']_GET_GETOPTS_STRING()[' _key]],
+			[[do]],
 		)],
 		[_EVAL_OPTIONALS_GETOPTS],
 		[_INDENT_()done[]_ENDL_()],
