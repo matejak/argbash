@@ -323,6 +323,8 @@ Typically, you generate docopt output to the standard output from the generated 
   $ argbash my-script --type docopt --strip all
 
 
+.. _manpage_output:
+
 Manpage output
 ++++++++++++++
 
