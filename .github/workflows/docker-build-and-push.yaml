@@ -1,0 +1,48 @@
+name: Docker Build and Push
+
+on:
+  push:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE: matejak/argbash
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set tags
+        id: set_tags
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" = refs/tags/* ]]; then
+            version="${GITHUB_REF#refs/tags/}"
+            tags="latest,$version"
+          else
+            branch="${GITHUB_REF#refs/heads/}"
+            branch="branch-${branch/\//-}"
+            tags="$branch"
+          fi
+          echo "::set-output name=tags::$tags"
+          echo "The tags were set to '$tags'"
+          
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ env.IMAGE }}
+          dockerfile: docker/Dockerfile
+          add_git_labels: true
+          tags: ${{ steps.set_tags.outputs.tags }}
+          tag_with_sha: true
+
+      - name: Update Docker Hub Description
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: peter-evans/dockerhub-description@v2
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERHUB_REPOSITORY: ${{ env.IMAGE }}
+          README_FILEPATH: docker/README.md
