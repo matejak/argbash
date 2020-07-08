@@ -33,7 +33,7 @@ The sensible way how to use the `Argbash` image is to create a one-line shell sc
 
 | OS | script |
 | --- | --- |
-| Posix (e.g. Linux, MacOS) | `docker run -it --rm -e PROGRAM=argbash -v "$(pwd):/work" matejak/argbash "$@"` |
+| Posix (e.g. Linux, MacOS) | `docker run -it --rm -e PROGRAM=argbash -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"` |
 | Windows | `docker run -it --rm -e PROGRAM=argbash -v "%CD%:/work" matejak/argbash %*` |
 
 What happens here?
@@ -42,6 +42,7 @@ A container is created from the `matejak/argbash` image.
 * The `-t` option is needed for the output to be displayed.
 * The `-e PROGRAM=argbash` option is redundant and it basically affirms the container to invoke `argbash`. If you specify `PROGRAM=argbash-init`, `argbash-init` will be invoked instead, default program is `argbash`.
 * The `-v ...:/work` mounts the current directory to the working directory of the container, which is `/work`.
+* The `-u $(id -u):$(id -g)` makes the container run as the same user of the host machine, which allows `argbash` to replace files that were not created by it.
 * The `"$@"` or `%*` propagates any arguments given to this one-liner script to the `argbash` invocation in the container.
   Make sure that you use the `-o|--output` option - if you intend to use the Argbash output from stdout, the line endings will be of the DOS kind (i.e. `\r\n` instead of just `\n` - thanks to [Filip Filmar](https://github.com/filmil) who found this out).
 
@@ -54,9 +55,9 @@ Example
 Imagine that you want to download an example, edit it, and make it a full-fledged script with `argbash`.
 You obviously have to fire up `docker`, but then, you just create the one-liner, download the example, and proceed.
 
-```
-printf '%s\n' '#!/bin/bash' 'docker run -it --rm -v "$(pwd):/work" matejak/argbash "$@"' > argbash-docker
-printf '%s\n' '#!/bin/bash' 'docker run -it -e PROGRAM=argbash-init --rm -v "$(pwd):/work" matejak/argbash "$@"' > argbash-init-docker
+``` shell
+printf '%s\n' '#!/bin/bash' 'docker run -it --rm -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-docker
+printf '%s\n' '#!/bin/bash' 'docker run -it -e PROGRAM=argbash-init --rm -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-init-docker
 chmod a+x argbash-docker argbash-init-docker
 
 ./argbash-init-docker --pos positional-arg --opt optional-arg minimal.m4
