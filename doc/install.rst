@@ -35,16 +35,10 @@ If you want to use Argbash locally, you have to download the software package an
    * Supply ``INSTALL_COMPLETION=yes`` as an installation argument to install bash completion for ``argbash`` to ``$(SYSCONFDIR)/bash_completion.d``.
      The default ``SYSCONFDIR`` is ``/etc``, but you may override it in the same way as you can override the ``PREFIX`` variable.
 
-   * To be able to let Argbash :ref:`generate manpages <manpage_output>`, |rst2man|_ needs to be installed on your system. It's part of the Python package |docutils|_ which can be installed on Debian/Ubuntu using ``sudo apt install python3-docutils``.
+   * To be able to let Argbash :ref:`generate manpages <manpage_output>`, :ref:`rst2man <https://docutils.sourceforge.io/sandbox/manpage-writer/rst2man.txt>` needs to be installed on your system. It's part of the Python package :ref:`docutils <https://pypi.org/project/docutils/>` which can be installed on Debian/Ubuntu using ``sudo apt install python3-docutils``.
 
    * Run some checks by executing: ``make check`` (still in the ``resources`` folder).
      You should get a message ``All is OK`` at the bottom.
-
-.. |rst2man| replace:: ``rst2man``
-.. _rst2man: https://docutils.sourceforge.io/sandbox/manpage-writer/rst2man.txt
-
-.. |docutils| replace:: ``docutils``
-.. _docutils: https://pypi.org/project/docutils/
 
 
 ``Argbash`` has this audience:
