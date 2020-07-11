@@ -688,13 +688,20 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION_IF_IT_MAKES_SENSE],
 			[_IF_ARG_ACCEPTS_VALUE([$3], , [_PICK_SIMPLE_CASE_STATEMENT_COMMENT($@)_MAKE_OPTARG_SIMPLE_CASE_SECTION($@)])])])])
 
 
+dnl
+dnl $1: Value to escape
+dnl Characters s.a. ? (the only one implemented) have special meaning in case statements,
+dnl so they need to be backslash-escaped.
+m4_define([_CASE_ESCAPE], [m4_bpatsubsts([[$1]], [\?], [\\?])])
+
+
 dnl TODO: We have to restrict case match for long options only if those long opts accept value.
 dnl We always match for --help - even if delim is = only.
 dnl And we also match for --no-that
 dnl And for -h*, since this is an action and argbash then ends (but maybe not, what if one has passed -hx, while -x is invalid?)
 m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
-		[m4_ifblank([$2], [], [[-$2]])],
+		[m4_ifblank([$2], [], m4_dquote(_CASE_ESCAPE([-$2])))],
 		[_IF_ARG_IS_BOOLEAN([$3], [[--no-$1]])],
 		[_IF_ARG_ACCEPTS_VALUE([$3], [_IF_SPACE_IS_A_DELIMITER([[--$1]])], [[--$1]])])],
 	[m4_case([$3],
@@ -786,7 +793,7 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 
 m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
-		[[-$2*]])],
+		m4_dquote(-[]_CASE_ESCAPE([$2])*))],
 	[dnl Search for occurences of e.g. -ujohn and make sure that either -u accepts a value, or -j is a short option
 ],
 	[m4_case([$3],

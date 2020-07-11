@@ -6,7 +6,7 @@
 # ARG_POSITIONAL_SINGLE([another])
 # ARG_LEFTOVERS([just leftovers])
 # ARG_DEFAULTS_POS()
-# ARG_HELP()
+# ARG_HELP(,, [hilfe], [?])
 # ARGBASH_GO
 
 # opening escape square bracket: [

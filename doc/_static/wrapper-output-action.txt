@@ -2,7 +2,7 @@ resources/examples/simple-wrapper.sh --glob '*.m4' ../src ../resources/examples 
 
 Contents of '../src' matching '*.m4':
 	argbash-1to2.m4: 1 kiB
-	argbash-init.m4: 5 kiB
+	argbash-init.m4: 6 kiB
 	argbash-lib.m4: 0 kiB
 	argbash.m4: 10 kiB
 	argument_value_types.m4: 5 kiB

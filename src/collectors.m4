@@ -73,7 +73,7 @@ dnl Checks that the an argument is a correct short option arg
 dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPTION_NAME_IS_OK], [m4_ifnblank([$1], [m4_do(
-		[m4_bmatch([$1], [^[0-9a-zA-z]$], ,
+		[m4_bmatch([$1], [^[0-9a-zA-z?]$], ,
 			[_COLLECTOR_FEEDBACK([The value of short option '$1' for argument '--$2' is not valid - it has to be either left blank, or exactly one character.]m4_ifnblank([$1], [[ (Yours has ]m4_len([$1])[ characters).]]))])],
 		[m4_set_contains([_ARGS_SHORT], [$1],
 			[_COLLECTOR_FEEDBACK([The short option '$1' (in definition of '--$2') is already used.])],
@@ -264,11 +264,19 @@ m4_define([_ARG_VERSION], [m4_do(
 dnl
 dnl $1: The main help message
 dnl $2: The bottom help message
-argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
+dnl $3: The help command's long option (optional)
+dnl $4: The help command's short option (optional)
+dnl $5: The help command's description (optional)
+argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 5)[m4_do(
 	[dnl Skip help if we declare we don't want it
 ],
 	[[$0($@)]],
-	[_IF_W_FLAGS_DONT_CONTAIN([H], [_ARG_HELP([$1], [$2])])],
+	[_IF_W_FLAGS_DONT_CONTAIN(
+		[H], [_ARG_HELP([$1], [$2],
+		m4_default_quoted([$3], [help]),
+		m4_default_quoted([$4], [h]),
+		m4_default_quoted([$5], [Prints help]),
+	)])],
 )])
 
 
@@ -279,9 +287,9 @@ m4_define([_ARG_HELP], [m4_do(
 	[m4_define([_HELP_MSG], [m4_escape([$1])])],
 	[m4_define([_HELP_MSG_EX], [m4_escape([$2])])],
 	[_ARG_OPTIONAL_ACTION(
-		[help],
-		[h],
-		[Prints help],
+		[$3],
+		[$4],
+		[$5],
 		[print_help],
 	)],
 )])
