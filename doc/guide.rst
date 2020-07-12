@@ -379,7 +379,8 @@ You have these possibilities:
      test "$_arg_stop_with_index" -gt "$_arg_start_with_index" \
         || die "The last operation has to be a successor of the first one, which is not the case."
 
-* Filenames
+..
+ * Filenames (not implemented yet)
 
   ::
 
