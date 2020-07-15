@@ -322,6 +322,11 @@ Typically, you generate docopt output to the standard output from the generated 
 
   $ argbash my-script --type docopt --strip all
 
+.. note::
+
+   Docopt output doesn't work with likes of the :ref:`decoupled mode <argbash_init_modes>`.
+   You can't pass the script which sources the parsing code as Argbash input, as it doesn't contain any Argbash macros.
+   If you pass the parsing code script/template as Argbash input, the output will have wrong basename, as Argbash will use the basename of the parsing code file, not of the real script.
 
 .. _manpage_output:
 
