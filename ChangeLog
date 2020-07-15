@@ -7,6 +7,9 @@ Buxfixes:
 *  Fixed incorrect permission of non-script output files (#104).
 *  Increased MacOS compatibility by removing terminator from the `chmod` invocation (#107).
 
+New features:
+*  Increased flexibility of the help option (#92).
+
 
 2.8.1 (2019-06-30)
 ------------------

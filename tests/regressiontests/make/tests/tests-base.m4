@@ -293,7 +293,7 @@ ADD_TEST_BASH([test-infinity-mixed], [[
 ]])
 
 ADD_TEST_BASH([test-leftovers], [[
-	$< -h | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-h|--help\] <another> \.\.\. $$'
+	$< -? | grep -q '\[-c|--cosi <arg>\] \[--(no-)fear\] \[-m|--more\] \[-?|--hilfe\] <another> \.\.\. $$'
 	$< -c ours -m --more --more --no-fear "ours pos" left "o ver" | grep -q 'MORE=3,OPT_S=ours,FEAR=off,POS_S=ours pos,LEFTOVERS=left,o ver,'
 ]])
 
