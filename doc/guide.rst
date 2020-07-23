@@ -275,7 +275,7 @@ Special arguments
 
   If the ``ARG_HELP([MSG], ...)`` macro has been used before, it also outputs the ``MSG`` below the program name --- version pair.
 
-  For example, for argbashm, it yields
+  For example, for argbash, it yields
 
   .. literalinclude:: _static/argbash-version.txt
      :language: text
