@@ -287,8 +287,8 @@ m4_define([_ARG_VERSION], [m4_do(
 dnl
 dnl $1: The main help message
 dnl $2: The bottom help message
-dnl $3: The help command's long option (optional)
-dnl $4: The help command's short option (optional)
+dnl $3: The help command's short option (optional)
+dnl $4: The help command's long option (optional)
 dnl $5: The help command's description (optional)
 argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 5)[m4_do(
 	[dnl Skip help if we declare we don't want it
@@ -296,8 +296,8 @@ argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 5)[m4_do(
 	[[$0($@)]],
 	[_IF_W_FLAGS_DONT_CONTAIN(
 		[H], [_ARG_HELP([$1], [$2],
-		m4_default_quoted([$3], [help]),
-		m4_default_quoted([$4], [h]),
+		m4_default_quoted([$4], [help]),
+		_DEFAULT_IF_NARGS_GREATER_THAN([$#], 3, [$3], _VERSION_DEFAULT_SHORT_ARGNAME),
 		m4_default_quoted([$5], [Prints help]),
 	)])],
 )])
