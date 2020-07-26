@@ -138,3 +138,9 @@ assert_equals(_SUBSTITUTE_LF_FOR_NEWLINE_WITH_SPACE_INDENT_AND_ESCAPE_DOUBLEQUOT
 assert_equals(UNDERLINE([Abc], [+], [=]), [===
 Abc
 +++])
+
+assert_equals(_DEFAULT_IF_NARGS_GREATER_THAN(4, 3, [], foo), [])
+assert_equals(_DEFAULT_IF_NARGS_GREATER_THAN(4, 4, [], foo), [foo])
+assert_equals(_DEFAULT_IF_NARGS_GREATER_THAN(4, 5, [], foo), [foo])
+assert_equals(_DEFAULT_IF_NARGS_GREATER_THAN(4, 5, [], [BOMB]), [BOMB])
+assert_equals(_DEFAULT_IF_NARGS_GREATER_THAN(4, 5, [BOMB], foo), [BOMB])
