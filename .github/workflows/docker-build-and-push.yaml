@@ -1,0 +1,54 @@
+name: Docker Build and Push
+
+on:
+  push:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set environment variables
+        run: |
+          # These env variables are set here because of
+          # https://github.community/t/how-to-use-env-context/16975
+          
+          DOCKER_USERNAME=matejak
+          echo "::set-env name=DOCKER_USERNAME::$DOCKER_USERNAME"
+          
+          DOCKER_IMAGE="$DOCKER_USERNAME/argbash"
+          echo "::set-env name=DOCKER_IMAGE::$DOCKER_IMAGE"
+
+          if [[ "$GITHUB_REF" = refs/tags/* ]]; then
+            version="${GITHUB_REF#refs/tags/}"
+            DOCKER_TAGS="latest,$version"
+            unset version
+          else
+            branch="${GITHUB_REF#refs/heads/}"
+            branch="branch-${branch/\//-}"
+            DOCKER_TAGS="$branch"
+            unset branch
+          fi
+          echo "::set-env name=DOCKER_TAGS::$DOCKER_TAGS"
+          echo "The tags were set to '$DOCKER_TAGS'"
+
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ env.DOCKER_IMAGE }}
+          dockerfile: docker/Dockerfile
+          add_git_labels: true
+          tags: ${{ env.DOCKER_TAGS }}
+          tag_with_sha: true
+
+      - if: github.ref == 'refs/heads/master'
+        name: Update Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        env:
+          DOCKERHUB_USERNAME: ${{ env.DOCKER_USERNAME }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKERHUB_REPOSITORY: ${{ env.DOCKER_IMAGE }}
+          README_FILEPATH: docker/README.md

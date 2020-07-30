@@ -17,23 +17,19 @@ ENV PROGRAM=argbash
 
 # The application requires bash to run.
 # and coreutils for readlink
-RUN apk add --no-cache \
-	autoconf \
-	bash
+RUN apk add --no-cache autoconf bash
 
 # Install argbash from sources
-COPY    argbash/ /usr/src/argbash/
-COPY    entrypoint.sh /
+COPY . /usr/src/argbash/
+COPY docker/entrypoint.sh /
 
 WORKDIR /usr/src/argbash/resources/
-RUN     apk add --no-cache --virtual .build-dependencies \
-            make \
-     && make install PREFIX=/usr/local \
-     && apk del .build-dependencies
+RUN apk add --no-cache --virtual .build-dependencies make \
+	&& make install PREFIX=/usr/local \
+	&& apk del .build-dependencies
 
 # This is the workspace for exec commands
 WORKDIR /work
-VOLUME  /work
 
 # Run argbash with any default invocation.
 ENTRYPOINT [ "/entrypoint.sh" ]
