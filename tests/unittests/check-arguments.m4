@@ -103,3 +103,6 @@ ARG_OPTIONAL_SINGLE([bar], [f])
 assert_equals(m4_list_len([_ERRORS_]), 1)
 m4_bmatch(m4_list_nth([_ERRORS_], 1), ['f'.*already used], [], [m4_fatal([Expected error reflecting duplicate short option, got] 'm4_list_nth([_ERRORS_], 1)' instead.)])
 m4_popdef([_COLLECTOR_FEEDBACK])
+
+assert_equals(_VERSION_PRINTF_COMMAND([], [1.2]), [printf '%s %s\n\n%s\n' "" "1.2" ''])
+assert_equals(_VERSION_PRINTF_COMMAND(["hello"], [1.2]), [printf '%s %s\n\n%s\n%s\n' "" "1.2" '' "hello"])

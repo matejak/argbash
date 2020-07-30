@@ -244,10 +244,11 @@ Special arguments
   ::
 
      ARG_HELP([short program description (optional)], [long program description (optional)],
-         [long option (optional, "help" by default)], [short option (optional, "h" by default)], [option description (optional, "Prints help" by default)])
+         [short option (optional, "h" by default)], [long option (optional, "help" by default)], [option description (optional, "Prints help" by default)])
 
   By default, it will generate the ``--help`` and ``-h`` action arguments that will print the usage information.
   You can use the last three arguments to override the default help argument handling.
+  If you wish to disable the short argument for the help, just leave it blank, and specify either the long argument, or the description.
   Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
 
   The long program description is a string quoted in double quotation marks (so you may use environmental variables in it) and additionally, occurrences of ``\n`` will be translated to a line break with indentation (use ``\\n`` to have the actual ``\n`` in the help description).
@@ -262,12 +263,18 @@ Special arguments
 * Version argument (a special case of an action argument):
   ::
 
-     ARG_VERSION([code to execute when specified])
+     ARG_VERSION([code to execute when specified],
+         [short option (optional, "v" by default)], [long option (optional, "version" by default)], [option description (optional, "Prints version" by default)])
+
+  By default, it will generate the ``--version`` and ``-v`` action arguments that will print the version information.
+  You can use the last three arguments to override the default version argument handling.
+  If you wish to disable the short argument for the version, just leave it blank, and specify either the long argument, or the description.
 
 * Enhanced version argument (a special case of an action argument):
   ::
 
-     ARG_VERSION_AUTO([version number or macro containing it])
+     ARG_VERSION_AUTO([version number or macro containing it], [additional version message (optional)],
+         [short option (optional, "v" by default)], [long option (optional, "version" by default)], [option description (optional, "Prints version" by default)])
 
   The macro will take it's first argument, expands it, and treats it as a version number.
   This allows you to use a quoted macro containing the version number as the first argument.

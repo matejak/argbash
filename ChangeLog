@@ -10,6 +10,7 @@ Buxfixes:
 New features:
 *  Increased flexibility of the help option (#92).
 *  Improved `argbash-init` script template (#85).
+*  Increased flexibility of the version option (#123).
 
 
 2.8.1 (2019-06-30)

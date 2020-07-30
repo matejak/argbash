@@ -11,6 +11,16 @@ m4_define([m4_include_once], [m4_do(
 
 m4_include_once([list.m4])
 
+dnl
+dnl $1: nargs
+dnl $2: index
+dnl $3: actual value
+dnl $4: default
+m4_define([_DEFAULT_IF_NARGS_GREATER_THAN], [m4_do(
+	[dnl                                  too little args        enough args
+],
+	[m4_if(m4_eval([$1 <= $2]), 1, [m4_default_quoted([$3], [$4])], [$3])],
+)])
 
 m4_define([_ENDL_],
 	[m4_for(_, 1, m4_default([$1], 1), 1, [
