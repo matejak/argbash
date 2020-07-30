@@ -200,10 +200,6 @@ argbash_api([ARG_OPTIONAL_SINGLE], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 )])
 
 
-m4_define([_VERSION_DEFAULT_ARGNAME], [[version]])
-m4_define([_VERSION_DEFAULT_SHORT_ARGNAME], [[v]])
-m4_define([_VERSION_DEFAULT_HELP_MSG], [[Prints version]])
-
 dnl
 dnl $1 The function to call to get the version
 dnl $2: The version command's short option (optional)
@@ -251,6 +247,7 @@ m4_define([_VERSION_PRINTF_COMMAND],
 
 dnl
 dnl Try to guess the program name
+dnl Defines PROVIDED_VERSION_STRING
 dnl $1 The version string.
 dnl $2 The version message (incl. quotes) to printf past the simple <program> <version> display. (optional), UNDOCUMENTED NON-FEATURE
 dnl $3: The version command's short option (optional)
@@ -258,6 +255,7 @@ dnl $4: The version command's long option (optional)
 dnl $5: The version command's description (optional)
 argbash_api([ARG_VERSION_AUTO], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 	[[$0($@)]],
+	[m4_define([PROVIDED_VERSION_STRING], [m4_expand([$1])])],
 	[m4_bmatch(m4_expand([_W_FLAGS]), [V], ,
 		[_ARG_VERSION(
 			_VERSION_PRINTF_COMMAND([$2], m4_expand([$1])),
@@ -268,13 +266,11 @@ argbash_api([ARG_VERSION_AUTO], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
 )])
 
 
-dnl $1 What to do wht the version arg is specified
+dnl $1 What to do when the version arg is specified
 dnl $2 Version long arg name
 dnl $3 Version short arg
 dnl $4 Version help message
 m4_define([_ARG_VERSION], [m4_do(
-	[dnl The function with underscore doesn't record what we have just recorded
-],
 	[_ARG_OPTIONAL_ACTION(
 		[$2],
 		[$3],
@@ -296,9 +292,9 @@ argbash_api([ARG_HELP], _CHECK_PASSED_ARGS_COUNT(1, 5)[m4_do(
 	[[$0($@)]],
 	[_IF_W_FLAGS_DONT_CONTAIN(
 		[H], [_ARG_HELP([$1], [$2],
-		m4_default_quoted([$4], [help]),
-		_DEFAULT_IF_NARGS_GREATER_THAN([$#], 3, [$3], _VERSION_DEFAULT_SHORT_ARGNAME),
-		m4_default_quoted([$5], [Prints help]),
+		m4_default_quoted([$4], _HELP_DEFAULT_ARGNAME),
+		_DEFAULT_IF_NARGS_GREATER_THAN([$#], 3, [$3], _HELP_DEFAULT_SHORT_ARGNAME),
+		m4_default_quoted([$5], _HELP_DEFAULT_HELP_MSG),
 	)])],
 )])
 

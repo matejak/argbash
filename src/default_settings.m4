@@ -15,3 +15,11 @@ m4_define([_DEFAULT_SCRIPTDIR], [[script_dir]])
 
 
 m4_define([MAKE_FUNCTION], [MAKE_BASH_FUNCTION($@)])
+
+m4_define([_VERSION_DEFAULT_ARGNAME], [[version]])
+m4_define([_VERSION_DEFAULT_SHORT_ARGNAME], [[v]])
+m4_define([_VERSION_DEFAULT_HELP_MSG], [[Prints version]])
+
+m4_define([_HELP_DEFAULT_ARGNAME], [[help]])
+m4_define([_HELP_DEFAULT_SHORT_ARGNAME], [[h]])
+m4_define([_HELP_DEFAULT_HELP_MSG], [[Prints help]])
