@@ -459,6 +459,14 @@ Plus, there are convenience macros:
     This command is available only on GNU systems, so be very careful with its usage --- it won't work for OSX users, and for users on non-GNU based Linux distributions (s.a. Alpine Linux).
     Don't use it unless you need the functionality AND you are sure that the script will be used only on systems with GNU coreutils.
 
+* Add a function that you can use to source modules relative to the script's location
+  ::
+
+     DEFINE_LOAD_LIBRARY([loader function name (optional, default is load_lib_relativepath)])
+
+  Defines a function (``load_lib_relativepath`` by default) that takes a path relative to the script's directory as an input, and attempts to source a file at that path.
+  In case of failure, ``die`` is called, displays an error message, and quits the program.
+
 .. _parsing_code:
 
 * Include a file (let's say a ``parse.sh`` file) that is in the same directory during runtime.
