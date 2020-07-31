@@ -6,7 +6,7 @@ Contents of '../src' matching '*.m4':
 	argbash-lib.m4: 0 kiB
 	argbash.m4: 10 kiB
 	argument_value_types.m4: 5 kiB
-	collectors.m4: 20 kiB
+	collectors.m4: 21 kiB
 	constants.m4: 0 kiB
 	default_settings.m4: 0 kiB
 	docopt.m4: 3 kiB
@@ -23,7 +23,7 @@ Contents of '../src' matching '*.m4':
 	output-strip-none.m4: 0 kiB
 	output-strip-user-content.m4: 0 kiB
 	progs.m4: 2 kiB
-	stuff.m4: 46 kiB
+	stuff.m4: 47 kiB
 	utilities.m4: 11 kiB
 	value_validators.m4: 5 kiB
 Contents of '../resources/examples' matching '*.m4':

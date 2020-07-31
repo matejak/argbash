@@ -177,7 +177,7 @@ do_script_separate()
 
 do_body()
 {
-	echo "# vvv  PLACE YOUR CODE GOES HERE  vvv"
+	echo "# vvv  PLACE YOUR CODE HERE  vvv"
 	if test "${#_variables[@]}" -gt 0; then
 		echo "# For example:"
 		for stat in "${_variables[@]}"
