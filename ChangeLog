@@ -1,17 +1,24 @@
+2.9.1 (TBA)
+------------------
+
+Buxfixes:
+
 2.9.0 (2020-08-01)
 ------------------
 
 Buxfixes:
 
-*  Fixed typo in `argbash-init` and updated obsolete/incaccurate hints (#97).
-*  Fixed incorrect permission of non-script output files (#104).
-*  Increased MacOS compatibility by removing terminator from the `chmod` invocation (#107).
+* Fixed typo in `argbash-init` and updated obsolete/incaccurate hints (#97).
+* Fixed incorrect permission of non-script output files (#104).
+* Increased MacOS compatibility by removing terminator from the `chmod` invocation (#107).
 
 New features:
-*  Increased flexibility of the help option (#92).
-*  Improved `argbash-init` script template (#85).
-*  Increased flexibility of the version option (#123).
-*  Added a convenience function for module loading (#119).
+
+* Increased flexibility of the help option (#92).
+* Improved `argbash-init` script template (#85).
+* Increased flexibility of the version option (#123).
+* Added a convenience function for module loading (#119).
+* Added a possibility to the `argbash` tool to generate the script in-place, exposed as the `-i` option.
 
 
 2.8.1 (2019-06-30)
