@@ -4,7 +4,9 @@ on:
   push:
 
 jobs:
-  docker:
+  docker-build-and-push:
+    name: Docker Build and Push
+
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +46,7 @@ jobs:
           tags: ${{ env.DOCKER_TAGS }}
           tag_with_sha: true
 
-      - if: github.ref == 'refs/heads/master'
+      - if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')
         name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v2
         env:
