@@ -1,22 +1,23 @@
-name: Docker Build and Push
+name: Docker build and push
 
 on:
   push:
+  pull_request:
 
 jobs:
   docker-build-and-push:
-    name: Docker Build and Push
+    name: Docker build and push
 
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       
+      # This is a workaround due to
+      # https://github.community/t/how-to-use-env-context/16975
+      # and https://github.com/docker/build-push-action/issues/43
       - name: Set environment variables
         run: |
-          # These env variables are set here because of
-          # https://github.community/t/how-to-use-env-context/16975
-          
           DOCKER_USERNAME=matejak
           echo "::set-env name=DOCKER_USERNAME::$DOCKER_USERNAME"
           
@@ -27,16 +28,36 @@ jobs:
             version="${GITHUB_REF#refs/tags/}"
             DOCKER_TAGS="latest,$version"
             unset version
+          elif [[ "$GITHUB_REF" = refs/pull/* ]]; then
+            pr_number="${GITHUB_REF##*refs/pull/}"
+            pr_number="${pr_number%%/merge*}"
+            DOCKER_TAGS="pr-$pr_number"
+            unset pr_number
           else
             branch="${GITHUB_REF#refs/heads/}"
-            branch="branch-${branch/\//-}"
-            DOCKER_TAGS="$branch"
+            branch="${branch//\//-}"
+            DOCKER_TAGS="branch-$branch"
             unset branch
           fi
           echo "::set-env name=DOCKER_TAGS::$DOCKER_TAGS"
           echo "The tags were set to '$DOCKER_TAGS'"
 
-      - uses: docker/build-push-action@v1
+      # This is a workaround due to
+      # https://github.com/docker/build-push-action/issues/85
+      - if: startsWith(github.ref, 'refs/pull/')
+        name: Docker build
+        uses: docker/build-push-action@v1
+        with:
+          push: false
+          repository: ${{ env.DOCKER_IMAGE }}
+          dockerfile: docker/Dockerfile
+          add_git_labels: true
+          tags: ${{ env.DOCKER_TAGS }}
+          tag_with_sha: true
+
+      - if: "! startsWith(github.ref, 'refs/pull/')"
+        name: Docker build and push
+        uses: docker/build-push-action@v1
         with:
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
