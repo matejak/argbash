@@ -430,6 +430,7 @@ m4_define([_MAKE_HELP], [MAKE_FUNCTION(
 		[_MAKE_ARGS_STACKING_HELP_PRINT_IF_NEEDED],
 		[m4_ifnblank(m4_quote(_HELP_MSG_EX),
 			m4_dquote(_INDENT_()[printf] '\n%s\n' "SUBSTITUTE_LF_FOR_NEWLINE_WITH_INDENT_AND_ESCAPE_DOUBLEQUOTES(_HELP_MSG_EX, [])"_ENDL_()))],
+		[_HELP_PROGS],
 	)],
 )])
 

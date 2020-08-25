@@ -270,6 +270,25 @@ m4_define([test_body], [[
 ADD_TEST_BASH([test-infinity-minimal_call], [test_body])
 dnl ADD_TEST_BASH([test-infinity-minimal_call-dash], [test_body])
 
+ADD_TEST_BASH([test-progs], [[
+	$< -h | grep MAKE | grep -q utility
+	$< -h | grep FULALA | grep -q BOOM
+	ERROR="fulala doesnt exist" $(REVERSE) $<
+	$< 2>&1 | grep fulala | grep -q exist
+	FULALA=make $<
+	ERROR="make doesnt work" MAKE=false FULALA=make $(REVERSE) $<
+	$< -h | grep fulala | grep -q FULALA
+]])
+
+ADD_TEST_BASH([test-prog], [[
+	$< -h | grep FULALA | grep -q BOOM
+	ERROR="fulala doesnt exist" $(REVERSE) $<
+	$< 2>&1 | grep fulala | grep -q exist
+	FULALA=make $<
+	$< -h | grep fulala | grep -q FULALA
+	ERROR="fulala doesnt work" FULALA=false $(REVERSE) $<
+]])
+
 ADD_TEST_BASH([test-infinity], [[
 	$< | grep -q 'POS_S=first,second,third,'
 	$< 1 | grep -q 'POS_S=1,second,third,'
