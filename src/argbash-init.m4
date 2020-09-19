@@ -215,6 +215,8 @@ do_stuff()
 }
 
 outfname="$_arg_output"
+# we canonicize the empty string input to output filename to the dash
+test -n "$outfname" || outfname='-'
 test "$outfname" = "-" -a "$_arg_separate" -gt 0 && die "If you want to separate parsing and script body, you have to specify the outname, stdout doesn't work."
 
 if test "$outfname" = '-'
