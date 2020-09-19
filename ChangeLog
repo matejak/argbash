@@ -3,6 +3,8 @@
 
 Buxfixes:
 
+* `argbash-init` is able to handle empty string as the only argument without being puzzled (#130).
+
 New features:
 
 * Argbash in the container has no longer the terminal output limitation caused by the crlf line ending (#129). Thanks to Felipe Santos (@felipecrs)!.
