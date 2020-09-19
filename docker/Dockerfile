@@ -1,8 +1,8 @@
 FROM library/alpine:latest
 
 LABEL \
-	run="docker run -it --rm -v \"$(pwd):/work\" -u \"$(id -u):$(id -g)\" matejak/argbash my-template.m4 -o my-script.sh" \
-	help="docker run -it --rm matejak/argbash -h" \
+	run="docker run --rm -v \"$(pwd):/work\" -u \"$(id -u):$(id -g)\" matejak/argbash my-template.m4 -o my-script.sh" \
+	help="docker run --rm matejak/argbash -h" \
 	version="@VERSION@" \
 	vendor="matej.tyc@gmail.com" \
 	release="1" \
