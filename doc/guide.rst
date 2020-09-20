@@ -574,21 +574,18 @@ Plus, there are convenience macros:
 
   ::
 
-    ARG_USE_PROG([variable name], [default if empty (optional)], [help message (optional)], [args (optional)])
+    ARG_USE_PROGRAM([program name], [env variable name (optional)], [message if not found (optional)], [help message (optional)])
 
-  For instance, if you declare ``ARG_USE_PROG([PYTHON], [python], [The preferred Python executable])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` later.
-  This macro operates in two modes:
+  For instance, if you use ``ARG_USE_PROGRAM([python], [PYTHON], [], [The preferred Python interpreter])`` in your script, you can use constructs s.a. ``"$PYTHON" script.py`` later in the script body.
 
-  * ``args`` are not given:
-    The program name is searched for using the ``which`` utility and if it isn't a executable, the script will terminate with an error.
-    ``ARG_USE_PROG([PYTHON], [python], ,)``
-  * ``args`` are given:
-    The program is called with ``args`` and if the return code is non-zero, the script will terminate with an error.
-    If you want to call the program with no arguments, leave the last argument blank --- the following usage is 100% legal: ``ARG_USE_PROG([PYTHON], [python], ,)`` and it means "accept ``PYTHON`` with default value ``python``, but don't bother with help message and pass no arguments when evaluating whether a program is valid".
+  Remarks:
 
-    Notice that this approach is wrong, calling ``python`` without arguments won't work (since it starts the interactive Python interpreter) and you should use ``ARG_USE_PROG([PYTHON], [python], , [--version])`` instead.
-
-  In either case, the value of ``"$PYTHON"`` will be either ``python`` (if the user doesn't override it), or it can be whatever else what the caller sets.
+  * If the environment variable is not given, it defaults to the transliteration of the command.
+    Lowercase characters are converted to uppercase, the dashes are converted to underscore.
+  * If the script is called with the environment variable defined, then no checking will be done ---
+    the variable contents are trusted, and passed on.
+  * If the environment variable is empty, the program will be given to ``command -v`` as an argument.
+    If that doesn't succeed, a default or provided message will be displayed, and the script will terminate.
 
 * Declare every variable related to every positional argument:
 

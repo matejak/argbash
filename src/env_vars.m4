@@ -37,4 +37,3 @@ m4_define([__SETTLE_ENV], [m4_do(
 	[test -n "@S|@$1" || $1="$2"
 ],
 )])
-

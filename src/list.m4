@@ -138,6 +138,20 @@ m4_define([m4_list_join], [m4_do(
 	[m4_popdef([listlen])],
 )])
 
+
+dnl
+dnl $1: list name
+dnl $2: last join (separator by default)
+dnl $3: quote ("'" by default)
+dnl $4: separator (", " by default)
+m4_define([m4_list_format_sequence], [m4_do(
+	[m4_pushdef([_quote], m4_dquote(m4_default_quoted([$3], ['])))],
+	[m4_pushdef([_sep], m4_dquote(m4_default_quoted([$4], [, ])))],
+	[m4_list_join([$1], _sep, _quote, _quote, m4_dquote(m4_default_quoted([$2], _sep)))],
+	[m4_popdef([_sep])],
+	[m4_popdef([_quote])],
+)])
+
 dnl
 dnl Returns its n-th element, first item has index of 1.
 dnl If the element index is wrong, return $3
