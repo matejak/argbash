@@ -137,7 +137,7 @@ m4_define([_DEFINE_SCRIPT_DIR], [m4_do(
 	[m4_define([SCRIPT_DIR_DEFINED])],
 	[m4_define([_SCRIPT_DIR_NAME], m4_ifnblank([$1], [[$1]], _DEFAULT_SCRIPTDIR))],
 	[m4_list_append([_OTHER],
-		m4_quote(_SCRIPT_DIR_NAME[="$($2)" || die "Couldn't determine the script's running directory, which probably matters, bailing out" 2]))],
+		m4_quote(_SCRIPT_DIR_NAME[="$($2)" || ]_INLINE_DIE_BLOCK([Couldn't determine the script's running directory, which probably matters, bailing out], 2)))],
 )])
 
 
