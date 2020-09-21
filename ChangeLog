@@ -4,6 +4,7 @@
 Buxfixes:
 
 * `argbash-init` is able to handle empty string as the only argument without being puzzled (#130).
+* Error handling of script working directory detection now more robust (#134).
 
 New features:
 

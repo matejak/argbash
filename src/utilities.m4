@@ -319,6 +319,14 @@ m4_define([_CAPITALIZE], [m4_translit([[$1]], [a-z], [A-Z])])
 
 
 dnl
+dnl $1: The message - will be double-quoted
+dnl $2: The return code (default = 1)
+m4_define([_INLINE_DIE_BLOCK], [m4_do(
+	[[{ echo "$1" >&2; exit ]m4_default_quoted([$2], 1); }],
+)])
+
+
+dnl
 dnl $1: What to underline
 dnl $2: By what to underline
 dnl $3: By what to overline (optional)
