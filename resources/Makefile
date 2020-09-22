@@ -209,7 +209,6 @@ version:
 release: version $(GENPARSE) $(ARGBASH_TO) examples check
 	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
 	cd ../doc && $(MAKE) clean && $(MAKE) html && $(MAKE) clean-tmp
-	$(MAKE) ../docker/Dockerfile
 
 tag:
 	git tag $(shell cat ../src/version) -s -m 'Version release' master

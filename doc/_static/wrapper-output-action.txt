@@ -12,7 +12,7 @@ Contents of '../src' matching '*.m4':
 	docopt.m4: 3 kiB
 	env_vars.m4: 1 kiB
 	function_generators.m4: 7 kiB
-	list.m4: 5 kiB
+	list.m4: 6 kiB
 	output-bash-script.m4: 1 kiB
 	output-completion.m4: 4 kiB
 	output-docopt.m4: 0 kiB
