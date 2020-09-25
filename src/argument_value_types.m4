@@ -125,7 +125,7 @@ m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 
 		[m4_pushdef([_arg_varname], [_varname(_arg)])],
 
-		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname") || exit 1
+		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "${_arg_varname}") || exit 1
 ],
 		[m4_popdef([_arg_varname])],
 	)])])],
@@ -167,5 +167,5 @@ dnl $2: suffix
 m4_define([_VALIDATE_VALUES_IDX], [m4_ifnblank([$2], [m4_do(
 	[_varname([$1])[_$2="@S|@@{:@]],
 	[_GET_VALUE_TYPE([$1], 1)],
-	[ "$_varname([$1])" "[$1]" idx@:}@"],
+	[ "${_varname([$1])}" "[$1]" idx@:}@"],
 )])])

@@ -17,7 +17,7 @@ if_not_posix([# ARG_OPTIONAL_REPEATED([opt-repeated], r, [@opt-repeated@])])
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "BOOL=$_arg_boo_l,OPT_S=$_arg_opt_arg,OPT_INCR=$_arg_incrx,]if_not_posix([[ARG_REPEATED=${_arg_opt_repeated[*]},]])["
+echo "BOOL=${_arg_boo_l},OPT_S=${_arg_opt_arg},OPT_INCR=${_arg_incrx},]if_not_posix([[ARG_REPEATED=${_arg_opt_repeated[*]},]])["
 
 # closing escape square bracket: ]
 

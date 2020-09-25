@@ -14,9 +14,9 @@
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
 
-echo -n "MORE=$_arg_more,OPT_S=$_arg_cosi,FEAR=$_arg_fear,POS_S=$_arg_another,LEFTOVERS="
-for val in "${_arg_leftovers[@]}"
-	do echo -n "$val,"
+echo -n "MORE=${_arg_more},OPT_S=${_arg_cosi},FEAR=${_arg_fear},POS_S=${_arg_another},LEFTOVERS="
+for val in "${_arg_leftovers[@]}"; do
+	echo -n "${val},"
 done
 echo
 

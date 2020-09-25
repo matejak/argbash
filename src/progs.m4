@@ -9,9 +9,9 @@ m4_define([_CHECK_PROG_FACTORY_INDIR], [MAKE_FUNCTION(
 		[@S|@3: The error message]],
 	[check_prog],
 	[_JOIN_INDENTED(1,
-		[test -n "$_msg" || _msg="Unable to find a reachable executable '@S|@2'"],
-		[eval "test -n \"\@S|@@S|@1\" || @S|@1=\"@S|@2\""],
-		[eval "command -v \"\@S|@@S|@1\" > /dev/null 2> /dev/null" || die "$_msg" 1],
+		[test -n "${_msg}" || _msg="Unable to find a reachable executable '@S|@2'"],
+		[eval "test -n \"\@S|@{@S|@1}\" || @S|@1=\"@S|@2\""],
+		[eval "command -v \"\@S|@{@S|@1}\" > /dev/null 2> /dev/null" || die "${_msg}" 1],
 	)],
 	[_msg="@S|@3"],
 )])
@@ -29,8 +29,8 @@ m4_define([_CHECK_PROG_FACTORY_SINGLE], [MAKE_FUNCTION(
 	[],
 	[check_prog_for_$1],
 	[_JOIN_INDENTED(1,
-		[test -n "@S|@$1" || $1="$2"],
-		[$1="$(command -v "@S|@$1")" || die "m4_default([$3], [Unable to find a reachable executable '$2'])" 1],
+		[test -n "@S|@{$1}" || $1="$2"],
+		[$1="$(command -v "@S|@{$1}")" || die "m4_default([$3], [Unable to find a reachable executable '$2'])" 1],
 	)])])
 
 

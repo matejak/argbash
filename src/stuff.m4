@@ -76,11 +76,13 @@ dnl The argbash script generator will pick it up and (re)generate that one as we
 dnl
 dnl $1: the filename (assuming that it is in the same directory as the script)
 dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
+dnl TODO: add shellcheck source directive
 argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to define a script directory by some means before using '$0'])])],
 	[m4_list_append([_OTHER],
-		m4_expand([[. "$]m4_default_quoted([$2], _SCRIPT_DIR_NAME)[/$1]"  [# '.' means 'source'
+		m4_expand([[# shellcheck source=SCRIPTDIR/$1]]),
+		m4_expand([[. "$][{]m4_default_quoted([$2], _SCRIPT_DIR_NAME)[}][/$1]"  [# '.' means 'source'
 ]]))],
 )])
 
@@ -442,7 +444,7 @@ dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
+	[test $[]# -lt 2 && die "Missing value for the optional argument '${_key}'." 1],
 	[$3([$1], ["@S|@2"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [@S|@2])])],
 	[shift],
@@ -456,8 +458,8 @@ dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_GETOPTS], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[test "x$OPTARG" = x && die "Missing value for the optional argument '-$_key'." 1],
-	[$3([$1], ["$OPTARG"], [$4])],
+	[test "x${OPTARG}" = x && die "Missing value for the optional argument '-${_key}'." 1],
+	[$3([$1], ["${OPTARG}"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [$OPTARG])])],
 )])
 
@@ -512,13 +514,13 @@ m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE], [m4_do(
 
 dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
 m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_GETOPT], [m4_do(
-	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("$_key")])],
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("${_key}")])],
 )])
 
 
 dnl see _APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS_OR_BOTH for docs
 m4_define([_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS], [m4_do(
-	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("$_key")])],
+	[_IF_WRAPPING_OPTION([$1], [_COLLECT_$1+=("${_key}")])],
 )])
 
 
@@ -726,8 +728,8 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 		[_IF_ARG_IS_BOOLEAN([$3], [[--no-$1]])],
 		[_IF_ARG_ACCEPTS_VALUE([$3], [_IF_SPACE_IS_A_DELIMITER([[--$1]])], [[--$1]])])],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[arg], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5}])],
+		[repeated], [_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
@@ -758,7 +760,7 @@ dnl And for -h*, since this is an action and argbash then ends (but maybe not, w
 m4_define([_MAKE_OPTARG_GETOPTS_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH([[$2]])],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_GETOPTS([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
+		[arg], [_VAL_OPT_ADD_GETOPTS([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5}])],
 		[repeated], [m4_fatal([Repeated arguments are not supported in the POSIX mode])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
@@ -803,8 +805,8 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
 		[[--$1=*]])],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[arg], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5}])],
+		[repeated], [_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT([$1], [], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5[-1]}])],
 		[m4_fatal([Internal error: Argument of type '$3' is other than 'arg' or 'repeated' and shouldn't make it to the '$0' macro.])]
 	)],
 	[_INDENT_(_INDENT_LEVEL_IN_ARGV_CASE_BODY);;
@@ -818,8 +820,8 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 	[dnl Search for occurences of e.g. -ujohn and make sure that either -u accepts a value, or -j is a short option
 ],
 	[m4_case([$3],
-		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
-		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [${$5[-1]}])],
+		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5}])],
+		[repeated], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_APPEND_VALUE_TO_ARRAY], [$5], [${$5[-1]}])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([${_key}], [${$5[-1]}])],
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
@@ -866,7 +868,7 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG], [m4_do(
 		[# assign the rest of arguments as positional arguments and bail out.],
 	)],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_WHILE,
-		[if test "$_key" = '--'],
+		[if test "${_key}" = '--'],
 		[then],
 		_INDENT_MORE(
 			[shift],
@@ -887,7 +889,7 @@ m4_define([_HANDLE_OCCURENCE_OF_DOUBLEDASH_ARG_POSIX], [m4_do(
 		[# mark the first positional argument the one right after this one.],
 	)],
 	[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_WHILE,
-		[if test "$_key" = '--'],
+		[if test "${_key}" = '--'],
 		[then],
 		_INDENT_MORE(
 			[_positionals_index=$((_positionals_index + 1))],
@@ -914,7 +916,7 @@ m4_define([_EVAL_OPTIONALS_AND_POSITIONALS_POSIX], [m4_do(
 
 
 m4_define([_MAKE_CASE_STATEMENT], [m4_do(
-	[_INDENT_(2)[case "$_key" in
+	[_INDENT_(2)[case "${_key}" in
 ]],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_CASE_SECTIONS(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
@@ -930,7 +932,7 @@ m4_define([_EVAL_OPTIONALS_GETOPTS], [m4_do(
 
 
 m4_define([_MAKE_POSIX_CASE_STATEMENT], [m4_do(
-	[_INDENT_(2)[case "$_key" in
+	[_INDENT_(2)[case "${_key}" in
 ]],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_short,_arg_type,_default,_arg_varname],
 		[_MAKE_OPTARG_GETOPTS_CASE_SECTION(_argname, _arg_short, _arg_type, _default, _arg_varname)])],
@@ -971,7 +973,7 @@ m4_define([_HANDLE_NON_OPTION_MATCH_POSIX], [m4_do(
 
 m4_define([_STORE_CURRENT_ARG_AS_POSITIONAL_BODY],
 	[[_last_positional="@S|@1"],
-	[_positionals+=("$_last_positional")],
+	[_positionals+=("${_last_positional}")],
 	[_positionals_count=$((_positionals_count + 1))]])
 
 
@@ -1013,7 +1015,7 @@ m4_define([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS], [m4_do(
 			[_our_args=$(([${#_positionals[@]} - ]_pos_names_count))],
 			[[for ((ii = 0; ii < _our_args; ii++))]],
 			[do],
-			[_INDENT_()_positional_names="$_positional_names _INF_VARNAME@<:@$((ii + _INF_ARGN))@:>@"],
+			[_INDENT_()_positional_names="${_positional_names} _INF_VARNAME@<:@$((ii + _INF_ARGN))@:>@"],
 			[done],
 		)],
 	)])],
@@ -1051,7 +1053,7 @@ m4_define([_MAKE_VALUES_ASSIGNMENTS_BASE_POSIX], [m4_do(
 	[_IF_HAVE_POSITIONAL_ARGS([m4_do(
 		[_ENDL_()_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION()_ENDL_(2)],
 	)])],
-	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); _last_positional=$(eval "printf '%s' \"\@S|@@S|@#\""); handle_passed_args_count], [assign_positional_args "$OPTIND" "@S|@@"])],
+	[$1([parse_commandline "@S|@@"], [_positionals_count=$((@S|@# - OPTIND + 1)); _last_positional=$(eval "printf '%s' \"\@S|@@S|@#\""); handle_passed_args_count], [assign_positional_args "${OPTIND}" "@S|@@"])],
 )])
 
 
@@ -1328,9 +1330,9 @@ dnl $1: The short option
 m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
 	[_IF_OPT_GROUPING_GETOPT(
 		[[[_next="${_key##-$1}"]],
-		[[if test -n "$_next" -a "$_next" != "$_key"]],
+		[[if test -n "${_next}" -a "${_next}" != "${_key}"]],
 		[[then]],
-		[_INDENT_()[{ begins_with_short_option "$_next" && shift && set -- "-$1" "-${_next}" "@S|@@"; } || die "The short option '$_key' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."]],
+		[_INDENT_()[{ begins_with_short_option "${_next}" && shift && set -- "-$1" "-${_next}" "@S|@@"; } || die "The short option '${_key}' can't be decomposed to ${_key:0:2} and -${_key:2}, because ${_key:0:2} doesn't accept value and '-${_key:2:1}' doesn't correspond to a short option."]],
 		[[fi]]])],
 )])])
 

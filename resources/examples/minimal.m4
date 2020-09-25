@@ -16,10 +16,9 @@ exit 11  #)Created by argbash-init v2.10.0
 
 # vvv  PLACE YOUR CODE HERE  vvv
 # For example:
-if [ "$_arg_print" = on ]
-then
-  echo "Positional arg value: '$_arg_positional_arg'"
-  echo "Optional arg '--option' value: '$_arg_option'"
+if [ "${_arg_print}" = on ]; then
+  echo "Positional arg value: '${_arg_positional_arg}'"
+  echo "Optional arg '--option' value: '${_arg_option}'"
 else
   echo "Not telling anything, print not requested"
 fi

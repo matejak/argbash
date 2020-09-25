@@ -2,8 +2,9 @@ NUL =
 
 # SC2015: Note that A && B || C is not if-then-else. C may run when A is true.
 SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
+SHELLCHECK_OPTIONAL_CHECKS_ARGUMENT = --enable=all
 
-SHELLCHECK = $(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
+SHELLCHECK = $(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT) $(SHELLCHECK_OPTIONAL_CHECKS_ARGUMENT)")
 
 DEFINE_SCRIPT_DIR_FORM ?= DEFINE_SCRIPT_DIR$(shell readlink -e /dev/null > /dev/null && echo "_GNU")
 
