@@ -33,10 +33,7 @@ test "${#infname[@]}" -gt 1 && test -n "${outfname}" && die "You have specified 
 
 trap cleanup EXIT
 for infname in "${_arg_input[@]}"; do
-	test -f "${infname}" || {
-		echo "The input parameter has to be a file (got: '${infname}')" >&2
-		exit 1
-	}
+	test -f "${infname}" || die "The input parameter has to be a file (got: '${infname}')"
 
 	test -n "${_arg_output}" || outfname="${infname}"
 	if test "${outfname}" = '-'; then
