@@ -1,5 +1,5 @@
 #!/bin/bash
-#foo
+
 # ARG_POSITIONAL_SINGLE([filename])
 # ARG_OPTIONAL_SINGLE([unit], u, [What unit we accept (b for bytes, k for kibibytes, M for mebibytes)], b)
 # ARG_VERSION([echo $0 v0.1])

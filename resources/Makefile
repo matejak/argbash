@@ -59,6 +59,8 @@ EXAMPLES = \
 	examples/minimal.sh \
 	examples/simple.sh \
 	examples/simple-wrapper.sh \
+	examples/simple-standalone \
+	examples/simple-parsing \
 	$(NUL)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))

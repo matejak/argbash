@@ -208,9 +208,12 @@ assign_positional_args 1 "${_positionals[@]}"
 _variables=()
 HAVE_POSITIONAL_ARG=no
 
-# This should be in sync with _translate_var in stuff.m4
+# This should be in sync with _translate_var in collectors.m4
 _translate_var()
 {
+	# Single quotes so we don't need to escape the variable name here
+	# This is taking the original name, adding ${ to the front, } to
+	# the end, replacing - with _ and making it lowercase
 	printf '${_arg_%s}' "$1" | tr '[:upper:]' '[:lower:]' | tr '-' '_'
 }
 

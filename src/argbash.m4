@@ -34,8 +34,7 @@ cleanup()
 # $1: What (string) to pipe to autom4te
 run_autom4te()
 {
-	printf '%s\n' "$1" |
-		autom4te "${DEBUG[@]}" -l m4sugar -I "${m4dir}"
+	printf '%s\n' "$1" | autom4te "${DEBUG[@]}" -l m4sugar -I "${m4dir}"
 	return $?
 }
 
