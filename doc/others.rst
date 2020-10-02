@@ -48,13 +48,13 @@ Then read through this list of influences and/or alternatives!
 
   * Cons:
 
-    * Its use is `discouraged <http://bash.cumulonim.biz/BashFAQ(2f)035.html#getopts>`_ --- it seems to have some issues, you still need to deal with positional arguments by other means.
+    * The legacy version cannot handle whitespaces and metacharacters at all. It's also non-standard, so there's no guarantee of it existing.
 
 * ``getopts``: ``bash`` builtin for parsing command-line.
 
   * Pros:
 
-    * Being included with ``bash``, it behaves the same on all platforms.
+    * Being included with POSIX ``sh``, it behaves the same on all platforms.
 
   * Cons:
 
