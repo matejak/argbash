@@ -138,6 +138,7 @@ cleanup()
 	test "${#_files_to_clean[*]}" != 0 && rm -f "${_files_to_clean[@]}"
 }
 
+
 do_stuff()
 {
 	# SCRIPT_DIR is likely also a default, but maybe not - it may have been set explicitly
@@ -146,6 +147,7 @@ do_stuff()
 	# and _ARGS_FOO
 	sed 's/\(\${\?_ARGS\?_\w\+\)/\L\1\l/g' "${infname}"
 }
+
 
 outfname="${_arg_output}"
 test "${#infname[@]}" -gt 1 && test -n "${outfname}" && die "You have specified more than one (${#infname[@]}) input filenames, so you probably want to modify the corresponding files in-place. In order to do so, you can't specify an output filename, even '-' does make no sense (currently: '${outfname}')"

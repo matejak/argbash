@@ -22,8 +22,9 @@ version=_ARGBASH_VERSION
 _variables=()
 HAVE_POSITIONAL_ARG=no
 
-# This should be in sync with _translate_var in collectors.m4
-_translate_var()
+
+# This should be in sync with _translit_var in collectors.m4
+_translit_var()
 {
 	# Single quotes so we don't need to escape the variable name here
 	# This is taking the original name, adding ${ to the front, } to
@@ -31,54 +32,64 @@ _translate_var()
 	printf '${_arg_%s}' "$1" | tr '[:upper:]' '[:lower:]' | tr '-' '_'
 }
 
+
 optional_argument_without_hints()
 {
 	echo "# ARG_OPTIONAL_SINGLE([$1])"
 }
+
 
 optional_argument_with_hints()
 {
 	echo "# ARG_OPTIONAL_SINGLE([$1], [<short option character (optional)>], [<help message (optional)>], [<default (optional)>])"
 }
 
+
 optional_argument()
 {
 	"${FUNCNAME[0]}_$2" "$1"
-	_variables+=("printf 'Value of --%s: %s\\n' '$1' \"$(_translate_var "$1")\"")
+	_variables+=("printf 'Value of --%s: %s\\n' '$1' \"$(_translit_var "$1")\"")
 }
+
 
 boolean_argument_with_hints()
 {
 	echo "# ARG_OPTIONAL_BOOLEAN([$1], [<short option character (optional)>], [<help message (optional)>], [<default (optional), off by default>])"
 }
 
+
 boolean_argument_without_hints()
 {
 	echo "# ARG_OPTIONAL_BOOLEAN([$1])"
 }
 
+
 boolean_argument()
 {
 	"${FUNCNAME[0]}_$2" "$1"
-	_variables+=("printf \"'%s' is %s\\\\n\" '$1' \"$(_translate_var "$1")\"")
+	_variables+=("printf \"'%s' is %s\\\\n\" '$1' \"$(_translit_var "$1")\"")
 }
+
 
 positional_argument_with_hints()
 {
 	echo "# ARG_POSITIONAL_SINGLE([$1], [<help message (optional)>], [<default (optional)])"
 }
 
+
 positional_argument_without_hints()
 {
 	echo "# ARG_POSITIONAL_SINGLE([$1])"
 }
 
+
 positional_argument()
 {
 	HAVE_POSITIONAL_ARG=yes
 	"${FUNCNAME[0]}_$2" "$1"
-	_variables+=("printf \"Value of '%s': %s\\\\n\" '$1' \"$(_translate_var "$1")\"")
+	_variables+=("printf \"Value of '%s': %s\\\\n\" '$1' \"$(_translit_var "$1")\"")
 }
+
 
 do_header()
 {
@@ -97,6 +108,7 @@ do_header()
 	echo "exit 11  #)Created by argbash-init v${version}"
 }
 
+
 do_args()
 {
 	local _mode="without_hints"
@@ -108,6 +120,7 @@ do_args()
 	for name in "${_arg_opt_bool[@]}"; do boolean_argument "${name}" "${_mode}"; done
 	for name in "${_arg_pos[@]}"; do positional_argument "${name}" "${_mode}"; done
 }
+
 
 do_args_footer()
 {
@@ -125,6 +138,7 @@ do_args_footer()
 	echo "# ARGBASH_GO"
 }
 
+
 do_script_assisted()
 {
 	do_header script
@@ -135,6 +149,7 @@ do_script_assisted()
 
 	do_body_protected
 }
+
 
 #
 # $1: The filename of the parsing library
@@ -153,6 +168,7 @@ do_script_separate()
 	do_body
 }
 
+
 do_body()
 {
 	echo "# vvv  PLACE YOUR CODE HERE  vvv"
@@ -170,6 +186,7 @@ do_body()
 	echo "# ^^^  TERMINATE YOUR CODE BEFORE THE BOTTOM ARGBASH MARKER  ^^^"
 }
 
+
 do_body_protected()
 {
 	echo
@@ -180,6 +197,7 @@ do_body_protected()
 	echo "# ] <-- needed because of Argbash"
 }
 
+
 do_stuff()
 {
 	do_header "$1"
@@ -189,10 +207,11 @@ do_stuff()
 	test "${_arg_separate}" = 0 && do_body_protected
 }
 
+
 outfname="${_arg_output}"
 # we canonicize the empty string input to output filename to the dash
 test -n "${outfname}" || outfname='-'
-test "${outfname}" = "-" -a "${_arg_separate}" -gt 0 && die "If you want to separate parsing and script body, you have to specify the outname, stdout doesn't work."
+test "${outfname}" = "-" -a "${_arg_separate}" -gt 0 && die "If you want to separate parsing and script body, you have to specify the output filename, stdout doesn't work."
 
 if test "${outfname}" = '-'; then
 	do_stuff 'script'

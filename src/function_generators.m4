@@ -180,13 +180,11 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	)],
 )])
 
-
 m4_define([_GET_GETOPTS_STRING], [m4_do(
 	[m4_lists_foreach_optional([_ARGS_SHORT,_ARGS_CATH], [_arg_short,_arg_type], [m4_case(_arg_type,
 		[arg], [_arg_short:],
 		[_arg_short])])],
 )])
-
 
 dnl TODO: Don't make this if having only positional args.
 m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(

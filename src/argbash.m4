@@ -4,6 +4,7 @@
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.
 # SC2059 Don't use variables in the printf format string.
 
+
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_SINGLE([input], [The input template file (pass '-' for stdin)])
 # ARG_OPTIONAL_SINGLE([output], o, [Name of the output file (pass '-' for stdout)], -)
@@ -20,7 +21,6 @@
 # ARG_DEFAULTS_POS()
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 # ARG_VERSION_AUTO([_ARGBASH_VERSION])
-
 # ARGBASH_GO
 
 # [
@@ -31,12 +31,14 @@ cleanup()
 	test "${#_files_to_clean[*]}" != 0 && rm -f "${_files_to_clean[@]}"
 }
 
+
 # $1: What (string) to pipe to autom4te
 run_autom4te()
 {
 	printf '%s\n' "$1" | autom4te "${DEBUG[@]}" -l m4sugar -I "${m4dir}"
 	return $?
 }
+
 
 # TODO: Refactor to associative arrays as soon as the argbash online is sufficiently reliable
 # We don't use associative arrays due to old bash compatibility reasons
@@ -68,12 +70,13 @@ interpret_error()
 	done
 }
 
+
 # $1: The input file
 # $2: The original intended output file
 define_file_metadata()
 {
 	ARGBASH_INTENDED_DESTINATION="${ARGBASH_INTENDED_DESTINATION=}"
-	SPURIONS_OUTPUT_SUFFIX="${SPURIONS_OUTPUT_SUFFIX=}"
+	SPURIOUS_OUTPUT_SUFFIX="${SPURIOUS_OUTPUT_SUFFIX=}"
 	local _defines='' _intended_destination="${ARGBASH_INTENDED_DESTINATION}" _input_dirname _output_dirname
 	test -n "${_intended_destination}" || _intended_destination="$2"
 
@@ -82,10 +85,11 @@ define_file_metadata()
 	_defines="${_defines}m4_define([INPUT_ABS_DIRNAME], [[$(cd "${_input_dirname}" && pwd)]])"
 
 	_output_dirname="$(dirname "${_intended_destination}")"
-	test "${_intended_destination}" != '-' && _defines="${_defines}m4_define([OUTPUT_BASENAME], [[$(basename "${_intended_destination}" "${SPURIONS_OUTPUT_SUFFIX}")]])"
+	test "${_intended_destination}" != '-' && _defines="${_defines}m4_define([OUTPUT_BASENAME], [[$(basename "${_intended_destination}" "${SPURIOUS_OUTPUT_SUFFIX}")]])"
 	_defines="${_defines}m4_define([OUTPUT_ABS_DIRNAME], [[$(cd "${_output_dirname}" && pwd)]])"
 	printf "%s" "${_defines}"
 }
+
 
 # Yes both tests need to pass or we should throw out an error message
 # shellcheck disable=2015
@@ -96,6 +100,7 @@ assert_m4_files_are_readable()
 	test -r "${_argbash_lib}" && test -f "${_argbash_lib}" || die "The '${_argbash_lib}' file needed by Argbash is not readable. Check whether it exists and review it's permissions."
 	test -r "${output_m4}" && test -f "${output_m4}" || die "The '${output_m4}' file needed by Argbash is not readable. Check whether it exists and review it's permissions."
 }
+
 
 # The main function that generates the parsing script body
 # $1: The input file
@@ -123,6 +128,7 @@ do_stuff()
 	fi
 	return "${_ret}"
 }
+
 
 # Fills content to variable _wrapped_defns --- where are scripts of given stems
 # $1: Infile
@@ -166,6 +172,7 @@ settle_wrapped_fname()
 	done
 }
 
+
 # If we want to have the parsing code in a separate file,
 # 1. Find out the (possible) filename
 # 2. If the file exists, finish (OK).
@@ -197,6 +204,7 @@ get_parsing_code()
 	echo "${_newerfile}"
 }
 
+
 # $1: The output file
 # $2: The output type string
 set_output_permission()
@@ -205,6 +213,7 @@ set_output_permission()
 		chmod a+x "$1"
 	fi
 }
+
 
 # MS Windows compatibility fix
 discard=/dev/null
@@ -234,6 +243,7 @@ test "${_arg_library}" = "on" && {
 	echo "The --library option is deprecated, use --strip user-content" next time >&2
 	_arg_strip="user-content"
 }
+
 if test "${_arg_strip}" = "user-content"; then
 	output_m4="${m4dir}/output-strip-user-content.m4"
 elif test "${_arg_strip}" = "all"; then
@@ -244,15 +254,18 @@ test -f "${infile}" || _PRINT_HELP=yes die "argument '${infile}' is supposed to 
 if test "${_arg_in_place}" = on; then
 	_arg_output="${infile}"
 fi
+
 test -n "${_arg_output}" || {
 	echo "The output can't be blank - it is not a legal filename!" >&2
 	exit 1
 }
+
 outfname="${_arg_output}"
 autom4te --version > "${discard}" 2>&1 || {
 	echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1
 	exit 1
 }
+
 _arg_search+=("$(dirname "${infile}")")
 _wrapped_defns=""
 
@@ -274,6 +287,7 @@ if test "${_arg_check_typos}" = on; then
 	grep_output="$(printf "%s" "${output}" | grep '^#\s*\(ARG_\|ARGBASH\)' | grep -v '^#\s*\(]m4_set_contents([_KNOWN_MACROS], [\|])[\)\s*\((\|$\)' | sed -e 's/#\s*\([[:alnum:]_]*\).*/\1 /' | tr -d '\n\r')"
 	test -n "${grep_output}" && die "Your script contains possible misspelled Argbash macros: ${grep_output}" 1
 fi
+
 if test "${outfname}" != '-'; then
 	printf '%s\n' "${output}" > "${outfname}"
 	set_output_permission "${outfname}" "${_arg_type}"

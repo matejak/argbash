@@ -1,6 +1,8 @@
 {
     "cSpell.words": [
         "ARGBASH",
+        "DELIM",
+        "FUNCNAME",
         "SPURIONS",
         "alnum",
         "autom",
@@ -13,6 +15,7 @@
         "errstr",
         "eval",
         "fname",
+        "getopt",
         "infile",
         "infname",
         "lolo",
@@ -21,12 +24,14 @@
         "outfname",
         "positionals",
         "posix",
+        "readlink",
         "searchdir",
         "shfile",
         "sortof",
         "srcfile",
         "srcfiles",
         "srcstem",
-        "thatfile"
+        "thatfile",
+        "translit"
     ]
 }

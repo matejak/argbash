@@ -57,14 +57,14 @@ m4_define([_pos_suffix], [[_pos]])
 m4_define([_arg_prefix], [[_arg_]])
 m4_define([_args_prefix], [[_args_]])
 m4_define([_varname], [m4_do(
-	[m4_quote(_arg_prefix[]_translate_var([$1]))],
+	[m4_quote(_arg_prefix[]_translit_var([$1]))],
 )])
 
 
 dnl
 dnl The operation on command names that makes stem of variable names
-dnl Since each call of _translate_var etc. strips one level of quoting, we have to quote $1 more than usually
-m4_define([_translate_var], [m4_translit(m4_translit([[[$1]]], [A-Z], [a-z]), [-/], [__])])
+dnl Since each call of _translit_var etc. strips one level of quoting, we have to quote $1 more than usually
+m4_define([_translit_var], [m4_translit(m4_translit([[[$1]]], [A-Z], [a-z]), [-/], [__])])
 m4_define([_translit_prog], [m4_translit(m4_translit([[[$1]]], [a-z], [A-Z]), [-], [_])])
 
 
@@ -116,7 +116,7 @@ m4_define([_CHECK_ARGNAME_FREE], [m4_do(
 
 
 m4_define([_CHECK_POSITIONAL_ARGNAME_IS_FREE], [m4_do(
-	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translate_var([$1])))],
+	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
 	[_CHECK_ARGNAME_FREE_FATAL([$1], _ARG_VAR_NAME)],
 	[m4_set_add([_POSITIONALS], _ARG_VAR_NAME)],
 	[m4_popdef([_ARG_VAR_NAME])],
@@ -124,7 +124,7 @@ m4_define([_CHECK_POSITIONAL_ARGNAME_IS_FREE], [m4_do(
 
 
 m4_define([_ENSURE_UNIQUENESS_OF_ARGUMENT_IDENTIFIER], [m4_do(
-	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translate_var([$1])))],
+	[m4_pushdef([_ARG_VAR_NAME], m4_dquote(_translit_var([$1])))],
 	[_CHECK_ARGNAME_FREE_FATAL([$1], _ARG_VAR_NAME)],
 	[m4_set_add([_ARGS_LONG], _ARG_VAR_NAME)],
 	[m4_popdef([_ARG_VAR_NAME])],
@@ -171,7 +171,7 @@ dnl TODO: Take the _WRAPPED code and move it one level up
 dnl
 dnl $1 - the variable where the argument value is collected
 m4_define([_POS_WRAPPED], [m4_ifdef([WRAPPED_FILE_STEM],
-	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translate_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
+	[__POS_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
 )])
 
 m4_define([__POS_WRAPPED], [m4_do(
@@ -181,7 +181,7 @@ m4_define([__POS_WRAPPED], [m4_do(
 )])
 
 m4_define([_OPT_WRAPPED], [m4_ifdef([WRAPPED_FILE_STEM],
-	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translate_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
+	[__OPT_WRAPPED([$1], m4_expand([_args_prefix[]_translit_var(_GET_BASENAME(WRAPPED_FILE_STEM))]))],
 )])
 
 m4_define([__OPT_WRAPPED], [m4_do(

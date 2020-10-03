@@ -634,6 +634,7 @@ m4_define([LONG_ARG_TO_INDEX], [m4_do(
 m4_define([LONG_ARG_TO_ARGS_SOMETHING],
 	[m4_list_nth([_ARGS_$2], LONG_ARG_TO_INDEX([$1]))])
 
+
 dnl m4_ifblank([$1], [m4_fatal([The assignment is void, use '_val' variable to do wat you want (s.a. '_arg_varname="$_val"')])])
 dnl
 dnl Globally set the option-value delimiter according to a directive.
