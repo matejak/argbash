@@ -115,9 +115,9 @@ do_stuff()
 	input="$(printf '%s\n' "${_pass_also}" | cat - "${m4dir}/argbash-lib.m4" "${output_m4}")"
 	prefix_len=$(printf '%s\n' "${input}" | wc -l)
 	input="$(printf '%s\n' "${input}" | cat - "$1")"
-	run_autom4te "${input}" 2> "${discard}" |
-		grep -v '^#\s*needed because of Argbash -->\s*$' |
-		grep -v '^#\s*<-- needed because of Argbash\s*$'
+	run_autom4te "${input}" 2> "${discard}" \
+		| grep -v '^#\s*needed because of Argbash -->\s*$' \
+		| grep -v '^#\s*<-- needed because of Argbash\s*$'
 	_ret=$?
 	if test "${_ret}" != 0; then
 		local errstr
@@ -140,28 +140,31 @@ settle_wrapped_fname()
 	local _srcfiles=() _file_found _found ext srcstem searchdir line stem="$2"
 	while read -r line; do
 		_srcfiles+=("${line}")
-	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$1")" |
-		autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "${discard}")
+	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$1")" \
+		| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "${discard}")
 
 	test "${#_srcfiles[@]}" -gt 0 || return
 	for srcstem in "${_srcfiles[@]}"; do
 		_found=no
 		for searchdir in "${_arg_search[@]}"; do
-			test -f "${searchdir}/${srcstem}.m4" && {
-				_found=yes
-				ext='.m4'
-				break
-			}
-			test -f "${searchdir}/${srcstem}.sh" && {
-				_found=yes
-				ext='.sh'
-				break
-			}
-			test -f "${searchdir}/${srcstem}" && {
-				_found=yes
-				ext=''
-				break
-			}
+			test -f "${searchdir}/${srcstem}.m4" \
+				&& {
+					_found=yes
+					ext='.m4'
+					break
+				}
+			test -f "${searchdir}/${srcstem}.sh" \
+				&& {
+					_found=yes
+					ext='.sh'
+					break
+				}
+			test -f "${searchdir}/${srcstem}" \
+				&& {
+					_found=yes
+					ext=''
+					break
+				}
 		done
 		# The last searchdir is a correct one
 		test "${_found}" = yes || die "Couldn't find wrapped file of stem '${srcstem}' in any of directories: ${_arg_search[*]}" 2
@@ -182,9 +185,9 @@ get_parsing_code()
 {
 	local _shfile _m4file _newerfile
 	# Get the argument of INCLUDE_PARSING_CODE
-	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(cat "${infile}")" |
-		autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' 2> "${discard}" |
-		tail -n 1)"
+	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(cat "${infile}")" \
+		| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' 2> "${discard}" \
+		| tail -n 1)"
 	test -n "${_srcfile}" || return 1
 	_thatfile="$(dirname "${infile}")/${_srcfile}"
 	test -f "${_thatfile}" && _shfile="${_thatfile}"
@@ -239,10 +242,11 @@ m4dir="${script_dir}/../src"
 test -n "${_arg_debug}" && DEBUG=('-t' "${_arg_debug}")
 
 output_m4="${m4dir}/output-strip-none.m4"
-test "${_arg_library}" = "on" && {
-	echo "The --library option is deprecated, use --strip user-content" next time >&2
-	_arg_strip="user-content"
-}
+test "${_arg_library}" = "on" \
+	&& {
+		echo "The --library option is deprecated, use --strip user-content" next time >&2
+		_arg_strip="user-content"
+	}
 
 if test "${_arg_strip}" = "user-content"; then
 	output_m4="${m4dir}/output-strip-user-content.m4"
@@ -255,16 +259,18 @@ if test "${_arg_in_place}" = on; then
 	_arg_output="${infile}"
 fi
 
-test -n "${_arg_output}" || {
-	echo "The output can't be blank - it is not a legal filename!" >&2
-	exit 1
-}
+test -n "${_arg_output}" \
+	|| {
+		echo "The output can't be blank - it is not a legal filename!" >&2
+		exit 1
+	}
 
 outfname="${_arg_output}"
-autom4te --version > "${discard}" 2>&1 || {
-	echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1
-	exit 1
-}
+autom4te --version > "${discard}" 2>&1 \
+	|| {
+		echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1
+		exit 1
+	}
 
 _arg_search+=("$(dirname "${infile}")")
 _wrapped_defns=""

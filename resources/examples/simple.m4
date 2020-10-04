@@ -11,7 +11,8 @@
 verbose=${_arg_verbose}
 unit=${_arg_unit}
 
-test -f ${_arg_filename} || {
+test -f ${_arg_filename}\
+  || {
   echo "Filename ${_arg_filename} doesn't seem to belong to a file"
   exit 1
 }
