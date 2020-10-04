@@ -141,7 +141,8 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "Couldn't d
 
 
 script="${script_dir}/simple.sh"
-test -f "${script}" || {
+test -f "${script}" \
+  || {
   echo "Missing the wrapped script, was expecting it next to me, in '${script_dir}'."
   exit 1
 }

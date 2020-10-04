@@ -379,22 +379,22 @@ settle_wrapped_fname()
 		for searchdir in "${_arg_search[@]}"; do
 			test -f "${searchdir}/${srcstem}.m4" \
 				&& {
-				_found=yes
-				ext='.m4'
-				break
-			}
+					_found=yes
+					ext='.m4'
+					break
+				}
 			test -f "${searchdir}/${srcstem}.sh" \
 				&& {
-				_found=yes
-				ext='.sh'
-				break
-			}
+					_found=yes
+					ext='.sh'
+					break
+				}
 			test -f "${searchdir}/${srcstem}" \
 				&& {
-				_found=yes
-				ext=''
-				break
-			}
+					_found=yes
+					ext=''
+					break
+				}
 		done
 		# The last searchdir is a correct one
 		test "${_found}" = yes || die "Couldn't find wrapped file of stem '${srcstem}' in any of directories: ${_arg_search[*]}" 2
@@ -474,9 +474,9 @@ test -n "${_arg_debug}" && DEBUG=('-t' "${_arg_debug}")
 output_m4="${m4dir}/output-strip-none.m4"
 test "${_arg_library}" = "on" \
 	&& {
-	echo "The --library option is deprecated, use --strip user-content" next time >&2
-	_arg_strip="user-content"
-}
+		echo "The --library option is deprecated, use --strip user-content" next time >&2
+		_arg_strip="user-content"
+	}
 
 if test "${_arg_strip}" = "user-content"; then
 	output_m4="${m4dir}/output-strip-user-content.m4"
@@ -491,16 +491,16 @@ fi
 
 test -n "${_arg_output}" \
 	|| {
-	echo "The output can't be blank - it is not a legal filename!" >&2
-	exit 1
-}
+		echo "The output can't be blank - it is not a legal filename!" >&2
+		exit 1
+	}
 
 outfname="${_arg_output}"
 autom4te --version > "${discard}" 2>&1 \
 	|| {
-	echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1
-	exit 1
-}
+		echo "You need the 'autom4te' utility (it comes with 'autoconf'), if you have bash, that one is an easy one to get." 2>&1
+		exit 1
+	}
 
 _arg_search+=("$(dirname "${infile}")")
 _wrapped_defns=""
