@@ -81,8 +81,8 @@ argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to define a script directory by some means before using '$0'])])],
 	[m4_list_append([_OTHER],
-		m4_expand([[# shellcheck source=SCRIPTDIR/$1]]),
-		m4_expand([[. "$][{]m4_default_quoted([$2], _SCRIPT_DIR_NAME)[}][/$1]"  [# '.' means 'source'
+		[# shellcheck source=SCRIPTDIR/$1],
+		m4_expand([[. "${]m4_default_quoted([$2], _SCRIPT_DIR_NAME)[}/$1]"  [# '.' means 'source'
 ]]))],
 )])
 
@@ -1351,4 +1351,3 @@ dnl
 dnl * Upon arg encounter, validate the value. Die in case of no compliance.
 dnl * Help: optional args - value should take the name.
 dnl       : positional args - value should have the arg name, but the type should be mentioned on the help line.
-
