@@ -76,7 +76,6 @@ dnl The argbash script generator will pick it up and (re)generate that one as we
 dnl
 dnl $1: the filename (assuming that it is in the same directory as the script)
 dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
-dnl TODO: add shellcheck source directive
 argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
 	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to define a script directory by some means before using '$0'])])],
