@@ -197,7 +197,7 @@ uninstall:
 
 altuninstall: define-version uninstall
 
-version:
+version: $(MANPAGE)
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
 	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
