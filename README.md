@@ -10,7 +10,7 @@
 * But they don't since arguments support is a daunting task, because ...
 * `getopt` is discouraged, `getopts` doesn't support long options, there is no widely-accepted `Bash` module to do the task and some solutions don't work on all platforms (Linux, OSX, MSW)...
 
-Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
+Give `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
 * Fast, minimalistic declaration of arguments your script expects (see below for supported argument types).
 * Scripts generated from definitions once that can be used on all platforms that have `bash`.
@@ -45,7 +45,7 @@ If you are not into long reading, let `bin/argbash-init` generate the template f
 
 Following argument types are supported:
 
-- Positional arguments (defaults supported, possibiliy of fixed, variable or infinite number of arguments),
+- Positional arguments (defaults supported, possibility of fixed, variable or infinite number of arguments),
 - optional arguments that take one value,
 - boolean optional arguments,
 - repeated (i.e. non-overwriting) optional arguments,

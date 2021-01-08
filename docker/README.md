@@ -7,7 +7,7 @@
 * But they don't since arguments support is a daunting task, because ...
 * `getopt` is discouraged, `getopts` doesn't support long options, there is no widely-accepted `Bash` module to do the task and some solutions don't work on all platforms (Linux, OSX, MSW)...
 
-Give a `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
+Give `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
 
 What it is
