@@ -7,3 +7,8 @@ tests/regressiontests/test.sh
 
 doc/_build
 resources/packages/build
+resources/examples/simple-standalone
+resources/examples/simple-parsing
+resources/examples/minimal.sh
+resources/argbash.rst
+resources/argbash.1.gz

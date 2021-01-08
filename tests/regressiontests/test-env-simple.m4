@@ -4,4 +4,4 @@
 # ARG_HELP()
 # ARGBASH_GO
 
-echo "ENVI_FOO=$ENVI_FOO,"
+echo "ENVI_FOO=${ENVI_FOO},"

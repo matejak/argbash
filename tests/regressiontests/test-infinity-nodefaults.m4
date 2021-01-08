@@ -9,8 +9,7 @@
 # sometimes after a basic validation
 
 echo -n POS_S=
-for val in "${_arg_pos_arg[@]}"; do echo -n "$val,"; done
+for val in "${_arg_pos_arg[@]}"; do echo -n "${val},"; done
 echo
 
 # closing escape square bracket: ]
-

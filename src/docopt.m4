@@ -1,6 +1,7 @@
 m4_include([argument_value_types.m4])
 m4_include([value_validators.m4])
 
+
 dnl
 dnl $1: Argname
 m4_define([_REPRESENT_VALUE_VERBOSE], [_IF_ARG_IS_OF_SET_TYPE([$1],
@@ -28,6 +29,7 @@ m4_define([_SYNOPSIS_OF_OPTIONAL_ARGS], [m4_lists_foreach_optional([_ARGS_LONG,_
 		[incr], [...],
 		[])],
 )])])
+
 
 dnl
 dnl $1: Argname

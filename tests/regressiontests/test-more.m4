@@ -9,6 +9,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "POS_S=$_arg_pos_arg,POS_MORE=${_arg_pos_more[*]},"
+echo "POS_S=${_arg_pos_arg},POS_MORE=${_arg_pos_more[*]},"
 
 # closing escape square bracket: ]

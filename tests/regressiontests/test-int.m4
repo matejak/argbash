@@ -14,6 +14,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "POS_S=$_arg_pos_arg,OPT_S=$_arg_int,NN=$_arg_nnint,P=$_arg_pint,"
+echo "POS_S=${_arg_pos_arg},OPT_S=${_arg_int},NN=${_arg_nnint},P=${_arg_pint},"
 
 # closing escape square bracket: ]

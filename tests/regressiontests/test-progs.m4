@@ -8,7 +8,9 @@
 
 # [ <-- needed because of Argbash
 
-"$MAKE" --version > /dev/null || die "make doesnt work"
+# Expecting make to come from the environment
+# shellcheck disable=SC2154
+"${MAKE}" --version > /dev/null || die "make doesn't work"
 
 # ] <-- needed because of Argbash
 m4_ifdef([m4_esyscmd], [m4_fatal([The m4_esyscmd macro is enabled!])])

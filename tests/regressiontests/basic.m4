@@ -26,6 +26,6 @@ m4_define([opt_arg_help], [m4_fatal([The option 'opt_arg' help string got expand
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "BOOL=$_arg_boo_l,OPT_S=$_arg_opt_arg,POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_INCR=$_arg_opt_incr,"
+echo "BOOL=${_arg_boo_l},OPT_S=${_arg_opt_arg},POS_S=${_arg_pos_arg},POS_OPT=${_arg_pos_opt},OPT_INCR=${_arg_opt_incr},"
 
 # closing escape square bracket: ]

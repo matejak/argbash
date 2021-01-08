@@ -493,7 +493,7 @@ test-progs: $(TESTDIR)/test-progs.sh
 	ERROR="fulala doesnt exist" $(REVERSE) $<
 	$< 2>&1 | grep fulala | grep -q exist
 	FULALA=make $<
-	ERROR="make doesnt work" MAKE=false FULALA=make $(REVERSE) $<
+	ERROR="make doesn't work" MAKE=false FULALA=make $(REVERSE) $<
 	$< -h | grep fulala | grep -q FULALA
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-progs.sh"
 test-prog: $(TESTDIR)/test-prog.sh
@@ -502,7 +502,7 @@ test-prog: $(TESTDIR)/test-prog.sh
 	$< 2>&1 | grep fulala | grep -q exist
 	FULALA=make $<
 	$< -h | grep fulala | grep -q FULALA
-	ERROR="fulala doesnt work" FULALA=false $(REVERSE) $<
+	ERROR="fulala doesn't work" FULALA=false $(REVERSE) $<
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-prog.sh"
 test-infinity: $(TESTDIR)/test-infinity.sh
 	$< | grep -q 'POS_S=first,second,third,'
@@ -649,7 +649,7 @@ $(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-t
 	$(ARGBASH_INIT_EXEC) --opt ordnung -s $@ > /dev/null
 	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 	sed -i 's/^echo .*//' $@
-	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
+	echo 'test "$${_arg_ordnung}" = yes || exit 1' >> $@
 
 test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
 	@# Regenerate everyting during the next test run

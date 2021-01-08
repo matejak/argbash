@@ -7,7 +7,7 @@
 
 # [ <-- needed because of Argbash
 
-"$FULALA" --version > /dev/null || die "fulala doesnt work"
+"${FULALA}" --version > /dev/null || die "fulala doesn't work"
 
 # ] <-- needed because of Argbash
 m4_ifdef([m4_esyscmd], [m4_fatal([The m4_esyscmd macro is enabled!])])

@@ -1,0 +1,22 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Make Checks",
+            "type": "shell",
+            "command": "make check",
+            "options": {
+                "cwd": "${cwd}/resources"
+            }
+        }, {
+            "label": "Make Examples",
+            "type": "shell",
+            "command": "make examples",
+            "options": {
+                "cwd": "${cwd}/resources"
+            }
+        }
+    ]
+}

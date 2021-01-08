@@ -46,7 +46,7 @@ ADD_RULE([$(TESTDIR)/test-init_simple-s-update.m4], [$(ARGBASH_INIT) $(TESTDIR)/
 	[$(ARGBASH_INIT_EXEC) --opt ordnung -s $@ > /dev/null
 	sed -i '2 s|^|# shellcheck source=$(basename $@)-parsing.sh\n|' $@
 	sed -i 's/^echo .*//' $@
-	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
+	echo 'test "$${_arg_ordnung}" = yes || exit 1' >> $@
 ])
 
 dnl

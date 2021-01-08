@@ -1,27 +1,23 @@
 #!/bin/bash
 
-if test -n "$ERROR"
-then
+if test -n "${ERROR}"; then
 	ERRSTRING="$("$@" 2>&1)"
 else
 	"$@"
 fi
 
-if test $? = 0
-then
+if test $? = 0; then
 	echo "Error expected, but it did not occur" >&2
 	exit 1
 # We don't care what the error string should look like
-elif test -z "$ERROR"
-then
+elif test -z "${ERROR}"; then
 	exit 0
 # We examine the error string
 else
-	if echo "$ERRSTRING" | grep -q "$ERROR"
-	then
+	if echo "${ERRSTRING}" | grep -q "${ERROR}"; then
 		exit 0
 	else
-		echo "Error occured, but not a good one:" >&2
+		echo "Error occurred, but not the expected error:" >&2
 		"$@"
 	fi
 fi

@@ -8,8 +8,8 @@ m4_define([m4_include_once], [m4_do(
 		[m4_set_add([__FILES_ALREADY_INCLUDED__], [$1])m4_include([$1])])],
 )])
 
-
 m4_include_once([list.m4])
+
 
 dnl
 dnl $1: nargs
@@ -22,9 +22,11 @@ m4_define([_DEFAULT_IF_NARGS_GREATER_THAN], [m4_do(
 	[m4_if(m4_eval([$1 <= $2]), 1, [m4_default_quoted([$3], [$4])], [$3])],
 )])
 
+
 m4_define([_ENDL_],
 	[m4_for(_, 1, m4_default([$1], 1), 1, [
 ])])
+
 
 m4_define([_IF_DIY_MODE],
 	[m4_if(_DIY_MODE, 1, [$1], [$2])])
@@ -95,6 +97,7 @@ m4_define([_sh_quote_also_blanks], [m4_do(
 		[["$1"]])],
 )])
 
+
 dnl
 dnl Define a macro that is part of the public API
 dnl Ensure the replication and also add the macro name to a list of allowed macros
@@ -107,6 +110,7 @@ m4_define([argbash_arg_api], [m4_do(
 		[m4_list_contains([BLACKLIST], m4_quote($][1), , m4_dquote([$1($][@)])$4)],
 	)]])]],
 )])
+
 
 dnl
 dnl $1: this comm block ID
@@ -169,6 +173,7 @@ m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_FEW],
 
 m4_define([_CHECK_PASSED_ARGS_COUNT_TOO_MANY],
 	[m4_fatal([You have passed $2 arguments to macro $1, while it accepts at most $3.]m4_ifnblank([$4], [ Call it like: $4]))])
+
 
 dnl
 dnl $1: Name of the macro
@@ -270,10 +275,12 @@ dnl A very private macro --- return name of the macro containing description for
 dnl $1: Type ID
 m4_define([__type_str], [[_type_str_$1]])
 
+
 dnl
 dnl Return type description for the given argname
 dnl $1: Argument ID
 m4_define([_GET_VALUE_DESC], [m4_expand(__type_str(_GET_VALUE_TYPE([$1])))])
+
 
 dnl
 dnl Given an argname, return the argument group name (i.e. type string) or 'arg'
