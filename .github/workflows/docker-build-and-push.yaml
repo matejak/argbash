@@ -19,10 +19,10 @@ jobs:
       - name: Set environment variables
         run: |
           DOCKER_USERNAME=matejak
-          echo "::set-env name=DOCKER_USERNAME::$DOCKER_USERNAME"
+          echo "DOCKER_USERNAME=$DOCKER_USERNAME" >> $GITHUB_ENV
           
           DOCKER_IMAGE="$DOCKER_USERNAME/argbash"
-          echo "::set-env name=DOCKER_IMAGE::$DOCKER_IMAGE"
+          echo "DOCKER_IMAGE=$DOCKER_IMAGE" >> $GITHUB_ENV
 
           if [[ "$GITHUB_REF" = refs/tags/* ]]; then
             version="${GITHUB_REF#refs/tags/}"
