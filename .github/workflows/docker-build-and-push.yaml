@@ -39,7 +39,7 @@ jobs:
             DOCKER_TAGS="branch-$branch"
             unset branch
           fi
-          echo "::set-env name=DOCKER_TAGS::$DOCKER_TAGS"
+          echo "DOCKER_TAGS=$DOCKER_TAGS" >> $GITHUB_ENV
           echo "The tags were set to '$DOCKER_TAGS'"
 
       # This is a workaround due to
