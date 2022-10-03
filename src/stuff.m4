@@ -98,7 +98,7 @@ argbash_api([DEFINE_LOAD_LIBRARY], [m4_do(
 				_INDENT_()[@S|@1: Path to the file relative to the scripts directory]],
 			m4_default_quoted([$1], [load_lib_relativepath]),
 			[_JOIN_INDENTED(1,
-				[[. $lib_filename || die "Not able to load library file '$lib_filename'"]],
+				[[. "$lib_filename" || die "Not able to load library file '$lib_filename'"]],
 			)],
 			m4_quote([lib_filename="$]_SCRIPT_DIR_NAME/@S|@1"),
 		)]))],
