@@ -41,7 +41,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@]_ENDL_()],
 	[_ARGBASH_ID()_ENDL_()],
 	[[# Argbash is a bash code generator used to get arguments parsing right.
-# Argbash is FREE SOFTWARE, see https://argbash.io for more info]_ENDL_(2)],
+# Argbash is FREE SOFTWARE, see https://argbash.dev for more info]_ENDL_(2)],
 	[_IF_SOME_ARGS_ARE_DEFINED([m4_do(
 		[GENERATE_COMPLETION_FUNCTION(_FUNCTION_NAME)_ENDL_()],
 		[complete -F _FUNCTION_NAME _PROGRAM_NAME()_ENDL_()],

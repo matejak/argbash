@@ -4,7 +4,7 @@ Argbash documentation
 Argbash
 -------
 
-``Argbash`` (`<https://argbash.io>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
+``Argbash`` (`<https://argbash.dev>`_) is a ``bash`` code generator that can assist you in writing scripts that accept arguments.
 You declare arguments that your script should use in a few lines and then, you run ``Argbash`` on those declarations to get a parsing code that can be used on all platforms that have ``bash`` (Linux, macOS, MS Windows, ...).
 
 You :ref:`can have <file_layout>` your parsing code in the script, you can have ``Argbash`` to help you to use it as a ``bash`` library, or you can generate the library yourself and include it yourself too, it's up to you.
@@ -15,7 +15,7 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 .. image:: ../resources/logo/web-legacy.svg
    :alt: Link to argbash online generator
    :align: center
-   :target: https://argbash.io/generate
+   :target: https://argbash.dev/generate
 
 :Version:
   |version|
@@ -24,7 +24,7 @@ A basic template generator ``argbash-init`` is part of the package, and you can 
 :Copyright:
   2014--|current-year|, Matěj Týč
 :Website:
-  https://argbash.io
+  https://argbash.dev
 
 Requirements
 ++++++++++++
@@ -56,7 +56,7 @@ How to use ``Argbash``?
 You can either
 
 * :ref:`download and install it <user_install>` locally,
-* use the `online generator <https://argbash.io/generate>`_, or
+* use the `online generator <https://argbash.dev/generate>`_, or
 * use the `Docker container <https://hub.docker.com/r/matejak/argbash/>`_.
 
 

@@ -1,5 +1,5 @@
-[argbash](https://argbash.io)
------------------------------
+[argbash](https://argbash.dev)
+------------------------------
 
 ![argbash logo](https://raw.githubusercontent.com/matejak/argbash/master/resources/logo/argbash-docker.png)
 
