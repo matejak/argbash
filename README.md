@@ -1,5 +1,5 @@
-[argbash](https://argbash.io)
-=============================
+[argbash](https://argbash.dev)
+==============================
 
 [![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
 [![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://readthedocs.org/projects/argbash/?badge=latest)
@@ -23,7 +23,7 @@ Make your existing script powered by `Argbash` [in a couple of minutes](http://a
 
 Flavour               | Target group
 -------               | ------------
-[Argbash online](https://argbash.io/generate) | Use it if you want to try Argbash without installing it and you have permanent access to the Internet.
+[Argbash online](https://argbash.dev/generate) | Use it if you want to try Argbash without installing it and you have permanent access to the Internet.
 [Argbash CLI](https://github.com/matejak/argbash/releases/latest) | Install the package to have `argbash` ready locally all the time.
 [Argbash Docker](https://hub.docker.com/r/matejak/argbash/) | Pretty much like Argbash CLI, but you don't have to install it, you just download the image.
 
