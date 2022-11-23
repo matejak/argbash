@@ -276,7 +276,7 @@ ADD_TEST_BASH([test-progs], [[
 	ERROR="fulala doesnt exist" $(REVERSE) $<
 	$< 2>&1 | grep fulala | grep -q exist
 	FULALA=make $<
-	ERROR="make doesnt work" MAKE=false FULALA=make $(REVERSE) $<
+	ERROR="make doesn't work" MAKE=false FULALA=make $(REVERSE) $<
 	$< -h | grep fulala | grep -q FULALA
 ]])
 
@@ -286,7 +286,7 @@ ADD_TEST_BASH([test-prog], [[
 	$< 2>&1 | grep fulala | grep -q exist
 	FULALA=make $<
 	$< -h | grep fulala | grep -q FULALA
-	ERROR="fulala doesnt work" FULALA=false $(REVERSE) $<
+	ERROR="fulala doesn't work" FULALA=false $(REVERSE) $<
 ]])
 
 ADD_TEST_BASH([test-infinity], [[

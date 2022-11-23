@@ -51,7 +51,7 @@ m4_define([_MAKE_NEXT_OPTARG_FUNCTION], [MAKE_FUNCTION(
 	[begins_with_short_option],
 	[_JOIN_INDENTED(1,
 		[[first_option="${1:0:1}"]],
-		[[test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0]])],
+		[[test "${all_short_options}" = "${all_short_options/${first_option}/}" && return 1 || return 0]])],
 	[first_option], m4_expand([all_short_options='m4_list_join([_ARGS_SHORT], [])']),
 )])
 
@@ -80,7 +80,7 @@ m4_define([_CHECK_FOR_TOO_LITTLE_ARGS], [m4_do(
 	[_MINIMAL_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-	[ (namely: $_required_args_string)],
+	[ (namely: ${_required_args_string})],
 	[[, but got only ${_positionals_count}." 1
 ]],
 )])
@@ -95,7 +95,7 @@ m4_define([__CHECK_FOR_TOO_MANY_ARGS], [m4_do(
 	[_INDENT_(1)[test "${_positionals_count}" -le ]_HIGHEST_POSITIONAL_VALUES_COUNT],
 	[[ || _PRINT_HELP=yes die "FATAL ERROR: There were spurious positional arguments --- we expect ]],
 	[_SPECIFICATION_OF_ACCEPTED_VALUES_COUNT],
-	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: $_required_args_string)])],
+	[_IF_SOME_POSITIONAL_VALUES_ARE_EXPECTED([ (namely: ${_required_args_string})])],
 	[[, but got ${_positionals_count} (the last one was: '${_last_positional}')." 1
 ]],
 )])
@@ -138,15 +138,15 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	[assign_positional_args], [m4_do(
 	[m4_n([_MAKE_LIST_OF_POSITIONAL_ASSIGNMENT_TARGETS])],
 	[_JOIN_INDENTED(1,
-		[[shift "$_shift_for"]],
+		[[shift "${_shift_for}"]],
 		[[for _positional_name in ${_positional_names}]],
 		[[do]],
 		_INDENT_MORE(
 			[[test @S|@# -gt 0 || break]],
-			[[eval "$_positional_name=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
+			[[eval "${_positional_name}=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1]],
 			_CASE_RESTRICT_VALUES([], [],
 				[_COMM_BLOCK(0, [# It has been requested that all positional arguments that look like options are rejected]),
-				[[evaluate_strictness "$_positional_name" "${1##_arg}"]],
+				[[evaluate_strictness "${_positional_name}" "${1##_arg}"]],
 			]),
 			[[shift]],
 		),
@@ -180,13 +180,11 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	)],
 )])
 
-
 m4_define([_GET_GETOPTS_STRING], [m4_do(
 	[m4_lists_foreach_optional([_ARGS_SHORT,_ARGS_CATH], [_arg_short,_arg_type], [m4_case(_arg_type,
 		[arg], [_arg_short:],
 		[_arg_short])])],
 )])
-
 
 dnl TODO: Don't make this if having only positional args.
 m4_define([_MAKE_ARGV_PARSING_FUNCTION_POSIX], [MAKE_FUNCTION(

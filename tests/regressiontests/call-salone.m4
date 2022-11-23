@@ -8,6 +8,6 @@
 
 # [ <-- needed because of Argbash
 
-echo "BOOL=$_arg_boo_l,OPT_S=$_arg_opt_arg,POS_S=$_arg_pos_arg,POS_OPT=$_arg_pos_opt,OPT_INCR=$_arg_opt_incr,"
+echo "BOOL=${_arg_boo_l},OPT_S=${_arg_opt_arg},POS_S=${_arg_pos_arg},POS_OPT=${_arg_pos_opt},OPT_INCR=${_arg_opt_incr},"
 
 # ] <-- needed because of Argbash

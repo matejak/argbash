@@ -1,5 +1,6 @@
 m4_include_once([docopt.m4])
 
+
 dnl
 dnl $1: The macro call (the caller is supposed to pass [$0($@)])
 dnl What is also part of the API: The line

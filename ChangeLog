@@ -1,11 +1,20 @@
 2.10.1 (TBA)
 -------------------
+Bugfixes:
+
+* Warning during make install
+* Typos and spelling mistakes
+* Examples missing from build
+
+New features:
+
+* Compliant with optional checks for ShellCheck (most notably the require-variable-braces check)
 
 
 2.10.0 (2020-09-22)
 -------------------
 
-Buxfixes:
+Bugfixes:
 
 * `argbash-init` is able to handle empty string as the only argument without being puzzled (#130).
 * Error handling of script working directory detection now more robust (#134).
@@ -19,9 +28,9 @@ New features:
 2.9.0 (2020-08-01)
 ------------------
 
-Buxfixes:
+Bugfixes:
 
-* Fixed typo in `argbash-init` and updated obsolete/incaccurate hints (#97).
+* Fixed typo in `argbash-init` and updated obsolete/inaccurate hints (#97).
 * Fixed incorrect permission of non-script output files (#104).
 * Increased MacOS compatibility by removing terminator from the `chmod` invocation (#107).
 

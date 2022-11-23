@@ -26,7 +26,7 @@ begins_with_short_option()
 {
   local first_option all_short_options='uh'
   first_option="${1:0:1}"
-  test "$all_short_options" = "${all_short_options/$first_option/}" && return 1 || return 0
+  test "${all_short_options}" = "${all_short_options/${first_option}/}" && return 1 || return 0
 }
 
 # THE DEFAULTS INITIALIZATION - POSITIONALS
@@ -55,9 +55,9 @@ parse_commandline()
   while test $# -gt 0
   do
     _key="$1"
-    case "$_key" in
+    case "${_key}" in
       --glob)
-        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        test $# -lt 2 && die "Missing value for the optional argument '${_key}'." 1
         _arg_glob="$2"
         shift
         ;;
@@ -65,18 +65,18 @@ parse_commandline()
         _arg_glob="${_key##--glob=}"
         ;;
       -u|--unit)
-        test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
+        test $# -lt 2 && die "Missing value for the optional argument '${_key}'." 1
         _arg_unit="$2"
         _args_simple_parsing_opt+=("${_key}" "$2")
         shift
         ;;
       --unit=*)
         _arg_unit="${_key##--unit=}"
-        _args_simple_parsing_opt+=("$_key")
+        _args_simple_parsing_opt+=("${_key}")
         ;;
       -u*)
         _arg_unit="${_key##-u}"
-        _args_simple_parsing_opt+=("$_key")
+        _args_simple_parsing_opt+=("${_key}")
         ;;
       --no-verbose|--verbose)
         _arg_verbose="on"
@@ -93,7 +93,7 @@ parse_commandline()
         ;;
       *)
         _last_positional="$1"
-        _positionals+=("$_last_positional")
+        _positionals+=("${_last_positional}")
         _positionals_count=$((_positionals_count + 1))
         ;;
     esac
@@ -105,7 +105,7 @@ parse_commandline()
 handle_passed_args_count()
 {
   local _required_args_string="'directory'"
-  test "${_positionals_count}" -ge 1 || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: $_required_args_string), but got only ${_positionals_count}." 1
+  test "${_positionals_count}" -ge 1 || _PRINT_HELP=yes die "FATAL ERROR: Not enough positional arguments - we require at least 1 (namely: ${_required_args_string}), but got only ${_positionals_count}." 1
 }
 
 
@@ -116,14 +116,14 @@ assign_positional_args()
   _our_args=$((${#_positionals[@]} - 1))
   for ((ii = 0; ii < _our_args; ii++))
   do
-    _positional_names="$_positional_names _arg_directory[$((ii + 1))]"
+    _positional_names="${_positional_names} _arg_directory[$((ii + 1))]"
   done
 
-  shift "$_shift_for"
+  shift "${_shift_for}"
   for _positional_name in ${_positional_names}
   do
     test $# -gt 0 || break
-    eval "$_positional_name=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1
+    eval "${_positional_name}=\${1}" || die "Error during argument parsing, possibly an Argbash bug." 1
     shift
   done
 }
@@ -140,16 +140,18 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || { echo "Couldn't d
 # [ <-- needed because of Argbash
 
 
-script="$script_dir/simple.sh"
-test -f "$script" || { echo "Missing the wrapped script, was expecting it next to me, in '$script_dir'."; exit 1; }
+script="${script_dir}/simple.sh"
+test -f "${script}" \
+  || {
+  echo "Missing the wrapped script, was expecting it next to me, in '${script_dir}'."
+  exit 1
+}
 
-for directory in "${_arg_directory[@]}"
-do
-  test -d "$directory" || die "We expected a directory, got '$directory', bailing out."
-  printf "Contents of '%s' matching '%s':\n" "$directory" "$_arg_glob"
-  for file in "$directory"/$_arg_glob
-  do
-    test -f "$file" && printf "\t%s: %s\n" "$(basename "$file")" "$("$script" "${_args_simple_parsing_opt[@]}" "$file")"
+for directory in "${_arg_directory[@]}"; do
+  test -d "${directory}" || die "We expected a directory, got '${directory}', bailing out."
+  printf "Contents of '%s' matching '%s':\n" "${directory}" "${_arg_glob}"
+  for file in "${directory}"/${_arg_glob}; do
+    test -f "${file}" && printf "\t%s: %s\n" "$(basename "${file}")" "$("${script}" "${_args_simple_parsing_opt[@]}" "${file}")"
   done
 done
 

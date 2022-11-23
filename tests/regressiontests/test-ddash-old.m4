@@ -10,7 +10,6 @@
 
 # Now we take the parsed data and assign them no nice-looking variable names,
 # sometimes after a basic validation
-echo "BOOL=$_ARG_BOO_L,POS_OPT=$_ARG_POS_OPT,"
+echo "BOOL=${_ARG_BOO_L},POS_OPT=${_ARG_POS_OPT},"
 
 # closing escape square bracket: ]
-

@@ -14,9 +14,9 @@ exit 11  #)Created by argbash-init v2.10.0
 
 # vvv  PLACE YOUR CODE HERE  vvv
 # For example:
-printf 'Value of --%s: %s\n' 'option' "$_arg_option"
-printf "'%s' is %s\\n" 'print' "$_arg_print"
-printf "Value of '%s': %s\\n" 'positional-arg' "$_arg_positional_arg"
+printf 'Value of --%s: %s\n' 'option' "${_arg_option}"
+printf "'%s' is %s\\n" 'print' "${_arg_print}"
+printf "Value of '%s': %s\\n" 'positional-arg' "${_arg_positional_arg}"
 
 # ^^^  TERMINATE YOUR CODE BEFORE THE BOTTOM ARGBASH MARKER  ^^^
 

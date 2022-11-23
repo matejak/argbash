@@ -34,6 +34,6 @@ dnl $1: name
 dnl $2: default
 dnl TODO: Try to use the 'declare' builtin to see whether the variable is even defined
 m4_define([__SETTLE_ENV], [m4_do(
-	[test -n "@S|@$1" || $1="$2"
+	[test -n "@S|@{$1}" || $1="$2"
 ],
 )])

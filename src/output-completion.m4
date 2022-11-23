@@ -2,8 +2,8 @@ dnl TODO: Basename determination: output filename, or input filename, or nothing
 m4_include_once([argument_value_types.m4])
 m4_include_once([value_validators.m4])
 
-dnl Make somehow sure that the program name is translated to a valid shell function identifier
-m4_define([_TRANSLATE_BAD_CHARS], [m4_translit([[$1]], [-.], [__])])
+dnl Make somehow sure that the program name is transliterated to a valid shell function identifier
+m4_define([_TRANSLIT_BAD_CHARS], [m4_translit([[$1]], [-.], [__])])
 
 m4_define([GATHER_OPTIONS_OF_ARGUMENTS_THAT_ACCEPT_SOME_VALUE], [m4_do(
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_SHORT,_ARGS_CATH], [_argname,_arg_short,_arg_type], [_IF_ARG_ACCEPTS_VALUE(_arg_type,
@@ -35,7 +35,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[GATHER_OPTIONS_OF_ARGUMENTS_THAT_ACCEPT_SOME_VALUE()],
 	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
 	[m4_define([_PROGRAM_NAME], m4_dquote(_BASENAME))],
-	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLATE_BAD_CHARS(_PROGRAM_NAME)))],
+	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLIT_BAD_CHARS(_PROGRAM_NAME)))],
 	[[#!/bin/bash]_ENDL_(2)],
 	[[# Put this file to /etc/bash_completion.d/]_BASENAME()_ENDL_()],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@]_ENDL_()],
