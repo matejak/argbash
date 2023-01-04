@@ -9,7 +9,7 @@ m4_define([TEST_BODY], [m4_foreach([arg], [$@], [	arg
 
 dnl
 dnl Use in the case that some test produce scripts as side-effect
-dnl $1: The script stem (preppend $(TESTDIR)/), append suffix (.$2)
+dnl $1: The script stem (prepend $(TESTDIR)/), append suffix (.$2)
 dnl $2: The suffix, (optional, by default 'sh')
 m4_define([ADD_SCRIPT],
 	[m4_set_add([_TEST_SCRIPTS], [$(TESTDIR)/$1.]m4_default([$2], [sh]))])

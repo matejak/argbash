@@ -76,7 +76,7 @@ We have positional and optional arguments sorted out, so let's define some other
     Also note that it is perfectly possible to pass an empty string as an argument value.
 
 So let's get back to argument types.
-Below, is a list of argument types and macros that you have to write to support those (e.g. ``ARGBASH_GO`` is a macro and ``ARG_OPTIONAL_BOOLEAN([verbose], [Verbose mode])`` is a macro called wit two arguments --- ``verbose`` and ``Verbose mode``).
+Below, is a list of argument types and macros that you have to write to support those (e.g. ``ARGBASH_GO`` is a macro and ``ARG_OPTIONAL_BOOLEAN([verbose], [Verbose mode])`` is a macro called with two arguments --- ``verbose`` and ``Verbose mode``).
 Place those macros in your files as ``bash`` comments.
 
 
@@ -252,7 +252,7 @@ Special arguments
   Notice that the usage information is generated even if this macro is not used --- we print it when we think that there is something wrong with arguments that were passed.
 
   The long program description is a string quoted in double quotation marks (so you may use environmental variables in it) and additionally, occurrences of ``\n`` will be translated to a line break with indentation (use ``\\n`` to have the actual ``\n`` in the help description).
-  If you want to have environmental variables and newlines, you have to make sure that the env variable contains literal newlines/tabs --- you can either use the ``foo=$'broken\nline'`` `pattern <http://stackoverflow.com/a/3182519>`_, or you can use quotes to define the variable so it contains real literal newlines / tabs.
+  If you want to have environmental variables and newlines, you have to make sure that the env variable contains literal newlines/tabs --- you can either use the ``foo=$'broken\nline'`` `pattern <https://stackoverflow.com/a/3182519>`_, or you can use quotes to define the variable so it contains real literal newlines / tabs.
 
   Example invocation:
 
@@ -691,6 +691,6 @@ The argument name is transliterated like this:
   If (a boolean argument) ``--quiet`` is passed, value of ``_arg_quiet`` is set to ``on``.
   Conversely, if ``--no-quiet`` is passed, value of ``_arg_quiet`` is set to ``off``.
 
-* Repeated arguments collect values to a `bash array <http://tldp.org/LDP/Bash-Beginners-Guide/html/sect_10_02.html>`_.
+* Repeated arguments collect values to a `bash array <https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_10_02.html>`_.
 
 * Incremental arguments have a default value (0 by default) and their value in the script corresponds to the default plus the number of times the argument was specified.

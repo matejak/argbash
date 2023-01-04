@@ -21,7 +21,7 @@ else
 	then
 		exit 0
 	else
-		echo "Error occured, but not a good one:" >&2
+		echo "Error occurred, but not a good one:" >&2
 		"$@"
 	fi
 fi

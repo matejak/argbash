@@ -267,7 +267,7 @@ Due to limitations of those shells (mainly absence of arrays), the generated int
 * Certain arguments are not supported:
 
   * Repeated arguments.
-  * Multi-valued argumetns.
+  * Multi-valued arguments.
 
 Internally, Argbash uses the ``getopts`` shell builtin to handle optional arguments parsing.
 Then, checks for positional arguments are generated and applied, ditto for positional arguments processing, and the help message is generated.
@@ -335,7 +335,7 @@ Manpage output
 
 Argbash can generate source for the manual page for your script.
 There are two files in the process --- the template, and definitions.
-Those two files are in the `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ format, and the template is supposed to be processed by the `rst2man <http://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt>`_ utility.
+Those two files are in the `reStructuredText <https://docutils.sourceforge.net/rst.html>`_ format, and the template is supposed to be processed by the `rst2man <https://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt>`_ utility.
 
 The manpage template is supposed to be generated as script's metadata change, definitions are required to be maintained manually, as they are supposed to contain content that is not present in the script.
 You can regenerate the template using the ``manpage`` output, while you are probably going to use the ``manpage-defs`` once to get you kickstarted and then continue to maintain it manually.
@@ -385,5 +385,5 @@ API 2
 Parsed arguments were exposed as lowercase (``_ARG_LONG_OPTION`` became ``_arg_long_option``).
 The change was motivated by effort to comply to bash standard variable naming convention [#]_, [#]_.
 
-.. [#] `Unix StackExchange <http://unix.stackexchange.com/a/42849>`_
+.. [#] `Unix StackExchange <https://unix.stackexchange.com/a/42849>`_
 .. [#] `Google bash styleguide <https://google.github.io/styleguide/shell.xml#Naming_Conventions>`_

@@ -26,7 +26,7 @@ die()
 _arg_unit="b"
 _arg_verbose=off
 
-# THE PRINT HELP FUNCION
+# THE PRINT HELP FUNCTION
 print_help ()
 {
   printf 'Usage: %s [-u|--unit <arg>] [-v|--version] [--(no-)verbose] [-h|--help] <filename>\n' "$0"

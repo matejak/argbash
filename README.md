@@ -1,8 +1,8 @@
 [argbash](https://argbash.dev)
 ==============================
 
-[![Build Status](https://travis-ci.org/matejak/argbash.svg)](https://travis-ci.org/matejak/argbash)
-[![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://readthedocs.org/projects/argbash/?badge=latest)
+[![Build Status](https://api.travis-ci.com/matejak/argbash.svg)](https://app.travis-ci.com/github/matejak/argbash)
+[![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://argbash.readthedocs.io/en/latest/?badge=latest)     
 
 ![argbash logo](resources/logo/argbash.png)
 
@@ -17,9 +17,9 @@ Give `Argbash` a try and stop being terrorized by those pesky arguments! With Ar
 * Definitions embedded in few lines of the script itself (so you can use `Argbash` to regenerate the parsing part of your script easily).
 * Ability to re-use low-level `Argbash`-aware scripts by wrapping them by higher-level `Argbash`-aware ones conveniently, without duplicating code.
 * Easy installation (optional). Just [grab a release](https://github.com/matejak/argbash/releases), unzip it, go inside and run `cd resources && make install` (you may want to run `sudo make install PREFIX=/usr` for a system-wide installation).
-* [Documentation](http://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
+* [Documentation](https://argbash.readthedocs.org/en/latest/) and [examples](resources/examples).
 
-Make your existing script powered by `Argbash` [in a couple of minutes](http://argbash.readthedocs.io/en/latest/#generating-a-template). Explore various Argbash flavours:
+Make your existing script powered by `Argbash` [in a couple of minutes](https://argbash.readthedocs.io/en/latest/#generating-a-template). Explore various Argbash flavours:
 
 Flavour               | Target group
 -------               | ------------
@@ -58,11 +58,11 @@ Following outputs are available:
 - POSIX scripts that use `getopts`, also tailor-made.
 - Bash completion.
 - [docopt](https://docopt.org)-compliant usage message.
-- Manpage output using [rst2man](http://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt).
+- Manpage output using [rst2man](https://docutils.sourceforge.net/sandbox/manpage-writer/rst2man.txt).
 
 The utility has been inspired by Python's `argparse` and the `shflags` project.
 
-**[Read the docs (latest stable version)](http://argbash.readthedocs.org/en/stable/) for more info**
+**[Read the docs (latest stable version)](https://argbash.readthedocs.org/en/stable/) for more info**
 
 
 Requirements

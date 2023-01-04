@@ -134,7 +134,7 @@ do_stuff()
 settle_wrapped_fname()
 {
 	# Get arguments to ARGBASH_WRAP
-	# Based on http://stackoverflow.com/a/19772067/592892
+	# Based on https://stackoverflow.com/a/19772067/592892
 	local _srcfiles=() _file_found _found ext srcstem searchdir line stem="$2"
 	while read -r line; do
 		_srcfiles+=("$line")
@@ -175,7 +175,7 @@ get_parsing_code()
 	test -n "$_srcfile" || return 1
 	_thatfile="$(dirname "$infile")/$_srcfile"
 	test -f "$_thatfile" && _shfile="$_thatfile"
-	# Take out everything after last dot (http://stackoverflow.com/questions/125281/how-do-i-remove-the-file-suffix-and-path-portion-from-a-path-string-in-bash)
+	# Take out everything after last dot (https://stackoverflow.com/questions/125281/how-do-i-remove-the-file-suffix-and-path-portion-from-a-path-string-in-bash)
 	_thatfile="${_thatfile%.*}.m4"
 	test -f "$_thatfile" && _m4file="$_thatfile"
 

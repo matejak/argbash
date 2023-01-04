@@ -652,7 +652,7 @@ $(TESTDIR)/test-init_simple-s-update.m4: $(ARGBASH_INIT) $(TESTDIR)/regenerate-t
 	echo 'test "$$_arg_ordnung" = yes || exit 1' >> $@
 
 test-init_simple-s-update: $(TESTDIR)/test-init_simple-s-update.sh
-	@# Regenerate everyting during the next test run
+	@# Regenerate everything during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes > /dev/null
 	$(REVERSE) $< > /dev/null

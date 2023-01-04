@@ -85,7 +85,7 @@ m4_define([LIST_OF_VALUES_OF_ARGNAME], [[_LIST_]m4_quote(m4_indir([$1_VAL_TYPE])
 
 dnl
 dnl The common stuff to perform when adding a typed group
-dnl Registers the argument-type pair to be retreived by _GET_VALUE_TYPE or _GET_VALUE_STR
+dnl Registers the argument-type pair to be retrieved by _GET_VALUE_TYPE or _GET_VALUE_STR
 dnl $1: The value type
 dnl $2: The type group name (NOT optional)
 dnl $3: Concerned arguments (as a list)
