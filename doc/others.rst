@@ -126,12 +126,12 @@ Then read through this list of high-quality learning resources!
 * Best practices in argument parsing: http://www.shelldorado.com/goodcoding/cmdargs.html
   Don't miss the list of short options and their common meaning!
 
-* StackOverflow thread about argument parsing: http://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
+* StackOverflow thread about argument parsing: https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash
   It was mainly this thread which inspired ``Argbash``.
   There are plenty of recipes and suggestions available.
-  If you are a happy user of ``Argbash``, consider upvoting `the answer that promotes it <http://stackoverflow.com/a/38297066/592892>`_ since more people know ``Argbash``, the better for them.
+  If you are a happy user of ``Argbash``, consider upvoting `the answer that promotes it <https://stackoverflow.com/a/38297066/592892>`_ since more people know ``Argbash``, the better for them.
 
-* Argument parsing for dummies: http://wiki.bash-hackers.org/scripting/posparams
+* Argument parsing for dummies: https://wiki.bash-hackers.org/scripting/posparams
   A short and nice-looking introduction with all basics covered (wiki).
 
 * The `POSIX conventions <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html>`_ --- the reason why ``getopts`` are still mentioned in bash learning resources.

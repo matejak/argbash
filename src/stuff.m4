@@ -1,7 +1,7 @@
 dnl We don't like the # comments
 m4_changecom()
 
-dnl TODO: Produce command-line completition
+dnl TODO: Produce command-line completion
 dnl TODO: Add manpage generator
 dnl TODO: Add app finder wrappers
 dnl TODO: Test arg names against m4 builtins etc. for all arg types (and env stuff and prog stuff too)
@@ -13,7 +13,7 @@ dnl TODO: Test for parsing library hidden in a subdirectory / having an absolute
 dnl  - check out the INCLUDE_PARSING_CODE macro
 dnl  - check out argbash script that has to be able to find it
 dnl TODO: Add normalize-args utility --- given described script's command-line, simplify it.
-dnl TODO: Improve help generation - make it docopt-compiant + use printf's %s to print them default values. Currently, having | in default value breaks Argbash. Yes, args with arrays as values will have to be handled differently.
+dnl TODO: Improve help generation - make it docopt-compliant + use printf's %s to print them default values. Currently, having | in default value breaks Argbash. Yes, args with arrays as values will have to be handled differently.
 dnl
 dnl vvvvvvvvvvvvvvv
 dnl TODO: Optimize the _CHECK_PASSED_VALUE_AGAINST_BLACKLIST calls
@@ -45,7 +45,7 @@ dnl
 dnl ARGS_TYPE_OUTFILE([list of args], [fname])
 dnl Filename that may exist (file must be W) or may not exist (then the dirname of the file must be W)
 dnl
-dnl flags: -+0, defautlt is exactly -+0
+dnl flags: -+0, default is exactly -+0
 dnl ARGS_TYPE_INTEGER([list of args], [flags])
 dnl ARGS_TYPE_FLOAT([list of args])
 dnl typeid: int for integer, uint for non-negative integer, float for whatever
@@ -107,10 +107,10 @@ argbash_api([DEFINE_LOAD_LIBRARY], [m4_do(
 
 dnl
 dnl $1: Name of the holding variable
-dnl Taken from: http://stackoverflow.com/a/246128/592892
+dnl Taken from: https://stackoverflow.com/a/246128/592892
 argbash_api([DEFINE_SCRIPT_DIR], [m4_do(
 	[[$0($@)]],
-	[dnl Taken from: http://stackoverflow.com/a/246128/592892
+	[dnl Taken from: https://stackoverflow.com/a/246128/592892
 ],
 	[_DEFINE_SCRIPT_DIR([$1], [cd "$(dirname "${BASH_SOURCE[0]}")" && pwd])],
 )])
@@ -121,10 +121,10 @@ dnl Does the same as DEFINE_SCRIPT_DIR, but uses 'readlink -e' to follow symlink
 dnl Works only on GNU systems.
 dnl
 dnl $1: Name of the holding variable
-dnl Taken from: http://stackoverflow.com/a/246128/592892
+dnl Taken from: https://stackoverflow.com/a/246128/592892
 argbash_api([DEFINE_SCRIPT_DIR_GNU], [m4_do(
 	[[$0($@)]],
-	[dnl Taken from: http://stackoverflow.com/a/246128/592892
+	[dnl Taken from: https://stackoverflow.com/a/246128/592892
 ],
 	[_DEFINE_SCRIPT_DIR([$1], [cd "$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")" && pwd])],
 )])
@@ -456,7 +456,7 @@ dnl $3: Name of the value-to-variable macro
 dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_GETOPTS], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
-	[test "x$OPTARG" = x && die "Missing value for the optional argument '-$_key'." 1],
+	[test "$OPTARG" = "" && die "Missing value for the optional argument '-$_key'." 1],
 	[$3([$1], ["$OPTARG"], [$4])],
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [$OPTARG])])],
 )])
@@ -621,7 +621,7 @@ m4_define([_COMMENT_OPT_GETOPT_WITHOUT_VALUE], [,
 	[# We support getopts-style short arguments clustering,],
 	[# so as -$2 doesn't accept value, other short options may be appended to it, so we watch for -$2*.],
 	[# After stripping the leading -$2 from the argument, we have to make sure],
-	[# that the first character that follows coresponds to a short option.],
+	[# that the first character that follows corresponds to a short option.],
 ])
 
 
@@ -815,7 +815,7 @@ m4_define([_MAKE_OPTARG_LONGOPT_EQUALS_CASE_SECTION], [m4_do(
 m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 	[_INDENT_AND_END_CASE_MATCH(
 		m4_dquote(-[]_CASE_ESCAPE([$2])*))],
-	[dnl Search for occurences of e.g. -ujohn and make sure that either -u accepts a value, or -j is a short option
+	[dnl Search for occurrences of e.g. -ujohn and make sure that either -u accepts a value, or -j is a short option
 ],
 	[m4_case([$3],
 		[arg], [_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT([$1], [$2], [_ASSIGN_VALUE_TO_VAR], [$5])_CHECK_PASSED_VALUE_AGAINST_BLACKLIST([$_key], [$$5])],
@@ -1336,7 +1336,7 @@ m4_define([_PASS_WHEN_GETOPT], [m4_ifnblank([$1], [m4_do(
 
 
 dnl Types:
-dnl #. Register group name, assert uniquness
+dnl #. Register group name, assert uniqueness
 dnl #. Assign the validator to the name.
 dnl #. Assign the name to args.
 dnl #. Add the validator to the list of validators to be generated

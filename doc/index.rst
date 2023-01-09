@@ -49,7 +49,7 @@ In a nutshell, using ``Argbash`` consists of these simple steps:
 #. You run the ``argbash`` script (located in the package's ``bin`` directory) on it to get the fully functional script.
 
 Eventually, you may want to add/remove/rename arguments your script accepts.
-In that case, you just need to edit the script --- you don't need to repeate the two steps listed above!
+In that case, you just need to edit the script --- you don't need to repeat the two steps listed above!
 Why? It is so because the script retains the template section, so if you need to make adjustments to the template, you just edit the template section of the script and run ``argbash`` on top of the script to get it updated.
 
 How to use ``Argbash``?
@@ -72,7 +72,7 @@ In other words, we want to support these arguments:
 
 * ``--option`` that accepts one value,
 * ``--print`` or ``--no-print`` that doesn't accept any value, and
-* an argument named ``positional-arg`` that we are going to refer to as positional that must be passed and that is not preceeded by *options* (such as ``--foo``, ``-f``).
+* an argument named ``positional-arg`` that we are going to refer to as positional that must be passed and that is not preceded by *options* (such as ``--foo``, ``-f``).
 
 We call ``argbash-init`` and as the desired result is a script, we directly pipe the output of ``argbash-init`` to ``argbash``:
 

@@ -9,7 +9,7 @@ dnl  $4 - (don't implement now) arg name the env var can default to (none by def
 dnl
 dnl  internally:
 dnl  ENV_NAMES, ENV_DEFAULTS, ENV_HELPS, ENV_ARGNAMES
-dnl TODO: Hanlde the case of wrapping correctly
+dnl TODO: Handle the case of wrapping correctly
 dnl TODO: Find out a proper name for this
 argbash_api([ARG_USE_ENV], [m4_ifndef([WRAPPED_FILE_STEM], [m4_do(
 	[[$0($@)]],

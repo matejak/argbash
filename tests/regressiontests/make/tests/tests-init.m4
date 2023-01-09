@@ -54,7 +54,7 @@ dnl 1. The parsing part fails if --ordnung does not receive the "yes" value, but
 dnl 2. The support for -o is injected to the parsing shell script
 dnl 3. The script is regenerated and this time, we expect that the parsing stuff got also regenerated, so the -o alias is functional.
 ADD_TEST_BASH([test-init_simple-s-update], [[
-	@# Regenerate everyting during the next test run
+	@# Regenerate everything during the next test run
 	touch $(TESTDIR)/regenerate-test-init_simple-s-update.m4
 	$< --ordnung yes > /dev/null
 	$(REVERSE) $< > /dev/null
