@@ -15,6 +15,7 @@ m4_define([opt_arg_help], [m4_fatal([The option 'opt_arg' help string got expand
 # ARG_OPTIONAL_SINGLE([opt_arg], o, [opt_arg_help O percent: %], [opt_arg_default lolo])
 # ARG_USE_ENV([FOO], [foo], [help on foo])
 # ARG_USE_PROGRAM([make], [MAKE], [Please install GNU make to use this test], [The GNU make utility])
+# ARG_RESTRICT_VALUES([no-local-options])
 # ARG_DEFAULTS_POS()
 # ARG_VERSION([echo "$0 FOO"])
 # ARG_OPTIONAL_BOOLEAN(boo_l, b)
