@@ -1,7 +1,11 @@
 NUL =
 
 # SC2015: Note that A && B || C is not if-then-else. C may run when A is true.
-SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015
+# SC2268 (style): Avoid x-prefix in comparisons as it no longer serves a
+# purpose.
+# SC2317 (info): Command appears to be unreachable. Check usage (or ignore if
+# invoked indirectly).
+SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT = -e 2015 -e 2268 -e 2317
 
 SHELLCHECK = $(shell shellcheck -V > /dev/null && echo "shellcheck -x $(SHELLCHECK_EXCLUDE_CHECKS_ARGUMENT)")
 
