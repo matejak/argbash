@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# environs
+
+program='argbash'
+image='matejak/argbash'
+cwd="$(pwd)"
+user="$(id -u)"
+group="$(id -g)"
+has_stdin () { return 1; }                           # false
+[[ -p /dev/stdin ]] && has_stdin () { return 0; }    # true
+
+# docker run options
+
+# --interactive = keep STDIN open even if not attached
+#          --rm = automatically remove the container when it exits
+#         --env = set environment variables
+#      --volume = bind mount a volume
+#        --user = username or UID (format: <name|uid>[:<group|gid>])
+
+# build docker command
+
+cmd=(docker run)
+has_stdin && cmd+=(--interactive)
+cmd+=(
+    --rm
+    --env PROGRAM="$program"
+    --volume "$cwd:/work"
+    --user "$user:$group"
+    "$image"
+)
+
+# execute docker command
+
+if has_stdin ; then
+    stdin="$(< /dev/stdin)"
+    echo "$stdin" | "${cmd[@]}" "$@"
+else
+    "${cmd[@]}" "$@"
+fi
