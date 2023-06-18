@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+program='argbash-init'
+image='matejak/argbash'
+cwd="$(pwd)"
+user="$(id -u)"
+group="$(id -g)"
+
+# docker run options
+#     --rm = automatically remove the container when it exits
+#    --env = set environment variables
+# --volume = bind mount a volume
+#   --user = username or UID (format: <name|uid>[:<group|gid>])
+
+docker run                    \
+    --rm                      \
+    --env PROGRAM="$program"  \
+    --volume "$cwd:/work"     \
+    --user "$user:$group"     \
+    "$image"                  \
+    "$@"
