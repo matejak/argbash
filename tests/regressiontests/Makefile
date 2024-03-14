@@ -372,6 +372,9 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
 	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< pos -o 'uf ta' --print-optionals | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=0,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x --not-supplied | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple.sh"
 test-simple-dash: $(TESTDIR)/test-simple-dash.sh
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'

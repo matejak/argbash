@@ -305,6 +305,15 @@ Special arguments
   A use case for this is wrapping of scripts that are completely ``Argbash``-agnostic.
   Therefore, your script can take its own arguments and the rest that is not recognized can go to the wrapped script.
 
+* Detect supplied arguments:
+  ::
+
+    ARGBASH_INDICATE_SUPPLIED([long opt arg name], [another long opt arg name (optional)], ...)
+
+  This macro takes a list of long optional argument names and will generate a variable for each optional that will be set if that argument was explicitly provided on the command line. This only works for optional arguments.
+
+  For example, if you have `ARG_OPTIONAL_BOOLEAN([quiet], , , [off])`, followed by `ARGBASH_INDICATE_SUPPLIED([quiet])`, then if `--quiet` was provided on the command line the variable `_supplied_arg_quiet=1` would be set. This allows you to see if an argument was explicitly provided using `[ "$_supplied_arg_quiet" = 1 ]`. If the argument was not passed to the program then this variable will be set to `0`.
+
 Typing macros
 +++++++++++++
 

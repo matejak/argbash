@@ -525,6 +525,12 @@ m4_define([_ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 )])
 
 
+argbash_api([ARGBASH_INDICATE_SUPPLIED], [m4_do(
+	[[$0($@)]],
+	[m4_set_add_all([HAVE_SUPPLIED], $@)],
+)])
+
+
 dnl
 dnl $1: The mode of argument grouping: One of 'none', 'getopts'
 argbash_api([ARG_OPTION_STACKING], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
