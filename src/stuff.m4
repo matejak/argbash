@@ -444,6 +444,7 @@ dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_SPACE_WITHOUT_GETOPT_OR_SHORT_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test $[]# -lt 2 && die "Missing value for the optional argument '$_key'." 1],
 	[$3([$1], ["@S|@2"], [$4])],
+	[_optionals+=($4)]
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [@S|@2])])],
 	[shift],
 )])
@@ -458,6 +459,7 @@ dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_GETOPTS], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[test "$OPTARG" = "" && die "Missing value for the optional argument '-$_key'." 1],
 	[$3([$1], ["$OPTARG"], [$4])],
+	[_optionals+=($3)dnl]
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$4], [m4_default_quoted([$5], [$OPTARG])])],
 )])
 
@@ -470,6 +472,7 @@ dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_EQUALS_WITH_LONG_OPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[$3([$1], ["${_key##--$1=}"], [$4])],
+	[_optionals+=($4)dnl]
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_EQUALS([$4])],
 )])
 
@@ -482,6 +485,7 @@ dnl $4: The name of the argument-holding variable
 dnl $5: Where to get the last value (optional)
 m4_define([_VAL_OPT_ADD_ONLY_WITH_SHORT_OPT_GETOPT], [_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 	[$3([$1], ["${_key##-$2}"], [$4])],
+	[_optionals+=($4)dnl]
 	[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_GETOPT([$4])],
 )])
 
@@ -731,12 +735,14 @@ m4_define([_MAKE_OPTARG_SIMPLE_CASE_SECTION], [m4_do(
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
+			[[_optionals+=($5)]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 			[[test "${1:0:5}" = "--no-" && $5="off"]],
 		)],
 		[incr],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
+			[[_optionals+=($5)]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[action],
@@ -763,11 +769,13 @@ m4_define([_MAKE_OPTARG_GETOPTS_CASE_SECTION], [m4_do(
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
+			[[_optionals+=($5)]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[incr],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
+			[[_optionals+=($5)]],
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[action],
@@ -823,12 +831,14 @@ m4_define([_MAKE_OPTARG_GETOPT_CASE_SECTION], [m4_do(
 		[bool],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5="on"]],
+			[[_optionals+=($5)]],
 			_PASS_WHEN_GETOPT([$2]),
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
 		[incr],
 		[_JOIN_INDENTED(_INDENT_LEVEL_IN_ARGV_CASE_BODY,
 			[[$5=$(($5 + 1))]],
+			[[_optionals+=($5)]],
 			_PASS_WHEN_GETOPT([$2]),
 			[_APPEND_WRAPPED_ARGUMENT_TO_ARRAY_SPACE([$5])],
 		)],
@@ -1226,6 +1236,7 @@ m4_define([_MAKE_DEFAULTS_POSITIONAL_POSIX], [m4_do(
 
 m4_define([_MAKE_DEFAULTS_OPTIONAL], [m4_do(
 	[[# THE DEFAULTS INITIALIZATION - OPTIONALS]_ENDL_],
+	[[_optionals=()]_ENDL_],
 	[m4_lists_foreach_optional([_ARGS_LONG,_ARGS_CATH,_ARGS_DEFAULT,_ARGS_VARNAME], [_argname,_arg_type,_default,_arg_varname], [m4_do(
 		[dnl We have to handle 'incr' as a special case, there is a m4_default(..., 0)
 ],
