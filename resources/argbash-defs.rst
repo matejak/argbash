@@ -12,6 +12,8 @@
 
 .. |OPTION_OUTPUT| replace:: \
 
+.. |OPTION_IN_PLACE| replace:: \
+
 .. |OPTION_TYPE| replace:: Check out the documentation to learn about all argbash capabilities that are supported.
 
 .. |OPTION_LIBRARY| replace:: This option is deprecated and it is the same as ``--strip user-content``.
