@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARGBASH_WRAP([test-onlyopt], [boo_l,opt-arg])
 # ARG_HELP([Testing program - wrapper])

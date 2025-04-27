@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_POSITIONAL_SINGLE([act-ion], [help], [foo])
 # ARG_TYPE_GROUP_SET([act_null], [ACTION], [act-ion], [foo,baz,bar bar,[foo,baz],])

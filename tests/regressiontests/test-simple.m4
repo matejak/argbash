@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env -S bash -e
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [help line PEND-\n-PBEGIN])
 # ARG_OPTIONAL_SINGLE([prefix],[o],[help line END-\n-BEGIN "line 2" END-\\n-2BEGIN],[x])

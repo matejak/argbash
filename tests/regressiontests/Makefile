@@ -13,7 +13,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %-dash.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) --type posix-script -o $@ $<
-	sed -i "s|#!/bin/bash|#!$(shell which dash)|" $@
+	sed -i "s|#!/usr/bin/env bash|#!$(shell which dash)|" $@
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
@@ -741,9 +741,9 @@ gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
 	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	$< -o -x pos-arg | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx pos-arg | grep -q 'OPT_S=--opt-argx,'
@@ -758,11 +758,11 @@ test-very_strict: $(TESTDIR)/test-very_strict.sh
 	ERROR="are trying to pass an option" $(REVERSE) $< --foobar
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-very_strict.sh"
 $(TESTDIR)/test-getopt-equals.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-both.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-space.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-getopt-both: $(TESTDIR)/test-getopt-both.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
 	$< --incrx -ii | grep -q 'OPT_INCR=5,'

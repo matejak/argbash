@@ -54,8 +54,8 @@ Imagine that you want to download an example, edit it, and make it a full-fledge
 You obviously have to fire up `docker`, but then, you just create the one-liner, download the example, and proceed.
 
 ``` shell
-printf '%s\n' '#!/bin/bash' 'docker run --rm -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-docker
-printf '%s\n' '#!/bin/bash' 'docker run --rm -e PROGRAM=argbash-init -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-init-docker
+printf '%s\n' '#!/usr/bin/env bash' 'docker run --rm -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-docker
+printf '%s\n' '#!/usr/bin/env bash' 'docker run --rm -e PROGRAM=argbash-init -v "$(pwd):/work" -u "$(id -u):$(id -g)" matejak/argbash "$@"' > argbash-init-docker
 chmod a+x argbash-docker argbash-init-docker
 
 ./argbash-init-docker --pos positional-arg --opt optional-arg minimal.m4

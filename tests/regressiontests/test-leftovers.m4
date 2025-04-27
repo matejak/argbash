@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_OPTIONAL_SINGLE([cosi], [c])
 # ARG_OPTIONAL_BOOLEAN([fear])

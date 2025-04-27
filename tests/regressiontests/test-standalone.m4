@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ... appears unused. Verify it or export it.
 # This is a feature - those are modules that are supposed to be sourced.

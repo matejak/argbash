@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck disable=SC2001,SC2016
 # SC2001: See if you can use ${variable//search/replace} instead.
@@ -91,7 +91,7 @@ positional_argument()
 
 do_header()
 {
-	echo "#!/bin/bash"
+	echo "#!/usr/bin/env bash"
 	echo
 	# We if separate == 2, we don't want to pass this to argbash at all
 	test "$_arg_separate" = 2 && test "$1" = "script" && echo "# Created by argbash-init v$version" && return
