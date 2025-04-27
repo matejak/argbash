@@ -190,21 +190,21 @@ Optional arguments
 
      ARG_OPTIONAL_SINGLE([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
-  The default default is an empty string.
+  The default is an empty string.
 
 * Boolean optional arguments:
   ::
 
      ARG_OPTIONAL_BOOLEAN([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
-  The default default is ``off`` (the only alternative is ``on``).
+  The default is ``off`` (the only alternative is ``on``).
 
 * Incremental optional arguments:
   ::
 
      ARG_OPTIONAL_INCREMENTAL([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
-  The default default is 0.
+  The default is 0.
   The argument accepts no values on command-line, but it tracks a numerical value internally.
   That one increases with every argument occurrence.
 
@@ -213,7 +213,7 @@ Optional arguments
 
      ARG_OPTIONAL_REPEATED([argument-name-long], [argument-name-short (optional)], [help message (optional)], [default (optional)])
 
-  The default default is an empty array.
+  The default is an empty array.
   The argument can be repeated multiple times, but instead of the later specifications overriding earlier ones (s.a. ``ARG_OPTIONAL_SINGLE`` does), arguments are gradually appended to an array.
   The form of the default is what you normally put between the brackets when you create ``bash`` arrays, so put whitespace-separated values in there, for example:
 
