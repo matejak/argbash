@@ -15,6 +15,9 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 	$(word 2,$^) --type posix-script -o $@ $<
 	sed -i "s|#!/bin/bash|#!$(shell which dash)|" $@
 
+%-empty.m4: %.sh $(ARGBASH_BIN)
+	$(word 2,$^) --type empty -o $@ $<
+
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 
@@ -63,7 +66,6 @@ SCRIPTS = \
 	$(TESTDIR)/test-getopt-space.sh \
 	$(NUL)
 
-# bash tests
 TESTS += \
 	stability \
 	basic \
@@ -111,11 +113,16 @@ TESTS += \
 	test-getopt-equals \
 	$(NUL)
 
-# docopt tests
 TESTS += \
 	basic-docopt \
 	test-onlyopt-docopt \
 	$(NUL)
+
+
+TESTS += \
+	test-ls_like-empty \
+	$(NUL)
+
 
 TESTS_GEN += \
 	gen-test-pos \
@@ -182,6 +189,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-getopt-equals.sh \
 	$(TESTDIR)/basic.txt \
 	$(TESTDIR)/test-onlyopt.txt \
+	$(TESTDIR)/test-ls_like-empty.m4 \
 	$(NUL)
 
 ifneq "$(shell which dash 2> /dev/null)" ""
@@ -589,6 +597,9 @@ basic-docopt: $(TESTDIR)/basic.txt
 test-onlyopt-docopt: $(TESTDIR)/test-onlyopt.txt
 	grep -q "\[--opt-repeated OPT-REPEATED\]\.\.\." $<
 	grep -q "\[--incrx\]\.\.\." $<
+
+test-ls_like-empty: $(TESTDIR)/test-ls_like-empty.m4
+	diff -q $(TESTDIR)/test-ls_like.m4 $<
 
 test-delim-space: $(TESTDIR)/test-delim-space.sh
 	ERROR="unexpected argument '--opt=something'" $(REVERSE) $< --opt=something
