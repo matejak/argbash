@@ -19,6 +19,7 @@ M4_SRC += \
 	../src/output-bash-script.m4 \
 	../src/output-completion.m4 \
 	../src/output-docopt.m4 \
+	../src/output-excised.m4 \
 	../src/output-manpage.m4 \
 	../src/output-manpage-defs.m4 \
 	../src/output-posix-script.m4 \

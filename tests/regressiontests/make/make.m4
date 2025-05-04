@@ -49,16 +49,41 @@ dnl
 dnl Remarks:
 dnl No leading/trailing newlines, around the test body as it already has those.
 m4_define([ADD_DOCOPT_TEST], [m4_do(
-	[m4_pushdef([_script], m4_default_quoted([$4], [$(TESTDIR)/$1.txt]))],
+	[m4_pushdef([_artifact], m4_default_quoted([$4], [$(TESTDIR)/$1.txt]))],
 	[m4_pushdef([_testname], [[$1-docopt]])],
 	[m4_set_add([DOCOPT_TESTS], _testname)],
-	[m4_set_add([_TEST_DOCOPT_SCRIPTS], m4_quote(_script))],
+	[m4_set_add([_TEST_DOCOPT_SCRIPTS], m4_quote(_artifact))],
 	[m4_divert_text([STDOUT3], [m4_do(
-		_testname[: _script[]m4_ifnblank([$3], [ $3])],
+		_testname[: _artifact[]m4_ifnblank([$3], [ $3])],
 		[$2],
 	)])],
 	[m4_popdef([_testname])],
-	[m4_popdef([_script])],
+	[m4_popdef([_artifact])],
+)])
+
+
+dnl
+dnl $1: The test name
+dnl $2: The test body (see also: TEST_BODY)
+dnl
+dnl Remarks:
+dnl No leading/trailing newlines, around the test body as it already has those.
+m4_define([ADD_EXCISE_OUTPUT_TEST], [m4_do(
+	[m4_pushdef([_original_source], [$(TESTDIR)/$1.m4])],
+	[m4_pushdef([_artifact], [$(TESTDIR)/$1-excised.m4])],
+	[m4_pushdef([_testname], [[$1-excised]])],
+	[m4_set_add([EXCISE_OUTPUT_TESTS], _testname)],
+	[m4_set_add([_TEST_EXCISE_OUTPUT_SCRIPTS], m4_quote(_artifact))],
+	[m4_divert_text([STDOUT3], [m4_do(
+		[_testname: _artifact],
+		[
+	diff -q _original_source $<],
+		[$2],
+		[
+],
+	)])],
+	[m4_popdef([_testname])],
+	[m4_popdef([_artifact])],
 )])
 
 
