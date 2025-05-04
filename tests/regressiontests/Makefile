@@ -255,12 +255,15 @@ stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 basic: $(TESTDIR)/basic.sh
 	$(generic_regression_posix)
 	$(generic_regression_gnu_only)
+	grep -q "local _key$$" $<
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 	! $< -h | grep -qe '\[--\]'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 basic-dash: $(TESTDIR)/basic-dash.sh
 	$(generic_regression_posix)
+	! grep -q "local _key$$" $<
+	$< LOO -b | grep -q BOOL=off,
 	$< LOO -b | grep -q BOOL=off,
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'

@@ -168,6 +168,7 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 	[parse_commandline], [m4_do(
 		[_JOIN_INDENTED(1,
 			_IF_HAVE_POSITIONAL_ARGS([[_positionals_count=0],]),
+			m4_if(m4_expand([_OUTPUT_TYPE]), [bash-script], [[local _key]]),
 			[while test $[]# -gt 0],
 			[do],
 		)],
