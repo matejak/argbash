@@ -751,9 +751,9 @@ gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
 	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	$< -o -x pos-arg | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx pos-arg | grep -q 'OPT_S=--opt-argx,'
