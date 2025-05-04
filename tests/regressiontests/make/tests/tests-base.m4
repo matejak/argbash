@@ -6,6 +6,7 @@ ADD_TEST_BASH([stability], [[
 ADD_TEST_BASH([basic], [[
 	$(generic_regression_posix)
 	$(generic_regression_gnu_only)
+	grep -q "local _key$$" $<
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 	! $< -h | grep -qe '\[--\]'
@@ -14,6 +15,8 @@ ADD_TEST_BASH([basic], [[
 
 ADD_TEST_DASH([basic], [[
 	$(generic_regression_posix)
+	! grep -q "local _key$$" $<
+	$< LOO -b | grep -q BOOL=off,
 	$< LOO -b | grep -q BOOL=off,
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
