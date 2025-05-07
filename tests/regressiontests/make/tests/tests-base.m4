@@ -329,6 +329,7 @@ ADD_GENTEST_BASH([infinity-illegal], [number of expected positional arguments be
 ADD_GENTEST_BASH([bool-default], ['on' or 'off' are allowed as boolean defaults])
 ADD_GENTEST_BASH([pos-opt], [same-arg])
 ADD_GENTEST_BASH([pos-opt2], [same_arg])
+ADD_GENTEST_BASH([supplied-non-optional], [ARGBASH_INDICATE_SUPPLIED: The following arguments are not optional: phantom, pos-arg-inf, pos-arg-multi, pos-arg-single, opt-arg-action, opt-arg-incr, opt-arg-repeat])
 ADD_GENTEST_BASH([more], [is unknown])
 ADD_GENTEST_BASH([illegal-pos], [contains forbidden characters])
 ADD_GENTEST_BASH([illegal-opt], [one character])

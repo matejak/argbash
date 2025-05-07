@@ -126,6 +126,7 @@ TESTS_GEN += \
 	gen-test-bool-default \
 	gen-test-pos-opt \
 	gen-test-pos-opt2 \
+	gen-test-supplied-non-optional \
 	gen-test-more \
 	gen-test-illegal-pos \
 	gen-test-illegal-opt \
@@ -560,6 +561,9 @@ gen-test-pos-opt: $(TESTDIR)/gen-test-pos-opt.m4 $(ARGBASH_BIN)
 
 gen-test-pos-opt2: $(TESTDIR)/gen-test-pos-opt2.m4 $(ARGBASH_BIN)
 	ERROR="same_arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
+gen-test-supplied-non-optional: $(TESTDIR)/gen-test-supplied-non-optional.m4 $(ARGBASH_BIN)
+	ERROR="ARGBASH_INDICATE_SUPPLIED: The following arguments are not optional: phantom, pos-arg-inf, pos-arg-multi, pos-arg-single, opt-arg-action, opt-arg-incr, opt-arg-repeat" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
 	ERROR="is unknown" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
