@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_POSITIONAL_SINGLE([filename])
 # ARG_OPTIONAL_SINGLE([unit],[u],[What unit we accept (b for bytes, k for kibibytes, M for mebibytes)],[b])

@@ -1,5 +1,5 @@
 
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_FOOBAR([pos-arg])
 # ARG_POSITIONAL_SINGLE([pos-arg])

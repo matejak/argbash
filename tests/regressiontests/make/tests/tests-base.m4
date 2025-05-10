@@ -144,6 +144,9 @@ m4_define([test_simple_body], [[
 
 ADD_TEST_BASH([test-simple], [test_simple_body
 	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< pos -o 'uf ta' --print-optionals | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=0,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x --not-supplied | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
 ])
 
 ADD_TEST_DASH([test-simple], [test_simple_body
@@ -326,6 +329,7 @@ ADD_GENTEST_BASH([infinity-illegal], [number of expected positional arguments be
 ADD_GENTEST_BASH([bool-default], ['on' or 'off' are allowed as boolean defaults])
 ADD_GENTEST_BASH([pos-opt], [same-arg])
 ADD_GENTEST_BASH([pos-opt2], [same_arg])
+ADD_GENTEST_BASH([supplied-non-optional], [ARGBASH_INDICATE_SUPPLIED: The following arguments are not optional: phantom, pos-arg-inf, pos-arg-multi, pos-arg-single, opt-arg-action, opt-arg-incr, opt-arg-repeat])
 ADD_GENTEST_BASH([more], [is unknown])
 ADD_GENTEST_BASH([illegal-pos], [contains forbidden characters])
 ADD_GENTEST_BASH([illegal-opt], [one character])

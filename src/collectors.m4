@@ -163,6 +163,11 @@ m4_define([__ADD_OPTIONAL_ARGUMENT], [m4_do(
 	[_FILL_IN_VALUES_FOR_AN_OPTIONAL_ARGUMENT([$1], [$3], _arg_varname, [$5], [$2], [$4])],
 	[m4_popdef([_arg_varname])],
 	[m4_define([_DISTINCT_OPTIONAL_ARGS_COUNT], m4_incr(_DISTINCT_OPTIONAL_ARGS_COUNT))],
+	[m4_case([$5],
+		[arg], [m4_set_add([_ALL_OPTIONAL_ARGUMENTS], [$1])],
+		[bool], [m4_set_add([_ALL_OPTIONAL_ARGUMENTS], [$1])],
+		[dnl]
+	)],
 )])
 
 
@@ -522,6 +527,13 @@ argbash_api([ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 
 m4_define([_ARG_POSITIONAL_DOUBLEDASH], [m4_do(
 	[m4_define([HAVE_DOUBLEDASH], 1)],
+)])
+
+
+argbash_api([ARGBASH_INDICATE_SUPPLIED], _CHECK_PASSED_ARGS_COUNT(1)[m4_do(
+	[[$0($@)]],
+	[m4_set_add_all([HAVE_SUPPLIED], $@)],
+	[CHECK_SUPPLIED_ARE_OPTIONAL([HAVE_SUPPLIED], [_ALL_OPTIONAL_ARGUMENTS], [FATAL_NON_OPTIONAL_SUPPLIED])],
 )])
 
 

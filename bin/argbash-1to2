@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck disable=SC2016
 # SC2016: Expressions don't expand in single quotes, use double quotes for that.

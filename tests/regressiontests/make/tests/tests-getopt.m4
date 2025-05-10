@@ -1,11 +1,11 @@
 ADD_RULE([$(TESTDIR)/test-getopt-equals.sh], [$(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)],
-	[[printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
+	[[printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 ADD_RULE([$(TESTDIR)/test-getopt-both.sh], [$(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)],
-	[[printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
+	[[printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 ADD_RULE([$(TESTDIR)/test-getopt-space.sh], [$(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)],
-	[[printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
+	[[printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 dnl We have to pass a positional argument, so sometimes we pass 'pos-arg', sometimes stuff that looks like a option
 ADD_TEST_BASH([test-getopt-both], [[

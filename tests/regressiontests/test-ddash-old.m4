@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_OPTIONAL_BOOLEAN(boo_l)
 # ARG_POSITIONAL_DOUBLEDASH()

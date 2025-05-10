@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 m4_define([if_not_posix], [m4_if(m4_quote(_OUTPUT_TYPE), [posix-script], [$2], [$1])])
 

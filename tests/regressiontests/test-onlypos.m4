@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # SC2154: _arg_pos_arg is referenced but not assigned.
 # The absence of declaration is a feature of the test.

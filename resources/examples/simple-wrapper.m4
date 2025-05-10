@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # DEFINE_SCRIPT_DIR
 # ARG_POSITIONAL_INF([directory], [Directories to go through], 1)

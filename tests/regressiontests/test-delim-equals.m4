@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_OPTIONAL_SINGLE([opt], , [])
 # ARG_OPTIONAL_REPEATED([add], a, [@opt-repeated@])

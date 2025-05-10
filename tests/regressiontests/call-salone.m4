@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # shellcheck source=OUTPUT_ABS_DIRNAME/test-salone.sh
 

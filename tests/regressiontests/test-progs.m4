@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/usr/bin/env -S bash -e
 
 # SC2317: Command appears to be unreachable
 # When there are only action optional arguments and no positional ones, the shift statement can be omitted.

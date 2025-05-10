@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 m4_define(_DEFAULT_WRAP_FLAGS, [])
 

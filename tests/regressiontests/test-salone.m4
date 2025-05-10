@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 m4_define([pos_arg], [m4_fatal([The option string '$0' got expanded])])
 m4_define([_arg_pos_arg], [m4_fatal([The variable name '$0' got expanded])])

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_OPTIONAL_BOOLEAN([long], l, [)
 # ARG_OPTIONAL_INCREMENTAL([verbose], v, [])

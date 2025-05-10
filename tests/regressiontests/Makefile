@@ -13,7 +13,7 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 
 %-dash.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) --type posix-script -o $@ $<
-	sed -i "s|#!/bin/bash|#!$(shell which dash)|" $@
+	sed -i "s|#!/usr/bin/env bash|#!$(shell which dash)|" $@
 
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
@@ -126,6 +126,7 @@ TESTS_GEN += \
 	gen-test-bool-default \
 	gen-test-pos-opt \
 	gen-test-pos-opt2 \
+	gen-test-supplied-non-optional \
 	gen-test-more \
 	gen-test-illegal-pos \
 	gen-test-illegal-opt \
@@ -372,6 +373,9 @@ test-simple: $(TESTDIR)/test-simple.sh
 	ERROR="[Nn]ot enough" 	$(REVERSE) $<
 	ERROR="require exactly 1" 	$(REVERSE) $<
 	$< pos -o 'uf ta' | grep -q 'OPT_S=uf ta,POS_S=pos,'
+	$< pos -o 'uf ta' --print-optionals | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=0,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
+	$< pos -o 'uf ta' --print-optionals --la x --not-supplied | grep -q '_supplied_arg_prefix=1,_supplied_arg_print_optionals=1,_supplied_arg_la=1,_supplied_arg_not_supplied=x'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple.sh"
 test-simple-dash: $(TESTDIR)/test-simple-dash.sh
 	$< pos | grep -q 'OPT_S=x,POS_S=pos,'
@@ -558,6 +562,9 @@ gen-test-pos-opt: $(TESTDIR)/gen-test-pos-opt.m4 $(ARGBASH_BIN)
 gen-test-pos-opt2: $(TESTDIR)/gen-test-pos-opt2.m4 $(ARGBASH_BIN)
 	ERROR="same_arg" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
+gen-test-supplied-non-optional: $(TESTDIR)/gen-test-supplied-non-optional.m4 $(ARGBASH_BIN)
+	ERROR="ARGBASH_INDICATE_SUPPLIED: The following arguments are not optional: phantom, pos-arg-inf, pos-arg-multi, pos-arg-single, opt-arg-action, opt-arg-incr, opt-arg-repeat" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
 gen-test-more: $(TESTDIR)/gen-test-more.m4 $(ARGBASH_BIN)
 	ERROR="is unknown" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
@@ -741,9 +748,9 @@ gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
 	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/bin/bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	$< -o -x pos-arg | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx pos-arg | grep -q 'OPT_S=--opt-argx,'
@@ -758,11 +765,11 @@ test-very_strict: $(TESTDIR)/test-very_strict.sh
 	ERROR="are trying to pass an option" $(REVERSE) $< --foobar
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-very_strict.sh"
 $(TESTDIR)/test-getopt-equals.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([=])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-both.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ =])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-getopt-space.sh: $(TESTDIR)/test-onlyopt.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n%s\n" "#!/bin/bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n%s\n" "#!/usr/bin/env bash" "# ARGBASH_SET_DELIM([ ])" "# ARG_OPTION_STACKING([getopt])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-getopt-both: $(TESTDIR)/test-getopt-both.sh
 	$< -ii | grep -q 'OPT_INCR=4,'
 	$< --incrx -ii | grep -q 'OPT_INCR=5,'

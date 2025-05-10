@@ -340,3 +340,20 @@ m4_define([UNDERLINE], [m4_do(
 	[m4_if(m4_len([$1]), 0, ,
 		[m4_for(idx, 1, m4_len([$1]), 1, [$2])])],
 )])
+
+
+dnl
+dnl $1: Set of arguments marked as supplied
+dnl $2: Set of all optional arguments
+dnl $3: Macro that gets called with the supplied arguments that are not optional, if any.
+m4_define([CHECK_SUPPLIED_ARE_OPTIONAL], [m4_do(
+	[m4_set_add_all([_temp_supplied_not_optional]m4_set_difference([$1], [$2]))],
+	[m4_if(m4_set_size([_temp_supplied_not_optional]), 0,
+		[],
+		[$3([_temp_supplied_not_optional])])],
+	[m4_set_delete([_temp_set_supplied])],
+)])
+
+
+m4_define([FATAL_NON_OPTIONAL_SUPPLIED],
+    [m4_fatal([ARGBASH_INDICATE_SUPPLIED: The following arguments are not optional:] m4_set_dump([$1], [, ]))])

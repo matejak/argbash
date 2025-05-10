@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # DEFINE_SCRIPT_DIR([])
 # INCLUDE_PARSING_CODE([simple-parsing.sh])

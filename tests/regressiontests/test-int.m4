@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
 # ARG_OPTIONAL_SINGLE([int], , ,[0])
