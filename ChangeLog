@@ -1,6 +1,15 @@
-2.10.1 (TBA)
+2.11.0 (2024-05-??)
 -------------------
 
+Buxfixes:
+
+* `#!/bin/bash` is no longer the shebang. The more portable `#!/usr/bin/env bash` is used instead (#185).
+* Indentation is consistent in validation functions (#143)
+
+New features:
+
+* The new Argbash macro `ARGBASH_INDICATE_SUPPLIED` allows you to get information on whether an argument has been explicitly passed on the commandline. Big thanks to Kevin Stravers (@kstrafe) for his heroic effort!
+* A new `excised` mode that doesn't contain generated code has been introduced (#186)
 
 2.10.0 (2020-09-22)
 -------------------
