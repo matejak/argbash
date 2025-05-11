@@ -1,8 +1,8 @@
 ADD_RULE([$(TESTDIR)/test-semi_strict.sh], [$(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)],
-	[[printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
+	[[printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 ADD_RULE([$(TESTDIR)/test-very_strict.sh], [$(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)],
-	[[printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
+	[[printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -]])
 
 
 dnl We have to pass a positional argument, so sometimes we pass 'pos-arg', sometimes stuff that looks like a option

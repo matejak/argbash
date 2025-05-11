@@ -255,12 +255,15 @@ stability: $(TESTDIR)/basic.sh $(TESTDIR)/basic2.sh
 basic: $(TESTDIR)/basic.sh
 	$(generic_regression_posix)
 	$(generic_regression_gnu_only)
+	grep -q "local _key$$" $<
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
 	! $< -h | grep -qe '\[--\]'
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/basic.sh"
 basic-dash: $(TESTDIR)/basic-dash.sh
 	$(generic_regression_posix)
+	! grep -q "local _key$$" $<
+	$< LOO -b | grep -q BOOL=off,
 	$< LOO -b | grep -q BOOL=off,
 	$< -h | grep -q 'P percent: %'
 	$< -h | grep -q 'O percent: %'
@@ -748,9 +751,9 @@ gen-test-group-wrong: $(TESTDIR)/gen-test-group-wrong.m4 $(ARGBASH_BIN)
 	ERROR="'foo' is not a script argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 $(TESTDIR)/test-semi_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-local-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 $(TESTDIR)/test-very_strict.sh: $(TESTDIR)/test-simple.m4 $(ARGBASH_BIN)
-	printf "%s\n%s\n" "#!/usr/bin/env bash" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
+	printf "%s\n%s\n" "#!/usr/bin/env bash" "set -e" "# ARG_RESTRICT_VALUES([no-any-options])" | cat - $< | $(ARGBASH_BIN) -o $(@) -
 test-semi_strict: $(TESTDIR)/test-semi_strict.sh
 	$< -o -x pos-arg | grep -q 'OPT_S=-x,'
 	$< -o --opt-argx pos-arg | grep -q 'OPT_S=--opt-argx,'
