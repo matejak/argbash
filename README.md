@@ -10,7 +10,11 @@
 * But they don't since arguments support is a daunting task, because ...
 * `getopt` is discouraged, `getopts` doesn't support long options, there is no widely-accepted `Bash` module to do the task and some solutions don't work on all platforms (Linux, OSX, MSW)...
 
-Give `Argbash` a try and stop being terrorized by those pesky arguments! With Argbash, you will get:
+Having Argbash, you can generate interface for your first script in a matter of seconds. See a [termtosvg](https://github.com/nbedos/termtosvg) recording of how `head.sh`, a script with a subset of the `head` command's interface, is created by editing a template provided by `argbash-init`.
+
+![Example](./resources/screencast.svg)
+
+Definitely do give `Argbash` a try, and stop being terrorized by those pesky arguments! With Argbash, you will get:
 
 * Fast, minimalistic declaration of arguments your script expects (see below for supported argument types).
 * Scripts generated from definitions once that can be used on all platforms that have `bash`.
