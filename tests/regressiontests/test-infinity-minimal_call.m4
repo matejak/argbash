@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_POSITIONAL_INF([pos-arg], [@pos-arg@])
 # ARGBASH_GO

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARG_POSITIONAL_SINGLE([act-ion], [], [foo])
 # ARG_OPTIONAL_SINGLE([opt-tion], [], [], [foo])

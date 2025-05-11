@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ARGBASH_WRAP([test-onlypos], [pos-opt])
 # ARGBASH_WRAP([test-onlypos], [pos-arg])

@@ -36,7 +36,7 @@ m4_define([ARGBASH_GO_BASE], [m4_do(
 	[m4_define([_BASENAME], INFERRED_BASENAME_NOERROR)],
 	[m4_define([_PROGRAM_NAME], m4_dquote(_BASENAME))],
 	[m4_define([_FUNCTION_NAME], m4_dquote(_[]_TRANSLATE_BAD_CHARS(_PROGRAM_NAME)))],
-	[[#!/bin/bash]_ENDL_(2)],
+	[[#!/usr/bin/env bash]_ENDL_(2)],
 	[[# Put this file to /etc/bash_completion.d/]_BASENAME()_ENDL_()],
 	[[# needed because of Argbash --> m4_ignore@{:@@<:@]_ENDL_()],
 	[_ARGBASH_ID()_ENDL_()],

@@ -139,7 +139,7 @@ develop: $(ARGBASH_TO)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash" && rm "$(ROOT)/$(PREFIX)/bin/argbash"
-	echo '#!/bin/bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
+	echo '#!/usr/bin/env bash' > "$(ROOT)/$(PREFIX)/bin/argbash"
 	echo '$(abspath $(ROOT_DIR)/$(GENPARSE)) "$$@"' >> "$(ROOT)/$(PREFIX)/bin/argbash"
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash"
 	test -z "$(ARGBASH_TO)" || ln -s $(abspath $(ARGBASH_TO)) "$(ROOT)/$(PREFIX)/bin"
