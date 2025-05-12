@@ -17,7 +17,7 @@
 # ARG_OPTIONAL_REPEATED([search], I, [Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)], ["."])
 # ARG_OPTIONAL_SINGLE([debug],, [(developer option) Tell autom4te to trace a macro])
 # ARG_TYPE_GROUP_SET([content], [content], [strip], [none,user-content,all])
-# ARG_TYPE_GROUP_SET([type], [type], [type], [bash-script,posix-script,manpage,manpage-defs,completion,docopt])
+# ARG_TYPE_GROUP_SET([type], [type], [type], [bash-script,posix-script,manpage,manpage-defs,completion,docopt,excised])
 # ARG_DEFAULTS_POS()
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 # ARG_VERSION_AUTO([_ARGBASH_VERSION])

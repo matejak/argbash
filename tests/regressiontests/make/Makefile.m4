@@ -11,6 +11,7 @@ m4_define([include_test], [m4_do(
 
 m4_include([tests/tests-base.m4])
 m4_include([tests/tests-docopt.m4])
+m4_include([tests/tests-excise.m4])
 m4_include([tests/tests-delimiters.m4])
 m4_include([tests/tests-init.m4])
 m4_include([tests/tests-env.m4])
@@ -36,6 +37,9 @@ ARGBASH_INIT_EXEC ?= $(ARGBASH_INIT)
 	$(word 2,$^) --type posix-script -o $@ $<
 	[sed -i "s|#!/usr/bin/env bash|#!]$(shell which dash)|" $@
 
+%-excised.m4: %.sh $(ARGBASH_BIN)
+	$(word 2,$^) --type excised -o $@ $<
+
 %.sh: %.m4 $(ARGBASH_BIN)
 	$(word 2,$^) $< -o $@
 
@@ -53,17 +57,22 @@ SCRIPTS = \
 	], m4_set_list([_TEST_SCRIPTS])) \
 	$(NUL)
 
-# bash tests
 TESTS += \
 	m4_join([ \
 	], m4_set_list([BASH_TESTS])) \
 	$(NUL)
 
-# docopt tests
 TESTS += \
 	m4_join([ \
 	], m4_set_list([DOCOPT_TESTS])) \
 	$(NUL)
+
+
+TESTS += \
+	m4_join([ \
+	], m4_set_list([EXCISE_OUTPUT_TESTS])) \
+	$(NUL)
+
 
 TESTS_GEN += \
 	m4_join([ \
@@ -72,7 +81,7 @@ TESTS_GEN += \
 
 SCRIPTS += \
 	m4_join([ \
-	], m4_set_list([_TEST_BASH_SCRIPTS]),m4_set_list([_TEST_DOCOPT_SCRIPTS])) \
+	], m4_set_list([_TEST_BASH_SCRIPTS]),m4_set_list([_TEST_DOCOPT_SCRIPTS]),m4_set_list([_TEST_EXCISE_OUTPUT_SCRIPTS])) \
 	$(NUL)
 
 ifneq "$(shell which dash 2> /dev/null)" ""
