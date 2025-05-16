@@ -15,6 +15,7 @@ ADD_TEST_BASH([test-int], [[
 	$< 1 --pint 2 | grep -q "P=2,"
 	ERROR="positive" $(REVERSE) $< 1 --pint 0
 	ERROR="negative" $(REVERSE) $< 1 --nnint -1
+	! grep -q $$'\t' $<
 ]])
 
 ADD_TEST_BASH([test-group], [[

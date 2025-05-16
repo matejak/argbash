@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# ARGBASH_SET_INDENT([  ])
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
 # ARG_OPTIONAL_SINGLE([int], , ,[0])
 # ARG_TYPE_GROUP([int], [INT], [pos-arg,int])
