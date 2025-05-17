@@ -61,7 +61,7 @@ dnl TODO: We expand the _MK_VALIDATE_GROUP_FUNCTION one time too much
 argbash_api([ARG_TYPE_GROUP_SET], [m4_do(
 	[[$0($@)]],
 	[_SAVE_SET_TYPE([$1], [$4])],
-	[_define_validator([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),
+	[_define_validator_literal([$1], m4_expand([_MK_VALIDATE_GROUP_FUNCTION([$1], [$5])]),
 		m4_expand([[one of ]m4_list_join([_LIST_$1], [, ], ', ', [ and ])]))],
 	[m4_foreach([_argname], [$3], [m4_do(
 		[m4_list_contains([_ARGS_LONG], _argname, ,
@@ -124,9 +124,12 @@ m4_define([_VALIDATE_POSITIONAL_ARGUMENTS], [m4_do(
 	[m4_lists_foreach_positional([_ARGS_LONG], [_arg], [m4_set_contains([TYPED_ARGS], _arg, [m4_do(
 
 		[m4_pushdef([_arg_varname], [_varname(_arg)])],
+		[m4_pushdef([_validation_statement], [_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname")])],
 
-		[_arg_varname=_MAYBE_VALIDATE_VALUE(_arg, "$_arg_varname") || exit 1
-],
+		[m4_if(m4_expand([_validation_statement]), "$_arg_varname", [],
+			[_arg_varname=_validation_statement || exit 1
+])],
+		[m4_popdef([_validation_statement])],
 		[m4_popdef([_arg_varname])],
 	)])])],
 )])

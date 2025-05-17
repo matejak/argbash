@@ -3,14 +3,36 @@ m4_include_once([function_generators.m4])
 dnl
 dnl Define a validator for a particular type. Instead of using m4_define, use this:
 dnl $1: The type ID
-dnl $2: The validator body (a shell function accepting $1 - the value, $2 - the argument name)
+dnl $2: The body of the shell function (that is accepting $1 - the value, $2 - the argument name) - double-quoted lines
 dnl $3: The type description
 m4_define([_define_validator], [m4_do(
+	[_define_validator_literal([$1], m4_ifnblank([$2], [[_format_validator_body([$1], [$2], [$3])]]), [$3])],
+)])
+
+
+dnl
+dnl Define a validator for a particular type. Instead of using m4_define, use this:
+dnl $1: The type ID
+dnl $2: The quoted literal body of the shell function
+dnl $3: The type description
+m4_define([_define_validator_literal], [m4_do(
 	[m4_set_contains([VALUE_TYPES], [$1], [m4_fatal([We already have the validator for '$1'.])])],
 	[m4_set_add([VALUE_TYPES], [$1])],
-	[m4_define([_validator_$1], [$2])],
+	[m4_define([_validator_$1_with_line_breaks], [m4_ifnblank([$2], [_ENDL_()m4_expand([$2])_ENDL_(2)], [])])],
 	[m4_define(__type_str([$1]), [[$3]])],
 )])
+
+dnl Format the shell function
+dnl $1: The type ID
+dnl $2: The body of the shell function (that is accepting $1 - the value, $2 - the argument name) - double-quoted lines
+dnl $3: The type description
+m4_define([_format_validator_body], [MAKE_FUNCTION([[Validator - $3],
+		[Args:],
+		_INDENT_()[@S|@1: Value of the argument],
+		_INDENT_()[@S|@2: Name of the argument],
+		[Either exits with an error, or outputs the argument as the respective type using printf.]],
+	[$1],
+	[_JOIN_INDENTED(1, $2)])])
 
 
 dnl
@@ -19,7 +41,7 @@ m4_define([_PUT_VALIDATORS], [m4_do(
 	[m4_set_empty([VALUE_TYPES_USED], , [m4_n([# validators])])],
 	[m4_set_foreach([VALUE_TYPES], [_val_type], [m4_do(
 		[m4_set_empty(m4_expand([[VALUE_GROUP_]_val_type]), ,
-			m4_expand([_ENDL_()[_validator_]_val_type[]_ENDL_(2)]))],
+			m4_expand([[_validator_]_val_type[_with_line_breaks]]))],
 	)])],
 )])
 
@@ -28,47 +50,37 @@ dnl
 dnl Define an int validator
 dnl double quoting is important because of the [] group inside
 _define_validator([int],
-[[int()
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."
-	printf "%d" "@S|@1"
-}]], [integer])
+	[[[printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not an integer."]],
+	[[printf "%d" "@S|@1"]]],
+	[integer])
 
 
 dnl Define a positive int validator
 _define_validator([pint],
-[[pint()
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."
-	printf "%d" "@S|@1"
-}]], [positive integer])
+	[[[printf "%s" "@S|@1" | grep -q '^\s*[+]\?0*[1-9][0-9]*\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a positive integer."]],
+	[[printf "%d" "@S|@1"]]],
+	[positive integer])
 
 
 dnl Define a non-negative int validator
 _define_validator([nnint],
-[[nnint()
-{
-	printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."
-	printf "%d" "@S|@1"
-}]], [positive integer or zero])
+	[[[printf "%s" "@S|@1" | grep -q '^\s*+\?[0-9]\+\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a non-negative integer."]],
+	[[printf "%d" "@S|@1"]]],
+	[positive integer or zero])
 
 
 dnl Define a float number validator
 _define_validator([float],
-[[float()
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."
-	printf "%d" "@S|@1"
-}]], [floating-point number])
+	[[[printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+(e[0-9]\+)?)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a floating-point number."]],
+	[[printf "%d" "@S|@1"]]],
+	[floating-point number])
 
 
 dnl Define a decimal number validator
 _define_validator([decimal],
-[[decimal()
-{
-	printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."
-	printf "%d" "@S|@1"
-}]], [decimal number])
+	[[[printf "%s" "@S|@1" | grep -q '^\s*[+-]\?[0-9]\+(\.[0-9]\+)?\s*$' || die "The value of argument '@S|@2' is '@S|@1', which is not a plain-old decimal number."]],
+	[[printf "%d" "@S|@1"]]],
+	[decimal number])
 
 
 dnl The string validator is a null validator
@@ -135,7 +147,7 @@ m4_define([_MK_VALIDATE_GROUP_FUNCTION], [MAKE_BASH_FUNCTION(,
 		[done],
 		[die "Value '$_seeking' (of argument '@S|@2') doesn't match the list of allowed values: m4_list_join([_LIST_$1], [, ], ', ', [ and ])" 4],
 	)],
-	[_allowed=(m4_list_join([_LIST_$1_QUOTED], [ ]))],
+	m4_expand([_allowed=(m4_list_join([_LIST_$1_QUOTED], [ ]))]),
 	[_seeking="@S|@1"],
 	m4_ifnblank([$2], [[_idx=0],],),
 )])
