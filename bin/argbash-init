@@ -11,7 +11,6 @@ version=2.10.0
 # ARG_OPTIONAL_REPEATED([pos],[],[Add a single-valued positional argument])
 # ARG_OPTIONAL_REPEATED([opt],[],[Add an single-valued optional argument])
 # ARG_OPTIONAL_REPEATED([opt-bool],[],[Add an optional boolean argument])
-# ARG_OPTIONAL_REPEATED([wrap],[],[What script(s) to wrap])
 # ARG_OPTIONAL_SINGLE([mode],[m],[The slider between feature-rich and simple script.],[default])
 # ARG_TYPE_GROUP_SET([mode],[MODE],[mode],[default,full,minimal])
 # ARG_VERSION([echo "argbash-init v$version"])
@@ -61,21 +60,19 @@ _arg_hints="off"
 _arg_pos=()
 _arg_opt=()
 _arg_opt_bool=()
-_arg_wrap=()
 _arg_mode="default"
 
 
 print_help()
 {
 	printf '%s\n' "Make a template for scripts."
-	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [--wrap <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\n' "$0"
+	printf 'Usage: %s [-s|--separate] [--(no-)hints] [--pos <arg>] [--opt <arg>] [--opt-bool <arg>] [-m|--mode <MODE>] [-v|--version] [-h|--help] [<output>]\n' "$0"
 	printf '\t%s\n' "<output>: Name of the output template (default: '-')"
 	printf '\t%s\n' "-s, --separate: Separate the parsing logic (specify two times for complete separation)"
 	printf '\t%s\n' "--hints, --no-hints: Whether to write hints to the script template (off by default)"
 	printf '\t%s\n' "--pos: Add a single-valued positional argument (empty by default)"
 	printf '\t%s\n' "--opt: Add an single-valued optional argument (empty by default)"
 	printf '\t%s\n' "--opt-bool: Add an optional boolean argument (empty by default)"
-	printf '\t%s\n' "--wrap: What script(s) to wrap (empty by default)"
 	printf '\t%s\n' "-m, --mode: The slider between feature-rich and simple script.. Can be one of: 'default', 'full' and 'minimal' (default: 'default')"
 	printf '\t%s\n' "-v, --version: Prints version"
 	printf '\t%s\n' "-h, --help: Prints help"
@@ -128,14 +125,6 @@ parse_commandline()
 				;;
 			--opt-bool=*)
 				_arg_opt_bool+=("${_key##--opt-bool=}")
-				;;
-			--wrap)
-				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1
-				_arg_wrap+=("$2")
-				shift
-				;;
-			--wrap=*)
-				_arg_wrap+=("${_key##--wrap=}")
 				;;
 			-m|--mode)
 				test $# -lt 2 && die "Missing value for the optional argument '$_key'." 1

@@ -11,7 +11,6 @@ version=_ARGBASH_VERSION
 # ARG_OPTIONAL_REPEATED([pos], , [Add a single-valued positional argument])
 # ARG_OPTIONAL_REPEATED([opt], , [Add an single-valued optional argument])
 # ARG_OPTIONAL_REPEATED([opt-bool], ,[Add an optional boolean argument])
-# ARG_OPTIONAL_REPEATED([wrap], ,[What script(s) to wrap])
 # ARG_OPTIONAL_SINGLE([mode], m, [The slider between feature-rich and simple script.], [default])
 # ARG_TYPE_GROUP_SET([mode], [MODE], [mode], [default,full,minimal])
 # ARG_VERSION([echo "argbash-init v$version"])
