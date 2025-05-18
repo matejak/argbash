@@ -5,6 +5,7 @@ Buxfixes:
 
 * `#!/bin/bash` is no longer the shebang. The more portable `#!/usr/bin/env bash` is used instead (#185).
 * Indentation is consistent in validation functions (#143)
+* Fixed bug preventing short options to have capital letters (#199)
 
 New features:
 
