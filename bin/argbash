@@ -17,7 +17,7 @@
 # ARG_OPTIONAL_REPEATED([search],[I],[Directories to search for the wrapped scripts (directory of the template will be added to the end of the list)],["."])
 # ARG_OPTIONAL_SINGLE([debug],[],[(developer option) Tell autom4te to trace a macro])
 # ARG_TYPE_GROUP_SET([content],[content],[strip],[none,user-content,all])
-# ARG_TYPE_GROUP_SET([type],[type],[type],[bash-script,posix-script,manpage,manpage-defs,completion,docopt])
+# ARG_TYPE_GROUP_SET([type],[type],[type],[bash-script,posix-script,manpage,manpage-defs,completion,docopt,excised])
 # ARG_DEFAULTS_POS([])
 # ARG_HELP([Argbash is an argument parser generator for Bash.])
 # ARG_VERSION_AUTO([_ARGBASH_VERSION])
@@ -52,12 +52,12 @@ content()
 
 type()
 {
-	local _allowed=("bash-script" "posix-script" "manpage" "manpage-defs" "completion" "docopt") _seeking="$1"
+	local _allowed=("bash-script" "posix-script" "manpage" "manpage-defs" "completion" "docopt" "excised") _seeking="$1"
 	for element in "${_allowed[@]}"
 	do
 		test "$element" = "$_seeking" && echo "$element" && return 0
 	done
-	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'bash-script', 'posix-script', 'manpage', 'manpage-defs', 'completion' and 'docopt'" 4
+	die "Value '$_seeking' (of argument '$2') doesn't match the list of allowed values: 'bash-script', 'posix-script', 'manpage', 'manpage-defs', 'completion', 'docopt' and 'excised'" 4
 }
 
 
@@ -90,7 +90,7 @@ print_help()
 	printf '\t%s\n' "<input>: The input template file (pass '-' for stdin)"
 	printf '\t%s\n' "-o, --output: Name of the output file (pass '-' for stdout) (default: '-')"
 	printf '\t%s\n' "-i, --in-place, --no-in-place: Update a bash script in-place (off by default)"
-	printf '\t%s\n' "-t, --type: Output type to generate. Can be one of: 'bash-script', 'posix-script', 'manpage', 'manpage-defs', 'completion' and 'docopt' (default: 'bash-script')"
+	printf '\t%s\n' "-t, --type: Output type to generate. Can be one of: 'bash-script', 'posix-script', 'manpage', 'manpage-defs', 'completion', 'docopt' and 'excised' (default: 'bash-script')"
 	printf '\t%s\n' "--library, --no-library: Whether the input file if the pure parsing library (off by default)"
 	printf '\t%s\n' "--strip: Determines what to have in the output. Can be one of: 'none', 'user-content' and 'all' (default: 'none')"
 	printf '\t%s\n' "--check-typos, --no-check-typos: Whether to check for possible argbash macro typos (on by default)"

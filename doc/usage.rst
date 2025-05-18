@@ -248,6 +248,7 @@ Bash completion                 completion                      all
 docopt help message             docopt                          all
 manpage template                manpage                         all
 manpage template definitions    manpage-defs                    all
+No generated code               excised                         all
 ============================    =======================         ==========================
 
 
@@ -328,6 +329,7 @@ Typically, you generate docopt output to the standard output from the generated 
    You can't pass the script which sources the parsing code as Argbash input, as it doesn't contain any Argbash macros.
    If you pass the parsing code script/template as Argbash input, the output will have wrong basename, as Argbash will use the basename of the parsing code file, not of the real script.
 
+
 .. _manpage_output:
 
 Manpage output
@@ -349,6 +351,21 @@ So given a argbash-powered script or m4 file, your manpage workflow will typical
   $ vim my-script-defs.rst  # Edit the definitions file
   $ rst2man my-script.rst > my-script.1
   $ man ./my-script.1
+
+
+.. _excise_output:
+
+Output without generated code
++++++++++++++++++++++++++++++
+
+Argbash can also generte output that doesn't contain parsing code --- only user code and the Argbash template.
+If the input contained parsing code, that one gets *excised*.
+There are following examples when the excised output makes sense when dealing with Argbash-powered scripts:
+
+- Space saving for e.g. copy-pasting:
+  Don't involve generated code earlier than you need to, as it does make the script larger, and that can be an annoyance.
+- Normalization of scripts for storage:
+  Store only definitions that are less likely to change, and generate implementation of parsing using the latest greatest version of Argbash just in time.
 
 
 .. _api_change:
