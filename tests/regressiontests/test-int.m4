@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 
+# ARGBASH_SET_INDENT([  ])
 # ARG_POSITIONAL_SINGLE([pos-arg], [])
+# ARG_POSITIONAL_SINGLE([pos-arg-2], [], [something])
 # ARG_OPTIONAL_SINGLE([int], , ,[0])
 # ARG_TYPE_GROUP([int], [INT], [pos-arg,int])
 # ARG_OPTIONAL_SINGLE([nnint], , ,[0])
 # ARG_TYPE_GROUP([nnint], [INT+0], [nnint])
 # ARG_OPTIONAL_SINGLE([pint], , ,[1])
 # ARG_TYPE_GROUP([pint], [INT+], [pint])
+# ARG_TYPE_GROUP([string], [STRING], [pos-arg-2])
 # ARG_HELP([Testing program])
 # ARGBASH_GO
 
