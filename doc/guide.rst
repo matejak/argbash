@@ -626,8 +626,10 @@ Plus, there are convenience macros:
 
   * The user forgets to supply value to an optional argument, so the next argument is mistaken for it.
     For example, when we leave ``time`` from ``ls --sort time --long /home/me/*``, we get a syntactically valid command-line ``ls --sort --long /home/me/*``, where ``--long`` is identified as value of the argument ``--sort`` instead an argument on its own.
+    As ``--long`` is a supported argument of ``ls``, both ``no-any-options`` or ``no-local-options`` would catch this error.
   * The user intends to pass an optional argument on the command-line (e.g. ``--sort``), but makes a typo, (e.g. ``--srot``), or the script actually doesn't support that argument.
     As an unwanted consequence, it is interpreted as a positional argument.
+    As ``--srot`` is not a supported argument of ``ls``, only ``no-any-options`` would catch this error.
 
 * Make Argbash-powered scripts getopts-compatible:
 

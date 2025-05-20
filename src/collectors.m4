@@ -73,7 +73,7 @@ dnl Checks that the an argument is a correct short option arg
 dnl $1: The short option "string"
 dnl $2: The argument name
 m4_define([_CHECK_SHORT_OPTION_NAME_IS_OK], [m4_ifnblank([$1], [m4_do(
-		[m4_bmatch([$1], [^[0-9a-zA-z?]$], ,
+		[m4_bmatch([$1], [^[0-9a-zA-Z?]$], ,
 			[_COLLECTOR_FEEDBACK([The value of short option '$1' for argument '--$2' is not valid - it has to be either left blank, or exactly one character.]m4_ifnblank([$1], [[ (Yours has ]m4_len([$1])[ characters).]]))])],
 		[m4_set_contains([_ARGS_SHORT], [$1],
 			[_COLLECTOR_FEEDBACK([The short option '$1' (in definition of '--$2') is already used.])],
