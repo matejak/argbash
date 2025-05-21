@@ -14,5 +14,7 @@ build:
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:
   configuration: doc/conf.py
+
+python:
   install:
-   - requirements: docs/requirements.txt
+   - requirements: doc/requirements.txt
