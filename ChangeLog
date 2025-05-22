@@ -1,4 +1,4 @@
-2.11.0 (2024-05-??)
+2.11.0 (2025-05-23)
 -------------------
 
 Buxfixes:
@@ -6,11 +6,18 @@ Buxfixes:
 * `#!/bin/bash` is no longer the shebang. The more portable `#!/usr/bin/env bash` is used instead (#185).
 * Indentation is consistent in validation functions (#143)
 * Fixed bug preventing short options to have capital letters (#199)
+* Scripts with strict argument checking don't abort when executed with errexit (#163)
 
 New features:
 
 * The new Argbash macro `ARGBASH_INDICATE_SUPPLIED` allows you to get information on whether an argument has been explicitly passed on the commandline. Big thanks to Kevin Stravers (@kstrafe) for his heroic effort!
 * A new `excised` mode that doesn't contain generated code has been introduced (#186)
+
+Incompatible changes (minor):
+
+* Archlinux packaging files were removed, because Argbash has a proper Archlinux package, and the redundant code in the project would require maintenance (#179)
+* The `--wrap` argument of `argbash-init` was removed, as it was not working at all, and its added value is negligible (#144)
+
 
 2.10.0 (2020-09-22)
 -------------------

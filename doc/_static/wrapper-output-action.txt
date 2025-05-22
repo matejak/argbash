@@ -16,6 +16,7 @@ Contents of '../src' matching '*.m4':
 	output-bash-script.m4: 1 kiB
 	output-completion.m4: 4 kiB
 	output-docopt.m4: 0 kiB
+	output-excised.m4: 0 kiB
 	output-manpage-defs.m4: 1 kiB
 	output-manpage.m4: 1 kiB
 	output-posix-script.m4: 3 kiB
@@ -24,8 +25,8 @@ Contents of '../src' matching '*.m4':
 	output-strip-user-content.m4: 0 kiB
 	progs.m4: 2 kiB
 	stuff.m4: 47 kiB
-	utilities.m4: 11 kiB
-	value_validators.m4: 5 kiB
+	utilities.m4: 12 kiB
+	value_validators.m4: 6 kiB
 Contents of '../resources/examples' matching '*.m4':
 	minimal.m4: 0 kiB
 	minimal-raw.m4: 0 kiB

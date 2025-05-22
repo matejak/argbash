@@ -201,6 +201,7 @@ altuninstall: define-version uninstall
 version: $(MANPAGE)
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
+	sed -i "s/v[0-9\.]\+$$/v$(VERSION)/" examples/minimal-raw.m4
 	sed -i "1s/.*/$(VERSION) ($$(date -I))/" $(CHANGELOG)
 	touch $(M4_SRC)
 
@@ -208,7 +209,7 @@ version: $(MANPAGE)
 	cat "$<" | sed -e "s/@VERSION@/$(shell cat ../src/version)/g; s/@NOW@/$(shell date -Iseconds)/" > "$@"
 
 release: version $(GENPARSE) $(ARGBASH_TO) examples check
-	sed -i "1s/([-0-9]+)/($$(date -I))/" $(CHANGELOG)
+	sed -i "1s/([-0-9]\+)/($$(date -I))/" $(CHANGELOG)
 	cd ../doc && $(MAKE) clean && $(MAKE) html && $(MAKE) clean-tmp
 
 tag:
