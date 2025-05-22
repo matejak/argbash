@@ -2,6 +2,30 @@ m4_define([_COLLECTOR_FEEDBACK], [m4_fatal($@)])
 
 
 dnl
+dnl $1: The key
+m4_define([_FORMAT_MISSING_PREFIX], [m4_do(
+	[[The prefix for option '$1' has not been found]],
+)])
+
+dnl
+dnl $1: The argname(i.e. storage key)
+dnl $2: The prefix
+m4_define([STORE_NEGATION_PREFIX], [m4_do(
+	[m4_define([_NEG_PREFIX_FOR_$1], [[$2]])],
+)])
+
+
+dnl
+dnl $1: The argname(i.e. storage key)
+dnl $2: Error-handling callback that is given the error message as the first argument.
+m4_define([GET_NEGATION_PREFIX], [m4_do(
+	[m4_ifndef([_NEG_PREFIX_FOR_$1],
+		[m4_default([$2], [m4_fatal])([_FORMAT_MISSING_PREFIX([$1])])],
+		[m4_quote(m4_indir([_NEG_PREFIX_FOR_$1]))])],
+)])
+
+
+dnl
 dnl $1: The argument name
 dnl $2: The help message
 dnl $3: The variable name
@@ -360,6 +384,26 @@ argbash_api([ARG_OPTIONAL_BOOLEAN], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
 		[_COLLECTOR_FEEDBACK([Problem with argument '$1': Only 'on' or 'off' are allowed as boolean defaults, you have specified '$4'.])])])],
 	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3],
 		m4_default_quoted([$4], [off]), [bool])],
+)])
+
+
+dnl $1: long name, var suffix (translit of [-] -> _)
+dnl $2: short name (opt)
+dnl $3: help
+argbash_api([ARG_OPTIONAL_SWITCH_ON], _CHECK_PASSED_ARGS_COUNT(1, 3)[m4_do(
+	[[$0($@)]],
+	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3], [off], [bool])],
+)])
+
+
+dnl $1: long name, var suffix (translit of [-] -> _)
+dnl $2: short name (opt)
+dnl $3: help
+dnl $4: the negation prefix (=no-, resulting in i.e. --no-video)
+argbash_api([ARG_OPTIONAL_SWITCH_OFF], _CHECK_PASSED_ARGS_COUNT(1, 4)[m4_do(
+	[[$0($@)]],
+	[STORE_NEGATION_PREFIX([$1], m4_default([[$4]], [[no-]]))],
+	[_ADD_OPTIONAL_ARGUMENT_IF_POSSIBLE([$1], [$2], [$3], [on], [bool])],
 )])
 
 
