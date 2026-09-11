@@ -94,6 +94,8 @@ TESTS += \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
 	test-leftovers \
+	test-load-library \
+	call-salone-implicit \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
@@ -140,6 +142,7 @@ TESTS_GEN += \
 	gen-test-misspelled \
 	gen-test-unmatched_bracket \
 	gen-test-badcall-multi \
+	gen-test-scriptdir-mismatch \
 	gen-test-init_name_dash \
 	gen-test-init_name_char \
 	gen-test-group-wrong \
@@ -171,6 +174,8 @@ SCRIPTS += \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
 	$(TESTDIR)/test-leftovers.sh \
+	$(TESTDIR)/test-load-library.sh \
+	$(TESTDIR)/call-salone-implicit.sh \
 	$(TESTDIR)/test-delim-space.sh \
 	$(TESTDIR)/test-delim-equals.sh \
 	$(TESTDIR)/test-delim-both.sh \
@@ -599,6 +604,19 @@ gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
 	ERROR="3rd argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
+test-load-library: $(TESTDIR)/test-load-library.sh
+	$< | grep -q 'LIB=yes,OPT_S=default,'
+	grep -q '^script_dir=' $<
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-load-library.sh"
+call-salone-implicit: $(TESTDIR)/call-salone-implicit.sh
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
+	grep -q '^my_dir=' $<
+	! grep -q '^script_dir=' $<
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/call-salone-implicit.sh"
+gen-test-scriptdir-mismatch: $(TESTDIR)/gen-test-scriptdir-mismatch.m4 $(ARGBASH_BIN)
+	ERROR="you have asked for 'other_dir'" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<

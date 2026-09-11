@@ -475,6 +475,7 @@ Plus, there are convenience macros:
 
   Defines a function (``load_lib_relativepath`` by default) that takes a path relative to the script's directory as an input, and attempts to source a file at that path.
   In case of failure, ``die`` is called, displays an error message, and quits the program.
+  If the script's directory hasn't been defined by ``DEFINE_SCRIPT_DIR`` (or by its GNU variant) on preceding lines, it gets defined implicitly, the same way as ``DEFINE_SCRIPT_DIR`` does it.
 
 .. _parsing_code:
 
@@ -486,7 +487,8 @@ Plus, there are convenience macros:
 
      INCLUDE_PARSING_CODE([filename], [SCRIPT_DIR variable name (optional, default is script_dir)])
 
-  In order to make use of ``INCLUDE_PARSING_CODE``, you have to use ``DEFINE_SCRIPT_DIR`` on preceding lines, but you will be told so if you don't.
+  ``INCLUDE_PARSING_CODE`` needs to know the script's directory.
+  If you don't define it by ``DEFINE_SCRIPT_DIR`` (or by its GNU variant) on preceding lines, it gets defined implicitly, the same way as ``DEFINE_SCRIPT_DIR`` does it.
 
   .. seealso::
 

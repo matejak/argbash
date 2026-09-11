@@ -342,3 +342,21 @@ ADD_GENTEST_BASH([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
 ADD_GENTEST_BASH([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
 ADD_GENTEST_BASH([badcall-multi], [3rd argument], [num of args], [actual number of])
+
+
+dnl DEFINE_LOAD_LIBRARY defines the script directory itself if it hasn't been defined before.
+ADD_TEST_BASH([test-load-library], [[
+	$< | grep -q 'LIB=yes,OPT_S=default,'
+	grep -q '^script_dir=' $<
+]])
+
+dnl INCLUDE_PARSING_CODE defines the script directory itself (under the requested name) if it hasn't been defined before.
+ADD_TEST_BASH([call-salone-implicit], [[
+	$(generic_regression_posix)
+	$(generic_regression_gnu_only)
+	grep -q '^my_dir=' $<
+	! grep -q '^script_dir=' $<
+]])
+
+dnl A script directory variable name that differs from the one that has been defined is an error.
+ADD_GENTEST_BASH([scriptdir-mismatch], [you have asked for 'other_dir'])
