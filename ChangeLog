@@ -1,3 +1,10 @@
+2.12.0 (unreleased)
+-------------------
+
+Bugfixes:
+
+* Code that precedes the first Argbash macro is passed through verbatim - square brackets in it are no longer stripped (#208).
+
 2.11.0 (2025-05-23)
 -------------------
 

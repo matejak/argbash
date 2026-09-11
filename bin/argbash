@@ -271,6 +271,30 @@ run_autom4te()
 	return $?
 }
 
+# Square brackets are m4 quotes, so m4 would strip them from the user's code
+# that precedes the first Argbash directive.
+# We escape them using quadrigraphs that autom4te converts back at the very end
+# (the quadrigraph strings are split so they survive the generation of this very script),
+# so that code is passed through verbatim.
+# Lines that contain m4 macros (and lines inside m4 quotes those lines open) are left alone,
+# so they are still expanded, which is what argbash-init templates (m4_ignore) rely on.
+# $1: The input file
+protect_leading_user_code()
+{
+	awk '
+		!seen_directive && /^#[[:space:]]*(ARG_|ARGBASH_|DEFINE_|INCLUDE_)/ { seen_directive = 1 }
+		!seen_directive {
+			if (quote_depth > 0 || $0 ~ /m4_[a-z]/) {
+				quote_depth += gsub(/\[/, "&") - gsub(/]/, "&")
+				if (quote_depth < 0) quote_depth = 0
+			} else {
+				gsub(/\[/, "@<" ":@"); gsub(/]/, "@:" ">@")
+			}
+		}
+		{ print }
+	' "$1"
+}
+
 
 # TODO: Refactor to associative arrays as soon as the argbash online is sufficiently reliable
 # We don't use associative arrays due to old bash compatibility reasons
@@ -343,7 +367,7 @@ do_stuff()
 	_pass_also="${_pass_also}$(define_file_metadata "$_arg_input" "$2")"
 	input="$(printf '%s\n' "$_pass_also" | cat - "$m4dir/argbash-lib.m4" "$output_m4")"
 	prefix_len=$(printf '%s\n' "$input" | wc -l)
-	input="$(printf '%s\n' "$input" | cat - "$1")"
+	input="$(printf '%s\n' "$input"; protect_leading_user_code "$1")"
 	run_autom4te "$input" 2> "$discard" \
 		| grep -v '^#\s*needed because of Argbash -->\s*$' \
 		| grep -v '^#\s*<-- needed because of Argbash\s*$'
@@ -369,7 +393,7 @@ settle_wrapped_fname()
 	local _srcfiles=() _file_found _found ext srcstem searchdir line stem="$2"
 	while read -r line; do
 		_srcfiles+=("$line")
-	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(cat "$1")" \
+	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(protect_leading_user_code "$1")" \
 			| autom4te -l m4sugar -t 'ARGBASH_WRAP:$1' 2> "$discard")
 
 	test "${#_srcfiles[@]}" -gt 0 || return
@@ -400,7 +424,7 @@ get_parsing_code()
 {
 	local _shfile _m4file _newerfile
 	# Get the argument of INCLUDE_PARSING_CODE
-	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(cat "$infile")" \
+	_srcfile="$(echo 'm4_changecom()m4_define([INCLUDE_PARSING_CODE])' "$(protect_leading_user_code "$infile")" \
 			| autom4te -l m4sugar -t 'INCLUDE_PARSING_CODE:$1' 2> "$discard" \
 			| tail -n 1)"
 	test -n "$_srcfile" || return 1

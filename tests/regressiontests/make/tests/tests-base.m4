@@ -342,3 +342,16 @@ ADD_GENTEST_BASH([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
 ADD_GENTEST_BASH([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
 ADD_GENTEST_BASH([badcall-multi], [3rd argument], [num of args], [actual number of])
+
+
+dnl User code before the first Argbash macro has to be preserved verbatim, square brackets included.
+ADD_TEST_BASH([test-leading-code], [[
+	$< | grep -q 'BRACKETS=preserved,ARRAY=one two,OPT_S=default,'
+	$< -o foo | grep -q 'OPT_S=foo,'
+	grep -q '^_before=("\[one\]" "\[two\]")$$' $<
+]])
+
+ADD_SCRIPT([test-leading-code2])
+ADD_TEST_BASH([stability-leading-code], [[
+	diff -q $< $(word 2,$^)
+]], [$(TESTDIR)/test-leading-code2.sh], [$(TESTDIR)/test-leading-code.sh])

@@ -41,6 +41,7 @@ SCRIPTS = \
 	$(TESTDIR)/test-wrapping-otherdir.sh \
 	$(TESTDIR)/otherdir/test-onlypos.m4 \
 	$(TESTDIR)/test-wrapping2.sh \
+	$(TESTDIR)/test-leading-code2.sh \
 	$(TESTDIR)/test-init_simple.sh \
 	$(TESTDIR)/test-init_simple.m4 \
 	$(TESTDIR)/test-init_simple-parsing.m4 \
@@ -94,6 +95,8 @@ TESTS += \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
 	test-leftovers \
+	test-leading-code \
+	stability-leading-code \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
@@ -171,6 +174,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-infinity-nodefaults.sh \
 	$(TESTDIR)/test-infinity-mixed.sh \
 	$(TESTDIR)/test-leftovers.sh \
+	$(TESTDIR)/test-leading-code.sh \
 	$(TESTDIR)/test-delim-space.sh \
 	$(TESTDIR)/test-delim-equals.sh \
 	$(TESTDIR)/test-delim-both.sh \
@@ -600,6 +604,14 @@ gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
 	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
+test-leading-code: $(TESTDIR)/test-leading-code.sh
+	$< | grep -q 'BRACKETS=preserved,ARRAY=one two,OPT_S=default,'
+	$< -o foo | grep -q 'OPT_S=foo,'
+	grep -q '^_before=("\[one\]" "\[two\]")$$' $<
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leading-code.sh"
+stability-leading-code: $(TESTDIR)/test-leading-code.sh $(TESTDIR)/test-leading-code2.sh
+	diff -q $< $(word 2,$^)
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leading-code.sh"
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<
 	grep -q "\[--opt_arg OPT_ARG\]" $<
