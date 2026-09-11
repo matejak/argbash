@@ -176,6 +176,7 @@ m4_define([_MAKE_ARGV_PARSING_FUNCTION], [MAKE_FUNCTION(
 			[_EVAL_OPTIONALS_AND_POSITIONALS],
 			[_STORE_CURRENT_ARG_AS_POSITIONAL])],
 		[_JOIN_INDENTED(1,
+			_IF_PARSING_LOOP_SHIFT_IS_UNREACHABLE([[_INDENT_()# shellcheck disable=SC2317  # every branch of the case statement above terminates the script],]),
 			[_INDENT_()[shift]],
 			[done])],
 	)],

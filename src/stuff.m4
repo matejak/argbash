@@ -1286,6 +1286,20 @@ m4_define([_MAKE_OTHER], [m4_do(
 
 
 dnl
+dnl The shift at the end of the command-line parsing loop is unreachable if every branch of the case statement terminates the script,
+dnl i.e. when there are no positional arguments and all optional arguments are actions (s.a. --help).
+dnl $1: What to do if the shift is unreachable
+dnl $2: What to do otherwise
+m4_define([_IF_PARSING_LOOP_SHIFT_IS_UNREACHABLE], [m4_do(
+	[m4_pushdef([_shift_is_reachable], 0)],
+	[_IF_HAVE_POSITIONAL_ARGS([m4_define([_shift_is_reachable], 1)])],
+	[m4_lists_foreach_optional([_ARGS_CATH], [_arg_type], [m4_if(_arg_type, [action], , [m4_define([_shift_is_reachable], 1)])])],
+	[m4_if(_shift_is_reachable, 0, [$1], [$2])],
+	[m4_popdef([_shift_is_reachable])],
+)])
+
+
+dnl
 dnl $1: What to do if they are defined
 dnl $2: What to do if not
 m4_define([_IF_SOME_ARGS_ARE_DEFINED],
