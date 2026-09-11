@@ -21,7 +21,7 @@ jobs:
       - name: Install deps
         run: |
           sudo apt-get update
-          sudo apt-get install make autoconf dash
+          sudo apt-get install -y make autoconf dash python3-docutils
 
       - name: Install Argbash
         run: "sudo make install PREFIX=/usr"

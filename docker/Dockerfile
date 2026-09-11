@@ -24,7 +24,7 @@ COPY . /usr/src/argbash/
 COPY docker/entrypoint.sh /
 
 WORKDIR /usr/src/argbash/resources/
-RUN apk add --no-cache --virtual .build-dependencies make \
+RUN apk add --no-cache --virtual .build-dependencies make py3-docutils \
 	&& make install PREFIX=/usr/local \
 	&& apk del .build-dependencies
 
