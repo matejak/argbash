@@ -86,6 +86,7 @@ TESTS += \
 	test-wrapping-otherdir \
 	test-wrapping-more \
 	test-wrapping-excl \
+	test-wrapleftovers \
 	stability-wrapping \
 	test-infinity-minimal_call \
 	test-progs \
@@ -164,6 +165,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-wrapping-otherdir.sh \
 	$(TESTDIR)/test-wrapping-more.sh \
 	$(TESTDIR)/test-wrapping-excl.sh \
+	$(TESTDIR)/test-wrapleftovers.sh \
 	$(TESTDIR)/test-infinity-minimal_call.sh \
 	$(TESTDIR)/test-progs.sh \
 	$(TESTDIR)/test-prog.sh \
@@ -496,6 +498,11 @@ test-wrapping-more: $(TESTDIR)/test-wrapping-more.sh $(TESTDIR)/test-onlyopt.m4
 test-wrapping-excl: $(TESTDIR)/test-wrapping-excl.sh $(TESTDIR)/test-onlypos.m4
 	$(_test_onlypos)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-excl.sh"
+test-wrapleftovers: $(TESTDIR)/test-wrapleftovers.sh $(TESTDIR)/test-wrapleftovers-lib.m4
+	! grep -q '@}' $<
+	$< hello a b | grep -q 'CMD=hello,PAIR=<a><b>,LEFTOVERS=0,<>,CMDLINE=2,<a><b>,'
+	$< hello 'a b' c 'd e' '' | grep -q 'CMD=hello,PAIR=<a b><c>,LEFTOVERS=2,<d e><>,CMDLINE=4,<a b><c><d e><>,'
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapleftovers.sh"
 stability-wrapping: $(TESTDIR)/test-wrapping.sh $(TESTDIR)/test-wrapping2.sh
 	diff -q $< $(word 2,$^)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping.sh"

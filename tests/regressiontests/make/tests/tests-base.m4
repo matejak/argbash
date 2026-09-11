@@ -262,6 +262,14 @@ ADD_TEST_BASH([test-wrapping-excl], [[
 	$(_test_onlypos)
 ]], [$(TESTDIR)/test-onlypos.m4])
 
+dnl Wrapping a script that declares ARG_LEFTOVERS and ARG_POSITIONAL_MULTI has to keep the [@] array expansion
+dnl in the generated forwarding code of the wrapper (the [@] used to be stripped by m4 as a quote).
+ADD_TEST_BASH([test-wrapleftovers], [[
+	! grep -q '@}' $<
+	$< hello a b | grep -q 'CMD=hello,PAIR=<a><b>,LEFTOVERS=0,<>,CMDLINE=2,<a><b>,'
+	$< hello 'a b' c 'd e' '' | grep -q 'CMD=hello,PAIR=<a b><c>,LEFTOVERS=2,<d e><>,CMDLINE=4,<a b><c><d e><>,'
+]], [$(TESTDIR)/test-wrapleftovers-lib.m4])
+
 ADD_SCRIPT([test-wrapping2])
 ADD_TEST_BASH([stability-wrapping], [[
 	diff -q $< $(word 2,$^)
