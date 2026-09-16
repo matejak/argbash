@@ -412,7 +412,7 @@ settle_wrapped_fname()
 {
 	# Get arguments to ARGBASH_WRAP
 	# Based on https://stackoverflow.com/a/19772067/592892
-	local _srcfiles=() _file_found _found ext srcstem searchdir line stem="$2"
+	local _srcfiles=() _file_found _file_protected _found ext srcstem searchdir line stem="$2"
 	while read -r line; do
 		_srcfiles+=("$line")
 	done < <(echo 'm4_changecom()m4_define([ARGBASH_WRAP])' "$(protect_user_code "$1")" \
@@ -433,7 +433,11 @@ settle_wrapped_fname()
 		_file_found="$searchdir/${srcstem}${ext}"
 		stem=${2:-$srcstem}
 		settle_wrapped_fname "$_file_found" "$stem"
-		_wrapped_defns="${_wrapped_defns}m4_define([_GROUP_OF_$srcstem], [[$stem]])m4_define([_SCRIPT_$srcstem], [[$_file_found]])"
+		# m4 includes the wrapped file, so we give it a copy with the user code protected
+		_file_protected="$(mktemp)" || die "Couldn't create a temporary file for the wrapped file '$_file_found'." 1
+		_files_to_clean+=("$_file_protected")
+		protect_user_code "$_file_found" > "$_file_protected"
+		_wrapped_defns="${_wrapped_defns}m4_define([_GROUP_OF_$srcstem], [[$stem]])m4_define([_SCRIPT_$srcstem], [[$_file_protected]])"
 	done
 }
 

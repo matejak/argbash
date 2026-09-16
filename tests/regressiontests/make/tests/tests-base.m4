@@ -369,3 +369,8 @@ ADD_SCRIPT([test-body-brackets2])
 ADD_TEST_BASH([stability-body-brackets], [[
 	diff -q $< $(word 2,$^)
 ]], [$(TESTDIR)/test-body-brackets2.sh], [$(TESTDIR)/test-body-brackets.sh])
+
+ADD_TEST_BASH([test-wrapping-body-brackets], [[
+	$< --opt-arg foo | grep -q '^WRAPPED=--opt-arg foo,$$'
+	test "$$($< | wc -l)" = 1
+]], [$(TESTDIR)/test-body-brackets.m4])

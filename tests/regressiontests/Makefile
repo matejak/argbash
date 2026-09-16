@@ -100,6 +100,7 @@ TESTS += \
 	stability-leading-code \
 	test-body-brackets \
 	stability-body-brackets \
+	test-wrapping-body-brackets \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
@@ -179,6 +180,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-leftovers.sh \
 	$(TESTDIR)/test-leading-code.sh \
 	$(TESTDIR)/test-body-brackets.sh \
+	$(TESTDIR)/test-wrapping-body-brackets.sh \
 	$(TESTDIR)/test-delim-space.sh \
 	$(TESTDIR)/test-delim-equals.sh \
 	$(TESTDIR)/test-delim-both.sh \
@@ -624,6 +626,10 @@ test-body-brackets: $(TESTDIR)/test-body-brackets.sh
 stability-body-brackets: $(TESTDIR)/test-body-brackets.sh $(TESTDIR)/test-body-brackets2.sh
 	diff -q $< $(word 2,$^)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-body-brackets.sh"
+test-wrapping-body-brackets: $(TESTDIR)/test-wrapping-body-brackets.sh $(TESTDIR)/test-body-brackets.m4
+	$< --opt-arg foo | grep -q '^WRAPPED=--opt-arg foo,$$'
+	test "$$($< | wc -l)" = 1
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-wrapping-body-brackets.sh"
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<
 	grep -q "\[--opt_arg OPT_ARG\]" $<
