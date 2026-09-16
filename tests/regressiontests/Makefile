@@ -42,6 +42,7 @@ SCRIPTS = \
 	$(TESTDIR)/otherdir/test-onlypos.m4 \
 	$(TESTDIR)/test-wrapping2.sh \
 	$(TESTDIR)/test-leading-code2.sh \
+	$(TESTDIR)/test-body-brackets2.sh \
 	$(TESTDIR)/test-init_simple.sh \
 	$(TESTDIR)/test-init_simple.m4 \
 	$(TESTDIR)/test-init_simple-parsing.m4 \
@@ -97,6 +98,8 @@ TESTS += \
 	test-leftovers \
 	test-leading-code \
 	stability-leading-code \
+	test-body-brackets \
+	stability-body-brackets \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
@@ -175,6 +178,7 @@ SCRIPTS += \
 	$(TESTDIR)/test-infinity-mixed.sh \
 	$(TESTDIR)/test-leftovers.sh \
 	$(TESTDIR)/test-leading-code.sh \
+	$(TESTDIR)/test-body-brackets.sh \
 	$(TESTDIR)/test-delim-space.sh \
 	$(TESTDIR)/test-delim-equals.sh \
 	$(TESTDIR)/test-delim-both.sh \
@@ -612,6 +616,14 @@ test-leading-code: $(TESTDIR)/test-leading-code.sh
 stability-leading-code: $(TESTDIR)/test-leading-code.sh $(TESTDIR)/test-leading-code2.sh
 	diff -q $< $(word 2,$^)
 	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-leading-code.sh"
+test-body-brackets: $(TESTDIR)/test-body-brackets.sh
+	$< | grep -q 'VALUE=42,BRACKETS=preserved,OPT_S=default,'
+	$< -o foo | grep -q 'OPT_S=foo,'
+	test "$$(sed -n '/^# \[ <-- needed/,$$p' $< | sed '/^$$/d')" = "$$(sed -n '/^# \[ <-- needed/,$$p' $(TESTDIR)/test-body-brackets.m4 | sed '/^$$/d')"
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-body-brackets.sh"
+stability-body-brackets: $(TESTDIR)/test-body-brackets.sh $(TESTDIR)/test-body-brackets2.sh
+	diff -q $< $(word 2,$^)
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-body-brackets.sh"
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<
 	grep -q "\[--opt_arg OPT_ARG\]" $<

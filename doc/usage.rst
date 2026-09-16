@@ -144,6 +144,8 @@ Here are those parts of the template:
 
    - This part of the file (typically the hand-written content supplied by the user) is treated in the same way as the beginning of the file that is described in point 1.
      However, thanks to the opened and closed square brackets, no changes to it will be made.
+     The square brackets in between the guards don't have to match, as ``argbash`` escapes them.
+     Lines that contain ``m4sugar`` macros are an exception, ``argbash`` doesn't escape square brackets on them.
 
 
 Parsing code and script body together

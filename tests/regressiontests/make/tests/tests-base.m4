@@ -355,3 +355,17 @@ ADD_SCRIPT([test-leading-code2])
 ADD_TEST_BASH([stability-leading-code], [[
 	diff -q $< $(word 2,$^)
 ]], [$(TESTDIR)/test-leading-code2.sh], [$(TESTDIR)/test-leading-code.sh])
+
+
+dnl The script body past the guard has to be preserved verbatim, even if its square brackets don't match.
+dnl We have to escape \[ -> \@<:@ for sed
+ADD_TEST_BASH([test-body-brackets], [[
+	$< | grep -q 'VALUE=42,BRACKETS=preserved,OPT_S=default,'
+	$< -o foo | grep -q 'OPT_S=foo,'
+	test "$$(sed -n '/^# \@<:@ <-- needed/,$$p' $< | sed '/^$$/d')" = "$$(sed -n '/^# \@<:@ <-- needed/,$$p' $(TESTDIR)/test-body-brackets.m4 | sed '/^$$/d')"
+]])
+
+ADD_SCRIPT([test-body-brackets2])
+ADD_TEST_BASH([stability-body-brackets], [[
+	diff -q $< $(word 2,$^)
+]], [$(TESTDIR)/test-body-brackets2.sh], [$(TESTDIR)/test-body-brackets.sh])

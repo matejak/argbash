@@ -160,7 +160,7 @@ Limitations
   Please read this carefully.
 
 #. The square brackets in your script have to match (i.e. every opening square bracket ``[`` has to be followed at some point by a closing square bracket ``]``).
-   Code that precedes the first Argbash macro is exempt from this rule (unless it contains ``m4sugar`` macros), as it is passed through verbatim.
+   Code that precedes the first Argbash macro and the script body in between the guard lines past ``ARGBASH_GO`` are exempt from this rule (except for lines that contain ``m4sugar`` macros), as they are passed through verbatim.
 
    There is a workaround --- if you need constructs s.a. ``red=$'\e[0;91m'``, you can put the matching square bracket behind a comment, i.e. ``red=$'\e[0;91m'  # match square bracket: ]``.
 
