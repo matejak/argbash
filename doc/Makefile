@@ -56,15 +56,11 @@ latexpdf: $(PIECES) latex
 man: $(PIECES)
 	$(BUILD_STEP)
 
-MANDIR = man
-$(MANDIR):
-	mkdir -p $@
-
 # Man files should be part of the repo.
-argbash.1: argbash.rst | $(MANDIR)
+argbash.1: argbash.rst
 	grep -v ':ref:' $< | sed -e 's/^\.\.\s\+code-block.*/::/' | rst2man > $@
 
-argbash.5: config.rst | $(MANDIR)
+argbash.5: config.rst
 	grep -v ':ref:' $< | sed -e 's/^\.\.\s\+code-block.*/::/' | rst2man > $@
 
 texinfo: $(PIECES)
