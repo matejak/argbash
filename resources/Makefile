@@ -62,7 +62,8 @@ EXAMPLES = \
 	$(NUL)
 
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
-MANPAGE = argbash.1.gz
+MANPAGE_GZ = argbash.1.gz
+MANPAGE_RAW = $(basename $(MANPAGE_GZ))
 
 $(GENPARSE): ../src/argbash.m4 $(M4_SRC)
 	ARGBASH_INTENDED_DESTINATION="$@" bash $(GENPARSE) $< -o argbash.temp && mv argbash.temp $@
@@ -157,12 +158,13 @@ define-version:
 argbash.rst: ../src/argbash.m4 $(ARGBASH_EXEC)
 	$(ARGBASH_EXEC) --type manpage --strip all -o $@ $<
 
-man: $(MANPAGE)
+man: $(MANPAGE_GZ)
 
-$(MANPAGE): argbash.rst argbash-defs.rst
-	rst2man $< | gzip > $@
+$(MANPAGE_GZ): argbash.rst argbash-defs.rst
+	rst2man $< > $(MANPAGE_RAW)
+	gzip -f $(MANPAGE_RAW)
 
-install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION) $(MANPAGE)
+install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION) $(MANPAGE_GZ)
 	@echo Installing to prefix "'/$(PREFIX)' of root $(ROOT)"
 	mkdir -p "$(ROOT)/$(PREFIX)/bin"
 	touch "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
@@ -175,7 +177,7 @@ install: $(GENPARSE) $(A_INIT) $(ARGBASH_TO) $(COMPLETION) $(MANPAGE)
 	chmod a+x "$(ROOT)/$(PREFIX)/bin/argbash$(VERSION_SUFFIX)"
 	test "$(INSTALL_COMPLETION)" = "no" || (mkdir -p "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)" && mv "$(COMPLETION)" "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/")
 	mkdir -p "$(ROOT)/$(PREFIX)/share/man/man1/"
-	cp -p $(MANPAGE) "$(ROOT)/$(PREFIX)/share/man/man1/"
+	cp -p $(MANPAGE_GZ) "$(ROOT)/$(PREFIX)/share/man/man1/"
 
 altpreclean: define-version
 	$(RM) "$(ROOT)/$(PREFIX)/bin/argbash-$(VERSION_MAJOR).$(VERSION_MINOR)"
@@ -194,11 +196,11 @@ uninstall:
 	$(RM) "$(ROOT)/$(PREFIX)"/bin/argbash-*
 	rmdir "$(ROOT)/$(PREFIXED_LIBDIR)/argbash$(VERSION_SUFFIX)"
 	$(RM) "$(ROOT)/$(BASH_COMPLETION_DIRECTORY)/$(COMPLETION)"
-	$(RM) "$(ROOT)/$(PREFIX)/share/man/man1/$(MANPAGE)"
+	$(RM) "$(ROOT)/$(PREFIX)/share/man/man1/$(MANPAGE_GZ)"
 
 altuninstall: define-version uninstall
 
-version: $(MANPAGE)
+version: $(MANPAGE_GZ)
 	@test -n '$(VERSION)' || { echo "You have to specify a version string, for example 'make version VERSION=1.0.0'"; exit 1; }
 	echo '$(VERSION)' > ../src/version
 	sed -i "s/v[0-9\.]\+$$/v$(VERSION)/" examples/minimal-raw.m4
