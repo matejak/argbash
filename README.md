@@ -1,7 +1,7 @@
 [argbash](https://argbash.dev)
 ==============================
 
-[![Build Status](https://api.travis-ci.com/matejak/argbash.svg)](https://app.travis-ci.com/github/matejak/argbash)
+[![Tests](https://github.com/matejak/argbash/actions/workflows/run-tests.yml/badge.svg)](https://github.com/matejak/argbash/actions/workflows/run-tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/argbash/badge/?version=latest)](https://argbash.readthedocs.io/en/latest/?badge=latest)     
 
 ![argbash logo](resources/logo/argbash.png)
