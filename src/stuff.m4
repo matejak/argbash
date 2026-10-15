@@ -71,6 +71,14 @@ m4_define([_IF_HAVE_DOUBLEDASH], [m4_if(
 
 
 dnl
+dnl Stop with an error that tells the user how to fix the template if the script directory is not defined.
+dnl $1: The name of the macro that needs the script directory
+dnl $2: The name of the variable that holds the script directory (optional)
+m4_define([_CHECK_SCRIPT_DIR_IS_DEFINED], [m4_ifndef([SCRIPT_DIR_DEFINED],
+	[m4_fatal([$1 needs the directory of the script, but it is not defined. Add '# DEFINE_SCRIPT_DIR($2)' (or '# DEFINE_SCRIPT_DIR_GNU($2)') on a line above '$1'.])])])
+
+
+dnl
 dnl In your script, include just this directive (and DEFINE_SCRIPT_DIR before) to include the parsing stuff from a standalone file.
 dnl The argbash script generator will pick it up and (re)generate that one as well
 dnl
@@ -78,7 +86,7 @@ dnl $1: the filename (assuming that it is in the same directory as the script)
 dnl $2: what has been passed to DEFINE_SCRIPT_DIR as the first param
 argbash_api([INCLUDE_PARSING_CODE], _CHECK_PASSED_ARGS_COUNT(1, 2)[m4_do(
 	[[$0($@)]],
-	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to define a script directory by some means before using '$0'])])],
+	[_CHECK_SCRIPT_DIR_IS_DEFINED([$0], [$2])],
 	[m4_list_append([_OTHER],
 		m4_expand([[. "$]m4_default_quoted([$2], _SCRIPT_DIR_NAME)[/$1]"  [# '.' means 'source'
 ]]))],
@@ -89,7 +97,7 @@ dnl
 dnl $1: Name of the function to define
 argbash_api([DEFINE_LOAD_LIBRARY], [m4_do(
 	[[$0($@)]],
-	[m4_ifndef([SCRIPT_DIR_DEFINED], [m4_fatal([You have to define a script directory by some means before using '$0'])])],
+	[_CHECK_SCRIPT_DIR_IS_DEFINED([$0])],
 	[m4_define([WANT_LOAD_LIBRARY])],
 	[m4_list_append([_OTHER],
 		m4_expand([MAKE_FUNCTION(
