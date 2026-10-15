@@ -342,3 +342,10 @@ ADD_GENTEST_BASH([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
 ADD_GENTEST_BASH([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
 ADD_GENTEST_BASH([badcall-multi], [3rd argument], [num of args], [actual number of])
+
+
+dnl argbash has to fail if it can't write the output.
+ADD_TEST_BASH([test-unwritable-output], [[
+	ERROR="write the output" $(REVERSE) $(ARGBASH_EXEC) $(TESTDIR)/test-simple.m4 -o $(TESTDIR)/nonexistent-dir/out.sh
+	$(ARGBASH_EXEC) $(TESTDIR)/test-simple.m4 -o $(TESTDIR)/nonexistent-dir/out.sh 2> /dev/null; test $$? -eq 1
+]], [], [$(TESTDIR)/test-simple.sh])

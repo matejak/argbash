@@ -253,7 +253,10 @@ _wrapped_defns=""
 parsing_code="$(get_parsing_code)"
 # Just if the original was m4, we replace .m4 with .sh
 test -n "$parsing_code" && parsing_code_out="${parsing_code:0:-2}sh"
-test "$_arg_library" = off && test -n "$parsing_code" && ($0 --strip user-content "$parsing_code" -o "$parsing_code_out")
+if test "$_arg_library" = off && test -n "$parsing_code"
+then
+	"$0" --strip user-content "$parsing_code" -o "$parsing_code_out" || die "Couldn't generate the parsing code file '$parsing_code_out'." 1
+fi
 
 # We may use some of the wrapping stuff, so let's fill the _wrapped_defns
 settle_wrapped_fname "$infile"
@@ -270,7 +273,7 @@ then
 fi
 if test "$outfname" != '-'
 then
-	printf "%s\\n" "$output" > "$outfname"
+	printf "%s\\n" "$output" > "$outfname" || die "Couldn't write the output to '$outfname'." 1
 	set_output_permission "$outfname" "$_arg_type"
 else
 	printf "%s\\n" "$output"

@@ -94,6 +94,7 @@ TESTS += \
 	test-infinity-nodefaults \
 	test-infinity-mixed \
 	test-leftovers \
+	test-unwritable-output \
 	test-delim-space \
 	test-delim-equals \
 	test-delim-both \
@@ -600,6 +601,10 @@ gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
 	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
+test-unwritable-output: $(TESTDIR)/test-simple.sh
+	ERROR="write the output" $(REVERSE) $(ARGBASH_EXEC) $(TESTDIR)/test-simple.m4 -o $(TESTDIR)/nonexistent-dir/out.sh
+	$(ARGBASH_EXEC) $(TESTDIR)/test-simple.m4 -o $(TESTDIR)/nonexistent-dir/out.sh 2> /dev/null; test $$? -eq 1
+	test -z "$(SHELLCHECK)" || $(SHELLCHECK) "$(TESTDIR)/test-simple.sh"
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<
 	grep -q "\[--opt_arg OPT_ARG\]" $<

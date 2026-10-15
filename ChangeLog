@@ -4,6 +4,7 @@
 Bugfixes:
 
 * `make install` fails instead of silently installing an empty manpage if `rst2man` is not available.
+* `argbash` reports an error and exits with a non-zero status if the output file can't be written.
 
 2.11.0 (2025-05-23)
 -------------------
