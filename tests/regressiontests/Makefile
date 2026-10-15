@@ -140,6 +140,8 @@ TESTS_GEN += \
 	gen-test-misspelled \
 	gen-test-unmatched_bracket \
 	gen-test-badcall-multi \
+	gen-test-scriptdir-missing-lib \
+	gen-test-scriptdir-missing-include \
 	gen-test-init_name_dash \
 	gen-test-init_name_char \
 	gen-test-group-wrong \
@@ -599,6 +601,14 @@ gen-test-badcall-multi: $(TESTDIR)/gen-test-badcall-multi.m4 $(ARGBASH_BIN)
 	ERROR="3rd argument" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="num of args" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 	ERROR="actual number of" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
+gen-test-scriptdir-missing-lib: $(TESTDIR)/gen-test-scriptdir-missing-lib.m4 $(ARGBASH_BIN)
+	ERROR="DEFINE_LOAD_LIBRARY needs the directory of the script" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="DEFINE_SCRIPT_DIR()' (or" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+
+gen-test-scriptdir-missing-include: $(TESTDIR)/gen-test-scriptdir-missing-include.m4 $(ARGBASH_BIN)
+	ERROR="INCLUDE_PARSING_CODE needs the directory of the script" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
+	ERROR="DEFINE_SCRIPT_DIR(custom_dir)' (or" $(REVERSE) $(ARGBASH_EXEC) $< > /dev/null
 
 basic-docopt: $(TESTDIR)/basic.txt
 	grep -q "\[<pos-opt>\]" $<

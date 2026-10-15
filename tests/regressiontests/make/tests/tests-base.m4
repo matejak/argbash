@@ -342,3 +342,5 @@ ADD_GENTEST_BASH([misspelled], [ARG_FOOBAR], [ARGBASH_GOO])
 dnl We have to escape \[ -> \@<:@ for grep
 ADD_GENTEST_BASH([unmatched_bracket], [unmatched square bracket on line 3], [[# ARG_OPTIONAL_BOOLEAN(\[long\], l, \@<:@)]])
 ADD_GENTEST_BASH([badcall-multi], [3rd argument], [num of args], [actual number of])
+ADD_GENTEST_BASH([scriptdir-missing-lib], [DEFINE_LOAD_LIBRARY needs the directory of the script], [DEFINE_SCRIPT_DIR()' (or])
+ADD_GENTEST_BASH([scriptdir-missing-include], [INCLUDE_PARSING_CODE needs the directory of the script], [DEFINE_SCRIPT_DIR(custom_dir)' (or])

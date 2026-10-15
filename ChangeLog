@@ -4,6 +4,7 @@
 Bugfixes:
 
 * `make install` fails instead of silently installing an empty manpage if `rst2man` is not available.
+* The error about a missing script directory of `DEFINE_LOAD_LIBRARY` and `INCLUDE_PARSING_CODE` tells which line to add to the template (#148).
 
 2.11.0 (2025-05-23)
 -------------------
