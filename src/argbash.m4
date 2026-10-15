@@ -192,6 +192,24 @@ get_parsing_code()
 }
 
 
+# The user content past ARGBASH_GO has to be enclosed in guard lines that contain square brackets,
+# otherwise m4 strips square brackets from it.
+# $1: The input file
+warn_if_guards_are_missing()
+{
+	test "$_arg_strip" = none || return 0
+	case "$_arg_type" in *script) ;; *) return 0 ;; esac
+	awk '
+		/^#[[:space:]]*ARGBASH_(GO|PREPARE)([^A-Za-z0-9_]|$)/ { seen_go = 1; if ($0 ~ /\[/) seen_guard = 1 }
+		seen_go && /^#[[:space:]]*\[/ { seen_guard = 1 }  # ]] <-- needed because of Argbash
+		END { exit !(seen_go && !seen_guard) }
+	' "$1" || return 0
+	printf '%s\n' \
+		"Warning: The ARGBASH_GO (or ARGBASH_PREPARE) line is not followed by the '# [ <-- needed because of Argbash' guard line (with the matching '# ] <-- needed because of Argbash' line at the end of the file)." \
+		"Square brackets in the code past that line will be stripped, and the script can't be regenerated correctly. See the 'Template layout' section of the documentation." >&2
+}
+
+
 # $1: The output file
 # $2: The output type string
 set_output_permission()
@@ -259,6 +277,7 @@ test "$_arg_library" = off && test -n "$parsing_code" && ($0 --strip user-conten
 settle_wrapped_fname "$infile"
 
 assert_m4_files_are_readable
+warn_if_guards_are_missing "$infile"
 output="$(do_stuff "$infile" "$outfname" "$_arg_type")" || die "" "$?"
 if test "$_arg_check_typos" = on
 then
