@@ -4,6 +4,7 @@
 Bugfixes:
 
 * `make install` fails instead of silently installing an empty manpage if `rst2man` is not available.
+* `argbash` warns if the template lacks the guard lines past `ARGBASH_GO`, as square brackets in the user code get stripped in that case (#205).
 
 2.11.0 (2025-05-23)
 -------------------
