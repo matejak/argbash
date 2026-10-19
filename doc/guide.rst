@@ -468,6 +468,8 @@ Plus, there are convenience macros:
     This command is available only on GNU systems, so be very careful with its usage --- it won't work for OSX users, and for users on non-GNU based Linux distributions (s.a. Alpine Linux).
     Don't use it unless you need the functionality AND you are sure that the script will be used only on systems with GNU coreutils.
 
+.. _load_library:
+
 * Add a function that you can use to source modules relative to the script's location
   ::
 
@@ -684,6 +686,11 @@ Available shell stuff
 
   Accepts two parameters --- string that is printed to ``stderr`` and exit status number (optional, default is 1).
   If an environmental variable ``_PRINT_HELP`` is set to ``yes``, it prints help before the error message.
+
+* Function ``load_lib_relativepath`` (or the function of the name that has been passed to the macro) that is available if the :ref:`DEFINE_LOAD_LIBRARY <load_library>` is used.
+
+  Accepts one parameter --- path to a file relative to the script's directory, and sources that file.
+  If the file can't be sourced, ``die`` is called.
 
 .. _argument_names:
 
