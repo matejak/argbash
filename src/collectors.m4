@@ -463,7 +463,7 @@ dnl $5, ...: Defaults
 m4_define([_ARG_POSITIONAL_INF], _CHECK_INTEGER_TYPE(3, [minimal number of arguments])[m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
-	[_POS_WRAPPED(${_varname([$1])[@]})],
+	[_POS_WRAPPED("${_varname([$1])[[@]]}")],
 	[m4_define([_POSITIONALS_INF], 1)],
 	[dnl We won't have to use stuff s.a. m4_quote(_INF_REPR), but _INF_REPR directly
 ],
@@ -502,7 +502,7 @@ argbash_api([ARG_POSITIONAL_MULTI], _CHECK_PASSED_ARGS_COUNT(3)_CHECK_INTEGER_TY
 m4_define([_ARG_POSITIONAL_MULTI], [m4_do(
 	[_CHECK_THAT_NUMBER_OF_PRECEDING_ARGUMENTS_IS_KNOWN([$1])],
 	[_CHECK_POSITIONAL_ARGNAME_IS_FREE([$1])],
-	[_POS_WRAPPED(${_varname([$1])[@]})],
+	[_POS_WRAPPED("${_varname([$1])[[@]]}")],
 	[m4_define([_HIGHEST_POSITIONAL_VALUES_COUNT], m4_eval(_HIGHEST_POSITIONAL_VALUES_COUNT + [$3]))],
 	[_FILL_IN_VALUES_FOR_A_POSITIONAL_ARGUMENT([$1], [$2], _varname([$1]), [more])],
 	[dnl Minimal number of args is number of accepted - number of defaults (= $3 - ($# - 3))

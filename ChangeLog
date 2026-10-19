@@ -4,6 +4,7 @@
 Bugfixes:
 
 * `make install` fails instead of silently installing an empty manpage if `rst2man` is not available.
+* Wrapper scripts forward the values of wrapped `ARG_LEFTOVERS` and `ARG_POSITIONAL_MULTI` arguments correctly - the `[@]` of the array expansion is no longer stripped (#205).
 
 2.11.0 (2025-05-23)
 -------------------
