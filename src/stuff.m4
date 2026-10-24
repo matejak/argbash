@@ -1225,6 +1225,9 @@ m4_define([_MAKE_DEFAULTS_POSITIONAL], [m4_do(
 	[[_positionals=()]_ENDL_],
 	[m4_lists_foreach_positional([_ARGS_LONG,_POSITIONALS_MINS,_POSITIONALS_DEFAULTS,_ARGS_CATH], [_argname,_min_argn,_defaults,_arg_type],
 		[_MAKE_DEFAULTS_POSITIONALS_LOOP(_argname, _arg_type, _min_argn, _defaults)])],
+	[dnl Initialize wrapped argument arrays (both _opt and _pos) for all groups to ensure they exist
+],
+	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup[]_opt_suffix=()_ENDL_[]agroup[]_pos_suffix=()_ENDL_])],
 )])
 
 
@@ -1250,6 +1253,9 @@ m4_define([_MAKE_DEFAULTS_OPTIONAL], [m4_do(
 			[_arg_varname=_sh_quote(_default)_ENDL_])],
 		[m4_set_contains([HAVE_SUPPLIED], _argname, [[_supplied]_arg_varname=0]_ENDL_, [])],
 	)])],
+	[dnl Initialize wrapped argument arrays (both _opt and _pos) for all groups to ensure they exist
+],
+	[m4_set_foreach([_ARGS_GROUPS], [agroup], [agroup[]_opt_suffix=()_ENDL_[]agroup[]_pos_suffix=()_ENDL_])],
 )])
 
 
