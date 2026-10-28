@@ -154,6 +154,8 @@ m4_define([_MAKE_ASSIGN_POSITIONAL_ARGS_FUNCTION], [MAKE_FUNCTION(
 	)],
 	[m4_list_ifempty([_WRAPPED_ADD_SINGLE], [], [m4_do(
 		[m4_set_foreach([_POS_VARNAMES], [varname], [m4_n([_INDENT_()varname=()])])],
+		[_INDENT_()# shellcheck disable=SC2154  # the _arg_* variables are assigned via eval
+],
 		[_INDENT_()m4_list_join([_WRAPPED_ADD_SINGLE], m4_newline([_INDENT_()]))],
 		[
 ],
